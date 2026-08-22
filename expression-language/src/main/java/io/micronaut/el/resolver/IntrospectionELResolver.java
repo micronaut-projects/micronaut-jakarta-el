@@ -17,15 +17,20 @@ package io.micronaut.el.resolver;
 
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.beans.BeanIntrospection;
-import io.micronaut.core.type.Argument;
 import io.micronaut.core.beans.BeanIntrospector;
 import io.micronaut.core.beans.BeanMethod;
 import io.micronaut.core.beans.BeanProperty;
+import io.micronaut.core.type.Argument;
 import io.micronaut.el.runtime.ELSupport;
 import jakarta.el.ELContext;
+import jakarta.el.ELException;
 import jakarta.el.ELResolver;
 import jakarta.el.PropertyNotWritableException;
 import org.jspecify.annotations.Nullable;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -131,12 +136,17 @@ public final class IntrospectionELResolver extends ELResolver {
             return null;
         }
         Object[] arguments = params == null ? new Object[0] : params;
-        BeanMethod<Object, Object> beanMethod = findMethod(introspection, name, arguments);
-        if (beanMethod == null) {
-            return null;
+        // Coercing the arguments is part of selecting the overload, so it happens before the resolver commits:
+        // an overload the arguments do not fit is skipped, and when none fits the resolver declines and the
+        // standard resolvers get their chance.
+        for (BeanMethod<Object, Object> candidate : candidates(introspection, name, arguments)) {
+            Object[] coerced = coerce(context, candidate.getArguments(), arguments);
+            if (coerced != null) {
+                context.setPropertyResolved(base, method);
+                return candidate.invoke(base, coerced);
+            }
         }
-        context.setPropertyResolved(base, method);
-        return beanMethod.invoke(base, coerce(context, beanMethod, arguments));
+        return null;
     }
 
     @Override
@@ -145,39 +155,35 @@ public final class IntrospectionELResolver extends ELResolver {
         return base == null ? null : Object.class;
     }
 
-    private static Object[] coerce(ELContext context, BeanMethod<Object, Object> beanMethod, Object[] arguments) {
-        Object[] coerced = new Object[arguments.length];
-        for (int i = 0; i < arguments.length; i++) {
-            coerced[i] = ELSupport.coerceToType(context, arguments[i], beanMethod.getArguments()[i].getType());
-        }
-        return coerced;
-    }
 
     /**
-     * Among the overloads of the given arity, prefers one whose parameters accept the arguments as they are,
-     * and falls back to the first one, which will coerce them.
+     * The overloads of the given name that can take the arguments, in the order the section 1.6 of the
+     * specification prefers them: a fixed arity overload whose parameters accept the arguments as they are,
+     * then the other fixed arity overloads of the same arity, then the variable arity ones.
      */
-    @Nullable
-    private BeanMethod<Object, Object> findMethod(BeanIntrospection<Object> introspection,
-                                                  String name,
-                                                  Object[] arguments) {
-        BeanMethod<Object, Object> fallback = null;
+    private static List<BeanMethod<Object, Object>> candidates(BeanIntrospection<Object> introspection,
+                                                               String name,
+                                                               Object[] arguments) {
+        List<BeanMethod<Object, Object>> exact = new ArrayList<>(2);
+        List<BeanMethod<Object, Object>> fixedArity = new ArrayList<>(2);
+        List<BeanMethod<Object, Object>> variableArity = new ArrayList<>(2);
         for (BeanMethod<Object, Object> beanMethod : introspection.getBeanMethods()) {
-            if (!beanMethod.getName().equals(name) || beanMethod.getArguments().length != arguments.length) {
+            if (!beanMethod.getName().equals(name)) {
                 continue;
             }
-            if (accepts(beanMethod, arguments)) {
-                return beanMethod;
-            }
-            if (fallback == null) {
-                fallback = beanMethod;
+            Argument<?>[] parameters = beanMethod.getArguments();
+            if (parameters.length == arguments.length) {
+                (accepts(parameters, arguments) ? exact : fixedArity).add(beanMethod);
+            } else if (isVariableArity(parameters) && arguments.length >= parameters.length - 1) {
+                variableArity.add(beanMethod);
             }
         }
-        return fallback;
+        exact.addAll(fixedArity);
+        exact.addAll(variableArity);
+        return exact;
     }
 
-    private static boolean accepts(BeanMethod<Object, Object> beanMethod, Object[] arguments) {
-        Argument<?>[] parameters = beanMethod.getArguments();
+    private static boolean accepts(Argument<?>[] parameters, Object[] arguments) {
         for (int i = 0; i < parameters.length; i++) {
             Object argument = arguments[i];
             Class<?> type = parameters[i].getWrapperType();
@@ -187,6 +193,57 @@ public final class IntrospectionELResolver extends ELResolver {
         }
         return true;
     }
+
+    /**
+     * A {@link BeanMethod} does not carry the variable arity flag of the method it dispatches to, so a trailing
+     * array parameter is treated as variable arity. A fixed arity array parameter is still served: an array
+     * given directly is passed through rather than wrapped.
+     */
+    private static boolean isVariableArity(Argument<?>[] parameters) {
+        return parameters.length > 0 && parameters[parameters.length - 1].getType().isArray();
+    }
+
+    /**
+     * Coerces the arguments to the parameters, packing the trailing ones into the array of a variable arity
+     * method.
+     *
+     * @return The coerced arguments, or {@code null} when the arguments do not fit the parameters, so that the
+     * overload is not selected
+     */
+    private static Object @Nullable [] coerce(ELContext context, Argument<?>[] parameters, Object[] arguments) {
+        int fixed = parameters.length;
+        Class<?> componentType = null;
+        if (isVariableArity(parameters)) {
+            Class<?> last = parameters[parameters.length - 1].getType();
+            boolean arrayGivenDirectly = arguments.length == parameters.length
+                && last.isInstance(arguments[arguments.length - 1]);
+            if (!arrayGivenDirectly) {
+                componentType = last.getComponentType();
+                fixed = parameters.length - 1;
+            }
+        }
+        if (componentType == null ? arguments.length != parameters.length : arguments.length < fixed) {
+            return null;
+        }
+        try {
+            Object[] coerced = new Object[parameters.length];
+            for (int i = 0; i < fixed; i++) {
+                coerced[i] = ELSupport.coerceToType(context, arguments[i], parameters[i].getType());
+            }
+            if (componentType != null) {
+                Object variadic = Array.newInstance(componentType, arguments.length - fixed);
+                for (int i = fixed; i < arguments.length; i++) {
+                    Array.set(variadic, i - fixed, ELSupport.coerceToType(context, arguments[i], componentType));
+                }
+                coerced[parameters.length - 1] = variadic;
+            }
+            return coerced;
+        } catch (ELException e) {
+            // this overload does not accept these arguments
+            return null;
+        }
+    }
+
 
     @Nullable
     private BeanProperty<Object, Object> findProperty(@Nullable Object base, @Nullable Object property) {
