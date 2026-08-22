@@ -166,19 +166,22 @@ work that could have been generated. To keep a method invocation off them, annot
 
 ## Language support
 
-The annotation processor generates Java source, so **the compile time path requires the expressions to be declared
-in Java source**. `@Introspected` beans, and everything at runtime, work from Java, Groovy and Kotlin alike.
+The annotation processor runs for Java, Groovy and Kotlin, and generates the same expressions for all three.
 
-| Language | `@Introspected` beans | Expressions declared with `@ELExpression`             |
-|----------|-----------------------|--------------------------------------------------------|
-| Java     | Generated             | Generated                                              |
-| Groovy   | Generated             | Not yet, add the interpreter module                    |
-| Kotlin   | Generated             | Not yet, add the interpreter module                    |
+| Language | `@Introspected` beans | Expressions declared with `@ELExpression` | Generated as |
+|----------|-----------------------|--------------------------------------------|--------------|
+| Java     | Generated             | Generated                                   | Java source  |
+| Groovy   | Generated             | Generated                                   | Bytecode     |
+| Kotlin   | Generated             | Generated                                   | Bytecode     |
 
-The Groovy and Kotlin writers of Micronaut SourceGen cannot yet emit these classes: the Kotlin writer renders a
-class literal as the `toString()` of the model and drops static initializers, and the Groovy writer emits the
-service descriptor without compiling the generated source. `test-suite-groovy` and `test-suite-kotlin` therefore
-use the interpreter module, and show what does work from those languages today.
+A Java build gets readable Java sources, which are worth reading when you want to see what an expression compiled
+to. The Groovy and Kotlin source writers of Micronaut SourceGen cannot emit these classes yet, so those builds get
+bytecode instead, written through `VisitorContext.visitClass` like every Micronaut bean definition. The result is
+the same classes and the same behaviour; only the intermediate representation differs.
+
+`test-suite-groovy` and `test-suite-kotlin` declare their expressions in Groovy and Kotlin source and assert that
+they were compiled. Neither has the interpreter on its classpath, so an expression that reached the runtime
+unparsed would fail rather than silently fall back.
 
 ## What is compiled statically
 

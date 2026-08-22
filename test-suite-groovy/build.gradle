@@ -3,15 +3,14 @@ plugins {
     id 'groovy'
 }
 
-// The annotation processor is deliberately absent: the Groovy source writer of Micronaut SourceGen does not yet
-// emit the generated expressions, so an expression declared in Groovy source is evaluated by the interpreter.
-// See the "Language support" section of the README.
 dependencies {
+    // the Groovy compiler picks up the TypeElementVisitor of the processor from the compile classpath
     testImplementation mn.micronaut.inject.groovy
+    testImplementation projects.micronautExpressionLanguageProcessor
+    testImplementation mnSourcegen.micronaut.sourcegen.annotations
 
     testImplementation platform(libs.micronaut.core)
     testImplementation projects.micronautExpressionLanguage
-    testImplementation projects.micronautExpressionLanguageInterpreter
     testImplementation mn.micronaut.core
     testImplementation mn.micronaut.inject
     testImplementation platform(libs.junit.bom)

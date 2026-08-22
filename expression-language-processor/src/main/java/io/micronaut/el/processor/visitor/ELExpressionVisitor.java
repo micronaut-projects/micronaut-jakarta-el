@@ -43,6 +43,7 @@ import io.micronaut.inject.processing.ProcessingException;
 import io.micronaut.inject.visitor.TypeElementVisitor;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.sourcegen.generator.SourceGenerator;
+import io.micronaut.sourcegen.generator.bytecode.ByteCodeGenerator;
 import io.micronaut.sourcegen.generator.SourceGenerators;
 import io.micronaut.sourcegen.model.ClassDef;
 
@@ -84,6 +85,24 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
         );
     }
 
+    /**
+     * Selects how the generated classes are written.
+     *
+     * <p>A Java build gets readable Java sources. The source writers of the other languages cannot emit these
+     * classes yet, so they get bytecode instead, which every language writes through
+     * {@code VisitorContext.visitClass}.</p>
+     *
+     * @param context The context
+     * @return The generator
+     */
+    private static SourceGenerator generatorFor(VisitorContext context) {
+        if (context.getLanguage() == VisitorContext.Language.JAVA) {
+            return SourceGenerators.findByLanguage(VisitorContext.Language.JAVA)
+                .orElseGet(ByteCodeGenerator::new);
+        }
+        return new ByteCodeGenerator();
+    }
+
     @Override
     public void visitClass(ClassElement element, VisitorContext context) {
         if (!processed.add(element.getName())) {
@@ -95,10 +114,7 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
         if (expressions.isEmpty() && methodExpressions.isEmpty()) {
             return;
         }
-        SourceGenerator sourceGenerator = SourceGenerators.findByLanguage(context.getLanguage()).orElse(null);
-        if (sourceGenerator == null) {
-            return;
-        }
+        SourceGenerator sourceGenerator = generatorFor(context);
         try {
             CompilationContext compilationContext = environmentOf(element, context);
             ELCompiler compiler = new ELCompiler(compilationContext);

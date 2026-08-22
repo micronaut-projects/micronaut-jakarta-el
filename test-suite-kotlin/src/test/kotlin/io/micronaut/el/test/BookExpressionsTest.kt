@@ -2,15 +2,18 @@ package io.micronaut.el.test
 
 import io.micronaut.el.CompiledELContext
 import io.micronaut.el.resolver.IntrospectionELResolver
-import jakarta.el.ELProcessor
+import io.micronaut.el.runtime.CompiledExpression
+import jakarta.el.ELException
 import jakarta.el.ExpressionFactory
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 /**
- * Uses the module from Kotlin. The bean is introspected at compilation time by Micronaut, so its properties and
- * its executable methods resolve without reflection; the expressions are parsed by the interpreter module.
+ * The expressions of this suite are declared in Kotlin source and compiled by the annotation processor running
+ * under KSP. The interpreter is deliberately absent from the classpath, so an expression that reaches the runtime
+ * unparsed fails rather than falling back.
  */
 class BookExpressionsTest {
 
@@ -18,7 +21,7 @@ class BookExpressionsTest {
     private val context = CompiledELContext().setBean("book", Book("Expression Language", "reference", 20.0))
 
     @Test
-    fun `evaluates expressions over a Kotlin bean`() {
+    fun `evaluates the expressions compiled from Kotlin source`() {
         assertEquals(
             "Expression Language",
             factory.createValueExpression(context, "\${book.title}", String::class.java).getValue(context)
@@ -30,9 +33,24 @@ class BookExpressionsTest {
         )
         assertEquals(
             "expensive",
-            factory.createValueExpression(context, "\${book.unitPrice > 15 ? 'expensive' : 'cheap'}", String::class.java)
-                .getValue(context)
+            factory.createValueExpression(
+                context,
+                "\${book.unitPrice > 15 ? 'expensive' : 'cheap'}",
+                String::class.java
+            ).getValue(context)
         )
+    }
+
+    @Test
+    fun `the expressions are compiled rather than parsed`() {
+        assertTrue(factory.createValueExpression(context, "\${book.title}", String::class.java) is CompiledExpression)
+    }
+
+    @Test
+    fun `an undeclared expression is rejected without the interpreter`() {
+        assertThrows(ELException::class.java) {
+            factory.createValueExpression(context, "\${book.category}", String::class.java)
+        }
     }
 
     @Test
@@ -41,23 +59,5 @@ class BookExpressionsTest {
         context.setPropertyResolved(false)
         assertEquals("Expression Language", resolver.getValue(context, context.getBean("book"), "title"))
         assertTrue(context.isPropertyResolved)
-    }
-
-    @Test
-    fun `supports the collection operations of the specification`() {
-        val processor = ELProcessor()
-        processor.defineBean(
-            "books",
-            listOf(
-                Book("a", "history", 30.0),
-                Book("b", "history", 10.0),
-                Book("c", "science", 20.0)
-            )
-        )
-        assertEquals(
-            listOf("a", "c"),
-            processor.eval("books.stream().filter(b -> b.unitPrice >= 20).map(b -> b.title).toList()")
-        )
-        assertEquals(60.0, processor.eval("books.stream().map(b -> b.unitPrice).sum()"))
     }
 }

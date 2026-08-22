@@ -122,6 +122,75 @@ public final class ELCompiler {
         return null;
     }
 
+    /**
+     * Invokes a static method of the runtime with the signature the runtime actually declares.
+     *
+     * <p>The convenience overload of {@code invokeStatic} infers the parameter types from the arguments, which
+     * produces a descriptor that does not exist: the runtime declares its dynamic parameters as {@link Object},
+     * and an argument whose static type is known would narrow them. The Java source writer hides this because
+     * the compiler resolves the overload, the bytecode writer does not. A variable arity method is invoked with
+     * its trailing arguments packed into an array, for the same reason.</p>
+     *
+     * @param owner     The declaring type
+     * @param name      The method name
+     * @param returning The type the result is used as, which a generic method reaches through a cast
+     * @param values    The arguments
+     * @return The invocation
+     */
+    private ExpressionDef runtime(ClassTypeDef owner, String name, TypeDef returning, ExpressionDef... values) {
+        return runtime(owner, name, returning, List.of(values));
+    }
+
+    /**
+     * @param owner     The declaring type
+     * @param name      The method name
+     * @param returning The return type
+     * @param values    The arguments
+     * @return The invocation
+     * @see #runtime(ClassTypeDef, String, TypeDef, ExpressionDef...)
+     */
+    private ExpressionDef runtime(ClassTypeDef owner,
+                                  String name,
+                                  TypeDef returning,
+                                  List<? extends ExpressionDef> values) {
+        MethodElement method = runtimeMethod(owner, name, values.size());
+        if (method == null) {
+            return owner.invokeStatic(name, returning, values);
+        }
+        ParameterElement[] parameters = method.getParameters();
+        List<TypeDef> parameterTypes = new ArrayList<>(parameters.length);
+        for (ParameterElement parameter : parameters) {
+            parameterTypes.add(TypeDef.erasure(parameter.getType()));
+        }
+        List<ExpressionDef> arguments = new ArrayList<>(parameters.length);
+        int fixed = method.isVarArgs() ? parameters.length - 1 : parameters.length;
+        for (int i = 0; i < fixed; i++) {
+            arguments.add(values.get(i));
+        }
+        if (method.isVarArgs()) {
+            TypeDef componentType = ((TypeDef.Array) parameterTypes.get(parameterTypes.size() - 1)).componentType();
+            arguments.add(componentType.array().instantiate(values.subList(fixed, values.size())));
+        }
+        // a generic method erases to its bound, so the descriptor uses the declared return type and the result
+        // is cast to the type the caller asked for
+        TypeDef declaredReturn = TypeDef.erasure(method.getReturnType());
+        ExpressionDef invocation = owner.invokeStatic(name, parameterTypes, declaredReturn, arguments);
+        return declaredReturn.equals(returning) ? invocation : invocation.cast(returning);
+    }
+
+    @Nullable
+    private MethodElement runtimeMethod(ClassTypeDef owner, String name, int argumentCount) {
+        return context.getVisitorContext()
+            .getClassElement(owner.getName())
+            .flatMap(type -> type.getEnclosedElements(ElementQuery.ALL_METHODS.onlyStatic().named(name))
+                .stream()
+                .filter(method -> method.isVarArgs()
+                    ? argumentCount >= method.getParameters().length - 1
+                    : argumentCount == method.getParameters().length)
+                .findFirst())
+            .orElse(null);
+    }
+
     private Typed compileTyped(ELNode node, ExpressionDef ctx) {
         return switch (node) {
             case ELNode.Eval eval -> compileTyped(eval.expression(), ctx);
@@ -136,7 +205,7 @@ public final class ELCompiler {
             case ELNode.Property property -> compileProperty(property, ctx);
             case ELNode.Method method -> compileMethod(method, ctx);
             case ELNode.Function function -> compileFunction(function, ctx);
-            case ELNode.Call call -> dynamic(EL_RESOLUTION.invokeStatic("invokeCallable", TypeDef.OBJECT,
+            case ELNode.Call call -> dynamic(runtime(EL_RESOLUTION, "invokeCallable", TypeDef.OBJECT,
                 arguments(ctx, compile(call.target(), ctx), call.arguments())));
             case ELNode.Unary unary -> compileUnary(unary, ctx);
             case ELNode.Binary binary -> compileBinary(binary, ctx);
@@ -146,14 +215,14 @@ public final class ELCompiler {
                 compile(ternary.ifFalse(), ctx)
             ));
             case ELNode.Assign assign -> dynamic(compileAssign(assign, ctx));
-            case ELNode.Semicolon semicolon -> dynamic(EL_SUPPORT.invokeStatic("sequence", TypeDef.OBJECT,
+            case ELNode.Semicolon semicolon -> dynamic(runtime(EL_SUPPORT, "sequence", TypeDef.OBJECT,
                 compile(semicolon.left(), ctx), compile(semicolon.right(), ctx)));
             case ELNode.Lambda lambda -> dynamic(compileLambda(lambda, ctx));
-            case ELNode.ListData list -> dynamic(EL_COLLECTIONS.invokeStatic("list", TypeDef.OBJECT,
+            case ELNode.ListData list -> dynamic(runtime(EL_COLLECTIONS, "list", TypeDef.OBJECT,
                 compileAll(list.elements(), ctx)));
-            case ELNode.SetData set -> dynamic(EL_COLLECTIONS.invokeStatic("set", TypeDef.OBJECT,
+            case ELNode.SetData set -> dynamic(runtime(EL_COLLECTIONS, "set", TypeDef.OBJECT,
                 compileAll(set.elements(), ctx)));
-            case ELNode.MapData map -> dynamic(EL_COLLECTIONS.invokeStatic("map", TypeDef.OBJECT,
+            case ELNode.MapData map -> dynamic(runtime(EL_COLLECTIONS, "map", TypeDef.OBJECT,
                 compileMapEntries(map, ctx)));
         };
     }
@@ -162,7 +231,7 @@ public final class ELCompiler {
         ExpressionDef result = null;
         for (ELNode part : composite.parts()) {
             ExpressionDef compiled = compile(part, ctx);
-            result = result == null ? compiled : EL_ARITHMETIC.invokeStatic("concat", STRING, result, compiled);
+            result = result == null ? compiled : runtime(EL_ARITHMETIC, "concat", STRING, result, compiled);
         }
         if (result == null) {
             return new Typed(ExpressionDef.constant(""), null);
@@ -173,7 +242,7 @@ public final class ELCompiler {
     private Typed compileIdentifier(ELNode.Identifier identifier, ExpressionDef ctx) {
         String name = identifier.name();
         ClassElement variableType = context.variableType(name);
-        ExpressionDef resolved = EL_RESOLUTION.invokeStatic("resolveIdentifier", TypeDef.OBJECT,
+        ExpressionDef resolved = runtime(EL_RESOLUTION, "resolveIdentifier", TypeDef.OBJECT,
             ctx, ExpressionDef.constant(name));
         if (variableType != null) {
             return new Typed(resolved.cast(TypeDef.erasure(variableType)), variableType);
@@ -207,7 +276,7 @@ public final class ELCompiler {
                 return new Typed(base.expression().invoke(reader), reader.getReturnType());
             }
         }
-        return dynamic(EL_RESOLUTION.invokeStatic("getValue", TypeDef.OBJECT,
+        return dynamic(runtime(EL_RESOLUTION, "getValue", TypeDef.OBJECT,
             ctx, base.expression(), compile(property.property(), ctx)));
     }
 
@@ -225,14 +294,14 @@ public final class ELCompiler {
                     );
                 }
                 // the class declares overloads of the method, the resolution is deferred to the resolvers
-                return dynamic(EL_RESOLUTION.invokeStatic("invoke", TypeDef.OBJECT,
+                return dynamic(runtime(EL_RESOLUTION, "invoke", TypeDef.OBJECT,
                     arguments(ctx, elClass(importedClass), compile(method.property(), ctx), method.arguments())));
             }
         }
         Typed base = compileTyped(method.base(), ctx);
         if (STREAM.equals(methodName) && method.arguments().isEmpty() && isStreamable(base.type())) {
             // the section 2.3.1 of the specification defines stream() as the source of a pipeline
-            return dynamic(EL_STREAM.invokeStatic("of", TypeDef.OBJECT, ctx, base.expression()));
+            return dynamic(runtime(EL_STREAM, "of", TypeDef.OBJECT, ctx, base.expression()));
         }
         if (methodName != null && base.type() != null) {
             MethodElement target = findMethod(base.type(), methodName, method.arguments().size(), false);
@@ -243,7 +312,7 @@ public final class ELCompiler {
                 );
             }
         }
-        return dynamic(EL_RESOLUTION.invokeStatic("invoke", TypeDef.OBJECT,
+        return dynamic(runtime(EL_RESOLUTION, "invoke", TypeDef.OBJECT,
             arguments(ctx, base.expression(), compile(method.property(), ctx), method.arguments())));
     }
 
@@ -252,7 +321,7 @@ public final class ELCompiler {
         List<ELNode> first = invocations.get(0);
         Typed result = compileFirstInvocation(function, first, ctx);
         for (int i = 1; i < invocations.size(); i++) {
-            result = dynamic(EL_RESOLUTION.invokeStatic("invokeCallable", TypeDef.OBJECT,
+            result = dynamic(runtime(EL_RESOLUTION, "invokeCallable", TypeDef.OBJECT,
                 arguments(ctx, result.expression(), invocations.get(i))));
         }
         return result;
@@ -303,18 +372,18 @@ public final class ELCompiler {
                 );
             }
         }
-        ExpressionDef target = EL_RESOLUTION.invokeStatic("resolveIdentifier", TypeDef.OBJECT,
+        ExpressionDef target = runtime(EL_RESOLUTION, "resolveIdentifier", TypeDef.OBJECT,
             ctx, ExpressionDef.constant(name));
-        return dynamic(EL_RESOLUTION.invokeStatic("invokeCallable", TypeDef.OBJECT,
+        return dynamic(runtime(EL_RESOLUTION, "invokeCallable", TypeDef.OBJECT,
             arguments(ctx, target, arguments)));
     }
 
     private Typed compileUnary(ELNode.Unary unary, ExpressionDef ctx) {
         ExpressionDef operand = compile(unary.operand(), ctx);
         return dynamic(switch (unary.operator()) {
-            case NEGATE -> EL_ARITHMETIC.invokeStatic("negate", TypeDef.OBJECT, operand);
-            case NOT -> EL_SUPPORT.invokeStatic("not", BOOLEAN, operand);
-            case EMPTY -> EL_SUPPORT.invokeStatic("isEmpty", BOOLEAN, operand);
+            case NEGATE -> runtime(EL_ARITHMETIC, "negate", TypeDef.OBJECT, operand);
+            case NOT -> runtime(EL_SUPPORT, "not", BOOLEAN, operand);
+            case EMPTY -> runtime(EL_SUPPORT, "isEmpty", BOOLEAN, operand);
         });
     }
 
@@ -336,18 +405,18 @@ public final class ELCompiler {
         ExpressionDef left = compile(binary.left(), ctx);
         ExpressionDef right = compile(binary.right(), ctx);
         return dynamic(switch (binary.operator()) {
-            case ADD -> EL_ARITHMETIC.invokeStatic("add", TypeDef.OBJECT, left, right);
-            case SUBTRACT -> EL_ARITHMETIC.invokeStatic("subtract", TypeDef.OBJECT, left, right);
-            case MULTIPLY -> EL_ARITHMETIC.invokeStatic("multiply", TypeDef.OBJECT, left, right);
-            case DIVIDE -> EL_ARITHMETIC.invokeStatic("divide", TypeDef.OBJECT, left, right);
-            case MODULO -> EL_ARITHMETIC.invokeStatic("mod", TypeDef.OBJECT, left, right);
-            case CONCAT -> EL_ARITHMETIC.invokeStatic("concat", STRING, left, right);
-            case EQUAL -> EL_SUPPORT.invokeStatic("equals", BOOLEAN, left, right);
-            case NOT_EQUAL -> EL_SUPPORT.invokeStatic("notEquals", BOOLEAN, left, right);
-            case LESS_THAN -> EL_SUPPORT.invokeStatic("lessThan", BOOLEAN, left, right);
-            case GREATER_THAN -> EL_SUPPORT.invokeStatic("greaterThan", BOOLEAN, left, right);
-            case LESS_THAN_OR_EQUAL -> EL_SUPPORT.invokeStatic("lessThanOrEqual", BOOLEAN, left, right);
-            case GREATER_THAN_OR_EQUAL -> EL_SUPPORT.invokeStatic("greaterThanOrEqual", BOOLEAN, left, right);
+            case ADD -> runtime(EL_ARITHMETIC, "add", TypeDef.OBJECT, left, right);
+            case SUBTRACT -> runtime(EL_ARITHMETIC, "subtract", TypeDef.OBJECT, left, right);
+            case MULTIPLY -> runtime(EL_ARITHMETIC, "multiply", TypeDef.OBJECT, left, right);
+            case DIVIDE -> runtime(EL_ARITHMETIC, "divide", TypeDef.OBJECT, left, right);
+            case MODULO -> runtime(EL_ARITHMETIC, "mod", TypeDef.OBJECT, left, right);
+            case CONCAT -> runtime(EL_ARITHMETIC, "concat", STRING, left, right);
+            case EQUAL -> runtime(EL_SUPPORT, "equals", BOOLEAN, left, right);
+            case NOT_EQUAL -> runtime(EL_SUPPORT, "notEquals", BOOLEAN, left, right);
+            case LESS_THAN -> runtime(EL_SUPPORT, "lessThan", BOOLEAN, left, right);
+            case GREATER_THAN -> runtime(EL_SUPPORT, "greaterThan", BOOLEAN, left, right);
+            case LESS_THAN_OR_EQUAL -> runtime(EL_SUPPORT, "lessThanOrEqual", BOOLEAN, left, right);
+            case GREATER_THAN_OR_EQUAL -> runtime(EL_SUPPORT, "greaterThanOrEqual", BOOLEAN, left, right);
             case AND, OR -> throw new IllegalStateException("The logical operators are compiled separately");
         });
     }
@@ -359,9 +428,9 @@ public final class ELCompiler {
         }
         ExpressionDef value = compile(assign.value(), ctx);
         if (lValue.base() == null) {
-            return EL_RESOLUTION.invokeStatic("assignIdentifier", TypeDef.OBJECT, ctx, lValue.property(), value);
+            return runtime(EL_RESOLUTION, "assignIdentifier", TypeDef.OBJECT, ctx, lValue.property(), value);
         }
-        return EL_RESOLUTION.invokeStatic("assignProperty", TypeDef.OBJECT,
+        return runtime(EL_RESOLUTION, "assignProperty", TypeDef.OBJECT,
             ctx, lValue.base(), lValue.property(), value);
     }
 
@@ -390,7 +459,7 @@ public final class ELCompiler {
         List<ExpressionDef> names = lambda.parameters().stream()
             .map(parameter -> (ExpressionDef) ExpressionDef.constant(parameter))
             .toList();
-        return EL_LAMBDAS.invokeStatic("create", LAMBDA_EXPRESSION,
+        return runtime(EL_LAMBDAS, "create", LAMBDA_EXPRESSION,
             ctx, LIST.invokeStatic("of", TypeDef.of(List.class), names), body);
     }
 
@@ -449,7 +518,7 @@ public final class ELCompiler {
         TypeDef targetType = TypeDef.erasure(target);
         // the section 1.25.8 of the specification coerces a lambda expression to a functional interface
         boolean functionalInterface = target.isInterface() && !target.isAssignable(LambdaExpression.class);
-        return EL_SUPPORT.invokeStatic(
+        return runtime(EL_SUPPORT, 
             functionalInterface ? "coerceToFunctionalInterface" : "coerceToType",
             targetType,
             ctx, value, ExpressionDef.constant(targetType)
@@ -457,7 +526,7 @@ public final class ELCompiler {
     }
 
     private ExpressionDef toBoolean(ExpressionDef value) {
-        return EL_SUPPORT.invokeStatic("toBoolean", BOOLEAN, value);
+        return runtime(EL_SUPPORT, "toBoolean", BOOLEAN, value);
     }
 
     private static boolean isStreamable(@Nullable ClassElement type) {

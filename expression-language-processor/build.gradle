@@ -8,10 +8,12 @@ dependencies {
     api projects.micronautExpressionLanguage
     api projects.micronautExpressionLanguageParser
 
-    runtimeOnly mnSourcegen.micronaut.sourcegen.generator.java
-    runtimeOnly mnSourcegen.micronaut.sourcegen.generator.kotlin
+    // The Java source writer produces readable sources for a Java build; the bytecode writer is used for the
+    // languages whose source writer cannot emit these classes yet. Both are needed on the compile classpath of a
+    // Groovy build, which is why they are api rather than runtimeOnly.
+    api mnSourcegen.micronaut.sourcegen.generator.java
+    api mnSourcegen.micronaut.sourcegen.generator.bytecode
 
-    testImplementation mnSourcegen.micronaut.sourcegen.generator.java
     testImplementation platform(libs.junit.bom)
     testImplementation libs.junit.jupiter
     testRuntimeOnly libs.junit.jupiter.engine
