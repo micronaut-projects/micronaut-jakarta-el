@@ -1,0 +1,11 @@
+plugins {
+    id "io.micronaut.build.internal.jakarta-el-test-suite"
+}
+
+// Simulates what a user, or a module such as micronaut-validation, writes to route the expressions of its own
+// annotations to Jakarta Expression Language: an AnnotationRemapper, built only against the published API, the
+// annotation metadata SPI of micronaut-core and the annotations of this project.
+dependencies {
+    implementation mn.micronaut.core.processor
+    implementation projects.micronautJakartaElAnnotations
+}

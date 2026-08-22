@@ -4,12 +4,16 @@ plugins {
 
 dependencies {
     testAnnotationProcessor projects.micronautJakartaElProcessor
+    // the user's own processor, routing the expressions of its annotations to Jakarta Expression Language
+    testAnnotationProcessor projects.testSuiteCustomProcessor
     testAnnotationProcessor mn.micronaut.inject.java
 
     testAnnotationProcessor platform(libs.micronaut.core)
 
     testImplementation platform(libs.micronaut.core)
     testImplementation projects.micronautJakartaEl
+    testImplementation "jakarta.validation:jakarta.validation-api:3.1.1"
+    testImplementation projects.testSuiteCustomProcessor
     testImplementation mn.micronaut.core
     testImplementation mn.micronaut.inject
     testImplementation platform(libs.junit.bom)
