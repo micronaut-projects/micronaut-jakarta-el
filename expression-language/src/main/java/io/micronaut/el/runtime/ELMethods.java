@@ -16,10 +16,12 @@
 package io.micronaut.el.runtime;
 
 import io.micronaut.core.annotation.Internal;
+import io.micronaut.core.reflect.ReflectionUtils;
 import jakarta.el.MethodNotFoundException;
 import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -62,8 +64,8 @@ public final class ELMethods {
                                     Object @Nullable [] arguments) {
         if (paramTypes != null) {
             for (Method method : type.getMethods()) {
-                if (method.getName().equals(name) && Arrays.equals(method.getParameterTypes(), paramTypes)) {
-                    return method;
+                if (method.getName().equals(name) && sameTypes(method.getParameterTypes(), paramTypes)) {
+                    return accessible(method);
                 }
             }
             throw notFound(type, name, paramTypes.length);
@@ -94,7 +96,72 @@ public final class ELMethods {
             throw new MethodNotFoundException("The reference to the method '" + name + "' of " + type.getName()
                 + " is ambiguous, " + best.size() + " methods match the arguments");
         }
-        return best.get(0);
+        return accessible(best.get(0));
+    }
+
+    /**
+     * Compares declared parameter types with the ones provided at parse time, treating a primitive and its
+     * wrapper as the same type: a class literal such as {@code double.class} cannot reach an annotation member
+     * of a Micronaut annotation, so the wrapper is what a declaration can provide.
+     */
+    private static boolean sameTypes(Class<?>[] declared, Class<?>[] provided) {
+        if (declared.length != provided.length) {
+            return false;
+        }
+        for (int i = 0; i < declared.length; i++) {
+            if (declared[i] != provided[i] && ReflectionUtils.getWrapperType(declared[i]) != ReflectionUtils.getWrapperType(provided[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Returns a declaration of the method that can be invoked reflectively.
+     *
+     * <p>{@code Class.getMethods()} returns the method as declared on the runtime class, which may not be
+     * accessible: the lists of {@code List.of}, the views of {@code Collections} and lambdas all implement public
+     * interfaces from classes that are not public. The public declaration is found on a supertype, which is
+     * what {@code jakarta.el.ELUtil} does for the standard resolvers.</p>
+     *
+     * @param method The method as declared on the runtime class
+     * @return An accessible declaration of the same method
+     */
+    public static Method accessible(Method method) {
+        if (Modifier.isPublic(method.getDeclaringClass().getModifiers())) {
+            return method;
+        }
+        Method found = findAccessible(method.getDeclaringClass(), method);
+        return found == null ? method : found;
+    }
+
+    @Nullable
+    private static Method findAccessible(Class<?> type, Method method) {
+        for (Class<?> anInterface : type.getInterfaces()) {
+            if (Modifier.isPublic(anInterface.getModifiers())) {
+                try {
+                    return anInterface.getMethod(method.getName(), method.getParameterTypes());
+                } catch (NoSuchMethodException ignored) {
+                    // declared further up
+                }
+            }
+            Method found = findAccessible(anInterface, method);
+            if (found != null) {
+                return found;
+            }
+        }
+        Class<?> superclass = type.getSuperclass();
+        if (superclass == null) {
+            return null;
+        }
+        if (Modifier.isPublic(superclass.getModifiers())) {
+            try {
+                return superclass.getMethod(method.getName(), method.getParameterTypes());
+            } catch (NoSuchMethodException ignored) {
+                // declared further up
+            }
+        }
+        return findAccessible(superclass, method);
     }
 
     /**

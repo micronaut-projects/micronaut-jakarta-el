@@ -19,6 +19,7 @@ import io.micronaut.core.annotation.Generated;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.el.processor.compiler.ELCompiler;
 import io.micronaut.el.processor.compiler.ELMethodExpressionDefinition;
+import io.micronaut.el.parser.ELNodes;
 import io.micronaut.el.parser.ast.ELNode;
 import io.micronaut.el.runtime.CompiledMethodExpression;
 import io.micronaut.el.runtime.ELResolution;
@@ -64,7 +65,7 @@ public final class MethodExpressionWriter {
                                  ELMethodExpressionDefinition definition,
                                  ELCompiler compiler) {
         ELNode node = unwrap(definition.node());
-        return ClassDef.builder(className)
+        ClassDef.ClassDefBuilder builder = ClassDef.builder(className)
             .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
             .addAnnotation(Generated.class)
             .superclass(ClassTypeDef.of(CompiledMethodExpression.class))
@@ -72,8 +73,11 @@ public final class MethodExpressionWriter {
             .addMethod(constructor(definition, node))
             .addMethod(evaluateBase(node, compiler))
             .addMethod(evaluateProperty(node, compiler))
-            .addMethod(doInvoke(node, compiler))
-            .build();
+            .addMethod(doInvoke(node, compiler));
+        if (node instanceof ELNode.Method method) {
+            builder.addMethod(evaluateArguments(method, compiler));
+        }
+        return builder.build();
     }
 
     private static MethodDef constructor(ELMethodExpressionDefinition definition, ELNode node) {
@@ -84,6 +88,7 @@ public final class MethodExpressionWriter {
             .addModifiers(Modifier.PUBLIC)
             .build((aThis, parameters) -> aThis.superRef().invokeSuperConstructor(
                 ExpressionDef.constant(definition.expression()),
+                ExpressionDef.constant(ELNodes.canonical(definition.node())),
                 ExpressionDef.constant(TypeDef.erasure(definition.returnType())),
                 CLASS_ARRAY.instantiate(parameterTypes),
                 ExpressionDef.constant(node instanceof ELNode.Method)
@@ -139,6 +144,19 @@ public final class MethodExpressionWriter {
         values.add(compiler.compile(method.property(), context));
         method.arguments().forEach(argument -> values.add(compiler.compile(argument, context)));
         return values;
+    }
+
+    private static MethodDef evaluateArguments(ELNode.Method method, ELCompiler compiler) {
+        return MethodDef.builder("evaluateArguments")
+            .addModifiers(Modifier.PROTECTED)
+            .overrides()
+            .addParameter(CONTEXT, EL_CONTEXT)
+            .returns(TypeDef.OBJECT.array())
+            .build((aThis, parameters) -> TypeDef.OBJECT.array()
+                .instantiate(method.arguments().stream()
+                    .map(argument -> compiler.compile(argument, parameters.get(0)))
+                    .toList())
+                .returning());
     }
 
     private static ExpressionDef base(ELNode node, ELCompiler compiler, ExpressionDef context) {

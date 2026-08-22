@@ -37,6 +37,7 @@ public abstract class CompiledValueExpression extends ValueExpression implements
     private static final long serialVersionUID = 1L;
 
     private final String expressionString;
+    private final String canonicalForm;
     private final Class<?> expectedType;
 
     /**
@@ -44,7 +45,17 @@ public abstract class CompiledValueExpression extends ValueExpression implements
      * @param expectedType     The expected type of the evaluation result
      */
     protected CompiledValueExpression(String expressionString, Class<?> expectedType) {
+        this(expressionString, expressionString, expectedType);
+    }
+
+    /**
+     * @param expressionString The original expression
+     * @param canonicalForm    The canonical form of the expression, which is what equality compares
+     * @param expectedType     The expected type of the evaluation result
+     */
+    protected CompiledValueExpression(String expressionString, String canonicalForm, Class<?> expectedType) {
         this.expressionString = Objects.requireNonNull(expressionString, "expressionString");
+        this.canonicalForm = Objects.requireNonNull(canonicalForm, "canonicalForm");
         this.expectedType = Objects.requireNonNull(expectedType, "expectedType");
     }
 
@@ -101,14 +112,14 @@ public abstract class CompiledValueExpression extends ValueExpression implements
     @Override
     public boolean equals(Object obj) {
         return obj instanceof CompiledValueExpression other
-            && other.getClass() == getClass()
-            && other.expressionString.equals(expressionString)
+            && other.isLiteralText() == isLiteralText()
+            && other.canonicalForm.equals(canonicalForm)
             && other.expectedType.equals(expectedType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getClass(), expressionString, expectedType);
+        return Objects.hash(canonicalForm, expectedType);
     }
 
     @Override

@@ -83,7 +83,14 @@ ValueExpression expression = factory.createValueExpression(context, "${book.titl
 ```
 
 An expression that was not compiled and that is not a literal-expression is rejected, unless the interpreter
-module is on the classpath.
+module is on the classpath. The lookup matches the expected type exactly: an expression declared with
+`String.class` is only returned for a request with `String.class`.
+
+Two behaviours of Micronaut's annotation metadata affect how an expression is declared. Any annotation string
+containing `#{...}` is treated by Micronaut as one of its own evaluated expressions; the processor reads the
+original text back out, but prefer `${...}`, which the specification parses identically and which Micronaut leaves
+alone. And a primitive class literal such as `double.class` cannot be read from an annotation member, so
+`expectedReturnType` and `expectedParamTypes` must use the wrapper types, which match the primitive declarations.
 
 ## Parsing at runtime
 

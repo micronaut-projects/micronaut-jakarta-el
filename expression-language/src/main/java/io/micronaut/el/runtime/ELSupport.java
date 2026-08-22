@@ -448,7 +448,7 @@ public final class ELSupport {
         if (isOperand(left, right, BigDecimal.class)) {
             return number(left, BigDecimal.class).equals(number(right, BigDecimal.class));
         }
-        if (isFloatingPointOperand(left, right)) {
+        if (isFloatingPointInstance(left, right)) {
             return number(left, Double.class).equals(number(right, Double.class));
         }
         if (isOperand(left, right, BigInteger.class)) {
@@ -560,7 +560,7 @@ public final class ELSupport {
         if (isOperand(left, right, BigDecimal.class)) {
             return ((BigDecimal) number(left, BigDecimal.class)).compareTo((BigDecimal) number(right, BigDecimal.class));
         }
-        if (isFloatingPointOperand(left, right)) {
+        if (isFloatingPointInstance(left, right)) {
             return Double.compare(number(left, Double.class).doubleValue(), number(right, Double.class).doubleValue());
         }
         if (isOperand(left, right, BigInteger.class)) {
@@ -582,9 +582,22 @@ public final class ELSupport {
     }
 
     /**
+     * The floating point rule of the relational operators, which the sections 1.9.1 and 1.9.2 of the
+     * specification restrict to actual {@link Float} and {@link Double} instances. Only the arithmetic operators
+     * of the section 1.7 extend it to strings in floating point notation.
+     *
      * @param left  The left operand
      * @param right The right operand
-     * @return True when one of the operands is a floating point value
+     * @return True when one of the operands is a Float or a Double
+     */
+    public static boolean isFloatingPointInstance(@Nullable Object left, @Nullable Object right) {
+        return left instanceof Double || left instanceof Float || right instanceof Double || right instanceof Float;
+    }
+
+    /**
+     * @param left  The left operand
+     * @param right The right operand
+     * @return True when one of the operands is a floating point value, or a string in floating point notation
      */
     public static boolean isFloatingPointOperand(@Nullable Object left, @Nullable Object right) {
         return isFloatingPoint(left) || isFloatingPoint(right);

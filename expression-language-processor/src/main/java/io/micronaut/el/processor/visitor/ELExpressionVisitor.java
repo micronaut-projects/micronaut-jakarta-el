@@ -15,7 +15,9 @@
  */
 package io.micronaut.el.processor.visitor;
 
+import io.micronaut.core.annotation.AnnotationMetadata;
 import io.micronaut.core.annotation.AnnotationValue;
+import io.micronaut.core.expressions.EvaluatedExpressionReference;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.el.ELExpressionSource;
 import io.micronaut.el.annotation.ELEnvironment;
@@ -51,6 +53,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.Map;
 import java.util.Set;
 
@@ -83,6 +86,24 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
             ELMethodExpression.class.getName(),
             ELMethodExpressions.class.getName()
         );
+    }
+
+    /**
+     * Reads the expression declared by an annotation.
+     *
+     * <p>Micronaut treats any annotation string containing {@code #{...}} as one of its own evaluated
+     * expressions and replaces it with an {@link EvaluatedExpressionReference}, which would otherwise be
+     * rendered as its {@code toString()}. The original text is taken back out of the reference.</p>
+     *
+     * @param annotation The annotation
+     * @return The expression
+     */
+    private static Optional<String> expressionOf(AnnotationValue<?> annotation) {
+        Object value = annotation.getValues().get(AnnotationMetadata.VALUE_MEMBER);
+        if (value instanceof EvaluatedExpressionReference reference) {
+            return Optional.of(reference.annotationValue().toString());
+        }
+        return annotation.stringValue();
     }
 
     /**
@@ -159,7 +180,7 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
     private ELExpressionDefinition valueDefinition(AnnotationValue<ELExpression> annotation,
                                                    int index,
                                                    VisitorContext context) {
-        String expression = annotation.stringValue().orElseThrow(() ->
+        String expression = expressionOf(annotation).orElseThrow(() ->
             new ELCompilationException("The expression of @ELExpression is required"));
         ClassElement expectedType = ELTypes.resolveMember(annotation, "expectedType", context)
             .orElseGet(() -> ClassElement.of(Object.class));
@@ -172,7 +193,7 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
     private ELMethodExpressionDefinition methodDefinition(AnnotationValue<ELMethodExpression> annotation,
                                                           int index,
                                                           VisitorContext context) {
-        String expression = annotation.stringValue().orElseThrow(() ->
+        String expression = expressionOf(annotation).orElseThrow(() ->
             new ELCompilationException("The expression of @ELMethodExpression is required"));
         ClassElement returnType = ELTypes.resolveMember(annotation, "expectedReturnType", context)
             .orElseGet(() -> ClassElement.of(Object.class));

@@ -19,6 +19,7 @@ import io.micronaut.core.annotation.Generated;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.el.processor.compiler.ELCompiler;
 import io.micronaut.el.processor.compiler.ELExpressionDefinition;
+import io.micronaut.el.parser.ELNodes;
 import io.micronaut.el.parser.ast.ELNode;
 import io.micronaut.el.runtime.CompiledValueExpression;
 import io.micronaut.el.runtime.ELResolution;
@@ -83,6 +84,7 @@ public final class ValueExpressionWriter {
             .addModifiers(Modifier.PUBLIC)
             .build((aThis, parameters) -> aThis.superRef().invokeSuperConstructor(
                 ExpressionDef.constant(definition.expression()),
+                ExpressionDef.constant(ELNodes.canonical(definition.node())),
                 ExpressionDef.constant(TypeDef.erasure(definition.expectedType()))
             ));
     }

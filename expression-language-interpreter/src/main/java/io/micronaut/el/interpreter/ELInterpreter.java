@@ -312,11 +312,9 @@ final class ELInterpreter {
         List<ELNode> firstArguments = function.invocations().isEmpty() ? List.of() : function.invocations().get(0);
         String prefix = function.prefix();
         String localName = function.localName();
-        if (prefix.isEmpty()) {
-            Object identifier = resolveIdentifierOrNull(context, localName);
-            if (identifier != null) {
-                return ELResolution.invokeCallable(context, identifier, evaluateAll(context, firstArguments));
-            }
+        Object identifier = prefix.isEmpty() ? resolveIdentifierOrNull(context, localName) : null;
+        if (identifier instanceof LambdaExpression || identifier instanceof ELClass) {
+            return ELResolution.invokeCallable(context, identifier, evaluateAll(context, firstArguments));
         }
         Method method = resolveMappedFunction(context, function);
         if (method != null) {
@@ -335,6 +333,10 @@ final class ELInterpreter {
                         evaluateAll(context, firstArguments));
                 }
             }
+        }
+        if (identifier != null) {
+            throw new MethodNotFoundException("The identifier '" + localName + "' does not evaluate to an invocable"
+                + " value: " + identifier);
         }
         throw new MethodNotFoundException("Cannot resolve the function '" + qualifiedName(prefix, localName) + "'");
     }
@@ -382,8 +384,7 @@ final class ELInterpreter {
     @Nullable
     private Object resolveIdentifierOrNull(ELContext context, String name) {
         if (context.isLambdaArgument(name)) {
-            Object value = context.getLambdaArgument(name);
-            return value instanceof LambdaExpression ? value : null;
+            return context.getLambdaArgument(name);
         }
         if (context.getVariableMapper() != null && context.getVariableMapper().resolveVariable(name) != null) {
             return context.getVariableMapper().resolveVariable(name).getValue(context);

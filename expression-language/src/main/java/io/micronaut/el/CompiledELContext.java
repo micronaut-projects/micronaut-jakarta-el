@@ -17,6 +17,7 @@ package io.micronaut.el;
 
 import org.jspecify.annotations.Nullable;
 import io.micronaut.el.resolver.IntrospectionELResolver;
+import io.micronaut.el.runtime.MapVariableMapper;
 import io.micronaut.el.resolver.ELResolvers;
 import jakarta.el.BeanNameELResolver;
 import jakarta.el.BeanNameResolver;
@@ -24,7 +25,6 @@ import jakarta.el.CompositeELResolver;
 import jakarta.el.ELContext;
 import jakarta.el.ELResolver;
 import jakarta.el.FunctionMapper;
-import jakarta.el.ValueExpression;
 import jakarta.el.VariableMapper;
 
 import java.lang.reflect.Method;
@@ -43,7 +43,6 @@ import java.util.Map;
 public class CompiledELContext extends ELContext {
 
     private final Map<String, Object> beans = new HashMap<>();
-    private final Map<String, ValueExpression> variables = new HashMap<>();
     private final ELResolver resolver;
     private final FunctionMapper functionMapper = new NoFunctionMapper();
     private final VariableMapper variableMapper = new MapVariableMapper();
@@ -135,24 +134,6 @@ public class CompiledELContext extends ELContext {
 
     /**
      * The variable mapper backed by the local variables of the context.
-     */
-    private final class MapVariableMapper extends VariableMapper {
-
-        @Override
-        @Nullable
-        public ValueExpression resolveVariable(String variable) {
-            return variables.get(variable);
-        }
-
-        @Override
-        @Nullable
-        public ValueExpression setVariable(String variable, @Nullable ValueExpression expression) {
-            return expression == null ? variables.remove(variable) : variables.put(variable, expression);
-        }
-    }
-
-    /**
-     * The function mapper of a context whose expressions bind their functions at compilation time.
      */
     private static final class NoFunctionMapper extends FunctionMapper {
 

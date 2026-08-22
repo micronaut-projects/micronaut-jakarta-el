@@ -21,6 +21,7 @@ import jakarta.el.MethodExpression;
 import jakarta.el.MethodInfo;
 import jakarta.el.MethodNotFoundException;
 import jakarta.el.MethodReference;
+import jakarta.el.PropertyNotFoundException;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -38,6 +39,7 @@ public abstract class CompiledMethodExpression extends MethodExpression implemen
     private static final Class<?>[] NO_PARAM_TYPES = new Class<?>[0];
 
     private final String expressionString;
+    private final String canonicalForm;
     private final Class<?> expectedReturnType;
     private final Class<?> @Nullable [] expectedParamTypes;
     private final boolean parametersProvided;
@@ -52,7 +54,23 @@ public abstract class CompiledMethodExpression extends MethodExpression implemen
                                        Class<?> expectedReturnType,
                                        @Nullable Class<?>[] expectedParamTypes,
                                        boolean parametersProvided) {
+        this(expressionString, expressionString, expectedReturnType, expectedParamTypes, parametersProvided);
+    }
+
+    /**
+     * @param expressionString   The original expression
+     * @param canonicalForm      The canonical form of the expression, which is what equality compares
+     * @param expectedReturnType The expected return type
+     * @param expectedParamTypes The expected parameter types
+     * @param parametersProvided Whether the parameters are provided by the expression itself
+     */
+    protected CompiledMethodExpression(String expressionString,
+                                       String canonicalForm,
+                                       Class<?> expectedReturnType,
+                                       @Nullable Class<?>[] expectedParamTypes,
+                                       boolean parametersProvided) {
         this.expressionString = Objects.requireNonNull(expressionString, "expressionString");
+        this.canonicalForm = Objects.requireNonNull(canonicalForm, "canonicalForm");
         this.expectedReturnType = Objects.requireNonNull(expectedReturnType, "expectedReturnType");
         this.expectedParamTypes = expectedParamTypes;
         this.parametersProvided = parametersProvided;
@@ -85,6 +103,16 @@ public abstract class CompiledMethodExpression extends MethodExpression implemen
     @Nullable
     protected abstract Object doInvoke(ELContext context, @Nullable Object[] arguments);
 
+    /**
+     * Evaluates the parameters an expression such as {@code ${bean.method(a, b)}} provides itself.
+     *
+     * @param context The context
+     * @return The evaluated parameters, {@code null} for an expression that does not provide them
+     */
+    protected Object @Nullable [] evaluateArguments(ELContext context) {
+        return null;
+    }
+
     @Override
     @Nullable
     public Object invoke(ELContext context, @Nullable Object[] params) {
@@ -96,19 +124,17 @@ public abstract class CompiledMethodExpression extends MethodExpression implemen
 
     @Override
     public MethodInfo getMethodInfo(ELContext context) {
-        Object base = evaluateBase(context);
-        Object property = evaluateProperty(context);
-        Method method = findMethod(base, property);
+        Method method = findMethod(evaluateBase(context), evaluateProperty(context), evaluateArguments(context));
         return new MethodInfo(method.getName(), method.getReturnType(), method.getParameterTypes());
     }
 
     @Override
     public MethodReference getMethodReference(ELContext context) {
         Object base = evaluateBase(context);
-        Object property = evaluateProperty(context);
-        Method method = findMethod(base, property);
+        Object[] arguments = evaluateArguments(context);
+        Method method = findMethod(base, evaluateProperty(context), arguments);
         MethodInfo methodInfo = new MethodInfo(method.getName(), method.getReturnType(), method.getParameterTypes());
-        return new MethodReference(base, methodInfo, method.getAnnotations(), null);
+        return new MethodReference(base, methodInfo, method.getAnnotations(), arguments);
     }
 
     @Override
@@ -143,15 +169,14 @@ public abstract class CompiledMethodExpression extends MethodExpression implemen
     @Override
     public boolean equals(Object obj) {
         return obj instanceof CompiledMethodExpression other
-            && other.getClass() == getClass()
-            && other.expressionString.equals(expressionString)
+            && other.canonicalForm.equals(canonicalForm)
             && other.expectedReturnType.equals(expectedReturnType)
             && Arrays.equals(other.expectedParamTypes, expectedParamTypes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getClass(), expressionString, expectedReturnType, Arrays.hashCode(expectedParamTypes));
+        return Objects.hash(canonicalForm, expectedReturnType, Arrays.hashCode(expectedParamTypes));
     }
 
     @Override
@@ -159,18 +184,16 @@ public abstract class CompiledMethodExpression extends MethodExpression implemen
         return "MethodExpression[" + expressionString + "]";
     }
 
-    private Method findMethod(@Nullable Object base, @Nullable Object property) {
-        if (base == null || property == null) {
-            throw new MethodNotFoundException("Cannot resolve the method '" + property + "' of the expression '"
+    private Method findMethod(@Nullable Object base, @Nullable Object property, Object @Nullable [] arguments) {
+        if (base == null) {
+            throw new PropertyNotFoundException("Cannot resolve the base object of the expression '"
                 + expressionString + "'");
         }
-        String name = ELSupport.coerceToString(property);
-        for (Method method : base.getClass().getMethods()) {
-            if (method.getName().equals(name) && method.getParameterCount() == getExpectedParamTypes().length) {
-                return method;
-            }
+        if (property == null) {
+            throw new MethodNotFoundException("Cannot resolve the method of the expression '" + expressionString + "'");
         }
-        throw new MethodNotFoundException("Cannot find the method '" + name + "' of "
-            + base.getClass().getName() + " accepting " + getExpectedParamTypes().length + " argument(s)");
+        // the parameters provided by the expression select the method, the declared types otherwise
+        Class<?>[] paramTypes = arguments == null ? getExpectedParamTypes() : null;
+        return ELMethods.findMethod(base.getClass(), ELSupport.coerceToString(property), paramTypes, arguments);
     }
 }

@@ -105,4 +105,16 @@ class ELSupportTest {
         assertTrue(ELSupport.lessThan("a", "b"));
         assertTrue(ELSupport.greaterThan(new BigDecimal("2.5"), 2));
     }
+
+    @Test
+    void relationalOperatorsOnlyTreatFloatAndDoubleInstancesAsFloatingPoint() {
+        // the section 1.9.2 leaves strings to the lexical rule, the floating point notation rule is arithmetic only
+        assertFalse(ELSupport.equals("1.5", "1.50"));
+        assertTrue(ELSupport.lessThan("1.5", "1.50"));
+        assertTrue(ELSupport.equals(1.5d, "1.5"));
+        assertTrue(ELSupport.equals(1L, "1"));
+        assertThrows(ELException.class, () -> ELSupport.equals(1L, "1.0"));
+        // while the arithmetic rule still applies to strings
+        assertEquals(2.5d, ELArithmetic.add("1.5", 1L));
+    }
 }

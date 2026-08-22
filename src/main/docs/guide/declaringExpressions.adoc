@@ -26,6 +26,24 @@ the expressions, as described in the section 1.24 of the specification.
 `functions`:: the classes whose public static methods are exposed as functions, optionally under a namespace
 prefix. Use `@ELFunction` on a method to give it a different name.
 
+NOTE: The generated registry matches the expected type exactly: an expression declared with
+`expectedType = String.class` is only returned for a request with `String.class`. A request for the same string
+with another type, `Object.class` included, is treated as a different expression, and is rejected as not compiled
+unless the interpreter module is present.
+
+[WARNING]
+====
+Two behaviours of Micronaut's annotation metadata affect how an expression is declared:
+
+* Any annotation string containing `#{...}` is treated by Micronaut as one of its own evaluated expressions. The
+processor reads the original text back out, so `#{...}` works in a plain holder class, but on a Micronaut bean
+Micronaut will also try to compile it with its own expression language. Prefer `${...}`: the specification parses
+the two identically.
+* A primitive class literal such as `double.class` cannot be read from an annotation member, so
+`expectedReturnType` and `expectedParamTypes` must use the wrapper types. `Double.class` matches a method declared
+with `double`.
+====
+
 === What the processor generates
 
 For `${book.title}` with `book` declared as a `Book`, the generated implementation contains the invocation

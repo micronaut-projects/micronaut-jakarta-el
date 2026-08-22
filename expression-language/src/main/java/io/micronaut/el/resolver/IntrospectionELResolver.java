@@ -17,6 +17,7 @@ package io.micronaut.el.resolver;
 
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.beans.BeanIntrospection;
+import io.micronaut.core.type.Argument;
 import io.micronaut.core.beans.BeanIntrospector;
 import io.micronaut.core.beans.BeanMethod;
 import io.micronaut.core.beans.BeanProperty;
@@ -130,7 +131,7 @@ public final class IntrospectionELResolver extends ELResolver {
             return null;
         }
         Object[] arguments = params == null ? new Object[0] : params;
-        BeanMethod<Object, Object> beanMethod = findMethod(introspection, name, arguments.length);
+        BeanMethod<Object, Object> beanMethod = findMethod(introspection, name, arguments);
         if (beanMethod == null) {
             return null;
         }
@@ -152,14 +153,39 @@ public final class IntrospectionELResolver extends ELResolver {
         return coerced;
     }
 
+    /**
+     * Among the overloads of the given arity, prefers one whose parameters accept the arguments as they are,
+     * and falls back to the first one, which will coerce them.
+     */
     @Nullable
-    private BeanMethod<Object, Object> findMethod(BeanIntrospection<Object> introspection, String name, int count) {
+    private BeanMethod<Object, Object> findMethod(BeanIntrospection<Object> introspection,
+                                                  String name,
+                                                  Object[] arguments) {
+        BeanMethod<Object, Object> fallback = null;
         for (BeanMethod<Object, Object> beanMethod : introspection.getBeanMethods()) {
-            if (beanMethod.getName().equals(name) && beanMethod.getArguments().length == count) {
+            if (!beanMethod.getName().equals(name) || beanMethod.getArguments().length != arguments.length) {
+                continue;
+            }
+            if (accepts(beanMethod, arguments)) {
                 return beanMethod;
             }
+            if (fallback == null) {
+                fallback = beanMethod;
+            }
         }
-        return null;
+        return fallback;
+    }
+
+    private static boolean accepts(BeanMethod<Object, Object> beanMethod, Object[] arguments) {
+        Argument<?>[] parameters = beanMethod.getArguments();
+        for (int i = 0; i < parameters.length; i++) {
+            Object argument = arguments[i];
+            Class<?> type = parameters[i].getWrapperType();
+            if (argument == null ? parameters[i].getType().isPrimitive() : !type.isInstance(argument)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Nullable

@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ELInterpreterTest {
@@ -90,5 +91,28 @@ class ELInterpreterTest {
         assertEquals(Boolean.TRUE, processor.eval("Boolean.TRUE"));
         assertEquals(Integer.valueOf(3), processor.eval("Integer.valueOf(3)"));
         assertEquals("x", processor.eval("String('x')"));
+    }
+
+    @Test
+    void methodExpressionsResolveAnAccessibleDeclaration() {
+        // List.of returns a class that is not public, the method must be invoked through the interface
+        processor.defineBean("xs", List.of(1, 2, 3));
+        jakarta.el.ELContext context = processor.getELManager().getELContext();
+        jakarta.el.ExpressionFactory factory = jakarta.el.ExpressionFactory.newInstance();
+        jakarta.el.MethodExpression size = factory.createMethodExpression(context, "#{xs.size}", Object.class, new Class<?>[0]);
+        assertEquals((Object) 3, size.invoke(context, null));
+        assertEquals("size", size.getMethodInfo(context).getName());
+    }
+
+    @Test
+    void anIdentifierThatIsNotInvocableDefersToTheFunctionMapper() throws NoSuchMethodException {
+        processor.defineBean("twice", 42L);
+        processor.defineFunction("", "twice", ELInterpreterTest.class.getMethod("twice", long.class));
+        assertEquals((Object) 6L, processor.eval("twice(3)"));
+        assertThrows(jakarta.el.MethodNotFoundException.class, () -> processor.eval("twice2(3)"));
+    }
+
+    public static long twice(long value) {
+        return value * 2;
     }
 }
