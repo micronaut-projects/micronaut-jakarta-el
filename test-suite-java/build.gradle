@@ -16,6 +16,7 @@ dependencies {
     testImplementation projects.testSuiteCustomProcessor
     testImplementation mn.micronaut.core
     testImplementation mn.micronaut.inject
+    testRuntimeOnly mn.micronaut.context
     testImplementation platform(libs.junit.bom)
     testImplementation libs.junit.jupiter
     testRuntimeOnly libs.junit.jupiter.engine

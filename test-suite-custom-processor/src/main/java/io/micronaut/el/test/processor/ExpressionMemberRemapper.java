@@ -79,6 +79,15 @@ public final class ExpressionMemberRemapper implements AnnotationRemapper {
         return remapped;
     }
 
+    private static int nextSegment(String text, int from) {
+        int hash = text.indexOf("#{", from);
+        int dollar = text.indexOf("${", from);
+        if (hash < 0) {
+            return dollar;
+        }
+        return dollar < 0 ? hash : Math.min(hash, dollar);
+    }
+
     /**
      * The text of the members as written. Micronaut has already replaced a string containing {@code #{...}} by an
      * evaluated expression reference when the remapper runs; the original text is taken back.
@@ -89,7 +98,8 @@ public final class ExpressionMemberRemapper implements AnnotationRemapper {
             Object value = annotation.getValues().get(member);
             if (value instanceof EvaluatedExpressionReference reference) {
                 texts.put(member, reference.annotationValue().toString());
-            } else if (value instanceof String text && text.contains("#{")) {
+            } else if (value instanceof String text && (text.contains("#{") || text.contains("${"))) {
+                // a ${...} is not claimed by Micronaut at compilation time, it reaches the remapper as written
                 texts.put(member, text);
             }
         }
@@ -97,7 +107,7 @@ public final class ExpressionMemberRemapper implements AnnotationRemapper {
     }
 
     /**
-     * The {@code #{...}} segments of the texts, as an interpolator scans them: a segment ends at the first
+     * The {@code #{...}} and {@code ${...}} segments of the texts, as an interpolator scans them: a segment ends at the first
      * unescaped closing brace outside a string literal. The registry is keyed by the text the runtime asks the
      * factory for, so the segments are taken from the text as written.
      */
@@ -105,7 +115,7 @@ public final class ExpressionMemberRemapper implements AnnotationRemapper {
         List<String> segments = new ArrayList<>();
         for (String text : texts) {
             int i = 0;
-            while ((i = text.indexOf("#{", i)) >= 0) {
+            while ((i = nextSegment(text, i)) >= 0) {
                 int end = -1;
                 char quote = 0;
                 for (int j = i + 2; j < text.length(); j++) {
