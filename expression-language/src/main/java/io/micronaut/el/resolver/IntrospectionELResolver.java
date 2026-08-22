@@ -32,7 +32,6 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * The {@link ELResolver} resolving the types annotated with {@link io.micronaut.core.annotation.Introspected}
  * through the bean introspection generated for them at compilation time.
@@ -155,7 +154,6 @@ public final class IntrospectionELResolver extends ELResolver {
         return base == null ? null : Object.class;
     }
 
-
     /**
      * The overloads of the given name that can take the arguments, in the order the section 1.6 of the
      * specification prefers them: a fixed arity overload whose parameters accept the arguments as they are,
@@ -243,7 +241,6 @@ public final class IntrospectionELResolver extends ELResolver {
             return null;
         }
     }
-
 
     @Nullable
     private BeanProperty<Object, Object> findProperty(@Nullable Object base, @Nullable Object property) {

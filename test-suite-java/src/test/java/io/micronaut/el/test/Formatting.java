@@ -25,6 +25,11 @@ public class Formatting {
     }
 
     @Executable
+    public int twice(int value) {
+        return value * 2;
+    }
+
+    @Executable
     public String format(String format, Object... args) {
         return String.format(format, args);
     }

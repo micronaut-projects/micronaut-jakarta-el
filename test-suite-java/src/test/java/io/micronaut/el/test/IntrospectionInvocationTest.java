@@ -3,7 +3,8 @@ package io.micronaut.el.test;
 import io.micronaut.el.CompiledELContext;
 import jakarta.el.ELContext;
 import jakarta.el.ELResolver;
-import jakarta.el.MethodNotFoundException;
+import io.micronaut.el.resolver.IntrospectionELResolver;
+import jakarta.el.ELException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -42,28 +43,32 @@ class IntrospectionInvocationTest {
 
     @Test
     void anArrayGivenDirectlyIsPassedThroughNotWrapped() {
-        assertEquals("a-b", invoke("join", "-", new Object[]{new Object[]{"a", "b"}}));
+        assertEquals("a-b", invoke("join", "-", new Object[]{"a", "b"}));
         assertEquals(3, invoke("size", new Object[]{new Object[]{1, 2, 3}}));
     }
 
     @Test
-    void aFixedArityArrayParameterIsNotPackedFromAScalar() {
-        // size(Object[]) with a scalar is not a fit for the introspection; the chain is left to decide
-        context.setPropertyResolved(false);
-        assertThrows(MethodNotFoundException.class, () -> invoke("size", "x"));
+    void aScalarIsPackedIntoATrailingArrayParameter() {
+        // a BeanMethod does not say whether the array is variadic, so a trailing array parameter is treated as
+        // one: a scalar that would otherwise fail to coerce to the array is packed into it
+        assertEquals(1, invoke("size", "x"));
     }
 
     @Test
     void theResolverDeclinesRatherThanCommittingToAMismatch() {
-        io.micronaut.el.resolver.IntrospectionELResolver alone = new io.micronaut.el.resolver.IntrospectionELResolver();
+        IntrospectionELResolver alone = new IntrospectionELResolver();
         context.setPropertyResolved(false);
-        assertNull(alone.invoke(context, formatting, "size", null, new Object[]{"x"}));
+        assertNull(alone.invoke(context, formatting, "twice", null, new Object[]{"not a number"}));
         assertFalse(context.isPropertyResolved());
+        // the standard resolvers then get their chance, and report the mismatch themselves
+        assertThrows(ELException.class, () -> invoke("twice", "not a number"));
+        assertEquals(6, invoke("twice", "3"));
     }
 
     @Test
-    void theCompiledAndInterpretedPathsSeeTheSameResult() {
-        jakarta.el.ExpressionFactory factory = jakarta.el.ExpressionFactory.newInstance();
-        assertEquals("0.50", factory.createValueExpression(context, "${f.format('%.2f', 0.5)}", String.class).getValue(context));
+    void theCompiledExpressionsReachTheFormatterThroughTheChain() {
+        assertEquals("0.50", FormattingExpressions$ELExpressions.FORMATTED.getValue(context));
+        assertEquals("a-b-c", FormattingExpressions$ELExpressions.JOINED.getValue(context));
+        assertEquals("only:-", FormattingExpressions$ELExpressions.JOINED_ALONE.getValue(context));
     }
 }
