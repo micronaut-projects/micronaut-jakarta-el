@@ -30,13 +30,17 @@ import java.lang.annotation.Target;
  * parsing, no abstract syntax tree traversal and, whenever the types are known, no reflective
  * resolution happens at runtime.</p>
  *
+ * <p>An expression declared on a field, a method or a parameter is compiled into the registry of the
+ * declaring class, exactly as one declared on the class itself. This is how an annotation processor routes
+ * the expressions of other annotations, which live on the members, to the compiler.</p>
+ *
  * @author Denis Stepanov
  * @since 1.0
  * @see ELEnvironment
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
+@Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE, ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER})
 @Repeatable(ELExpressions.class)
 @Experimental
 public @interface ELExpression {
