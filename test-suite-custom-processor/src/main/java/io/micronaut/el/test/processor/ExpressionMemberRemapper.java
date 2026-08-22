@@ -27,6 +27,11 @@ import java.util.Map;
  *
  * <p>Two sets of annotations are handled: the ones carrying {@link JakartaExpLang}, and the constraints of
  * Jakarta Validation, whose {@code message} member is an expression language template by specification.</p>
+ *
+ * <p>The specification parses {@code ${...}} and {@code #{...}} identically, Micronaut does not: at runtime
+ * the environment aware metadata of a bean resolves {@code ${...}} as a property placeholder. So the text is
+ * stored with every {@code ${...}} rewritten to {@code #{...}}, which nothing in Micronaut touches, and the
+ * author keeps writing the syntax of the specification.</p>
  */
 public final class ExpressionMemberRemapper implements AnnotationRemapper {
 
@@ -65,7 +70,9 @@ public final class ExpressionMemberRemapper implements AnnotationRemapper {
             return List.of(annotation);
         }
         List<AnnotationValue<?>> remapped = new ArrayList<>();
-        // the annotation, with the text exactly as written in place of what Micronaut made of it
+        // the annotation, with the text as written except that ${...} becomes #{...}, in place of what
+        // Micronaut made of it
+        texts.replaceAll((member, text) -> normalize(text));
         Map<CharSequence, Object> values = new LinkedHashMap<>(annotation.getValues());
         values.putAll(texts);
         remapped.add(new AnnotationValue<>(annotation.getAnnotationName(), values));
@@ -77,6 +84,23 @@ public final class ExpressionMemberRemapper implements AnnotationRemapper {
                 .build());
         }
         return remapped;
+    }
+
+    /**
+     * Rewrites every {@code ${...}} segment to {@code #{...}}, leaving the rest of the text untouched.
+     */
+    private static String normalize(String text) {
+        StringBuilder result = new StringBuilder(text.length());
+        int from = 0;
+        for (String segment : segmentsOf(List.of(text))) {
+            if (!segment.startsWith("${")) {
+                continue;
+            }
+            int at = text.indexOf(segment, from);
+            result.append(text, from, at).append('#').append(segment, 1, segment.length());
+            from = at + segment.length();
+        }
+        return result.append(text, from, text.length()).toString();
     }
 
     private static int nextSegment(String text, int from) {
