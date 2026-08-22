@@ -19,6 +19,8 @@ import org.jspecify.annotations.Nullable;
 import jakarta.el.MethodExpression;
 import jakarta.el.ValueExpression;
 
+import java.util.List;
+
 /**
  * A source of the expressions compiled at compilation time.
  *
@@ -31,6 +33,19 @@ import jakarta.el.ValueExpression;
  * @since 1.0
  */
 public interface ELExpressionSource {
+
+    /**
+     * The expression strings this source declares, so that {@link CompiledExpressionFactory} can index the
+     * sources once and consult only the ones declaring the expression it is asked for.
+     *
+     * <p>A source returning an empty list is consulted for every expression, which keeps a source generated
+     * before this method existed working, at the cost of a lookup per expression.</p>
+     *
+     * @return The expression strings, value and method expressions alike
+     */
+    default List<String> expressions() {
+        return List.of();
+    }
 
     /**
      * @param expression   The expression string

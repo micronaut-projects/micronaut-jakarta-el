@@ -31,9 +31,11 @@ import jakarta.el.MethodExpression;
 import jakarta.el.ValueExpression;
 
 import java.lang.reflect.Method;
-import java.util.Objects;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * The {@link ExpressionFactory} returning the expressions compiled at compilation time.
@@ -46,19 +48,37 @@ import java.util.Map;
  */
 public class CompiledExpressionFactory extends ExpressionFactory {
 
-    private final List<ELExpressionSource> sources;
+    /**
+     * The sources declaring each expression string, in their load order.
+     */
+    private final Map<String, List<ELExpressionSource>> indexed;
+    /**
+     * The sources declaring no expression strings, consulted for every expression.
+     */
+    private final List<ELExpressionSource> unindexed;
     private final @Nullable ELExpressionParser parser;
 
     /**
      * Creates a factory loading the generated expression sources with the {@link SoftServiceLoader}.
+     *
+     * <p>The sources are loaded with the context class loader of the thread, which is the loader
+     * {@link ExpressionFactory#newInstance()} locates this factory with, so that the expressions generated
+     * into a class loader that is a child of the one holding this class — a deployment, a plugin, an isolated
+     * test — are found. The loader of this class is used when the thread has none.</p>
      */
     public CompiledExpressionFactory() {
+        this(contextClassLoader());
+    }
+
+    /**
+     * Creates a factory loading the generated expression sources from the given class loader.
+     *
+     * @param classLoader The class loader holding the generated sources and the optional parser
+     */
+    public CompiledExpressionFactory(ClassLoader classLoader) {
         this(
-            SoftServiceLoader.load(ELExpressionSource.class, CompiledExpressionFactory.class.getClassLoader())
-                .collectAll(),
-            SoftServiceLoader.load(ELExpressionParser.class, CompiledExpressionFactory.class.getClassLoader())
-                .firstAvailable()
-                .orElse(null)
+            SoftServiceLoader.load(ELExpressionSource.class, classLoader).collectAll(),
+            SoftServiceLoader.load(ELExpressionParser.class, classLoader).firstAvailable().orElse(null)
         );
     }
 
@@ -74,14 +94,51 @@ public class CompiledExpressionFactory extends ExpressionFactory {
      * @param parser  The parser creating the expressions that were not compiled, can be {@code null}
      */
     public CompiledExpressionFactory(List<ELExpressionSource> sources, @Nullable ELExpressionParser parser) {
-        this.sources = sources;
+        Map<String, List<ELExpressionSource>> indexed = new HashMap<>();
+        List<ELExpressionSource> unindexed = new ArrayList<>();
+        for (ELExpressionSource source : sources) {
+            List<String> expressions = source.expressions();
+            if (expressions.isEmpty()) {
+                unindexed.add(source);
+                continue;
+            }
+            for (String expression : expressions) {
+                indexed.computeIfAbsent(expression, key -> new ArrayList<>(1)).add(source);
+            }
+        }
+        this.indexed = indexed;
+        this.unindexed = unindexed;
         this.parser = parser;
+    }
+
+    private static ClassLoader contextClassLoader() {
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        return classLoader == null ? CompiledExpressionFactory.class.getClassLoader() : classLoader;
+    }
+
+    /**
+     * The sources that may declare the expression: the ones indexed under its string, then the ones that
+     * declare no strings. A source generated before {@link ELExpressionSource#expressions()} existed falls in
+     * the second group and keeps working.
+     */
+    private List<ELExpressionSource> sourcesOf(@Nullable String expression) {
+        List<ELExpressionSource> declaring = expression == null ? null : indexed.get(expression);
+        if (declaring == null) {
+            return unindexed;
+        }
+        if (unindexed.isEmpty()) {
+            return declaring;
+        }
+        List<ELExpressionSource> all = new ArrayList<>(declaring.size() + unindexed.size());
+        all.addAll(declaring);
+        all.addAll(unindexed);
+        return all;
     }
 
     @Override
     public ValueExpression createValueExpression(ELContext context, String expression, Class<?> expectedType) {
         Class<?> type = Objects.requireNonNull(expectedType, "The expected type cannot be null");
-        for (ELExpressionSource source : sources) {
+        for (ELExpressionSource source : sourcesOf(expression)) {
             ValueExpression valueExpression = source.createValueExpression(expression, type);
             if (valueExpression != null) {
                 return valueExpression;
@@ -109,7 +166,7 @@ public class CompiledExpressionFactory extends ExpressionFactory {
                                                    Class<?>[] expectedParamTypes) {
         Class<?> returnType = expectedReturnType == null ? Object.class : expectedReturnType;
         Class<?>[] paramTypes = expectedParamTypes;
-        for (ELExpressionSource source : sources) {
+        for (ELExpressionSource source : sourcesOf(expression)) {
             MethodExpression methodExpression = source.createMethodExpression(expression, returnType, paramTypes);
             if (methodExpression != null) {
                 return requireParamTypes(methodExpression, paramTypes);

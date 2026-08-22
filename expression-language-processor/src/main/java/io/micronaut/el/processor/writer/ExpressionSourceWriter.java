@@ -33,8 +33,10 @@ import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * The writer of the {@link ELExpressionSource} implementations, which give access to the expressions
@@ -51,6 +53,9 @@ public final class ExpressionSourceWriter {
     private static final TypeDef CLASS_TYPE = TypeDef.parameterized(ClassTypeDef.of(Class.class), TypeDef.wildcard());
     private static final TypeDef.Array CLASS_ARRAY = TypeDef.array(CLASS_TYPE);
     private static final TypeDef STRING = TypeDef.of(String.class);
+    private static final TypeDef.Array STRING_ARRAY = TypeDef.array(STRING);
+    private static final TypeDef STRING_LIST = TypeDef.parameterized(ClassTypeDef.of(List.class), STRING);
+    private static final TypeDef.Array OBJECT_ARRAY = TypeDef.array(TypeDef.OBJECT);
     private static final String EXPRESSION = "expression";
 
     private ExpressionSourceWriter() {
@@ -79,6 +84,7 @@ public final class ExpressionSourceWriter {
         for (CompiledMethod method : methodExpressions) {
             builder.addField(constant(method.definition().constantName(), METHOD_EXPRESSION, method.className()));
         }
+        builder.addMethod(expressions(valueExpressions, methodExpressions));
         if (!valueExpressions.isEmpty()) {
             builder.addMethod(createValueExpression(className, valueExpressions));
         }
@@ -93,6 +99,31 @@ public final class ExpressionSourceWriter {
             .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
             .initializer(ClassTypeDef.of(implementationClass).instantiate())
             .build();
+    }
+
+    /**
+     * The expression strings of the source, without duplicates: an expression declared twice with different
+     * expected types is one string, and a string declared both as a value and as a method expression is one
+     * string too.
+     */
+    private static MethodDef expressions(List<CompiledValue> valueExpressions, List<CompiledMethod> methodExpressions) {
+        Set<String> strings = new LinkedHashSet<>();
+        for (CompiledValue value : valueExpressions) {
+            strings.add(value.definition().expression());
+        }
+        for (CompiledMethod method : methodExpressions) {
+            strings.add(method.definition().expression());
+        }
+        List<ExpressionDef> constants = strings.stream().map(s -> (ExpressionDef) ExpressionDef.constant(s)).toList();
+        // List.of(E...) erases to List.of(Object[]): the parameter type is given explicitly so that the bytecode
+        // generator emits that descriptor rather than List.of(String[]), which does not exist.
+        return MethodDef.builder("expressions")
+            .addModifiers(Modifier.PUBLIC)
+            .overrides()
+            .returns(STRING_LIST)
+            .build((aThis, parameters) -> ClassTypeDef.of(List.class)
+                .invokeStatic("of", List.of(OBJECT_ARRAY), STRING_LIST, List.of(STRING_ARRAY.instantiate(constants)))
+                .returning());
     }
 
     private static MethodDef createValueExpression(String className, List<CompiledValue> expressions) {

@@ -1,6 +1,7 @@
 package io.micronaut.el.test;
 
 import io.micronaut.el.CompiledELContext;
+import io.micronaut.el.ELExpressionSource;
 import jakarta.el.ELException;
 import jakarta.el.ExpressionFactory;
 import jakarta.el.ValueExpression;
@@ -28,6 +29,15 @@ class ExpressionFactoryTest {
         ValueExpression expression = factory.createValueExpression(context, "${suit == 'SPADE'}", Boolean.class);
         assertEquals(FactoryExpressions$ELExpressions.IS_SPADE, expression);
         assertEquals(Boolean.TRUE, expression.getValue(context));
+    }
+
+    @Test
+    void theGeneratedSourceDeclaresItsExpressions() {
+        ELExpressionSource source = new FactoryExpressions$ELExpressions();
+
+        assertTrue(source.expressions().contains("${suit == 'SPADE'}"),
+            () -> "Expected the source to declare its expressions but got " + source.expressions());
+        assertEquals(source.expressions().size(), source.expressions().stream().distinct().count());
     }
 
     @Test
