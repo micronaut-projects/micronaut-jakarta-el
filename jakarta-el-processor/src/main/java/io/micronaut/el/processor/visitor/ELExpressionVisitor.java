@@ -15,6 +15,7 @@
  */
 package io.micronaut.el.processor.visitor;
 
+import io.micronaut.core.annotation.AnnotationClassValue;
 import io.micronaut.core.annotation.AnnotationMetadata;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.expressions.EvaluatedExpressionReference;
@@ -39,8 +40,10 @@ import io.micronaut.el.processor.writer.ExpressionSourceWriter;
 import io.micronaut.el.processor.writer.MethodExpressionWriter;
 import io.micronaut.el.processor.writer.ValueExpressionWriter;
 import io.micronaut.inject.ast.ClassElement;
+import io.micronaut.inject.ast.FieldElement;
 import io.micronaut.inject.ast.ElementQuery;
 import io.micronaut.inject.ast.MethodElement;
+import io.micronaut.inject.ast.ParameterElement;
 import io.micronaut.inject.processing.ProcessingException;
 import io.micronaut.inject.visitor.TypeElementVisitor;
 import io.micronaut.inject.visitor.VisitorContext;
@@ -49,6 +52,7 @@ import io.micronaut.sourcegen.generator.bytecode.ByteCodeGenerator;
 import io.micronaut.sourcegen.generator.SourceGenerators;
 import io.micronaut.sourcegen.model.ClassDef;
 
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -129,9 +133,9 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
         if (!processed.add(element.getName())) {
             return;
         }
-        List<AnnotationValue<ELExpression>> expressions = element.getAnnotationValuesByType(ELExpression.class);
+        List<AnnotationValue<ELExpression>> expressions = declaredOn(element, ELExpression.class);
         List<AnnotationValue<ELMethodExpression>> methodExpressions =
-            element.getAnnotationValuesByType(ELMethodExpression.class);
+            declaredOn(element, ELMethodExpression.class);
         if (expressions.isEmpty() && methodExpressions.isEmpty()) {
             return;
         }
@@ -182,6 +186,31 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
      */
     private static String reportable(Exception e) {
         return String.valueOf(e.getMessage()).replace("%", "%%");
+    }
+
+    /**
+     * The declarations of an annotation on the class and on its declared fields, methods and parameters, in
+     * that order. An expression declared twice is compiled once.
+     */
+    private static <A extends Annotation> List<AnnotationValue<A>> declaredOn(ClassElement element, Class<A> annotation) {
+        List<AnnotationValue<A>> declared = new ArrayList<>(element.getAnnotationValuesByType(annotation));
+        for (FieldElement field : element.getEnclosedElements(ElementQuery.ALL_FIELDS.onlyDeclared())) {
+            declared.addAll(field.getAnnotationValuesByType(annotation));
+        }
+        for (MethodElement method : element.getEnclosedElements(ElementQuery.ALL_METHODS.onlyDeclared())) {
+            declared.addAll(method.getAnnotationValuesByType(annotation));
+            for (ParameterElement parameter : method.getParameters()) {
+                declared.addAll(parameter.getAnnotationValuesByType(annotation));
+            }
+        }
+        Map<String, AnnotationValue<A>> distinct = new LinkedHashMap<>();
+        for (AnnotationValue<A> value : declared) {
+            String key = expressionOf(value).orElse("") + "|"
+                + value.annotationClassValue("expectedType").map(AnnotationClassValue::getName).orElse("")
+                + "|" + value.annotationClassValue("expectedReturnType").map(AnnotationClassValue::getName).orElse("");
+            distinct.putIfAbsent(key, value);
+        }
+        return new ArrayList<>(distinct.values());
     }
 
     private ELExpressionDefinition valueDefinition(AnnotationValue<ELExpression> annotation,
