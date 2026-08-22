@@ -1,0 +1,16 @@
+plugins {
+    id "io.micronaut.build.internal.expression-language-test-suite"
+}
+
+dependencies {
+    testAnnotationProcessor projects.micronautExpressionLanguageProcessor
+    testAnnotationProcessor mn.micronaut.inject.java
+
+    testAnnotationProcessor platform(libs.micronaut.core)
+
+    testImplementation platform(libs.micronaut.core)
+    testImplementation projects.micronautExpressionLanguage
+    testImplementation platform(libs.junit.bom)
+    testImplementation libs.junit.jupiter
+    testRuntimeOnly libs.junit.jupiter.engine
+}

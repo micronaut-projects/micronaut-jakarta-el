@@ -1,0 +1,35 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+
+plugins {
+    id 'io.micronaut.build.shared.settings' version '8.0.0-M18'
+}
+
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+    }
+}
+
+rootProject.name = 'expression-language-parent'
+
+include 'expression-language'
+include 'expression-language-annotations'
+include 'expression-language-bom'
+include 'expression-language-interpreter'
+include 'expression-language-parser'
+include 'expression-language-processor'
+include 'test-suite-java'
+include 'tests:jakarta-el-tck'
+
+micronautBuild {
+    useStandardizedProjectNames.set(true)
+    importMicronautCatalog()
+    importMicronautCatalog("micronaut-sourcegen")
+}

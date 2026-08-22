@@ -1,0 +1,94 @@
+/*
+ * Copyright 2017-2026 original authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package io.micronaut.el.interpreter;
+
+import jakarta.el.ELProcessor;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class ELInterpreterTest {
+
+    private final ELProcessor processor = new ELProcessor();
+
+    @Test
+    void literalsAndArithmetic() {
+        assertEquals((Object) 3L, processor.eval("1 + 2"));
+        assertEquals((Object) 2.5d, processor.eval("5 / 2"));
+        assertEquals((Object) 1L, processor.eval("7 mod 3"));
+        assertEquals((Object) Long.valueOf(-3L), processor.eval("-(1 + 2)"));
+        assertEquals("ab", processor.eval("'a' += 'b'"));
+    }
+
+    @Test
+    void relationalAndLogicalOperators() {
+        assertEquals((Object) true, processor.eval("1 lt 2"));
+        assertEquals((Object) true, processor.eval("'a' == 'a'"));
+        assertEquals((Object) false, processor.eval("null == 1"));
+        assertEquals((Object) true, processor.eval("true and not false"));
+        assertEquals((Object) true, processor.eval("empty null"));
+        assertEquals((Object) true, processor.eval("empty []"));
+    }
+
+    @Test
+    void conditionalAndSemicolonOperators() {
+        assertEquals("yes", processor.eval("true ? 'yes' : 'no'"));
+        assertEquals((Object) 2L, processor.eval("1; 2"));
+    }
+
+    @Test
+    void collectionConstruction() {
+        assertEquals(List.of(1L, 2L, 3L), processor.eval("[1,2,3]"));
+        assertEquals(Map.of("one", 1L), processor.eval("{'one':1}"));
+        assertTrue(processor.eval("{1,2,3}") instanceof java.util.Set);
+    }
+
+    @Test
+    void lambdaExpressions() {
+        assertEquals((Object) 7L, processor.eval("((x,y)->x+y)(3,4)"));
+        assertEquals((Object) 7L, processor.eval("v = (x,y)->x+y; v(3,4)"));
+        assertEquals((Object) 120L, processor.eval("fact = n -> n==0? 1: n*fact(n-1); fact(5)"));
+        assertEquals((Object) 3L, processor.eval("(x->y->x+y)(1)(2)"));
+    }
+
+    @Test
+    void collectionOperations() {
+        assertEquals(List.of(2L, 4L), processor.eval("[1,2,3,4].stream().filter(i->i mod 2 == 0).toList()"));
+        assertEquals((Object) 10L, processor.eval("[1,2,3,4].stream().sum()"));
+        assertEquals((Object) 4L, processor.eval("[1,2,3,4].stream().count()"));
+        assertEquals(List.of(1L, 2L, 3L), processor.eval("[3,1,2].stream().sorted().toList()"));
+        assertEquals((Object) 3L, processor.eval("[1,2,3].stream().max().get()"));
+    }
+
+    @Test
+    void assignmentAndBeans() {
+        processor.defineBean("greeting", "hello");
+        assertEquals("hello", processor.eval("greeting"));
+        assertEquals((Object) 5, processor.eval("greeting.length()"));
+        assertEquals("HELLO", processor.eval("greeting.toUpperCase()"));
+    }
+
+    @Test
+    void staticFieldAndConstructorReferences() {
+        assertEquals(Boolean.TRUE, processor.eval("Boolean.TRUE"));
+        assertEquals(Integer.valueOf(3), processor.eval("Integer.valueOf(3)"));
+        assertEquals("x", processor.eval("String('x')"));
+    }
+}

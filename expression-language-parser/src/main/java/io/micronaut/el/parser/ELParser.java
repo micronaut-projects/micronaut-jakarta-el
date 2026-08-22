@@ -1,0 +1,491 @@
+/*
+ * Copyright 2017-2026 original authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package io.micronaut.el.parser;
+
+import io.micronaut.el.parser.ast.BinaryOperator;
+import io.micronaut.el.parser.ast.ELNode;
+import io.micronaut.el.parser.ast.UnaryOperator;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * The parser of the Jakarta Expression Language grammar collected in the section 1.26 of the
+ * specification.
+ *
+ * <p>The parser is a recursive descent implementation of the grammar, with the operator precedence
+ * described in the section 1.16 of the specification.</p>
+ *
+ * @author Denis Stepanov
+ * @since 1.0
+ */
+public final class ELParser {
+
+    private final String expression;
+    private final List<Token> tokens;
+    private int index;
+
+    private ELParser(String expression) {
+        this.expression = expression;
+        this.tokens = ELTokenizer.tokenize(expression);
+    }
+
+    /**
+     * Parses an expression, which can be a literal-expression, an eval-expression or a composite
+     * expression.
+     *
+     * @param expression The expression
+     * @return The parsed expression
+     */
+    public static ELNode parse(String expression) {
+        return new ELParser(expression).parseComposite();
+    }
+
+    /**
+     * Parses an expression that must consist of a single eval-expression, as required for a method
+     * expression by the section 1.2.3 of the specification.
+     *
+     * @param expression The expression
+     * @return The parsed expression
+     */
+    public static ELNode parseEval(String expression) {
+        ELNode node = parse(expression);
+        if (node instanceof ELNode.Eval) {
+            return node;
+        }
+        if (node instanceof ELNode.LiteralText) {
+            return node;
+        }
+        throw new ELParsingException("Only a single eval-expression can be used as a method expression, "
+            + "but the expression [" + expression + "] is a composite expression");
+    }
+
+    private ELNode parseComposite() {
+        List<ELNode> parts = new ArrayList<>();
+        Boolean deferred = null;
+        while (!at(TokenType.EOF)) {
+            if (at(TokenType.LITERAL_TEXT)) {
+                parts.add(new ELNode.LiteralText(next().value()));
+                continue;
+            }
+            if (at(TokenType.START_DYNAMIC) || at(TokenType.START_DEFERRED)) {
+                boolean nodeDeferred = at(TokenType.START_DEFERRED);
+                if (deferred != null && deferred != nodeDeferred) {
+                    throw error("The ${} and #{} constructs cannot be mixed in a composite expression");
+                }
+                deferred = nodeDeferred;
+                next();
+                ELNode node = parseExpression();
+                expect(TokenType.RCURL);
+                parts.add(new ELNode.Eval(node));
+                continue;
+            }
+            throw error("Unexpected token " + peek());
+        }
+        if (parts.isEmpty()) {
+            return new ELNode.LiteralText("");
+        }
+        if (parts.size() == 1) {
+            return parts.get(0);
+        }
+        return new ELNode.Composite(parts);
+    }
+
+    private ELNode parseExpression() {
+        return parseSemicolon();
+    }
+
+    private ELNode parseSemicolon() {
+        ELNode left = parseAssignment();
+        while (at(TokenType.SEMICOLON)) {
+            next();
+            left = new ELNode.Semicolon(left, parseAssignment());
+        }
+        return left;
+    }
+
+    private ELNode parseAssignment() {
+        if (isLambdaParametersAt(index)) {
+            return parseLambda();
+        }
+        ELNode left = parseChoice();
+        if (at(TokenType.ASSIGN)) {
+            next();
+            return new ELNode.Assign(left, parseAssignment());
+        }
+        return left;
+    }
+
+    private ELNode parseLambda() {
+        List<String> parameters = parseLambdaParameters();
+        expect(TokenType.ARROW);
+        ELNode body = isLambdaParametersAt(index) ? parseLambda() : parseChoice();
+        return new ELNode.Lambda(parameters, body);
+    }
+
+    private List<String> parseLambdaParameters() {
+        if (at(TokenType.IDENTIFIER)) {
+            return List.of(next().value());
+        }
+        expect(TokenType.LPAREN);
+        List<String> parameters = new ArrayList<>();
+        if (!at(TokenType.RPAREN)) {
+            parameters.add(expect(TokenType.IDENTIFIER).value());
+            while (at(TokenType.COMMA)) {
+                next();
+                parameters.add(expect(TokenType.IDENTIFIER).value());
+            }
+        }
+        expect(TokenType.RPAREN);
+        return parameters;
+    }
+
+    private ELNode parseChoice() {
+        ELNode condition = parseOr();
+        if (at(TokenType.QUESTIONMARK)) {
+            next();
+            ELNode ifTrue = parseChoice();
+            expect(TokenType.COLON);
+            ELNode ifFalse = parseChoice();
+            return new ELNode.Ternary(condition, ifTrue, ifFalse);
+        }
+        return condition;
+    }
+
+    private ELNode parseOr() {
+        ELNode left = parseAnd();
+        while (at(TokenType.OR)) {
+            next();
+            left = new ELNode.Binary(BinaryOperator.OR, left, parseAnd());
+        }
+        return left;
+    }
+
+    private ELNode parseAnd() {
+        ELNode left = parseEquality();
+        while (at(TokenType.AND)) {
+            next();
+            left = new ELNode.Binary(BinaryOperator.AND, left, parseEquality());
+        }
+        return left;
+    }
+
+    private ELNode parseEquality() {
+        ELNode left = parseComparison();
+        while (at(TokenType.EQ) || at(TokenType.NE)) {
+            BinaryOperator operator = next().is(TokenType.EQ) ? BinaryOperator.EQUAL : BinaryOperator.NOT_EQUAL;
+            left = new ELNode.Binary(operator, left, parseComparison());
+        }
+        return left;
+    }
+
+    private ELNode parseComparison() {
+        ELNode left = parseConcatenation();
+        while (at(TokenType.LT) || at(TokenType.GT) || at(TokenType.LE) || at(TokenType.GE)) {
+            BinaryOperator operator = switch (next().type()) {
+                case LT -> BinaryOperator.LESS_THAN;
+                case GT -> BinaryOperator.GREATER_THAN;
+                case LE -> BinaryOperator.LESS_THAN_OR_EQUAL;
+                default -> BinaryOperator.GREATER_THAN_OR_EQUAL;
+            };
+            left = new ELNode.Binary(operator, left, parseConcatenation());
+        }
+        return left;
+    }
+
+    private ELNode parseConcatenation() {
+        ELNode left = parseMath();
+        while (at(TokenType.CONCAT)) {
+            next();
+            left = new ELNode.Binary(BinaryOperator.CONCAT, left, parseMath());
+        }
+        return left;
+    }
+
+    private ELNode parseMath() {
+        ELNode left = parseMultiplication();
+        while (at(TokenType.PLUS) || at(TokenType.MINUS)) {
+            BinaryOperator operator = next().is(TokenType.PLUS) ? BinaryOperator.ADD : BinaryOperator.SUBTRACT;
+            left = new ELNode.Binary(operator, left, parseMultiplication());
+        }
+        return left;
+    }
+
+    private ELNode parseMultiplication() {
+        ELNode left = parseUnary();
+        while (at(TokenType.MULT) || at(TokenType.DIV) || at(TokenType.MOD)) {
+            BinaryOperator operator = switch (next().type()) {
+                case MULT -> BinaryOperator.MULTIPLY;
+                case DIV -> BinaryOperator.DIVIDE;
+                default -> BinaryOperator.MODULO;
+            };
+            left = new ELNode.Binary(operator, left, parseUnary());
+        }
+        return left;
+    }
+
+    private ELNode parseUnary() {
+        if (at(TokenType.MINUS)) {
+            next();
+            return new ELNode.Unary(UnaryOperator.NEGATE, parseUnary());
+        }
+        if (at(TokenType.NOT)) {
+            next();
+            return new ELNode.Unary(UnaryOperator.NOT, parseUnary());
+        }
+        if (at(TokenType.EMPTY)) {
+            next();
+            return new ELNode.Unary(UnaryOperator.EMPTY, parseUnary());
+        }
+        return parseValue();
+    }
+
+    private ELNode parseValue() {
+        ELNode value = parseValuePrefix();
+        while (true) {
+            if (at(TokenType.DOT)) {
+                next();
+                Token property = expectIdentifierLike();
+                ELNode name = new ELNode.StringLiteral(property.value());
+                if (at(TokenType.LPAREN)) {
+                    value = new ELNode.Method(value, name, parseArguments());
+                } else {
+                    value = new ELNode.Property(value, name);
+                }
+                continue;
+            }
+            if (at(TokenType.LBRACK)) {
+                next();
+                ELNode property = parseExpression();
+                expect(TokenType.RBRACK);
+                if (at(TokenType.LPAREN)) {
+                    value = new ELNode.Method(value, property, parseArguments());
+                } else {
+                    value = new ELNode.Property(value, property);
+                }
+                continue;
+            }
+            return value;
+        }
+    }
+
+    private ELNode parseValuePrefix() {
+        return switch (peek().type()) {
+            case TRUE -> {
+                next();
+                yield new ELNode.BooleanLiteral(true);
+            }
+            case FALSE -> {
+                next();
+                yield new ELNode.BooleanLiteral(false);
+            }
+            case NULL -> {
+                next();
+                yield new ELNode.NullLiteral();
+            }
+            case INTEGER_LITERAL -> new ELNode.IntegerLiteral(next().value());
+            case FLOATING_POINT_LITERAL -> new ELNode.FloatingPointLiteral(next().value());
+            case STRING_LITERAL -> new ELNode.StringLiteral(next().value());
+            default -> parseNonLiteral();
+        };
+    }
+
+    private ELNode parseNonLiteral() {
+        if (at(TokenType.LPAREN)) {
+            if (isLambdaParametersAt(index + 1)) {
+                return parseParenthesizedLambda();
+            }
+            next();
+            ELNode node = parseExpression();
+            expect(TokenType.RPAREN);
+            return node;
+        }
+        if (at(TokenType.START_MAP)) {
+            return parseSetOrMap();
+        }
+        if (at(TokenType.LBRACK)) {
+            return parseList();
+        }
+        if (at(TokenType.IDENTIFIER)) {
+            return parseIdentifierOrFunction();
+        }
+        throw error("Unexpected token " + peek());
+    }
+
+    private ELNode parseParenthesizedLambda() {
+        expect(TokenType.LPAREN);
+        ELNode lambda = parseLambda();
+        expect(TokenType.RPAREN);
+        while (at(TokenType.LPAREN)) {
+            lambda = new ELNode.Call(lambda, parseArguments());
+        }
+        return lambda;
+    }
+
+    private ELNode parseIdentifierOrFunction() {
+        int start = index;
+        String first = next().value();
+        String prefix = "";
+        String localName = first;
+        if (at(TokenType.COLON) && peek(1).is(TokenType.IDENTIFIER)) {
+            next();
+            prefix = first;
+            localName = next().value();
+        }
+        if (at(TokenType.LPAREN)) {
+            List<List<ELNode>> invocations = new ArrayList<>();
+            while (at(TokenType.LPAREN)) {
+                invocations.add(parseArguments());
+            }
+            return new ELNode.Function(prefix, localName, invocations);
+        }
+        if (!prefix.isEmpty()) {
+            index = start;
+            return new ELNode.Identifier(next().value());
+        }
+        return new ELNode.Identifier(localName);
+    }
+
+    private List<ELNode> parseArguments() {
+        expect(TokenType.LPAREN);
+        List<ELNode> arguments = new ArrayList<>();
+        if (!at(TokenType.RPAREN)) {
+            arguments.add(parseExpression());
+            while (at(TokenType.COMMA)) {
+                next();
+                arguments.add(parseExpression());
+            }
+        }
+        expect(TokenType.RPAREN);
+        return arguments;
+    }
+
+    private ELNode parseList() {
+        expect(TokenType.LBRACK);
+        List<ELNode> elements = new ArrayList<>();
+        if (!at(TokenType.RBRACK)) {
+            elements.add(parseExpression());
+            while (at(TokenType.COMMA)) {
+                next();
+                elements.add(parseExpression());
+            }
+        }
+        expect(TokenType.RBRACK);
+        return new ELNode.ListData(elements);
+    }
+
+    private ELNode parseSetOrMap() {
+        expect(TokenType.START_MAP);
+        List<ELNode.MapData.MapEntry> entries = new ArrayList<>();
+        if (!at(TokenType.RCURL)) {
+            entries.add(parseMapEntry());
+            while (at(TokenType.COMMA)) {
+                next();
+                entries.add(parseMapEntry());
+            }
+        }
+        expect(TokenType.RCURL);
+        boolean anyValue = entries.stream().anyMatch(entry -> entry.value() != null);
+        boolean allValues = entries.stream().allMatch(entry -> entry.value() != null);
+        if (anyValue && !allValues) {
+            throw error("A construction cannot mix set elements and map entries");
+        }
+        if (anyValue) {
+            return new ELNode.MapData(entries);
+        }
+        return new ELNode.SetData(entries.stream().map(ELNode.MapData.MapEntry::key).toList());
+    }
+
+    private ELNode.MapData.MapEntry parseMapEntry() {
+        ELNode key = parseExpression();
+        if (at(TokenType.COLON)) {
+            next();
+            return new ELNode.MapData.MapEntry(key, parseExpression());
+        }
+        return new ELNode.MapData.MapEntry(key, null);
+    }
+
+    private boolean isLambdaParametersAt(int position) {
+        if (typeAt(position) == TokenType.IDENTIFIER) {
+            return typeAt(position + 1) == TokenType.ARROW;
+        }
+        if (typeAt(position) != TokenType.LPAREN) {
+            return false;
+        }
+        int cursor = position + 1;
+        if (typeAt(cursor) != TokenType.RPAREN) {
+            while (true) {
+                if (typeAt(cursor) != TokenType.IDENTIFIER) {
+                    return false;
+                }
+                cursor++;
+                if (typeAt(cursor) != TokenType.COMMA) {
+                    break;
+                }
+                cursor++;
+            }
+        }
+        if (typeAt(cursor) != TokenType.RPAREN) {
+            return false;
+        }
+        return typeAt(cursor + 1) == TokenType.ARROW;
+    }
+
+    private Token expectIdentifierLike() {
+        Token token = peek();
+        if (token.is(TokenType.IDENTIFIER)) {
+            return next();
+        }
+        throw error("Expected an identifier but found " + token);
+    }
+
+    private TokenType typeAt(int position) {
+        return position < tokens.size() ? tokens.get(position).type() : TokenType.EOF;
+    }
+
+    private Token peek() {
+        return peek(0);
+    }
+
+    private Token peek(int offset) {
+        int position = index + offset;
+        return position < tokens.size() ? tokens.get(position) : tokens.get(tokens.size() - 1);
+    }
+
+    private boolean at(TokenType type) {
+        return peek().is(type);
+    }
+
+    private Token next() {
+        Token token = peek();
+        if (index < tokens.size() - 1) {
+            index++;
+        }
+        return token;
+    }
+
+    private Token expect(TokenType type) {
+        Token token = peek();
+        if (!token.is(type)) {
+            throw error("Expected '" + type.getSymbol() + "' but found " + token);
+        }
+        return next();
+    }
+
+    private ELParsingException error(String message) {
+        return new ELParsingException(message, expression, peek().position());
+    }
+}

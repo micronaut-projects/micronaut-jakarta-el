@@ -1,0 +1,13 @@
+plugins {
+    id "io.micronaut.build.internal.expression-language-module"
+}
+
+dependencies {
+    api libs.managed.jakarta.el
+    api mn.micronaut.core
+    api projects.micronautExpressionLanguageAnnotations
+
+    testImplementation platform(libs.junit.bom)
+    testImplementation libs.junit.jupiter
+    testRuntimeOnly libs.junit.jupiter.engine
+}

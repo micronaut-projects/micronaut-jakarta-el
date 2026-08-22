@@ -1,0 +1,12 @@
+plugins {
+    id "io.micronaut.build.internal.expression-language-module"
+}
+
+dependencies {
+    api projects.micronautExpressionLanguage
+    api projects.micronautExpressionLanguageParser
+
+    testImplementation platform(libs.junit.bom)
+    testImplementation libs.junit.jupiter
+    testRuntimeOnly libs.junit.jupiter.engine
+}
