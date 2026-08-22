@@ -65,7 +65,8 @@ public final class ValueExpressionWriter {
             .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
             .addAnnotation(Generated.class)
             .superclass(ClassTypeDef.of(CompiledValueExpression.class))
-            .addJavadoc("The compiled form of the expression <code>" + definition.expression() + "</code>.")
+            // the source writer interprets a '$' in the javadoc
+            .addJavadoc("The compiled form of the expression <code>" + definition.expression().replace("$", "$$") + "</code>.")
             .addMethod(constructor(definition))
             .addMethod(evaluate(definition, compiler));
 

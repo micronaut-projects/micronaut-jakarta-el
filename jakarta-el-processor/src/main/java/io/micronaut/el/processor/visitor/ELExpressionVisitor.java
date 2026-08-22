@@ -163,18 +163,25 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
             sourceGenerator.write(
                 ExpressionSourceWriter.write(sourceClassName, compiledValues, compiledMethods), context, element);
             context.visitServiceDescriptor(ELExpressionSource.class.getName(), sourceClassName, element);
-        } catch (ELParsingException | ELCompilationException e) {
+        } catch (ELParsingException | ELCompilationException | ProcessingException e) {
             processed.remove(element.getName());
-            throw new ProcessingException(element, e.getMessage(), e);
-        } catch (ProcessingException e) {
-            processed.remove(element.getName());
-            throw e;
+            throw new ProcessingException(element, reportable(e), e);
         } catch (Exception e) {
             processed.remove(element.getName());
-            SourceGenerators.handleFatalException(element, ELExpression.class, e, exception -> {
-                throw exception;
-            });
+            if (e instanceof RuntimeException runtimeException
+                && e.getClass().getSimpleName().equals("PostponeToNextRoundException")) {
+                throw runtimeException;
+            }
+            throw new ProcessingException(element, "Failed to generate the expressions: " + reportable(e), e);
         }
+    }
+
+    /**
+     * The annotation processor formats the messages it reports, and an expression may well contain a
+     * {@code %}, as in {@code formatter.format('%1$.2f', value)}.
+     */
+    private static String reportable(Exception e) {
+        return String.valueOf(e.getMessage()).replace("%", "%%");
     }
 
     private ELExpressionDefinition valueDefinition(AnnotationValue<ELExpression> annotation,

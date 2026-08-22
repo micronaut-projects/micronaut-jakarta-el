@@ -69,7 +69,8 @@ public final class MethodExpressionWriter {
             .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
             .addAnnotation(Generated.class)
             .superclass(ClassTypeDef.of(CompiledMethodExpression.class))
-            .addJavadoc("The compiled form of the method expression <code>" + definition.expression() + "</code>.")
+            // the source writer interprets a '$' in the javadoc
+            .addJavadoc("The compiled form of the method expression <code>" + definition.expression().replace("$", "$$") + "</code>.")
             .addMethod(constructor(definition, node))
             .addMethod(evaluateBase(node, compiler))
             .addMethod(evaluateProperty(node, compiler))
