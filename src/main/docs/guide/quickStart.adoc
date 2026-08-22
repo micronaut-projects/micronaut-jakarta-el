@@ -1,0 +1,51 @@
+Add the annotation processor and the runtime to your build:
+
+dependency:micronaut-expression-language-processor[scope="annotationProcessor", groupId="io.micronaut.el"]
+
+dependency:micronaut-expression-language[groupId="io.micronaut.el"]
+
+Declare a bean with Micronaut's `@Introspected` and the expressions that use it:
+
+[source,java]
+----
+@Introspected
+public class Book {
+
+    private String title;
+    private double unitPrice;
+
+    public String getTitle() { return title; }
+
+    public void setTitle(String title) { this.title = title; }
+
+    public double getUnitPrice() { return unitPrice; }
+}
+----
+
+[source,java]
+----
+@ELEnvironment(variables = @ELVariable(name = "book", type = Book.class))
+@ELExpression(value = "${book.title}", expectedType = String.class, name = "TITLE")
+@ELExpression(value = "Book: ${book.title} at ${book.unitPrice}", expectedType = String.class, name = "SUMMARY")
+public final class BookExpressions {
+}
+----
+
+Evaluate them against any `jakarta.el.ELContext`:
+
+[source,java]
+----
+ELContext context = new CompiledELContext()
+    .setBean("book", new Book("Expression Language", "reference", 20d));
+
+String title = BookExpressions$ELExpressions.TITLE.getValue(context);
+----
+
+The same expressions are returned by the `jakarta.el.ExpressionFactory` of the module, which is registered as a
+service, so code written against the standard API keeps working and still gets the compiled implementation:
+
+[source,java]
+----
+ExpressionFactory factory = ExpressionFactory.newInstance();
+ValueExpression expression = factory.createValueExpression(context, "${book.title}", String.class);
+----

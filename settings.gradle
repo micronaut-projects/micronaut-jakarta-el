@@ -25,7 +25,9 @@ include 'expression-language-bom'
 include 'expression-language-interpreter'
 include 'expression-language-parser'
 include 'expression-language-processor'
+include 'test-suite-groovy'
 include 'test-suite-java'
+include 'test-suite-kotlin'
 include 'tests:jakarta-el-tck'
 
 micronautBuild {

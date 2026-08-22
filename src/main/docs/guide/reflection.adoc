@@ -1,0 +1,58 @@
+The module is built so that the paths a typical expression takes are reflection free, but it does not claim to
+avoid reflection everywhere. The reflective paths are the ones the specification itself defines in reflective
+terms; they are not a fallback for work that could have been generated.
+
+=== Without reflection
+
+|===
+|Path |Mechanism
+
+|A property or method of a variable whose type is declared with `@ELVariable`
+|Compiled to a direct Java invocation
+
+|A property of an `@Introspected` type resolved dynamically
+|The generated `BeanIntrospection` dispatch table
+
+|A method of an `@Introspected` type annotated with `@Executable`
+|The generated `BeanIntrospection` dispatch table
+
+|A function declared with `@ELFunctions`
+|Compiled to a direct static invocation
+
+|An operator, a coercion, a collection operation, a lambda expression
+|Compiled to a direct call into the runtime
+
+|Locating a compiled expression by its string
+|A generated `switch`, with no lookup and no parsing
+|===
+
+=== With reflection
+
+|===
+|Path |Why
+
+|A `MethodExpression` on a type that is not introspected, or on a method that is not `@Executable`
+|The section 1.6 of the specification resolves the method against the base object at invocation time, so
+`ELMethods` selects it with `Class.getMethods()` and invokes it with `Method.invoke`
+
+|A function resolved at runtime through a `jakarta.el.FunctionMapper`
+|The contract of the mapper is `java.lang.reflect.Method`
+
+|`MethodExpression.getMethodInfo` and `MethodExpression.getMethodReference`
+|Both return reflective metadata by contract
+
+|A type with no `BeanIntrospection`, reached through the standard chain
+|`jakarta.el.BeanELResolver` is reflective by design
+
+|Coercing a lambda expression to a functional interface, section 1.25.8
+|A `java.lang.reflect.Proxy` implements the interface
+
+|Coercing a string to a type with a `PropertyEditor`, section 1.25.9
+|`PropertyEditorManager` is the mechanism the specification names
+
+|Reading and writing array elements and the `length` property
+|`java.lang.reflect.Array`, which is how the JDK exposes arrays
+|===
+
+TIP: To keep a method invocation off the reflective path, annotate the method with `@Executable` so that it
+enters the bean introspection of its type.

@@ -104,34 +104,81 @@ specification. The compiled path remains the fast one, and the interpreted path 
 
 ## Declaring beans
 
+Beans are declared with Micronaut's own `@Introspected`, not with an annotation of this module:
+
 ```java
-@ELBean
+@Introspected
 public class Book {
 
     public String getTitle() { ... }
 
     public void setTitle(String title) { ... }
 
+    @Executable
     public double discounted(double percent) { ... }
 }
 ```
 
-generates a reflection free `Book$ELResolver`:
+Micronaut generates a `BeanIntrospection` for the type at compilation time, and `IntrospectionELResolver` reads
+and writes the properties through it. The introspection carries a dispatch table of direct invocations, so no
+reflection is involved. A method reaches the same path once it is annotated with `@Executable`, which is what puts
+it in the introspection.
 
-```java
-public Object getProperty(ELContext context, Object bean, String name) {
-    switch (name) {
-        case "title" -> {
-            return ((Book) bean).getTitle();
-        }
-        ...
-    }
-}
-```
+`IntrospectionELResolver` is the first resolver of the chain built by `ELResolvers.standard()`. A type with no
+introspection is left unresolved, so the standard resolvers of the specification pick it up and a mixed model
+still resolves.
 
-The generated resolvers are registered as services and consulted by `CompiledBeanELResolver`, which is the first
-resolver of the chain built by `ELResolvers.standard()`. Types without a generated resolver are left to the standard
-resolvers of the specification, so a mixed model still resolves.
+Using `@Introspected` means any type that is already introspected for another reason — a Micronaut bean, a
+`@Introspected(classes = ...)` declaration for a third party type — is resolvable by expressions with no further
+annotation.
+
+## When and how reflection is used
+
+The module is built so that the paths a typical expression takes are reflection free, but it does not claim to
+avoid reflection everywhere. Precisely:
+
+**No reflection**
+
+| Path                                                              | Mechanism                                              |
+|-------------------------------------------------------------------|--------------------------------------------------------|
+| A property or method of a variable whose type is declared with `@ELVariable` | Compiled to a direct Java invocation           |
+| A property of an `@Introspected` type resolved dynamically         | The generated `BeanIntrospection` dispatch table        |
+| A method of an `@Introspected` type annotated with `@Executable`    | The generated `BeanIntrospection` dispatch table        |
+| A function declared with `@ELFunctions`                            | Compiled to a direct static invocation                  |
+| An operator, a coercion, a collection operation, a lambda           | Compiled to a direct call into the runtime              |
+| Locating a compiled expression by its string                       | A generated `switch`, no lookup and no parsing          |
+
+**Reflection**
+
+| Path                                                                   | Why                                                                 |
+|-------------------------------------------------------------------------|---------------------------------------------------------------------|
+| `MethodExpression` on a type that is not introspected, or a method that is not `@Executable` | The specification resolves the method against the base object at invocation time, so `ELMethods` selects it with `Class.getMethods()` and invokes it with `Method.invoke` |
+| A function resolved at runtime through a `jakarta.el.FunctionMapper`     | The mapper's contract is `java.lang.reflect.Method`                  |
+| `MethodExpression.getMethodInfo` and `getMethodReference`               | Both return reflective metadata by contract                          |
+| A type with no `BeanIntrospection`, reached through the standard chain   | `jakarta.el.BeanELResolver` is reflective by design                  |
+| Coercing a lambda expression to a functional interface (section 1.25.8)  | A `java.lang.reflect.Proxy` implements the interface                 |
+| Coercing a string to a type with a `PropertyEditor` (section 1.25.9)     | `PropertyEditorManager` is the mechanism the specification names     |
+| Reading and writing array elements and the `length` property            | `java.lang.reflect.Array`, which is how the JDK exposes arrays       |
+
+The reflective paths are the ones the specification defines in reflective terms; they are not a fallback for
+work that could have been generated. To keep a method invocation off them, annotate the method with
+`@Executable` so that it enters the bean introspection.
+
+## Language support
+
+The annotation processor generates Java source, so **the compile time path requires the expressions to be declared
+in Java source**. `@Introspected` beans, and everything at runtime, work from Java, Groovy and Kotlin alike.
+
+| Language | `@Introspected` beans | Expressions declared with `@ELExpression`             |
+|----------|-----------------------|--------------------------------------------------------|
+| Java     | Generated             | Generated                                              |
+| Groovy   | Generated             | Not yet, add the interpreter module                    |
+| Kotlin   | Generated             | Not yet, add the interpreter module                    |
+
+The Groovy and Kotlin writers of Micronaut SourceGen cannot yet emit these classes: the Kotlin writer renders a
+class literal as the `toString()` of the model and drops static initializers, and the Groovy writer emits the
+service descriptor without compiling the generated source. `test-suite-groovy` and `test-suite-kotlin` therefore
+use the interpreter module, and show what does work from those languages today.
 
 ## What is compiled statically
 

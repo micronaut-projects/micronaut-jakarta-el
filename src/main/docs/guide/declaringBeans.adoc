@@ -1,0 +1,30 @@
+Beans are declared with Micronaut's own api:core.annotation.Introspected[], not with an annotation of this module:
+
+[source,java]
+----
+@Introspected
+public class Book {
+
+    public String getTitle() { ... }
+
+    public void setTitle(String title) { ... }
+
+    @Executable
+    public double discounted(double percent) { ... }
+}
+----
+
+Micronaut generates a `BeanIntrospection` for the type at compilation time, and `IntrospectionELResolver` reads
+and writes the properties through it. The introspection dispatches to a direct invocation, so no reflection is
+involved.
+
+A method reaches the same path once it is annotated with api:context.annotation.Executable[], which is what puts
+it into the introspection. A method that is not executable is resolved reflectively, as described in
+<<reflection,When Reflection Is Used>>.
+
+`IntrospectionELResolver` is the first resolver of the chain built by `ELResolvers.standard()`. A type with no
+introspection is left unresolved, so the standard resolvers of the specification pick it up and a model that
+mixes introspected and plain types still resolves.
+
+TIP: Any type that is already introspected for another reason is resolvable by expressions with no further
+annotation, including third party types brought in with `@Introspected(classes = ...)`.

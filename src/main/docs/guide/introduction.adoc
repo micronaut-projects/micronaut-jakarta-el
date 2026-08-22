@@ -1,0 +1,18 @@
+Micronaut Expression Language is an implementation of the
+https://jakarta.ee/specifications/expression-language/6.0/jakarta-expression-language-spec-6.0[Jakarta Expression Language 6.0]
+specification whose expressions and bean resolution are prepared at **compilation time**, with
+https://micronaut-projects.github.io/micronaut-sourcegen/latest/guide/[Micronaut SourceGen] and an annotation
+processor.
+
+An interpreting implementation parses an expression string, builds an abstract syntax tree and walks it on every
+evaluation, resolving each property reflectively along the way. This module moves all of that to compilation time:
+
+* every declared expression becomes a generated `jakarta.el.ValueExpression` or `jakarta.el.MethodExpression`
+whose body is the compiled form of the expression, so nothing is parsed and no tree is walked at evaluation time;
+* every `@Introspected` type is resolved through the bean introspection Micronaut already generates for it, which
+replaces the reflective lookups of `jakarta.el.BeanELResolver`;
+* every property access, method invocation, function call and static reference whose type is known at compilation
+time becomes a direct Java invocation.
+
+The module passes the Jakarta Expression Language 6.0 Technology Compatibility Kit. See
+<<tck,Technology Compatibility Kit>>.

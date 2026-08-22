@@ -16,7 +16,7 @@
 package io.micronaut.el;
 
 import org.jspecify.annotations.Nullable;
-import io.micronaut.el.resolver.CompiledBeanELResolver;
+import io.micronaut.el.resolver.IntrospectionELResolver;
 import io.micronaut.el.resolver.ELResolvers;
 import jakarta.el.BeanNameELResolver;
 import jakarta.el.BeanNameResolver;
@@ -52,7 +52,7 @@ public class CompiledELContext extends ELContext {
      * Creates a context using the standard chain of resolvers.
      */
     public CompiledELContext() {
-        this(new CompiledBeanELResolver());
+        this(new IntrospectionELResolver());
     }
 
     /**

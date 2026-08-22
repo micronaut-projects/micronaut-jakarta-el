@@ -9,6 +9,7 @@ dependencies {
     api projects.micronautExpressionLanguageParser
 
     runtimeOnly mnSourcegen.micronaut.sourcegen.generator.java
+    runtimeOnly mnSourcegen.micronaut.sourcegen.generator.kotlin
 
     testImplementation mnSourcegen.micronaut.sourcegen.generator.java
     testImplementation platform(libs.junit.bom)

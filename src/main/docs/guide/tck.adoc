@@ -1,0 +1,23 @@
+The `tests/jakarta-el-tck` module runs the Jakarta Expression Language 6.0 Technology Compatibility Kit against
+the runtime of this repository:
+
+[source,bash]
+----
+./gradlew :micronaut-tests:micronaut-jakarta-el-tck:test
+----
+
+**360 tests, 0 failures, 0 skipped.**
+
+The TCK bundle is not published to Maven Central, so it is resolved from the Eclipse download site as an ordinary
+dependency, unpacked, and its test classes are handed to the test task. The version is set by `elTckBranch` and
+`elTckVersion` in `gradle.properties`.
+
+The TCK creates its expressions from strings at runtime through `ExpressionFactory.newInstance()`, so it
+exercises the parser and the interpreter, and through them the coercion, arithmetic, comparison, resolution and
+collection runtime that the generated code also calls.
+
+The signature test of the TCK is excluded: it verifies the signatures of the `jakarta.el` API jar, which this
+project consumes unchanged rather than implements.
+
+The TCK runs on every build, and a dedicated workflow publishes the evidence of each run — the sanitized JUnit
+XML, its checksums and a summary of the versions exercised — to the `gh-pages` branch under `tck-results/`.

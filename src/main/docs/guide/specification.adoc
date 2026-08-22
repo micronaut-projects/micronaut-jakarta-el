@@ -1,0 +1,23 @@
+=== Chapter 1, the language
+
+The eval-expressions, the literal-expressions and the composite expressions of the section 1.2, the literals of
+the section 1.3, the resolution rules of the sections 1.5 and 1.6, the full operator set with the precedence of
+the section 1.16, the functions of the section 1.18, the variables of the section 1.19, the lambda expressions of
+the section 1.20, the enums, the arrays and `java.util.Optional` of the sections 1.21 to 1.23, the static field
+and method references and the constructor references of the section 1.24, and the type conversion rules of the
+section 1.25.
+
+=== Chapter 2, the operations on collection objects
+
+The construction of sets, lists and maps of the section 2.2, and the 22 operations on collection objects of the
+section 2.3, implemented by `ELStream` and `ELOptional`.
+
+=== Notes
+
+Functions are bound when the expression is created, as required by the section 1.18: the compiler binds them from
+`@ELFunctions`, and the interpreter binds them from the `jakarta.el.FunctionMapper` of the context, so a later
+change of the mapper does not affect an expression that already exists.
+
+The `jakarta.el.VariableMapper` and the `jakarta.el.ImportHandler` of the context are consulted at evaluation
+time, as described in the sections 1.19 and 1.24. `MapVariableMapper` is provided as a map backed implementation
+of the former.

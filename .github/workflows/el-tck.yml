@@ -1,0 +1,135 @@
+name: Jakarta Expression Language TCK
+on:
+  push:
+    branches:
+      - main
+      - '[0-9]+.[0-9]+.x'
+  pull_request:
+    branches:
+      - main
+      - '[0-9]+.[0-9]+.x'
+jobs:
+  el-tck:
+    name: Run the Jakarta Expression Language TCK
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: "📥 Checkout repository"
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          fetch-depth: 0
+
+      - name: "🔧 Setup GraalVM CE"
+        uses: graalvm/setup-graalvm@6f3fa030c4b8f77c1f554a860f593a654538fa38 # v1
+        with:
+          distribution: 'graalvm'
+          java-version: '25'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "🔧 Setup Gradle"
+        uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6
+
+      - name: "🧪 Run the Jakarta Expression Language TCK"
+        id: tck
+        continue-on-error: true
+        env:
+          DEVELOCITY_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}
+          DEVELOCITY_CACHE_USERNAME: ${{ secrets.GRADLE_ENTERPRISE_CACHE_USERNAME }}
+          DEVELOCITY_CACHE_PASSWORD: ${{ secrets.GRADLE_ENTERPRISE_CACHE_PASSWORD }}
+        run: ./gradlew :micronaut-tests:micronaut-jakarta-el-tck:test --no-daemon
+
+      - name: "📦 Collect the Jakarta Expression Language TCK evidence"
+        if: always()
+        run: .github/scripts/el-tck-evidence.sh tests/jakarta-el-tck/build/test-results/test build/el-tck-evidence
+
+      - name: "📜 Upload the Jakarta Expression Language TCK evidence"
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: jakarta-el-tck-evidence
+          path: build/el-tck-evidence
+
+      - name: "✅ Check the Jakarta Expression Language TCK result"
+        if: always()
+        env:
+          TCK_OUTCOME: ${{ steps.tck.outcome }}
+        run: test "${TCK_OUTCOME}" = "success"
+
+  publish-results:
+    name: Publish the Jakarta Expression Language TCK results
+    needs: el-tck
+    if: success() && github.event_name == 'push' && github.repository == 'micronaut-projects/micronaut-expression-language'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: write
+    steps:
+      - name: "📥 Download the Jakarta Expression Language TCK evidence"
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: jakarta-el-tck-evidence
+          path: downloaded-tck-results
+
+      - name: "📑 Build the Jakarta Expression Language TCK results index"
+        run: |
+          set -euo pipefail
+
+          run_results_dir="pages-tck-results/${GITHUB_RUN_ID}"
+          mkdir -p "${run_results_dir}"
+          cp -R downloaded-tck-results/. "${run_results_dir}/"
+
+          if [ ! -f "${run_results_dir}/index.html" ]; then
+            echo "Missing Jakarta Expression Language TCK evidence." >&2
+            exit 1
+          fi
+
+      - name: "📑 Publish the Jakarta Expression Language TCK results to Github Pages"
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN || github.token }}
+        run: |
+          set -euo pipefail
+
+          docs_branch="gh-pages"
+          docs_dir="$(mktemp -d)"
+          repository_url="https://github.com/${GITHUB_REPOSITORY}.git"
+          target_dir="${docs_dir}/tck-results/${GITHUB_RUN_ID}"
+          latest_dir="${docs_dir}/tck-results/latest"
+          askpass="$(mktemp)"
+
+          cat > "${askpass}" <<'ASKPASS'
+          #!/usr/bin/env sh
+          case "$1" in
+            *Username*) printf '%s\n' 'x-access-token' ;;
+            *Password*) printf '%s\n' "${GH_TOKEN}" ;;
+            *) printf '\n' ;;
+          esac
+          ASKPASS
+          chmod 700 "${askpass}"
+          trap 'rm -f "${askpass}"' EXIT
+
+          git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          git config --global user.name "${GITHUB_ACTOR}"
+
+          if GIT_ASKPASS="${askpass}" GIT_TERMINAL_PROMPT=0 git ls-remote --exit-code --heads "${repository_url}" "${docs_branch}" > /dev/null 2>&1; then
+            GIT_ASKPASS="${askpass}" GIT_TERMINAL_PROMPT=0 git clone --depth 1 --branch "${docs_branch}" "${repository_url}" "${docs_dir}"
+          else
+            git init "${docs_dir}"
+            git -C "${docs_dir}" checkout -b "${docs_branch}"
+            git -C "${docs_dir}" remote add origin "${repository_url}"
+          fi
+
+          rm -rf "${target_dir}" "${latest_dir}"
+          mkdir -p "${target_dir}" "${latest_dir}"
+          cp -R "pages-tck-results/${GITHUB_RUN_ID}/." "${target_dir}/"
+          cp -R "pages-tck-results/${GITHUB_RUN_ID}/." "${latest_dir}/"
+
+          touch "${docs_dir}/.nojekyll"
+
+          git -C "${docs_dir}" add -A
+          if git -C "${docs_dir}" diff --cached --quiet; then
+            echo "No Jakarta Expression Language TCK result changes to publish."
+          else
+            git -C "${docs_dir}" commit -m "Deploy Jakarta Expression Language TCK results for ${GITHUB_RUN_ID}"
+            GIT_ASKPASS="${askpass}" GIT_TERMINAL_PROMPT=0 git -C "${docs_dir}" push origin "${docs_branch}"
+          fi

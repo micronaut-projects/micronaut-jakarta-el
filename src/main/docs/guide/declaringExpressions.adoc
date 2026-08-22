@@ -1,0 +1,56 @@
+An expression is declared on a type with `@ELExpression`, which is repeatable. The type itself is only a holder:
+the processor generates one class per expression, plus a registry that maps the expression string to its
+implementation.
+
+[source,java]
+----
+@ELEnvironment(
+    variables = @ELVariable(name = "book", type = Book.class),
+    imports = Suit.class,
+    functions = @ELFunctions(prefix = "fn", value = TextFunctions.class)
+)
+@ELExpression(value = "${book.title}", expectedType = String.class, name = "TITLE")
+@ELMethodExpression(value = "${book.discounted}", expectedReturnType = Double.class,
+                    expectedParamTypes = double.class, name = "DISCOUNT")
+public final class BookExpressions {
+}
+----
+
+`@ELEnvironment` is the compilation time counterpart of the `jakarta.el.ELContext`. It declares:
+
+`variables`:: the name and the static type of the variables the expressions use. A variable declared this way is
+still looked up in the `ELContext` at evaluation time, but every property access, method invocation and coercion
+applied to it is resolved statically.
+`imports`, `importPackages`, `staticImports`:: the classes, packages and statically imported fields available to
+the expressions, as described in the section 1.24 of the specification.
+`functions`:: the classes whose public static methods are exposed as functions, optionally under a namespace
+prefix. Use `@ELFunction` on a method to give it a different name.
+
+=== What the processor generates
+
+For `${book.title}` with `book` declared as a `Book`, the generated implementation contains the invocation
+itself:
+
+[source,java]
+----
+public final class BookExpressions$Expression0 extends CompiledValueExpression {
+
+    public BookExpressions$Expression0() {
+        super("${book.title}", java.lang.String.class);
+    }
+
+    @Override
+    protected Object evaluate(ELContext context) {
+        return ((Book) ELResolution.resolveIdentifier(context, "book")).getTitle();
+    }
+
+    @Override
+    public void setValue(ELContext context, Object value) {
+        ELResolution.setValue(context, (Book) ELResolution.resolveIdentifier(context, "book"), "title", value);
+    }
+}
+----
+
+`getType`, `isReadOnly` and `getValueReference` are generated as well when the expression is an lvalue. An
+expression that is not an lvalue inherits the base class behaviour, which rejects assignment with a
+`PropertyNotWritableException` as the specification requires.

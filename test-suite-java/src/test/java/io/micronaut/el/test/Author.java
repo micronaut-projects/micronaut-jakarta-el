@@ -1,10 +1,10 @@
 package io.micronaut.el.test;
 
-import io.micronaut.el.annotation.ELBean;
+import io.micronaut.core.annotation.Introspected;
 
 import java.util.List;
 
-@ELBean
+@Introspected
 public class Author {
 
     private final String name;

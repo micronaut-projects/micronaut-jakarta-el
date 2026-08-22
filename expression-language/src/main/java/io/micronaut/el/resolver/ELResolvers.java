@@ -38,13 +38,13 @@ public final class ELResolvers {
     }
 
     /**
-     * Creates the standard chain of resolvers, which starts with the resolvers generated at compilation
-     * time and continues with the resolvers of the specification.
+     * Creates the standard chain of resolvers, which starts with the bean introspections generated at
+     * compilation time and continues with the resolvers of the specification.
      *
      * @return The resolver chain
      */
     public static ELResolver standard() {
-        return standard(new CompiledBeanELResolver());
+        return standard(new IntrospectionELResolver());
     }
 
     /**

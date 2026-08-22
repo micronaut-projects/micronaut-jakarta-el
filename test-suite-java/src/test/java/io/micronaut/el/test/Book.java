@@ -1,8 +1,9 @@
 package io.micronaut.el.test;
 
-import io.micronaut.el.annotation.ELBean;
+import io.micronaut.context.annotation.Executable;
+import io.micronaut.core.annotation.Introspected;
 
-@ELBean
+@Introspected
 public class Book {
 
     private String title;
@@ -39,6 +40,7 @@ public class Book {
         return title + " (" + category + ")";
     }
 
+    @Executable
     public double discounted(double percent) {
         return unitPrice * (1 - percent / 100);
     }

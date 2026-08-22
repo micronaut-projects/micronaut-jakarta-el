@@ -1,0 +1,20 @@
+introduction:
+  title: Introduction
+releaseHistory: Release History
+quickStart:
+  title: Quick Start
+declaringExpressions:
+  title: Declaring Expressions
+declaringBeans:
+  title: Declaring Beans
+runtimeParsing:
+  title: Parsing at Runtime
+reflection:
+  title: When Reflection Is Used
+languageSupport:
+  title: Language Support
+specification:
+  title: Specification Coverage
+tck:
+  title: Technology Compatibility Kit
+repository: Repository
