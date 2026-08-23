@@ -35,10 +35,10 @@ are the same expectation, so `double.class` and `Double.class` match each other.
 with another type, `Object.class` included, is treated as a different expression, and is rejected as not compiled
 unless the interpreter module is present.
 
-WARNING: Any annotation string containing `#{...}` is treated by Micronaut as one of its own evaluated
-expressions. The processor reads the original text back out, so `#{...}` works in a plain holder class, but on a
-Micronaut bean Micronaut will also try to compile it with its own expression language. Prefer `${...}` for
-`@ELExpression`: the specification parses the two identically. An annotation of your own can use `#{...}` with
+WARNING: Any annotation string containing `+#{...}+` is treated by Micronaut as one of its own evaluated
+expressions. The processor reads the original text back out, so `+#{...}+` works in a plain holder class, but on a
+Micronaut bean Micronaut will also try to compile it with its own expression language. Prefer `+${...}+` for
+`@ELExpression`: the specification parses the two identically. An annotation of your own can use `+#{...}+` with
 the processor described in <<customAnnotations,Expressions in Custom Annotations>>.
 
 === What the processor generates

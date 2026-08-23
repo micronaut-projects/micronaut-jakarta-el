@@ -18,7 +18,7 @@ include::{sourcedir}/test-suite-custom-annotation/src/main/java/io/micronaut/el/
 <4> The name of the constant holding the compiled condition in the registry of the class, for the code that wants
 to reference it directly.
 
-Used on a bean, with the `#{...}` delimiters Micronaut would otherwise claim, the parameters of the method as
+Used on a bean, with the `+#{...}+` delimiters Micronaut would otherwise claim, the parameters of the method as
 variables, the functions of the library and an imported class:
 
 snippet::example.RegistrationService[project-base="doc-examples/example", title="RegistrationService"]
@@ -26,12 +26,12 @@ snippet::example.RegistrationService[project-base="doc-examples/example", title=
 <1> The condition over the parameters of the method, calling two functions of the library under their prefix.
 <2> The message of the rejection, another expression.
 <3> The name of the generated constant.
-<4> The `${...}` delimiters of the specification work too: the processor stores them as `#{...}`, which nothing in
+<4> The `+${...}+` delimiters of the specification work too: the processor stores them as `+#{...}+`, which nothing in
 Micronaut resolves as a property placeholder.
 
 === The processor
 
-Micronaut treats any annotation string containing `#{...}` as one of its own evaluated expressions, and would
+Micronaut treats any annotation string containing `+#{...}+` as one of its own evaluated expressions, and would
 fail to compile an expression of the Jakarta language. An `io.micronaut.inject.annotation.AnnotationRemapper`,
 which runs inside the annotation metadata builder before anything else sees the annotation, takes the text back
 and declares it:
@@ -50,9 +50,9 @@ registry of the class like any other declaration.
 <5> An `@ELEnvironment` beside them, binding the functions of the library under the `fn` prefix and importing a
 class; declared on the method, it applies to the expressions declared there. The parameters of the method are
 typed variables without any declaration.
-<6> Micronaut has already replaced a string containing `#{...}` by an evaluated expression reference when the
+<6> Micronaut has already replaced a string containing `+#{...}+` by an evaluated expression reference when the
 remapper runs; the original text is inside it.
-<7> A `${...}` is stored as `#{...}`: the specification treats the two alike, while Micronaut resolves a `${...}`
+<7> A `+${...}+` is stored as `+#{...}+`: the specification treats the two alike, while Micronaut resolves a `+${...}+`
 in the metadata of a bean as a property placeholder.
 
 === The runtime
