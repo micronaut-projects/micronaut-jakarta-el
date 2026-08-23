@@ -1,19 +1,33 @@
 Expressions are not limited to `@ELExpression`: any annotation can carry one, and have it compiled, with a small
-annotation processor. The `test-suite-custom-annotation` module of the repository is a complete example, used by
-`test-suite-java`.
+annotation processor. The `test-suite-custom-annotation` module of the repository is the library of this
+example, and the `doc-examples` modules use it.
 
 === The annotation
 
-The annotation is an ordinary one, here an AOP binding, whose `value` is a condition over the parameters of the
-method:
+The annotation is an ordinary one, here an AOP binding, whose members are conditions and messages over the
+parameters of the method:
 
 [source,java]
 ----
-@Eligible("#{ customer.age >= 18 && customer.country == 'CZ' }")
-public String register(Customer customer) {
-    return "registered " + customer.name();
-}
+include::{sourcedir}/test-suite-custom-annotation/src/main/java/io/micronaut/el/example/eligible/Eligible.java[tags=annotation,indent=0]
 ----
+
+<1> The annotation binds an interceptor, which is where the expressions are evaluated.
+<2> The condition the parameters of the method must satisfy.
+<3> A second expression, the message of the rejection, evaluating to a string.
+<4> The name of the constant holding the compiled condition in the registry of the class, for the code that wants
+to reference it directly.
+
+Used on a bean, with the `#{...}` delimiters Micronaut would otherwise claim, the parameters of the method as
+variables, the functions of the library and an imported class:
+
+snippet::example.RegistrationService[project-base="doc-examples/example", title="RegistrationService"]
+
+<1> The condition over the parameters of the method, calling two functions of the library under their prefix.
+<2> The message of the rejection, another expression.
+<3> The name of the generated constant.
+<4> The `${...}` delimiters of the specification work too: the processor stores them as `#{...}`, which nothing in
+Micronaut resolves as a property placeholder.
 
 === The processor
 
@@ -24,49 +38,38 @@ and declares it:
 
 [source,java]
 ----
-public final class EligibleRemapper implements AnnotationRemapper {
-
-    @Override
-    public String getPackageName() {
-        return Eligible.class.getPackageName();
-    }
-
-    @Override
-    public List<AnnotationValue<?>> remap(AnnotationValue<?> annotation, VisitorContext visitorContext) {
-        String condition = ...; // the text as written, taken back from the evaluated expression reference
-        return List.of(
-            AnnotationValue.builder(Eligible.class).value(condition).build(),
-            AnnotationValue.builder(ELExpression.class)
-                .value(condition)
-                .member("expectedType", new AnnotationClassValue<>(Boolean.class))
-                .build()
-        );
-    }
-}
+include::{sourcedir}/test-suite-custom-annotation/src/main/java/io/micronaut/el/example/eligible/EligibleRemapper.java[tags=remapper,indent=0]
 ----
 
-It returns two annotations in place of the one it was given: the same `@Eligible` holding the text as written,
-and an `@ELExpression` declaring it, which is compiled into the registry of the class like any other. The remapper
-is registered in `META-INF/services/io.micronaut.inject.annotation.AnnotationRemapper`.
-
-A `${...}` is stored as `#{...}`: the specification treats the two alike, while Micronaut resolves a `${...}` in
-the metadata of a bean as a property placeholder.
+<1> A remapper is registered for the package of the annotations it handles, in
+`META-INF/services/io.micronaut.inject.annotation.AnnotationRemapper`.
+<2> The text of the member as written, taken back from what Micronaut made of it.
+<3> The same annotation, holding the text.
+<4> An `@ELExpression` for every expression, with its expected type and its name, which is compiled into the
+registry of the class like any other declaration.
+<5> An `@ELEnvironment` beside them, binding the functions of the library under the `fn` prefix and importing a
+class; declared on the method, it applies to the expressions declared there. The parameters of the method are
+typed variables without any declaration.
+<6> Micronaut has already replaced a string containing `#{...}` by an evaluated expression reference when the
+remapper runs; the original text is inside it.
+<7> A `${...}` is stored as `#{...}`: the specification treats the two alike, while Micronaut resolves a `${...}`
+in the metadata of a bean as a property placeholder.
 
 === The runtime
 
 The text is read back from the annotation metadata and handed to `jakarta.el.ExpressionFactory`, which returns
 the compiled expression. The parameters of the invocation are bound by name:
 
-[source,java]
-----
-String condition = context.stringValue(Eligible.class).orElseThrow();
-CompiledELContext elContext = new CompiledELContext();
-context.getParameterValueMap().forEach(elContext::setBean);
-ValueExpression expression = ELManager.getExpressionFactory()
-    .createValueExpression(elContext, condition, Boolean.class);   // a lookup by text, not a parse
-if (!Boolean.TRUE.equals(expression.getValue(elContext))) {
-    throw new NotEligibleException(...);
-}
-----
+snippet::example.EligibleInterceptor[project-base="doc-examples/example", title="EligibleInterceptor"]
 
-`Customer` is `@Introspected`, so `customer.age` is resolved through its bean introspection, without reflection.
+<1> The interceptor bound to the annotation.
+<2> The parameters of the invocation become the variables of the expressions, under their names.
+<3> The condition, read back from the metadata exactly as written.
+<4> `createValueExpression` is a lookup by text, not a parse, done once per expression.
+
+snippet::example.EligibleTest[project-base="doc-examples/example", title="EligibleTest"]
+
+<1> The condition holds and the method runs.
+<2> The condition does not hold and the message is the evaluation of the second expression.
+<3> The compiled expressions carry the expected types the processor declared; in Java and Kotlin the registry of
+the class also exposes them under the names the annotation gave them.

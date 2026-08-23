@@ -4,48 +4,38 @@ dependency:micronaut-jakarta-el-processor[scope="annotationProcessor", groupId="
 
 dependency:micronaut-jakarta-el[groupId="io.micronaut.el"]
 
-Declare a bean with Micronaut's `@Introspected` and the expressions that use it:
+Declare a bean with Micronaut's api:core.annotation.Introspected[]:
 
-[source,java]
-----
-@Introspected
-public class Book {
+snippet::example.Book[project-base="doc-examples/example", title="Book"]
 
-    private String title;
-    private double unitPrice;
+<1> The introspection generated for the type is what resolves its properties at runtime, without reflection.
+<2> A property is read through its getter, which the introspection dispatches to directly.
+<3> api:context.annotation.Executable[] puts a method into the introspection, so that an expression can invoke it
+the same way.
 
-    public String getTitle() { return title; }
+Declare the expressions that use it:
 
-    public void setTitle(String title) { this.title = title; }
+snippet::example.BookExpressions[project-base="doc-examples/example", title="BookExpressions"]
 
-    public double getUnitPrice() { return unitPrice; }
-}
-----
-
-[source,java]
-----
-@ELEnvironment(variables = @ELVariable(name = "book", type = Book.class))
-@ELExpression(value = "${book.title}", expectedType = String.class, name = "TITLE")
-@ELExpression(value = "Book: ${book.title} at ${book.unitPrice}", expectedType = String.class, name = "SUMMARY")
-public final class BookExpressions {
-}
-----
+<1> The environment gives `book` a static type, so `book.title` compiles to a direct invocation of `getTitle()`
+and a misspelt property is reported at compilation time.
+<2> A value expression, the type its result is coerced to and the name of the constant holding it in the generated
+registry of the class.
+<3> A composite expression: the literal text and the eval-expressions are concatenated, then coerced to the
+expected type.
+<4> A method expression, which invokes the method rather than reading a value.
 
 Evaluate them against any `jakarta.el.ELContext`:
 
-[source,java]
-----
-ELContext context = new CompiledELContext()
-    .setBean("book", new Book("Expression Language", "reference", 20d));
+snippet::example.BookExpressionsTest[project-base="doc-examples/example", title="BookExpressionsTest"]
 
-String title = BookExpressions$ELExpressions.TITLE.getValue(context);
-----
-
-The same expressions are returned by the `jakarta.el.ExpressionFactory` of the module, which is registered as a
-service, so code written against the standard API keeps working and still gets the compiled implementation:
-
-[source,java]
-----
-ExpressionFactory factory = ExpressionFactory.newInstance();
-ValueExpression expression = factory.createValueExpression(context, "${book.title}", String.class);
-----
+<1> `CompiledELContext` is the standard resolver chain of the specification with `IntrospectionELResolver` in
+front, and holds the beans the expressions refer to by name.
+<2> The expressions are returned by the `jakarta.el.ExpressionFactory` of the module, registered as a service, so
+code written against the standard API keeps working: `createValueExpression` is a lookup of the expression string
+in the registries, not a parse.
+<3> What the factory returns is the class generated at compilation time.
+<4> A method expression is invoked the same way; the parameters are the ones written in the expression.
+<5> In Java and Kotlin the generated registry, `BookExpressions$ELExpressions`, also exposes each expression
+under the name it was declared with. The Groovy compiler resolves the names of a class before the registry is
+generated, so Groovy code reaches the expressions through the factory.

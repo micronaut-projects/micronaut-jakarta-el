@@ -7,6 +7,12 @@ It registers an `ELExpressionParser` service, which `CompiledExpressionFactory` 
 no generated source provides. Such an expression is parsed once, when it is created, and its tree is then
 evaluated by the interpreter.
 
+snippet::example.RuntimeExpressionTest[project-base="doc-examples/example", title="RuntimeExpressionTest"]
+
+<1> The property is only known at runtime, so no declaration can have compiled the expression.
+<2> The factory finds no generated source for the string and hands it to the interpreter.
+<3> What comes back is an interpreted expression, not a compiled one; it evaluates to the same result.
+
 Without the module, an expression that was neither compiled nor a literal-expression is rejected:
 
 [source]

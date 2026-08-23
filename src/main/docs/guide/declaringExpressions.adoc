@@ -1,48 +1,45 @@
-An expression is declared on a type with `@ELExpression`, which is repeatable. The type itself is only a holder:
-the processor generates one class per expression, plus a registry that maps the expression string to its
-implementation.
+An expression is declared with `@ELExpression`, which is repeatable, on a type, a field, a method or a parameter.
+The element is only a holder: the processor generates one class per expression, plus a registry per declaring
+class that maps each expression string to its implementation.
 
-[source,java]
-----
-@ELEnvironment(
-    variables = @ELVariable(name = "book", type = Book.class),
-    imports = Suit.class,
-    functions = @ELFunctions(prefix = "fn", value = TextFunctions.class)
-)
-@ELExpression(value = "${book.title}", expectedType = String.class, name = "TITLE")
-@ELMethodExpression(value = "${book.discounted}", expectedReturnType = Double.class,
-                    expectedParamTypes = double.class, name = "DISCOUNT")
-public final class BookExpressions {
-}
-----
+snippet::example.CatalogExpressions[project-base="doc-examples/example", title="CatalogExpressions"]
 
-`@ELEnvironment` is the compilation time counterpart of the `jakarta.el.ELContext`. It declares:
+<1> `variables` declares the name and the static type of the variables the expressions use. A variable declared
+this way is still looked up in the `ELContext` at evaluation time, but every property access, method invocation
+and coercion applied to it is resolved statically. A member the type does not declare is reported at compilation
+time.
+<2> `imports`, `importPackages` and `staticImports` make classes, packages and statically imported fields
+available to the expressions, as described in the section 1.24 of the specification. Among several overloads,
+`Math.max` here, the one whose parameters fit the static types of the arguments best is selected at compilation
+time.
+<3> `functions` exposes the public static methods of a class as functions, optionally under a namespace prefix.
+<4> A function is called with its prefix.
+<5> A static method of an imported class is called through the class name.
+<6> The collection operations of the chapter 2 of the specification, lambdas included, compile like the rest.
 
-`variables`:: the name and the static type of the variables the expressions use. A variable declared this way is
-still looked up in the `ELContext` at evaluation time, but every property access, method invocation and coercion
-applied to it is resolved statically.
-`imports`, `importPackages`, `staticImports`:: the classes, packages and statically imported fields available to
-the expressions, as described in the section 1.24 of the specification.
-`functions`:: the classes whose public static methods are exposed as functions, optionally under a namespace
-prefix. Use `@ELFunction` on a method to give it a different name.
+The functions are plain static methods:
 
-NOTE: The generated registry matches the expected type exactly: an expression declared with
-`expectedType = String.class` is only returned for a request with `String.class`. A request for the same string
+snippet::example.TextFunctions[project-base="doc-examples/example", title="TextFunctions"]
+
+<1> A public static method is a function under its own name.
+<2> `@ELFunction` gives a function another name.
+
+`@ELEnvironment` is the compilation time counterpart of the `jakarta.el.ELContext`. It is declared on the class,
+or on the member holding the expressions, in which case it applies to those on top of the environment of the
+class. The expressions declared on a method, or on one of its parameters, additionally see the parameters of the
+method as variables, under their names and with their declared types.
+
+NOTE: The generated registry matches the expected type of a request: an expression declared with
+`expectedType = String.class` is only returned for a request with `String.class`. A primitive and its wrapper
+are the same expectation, so `double.class` and `Double.class` match each other. A request for the same string
 with another type, `Object.class` included, is treated as a different expression, and is rejected as not compiled
 unless the interpreter module is present.
 
-[WARNING]
-====
-Two behaviours of Micronaut's annotation metadata affect how an expression is declared:
-
-* Any annotation string containing `#{...}` is treated by Micronaut as one of its own evaluated expressions. The
-processor reads the original text back out, so `#{...}` works in a plain holder class, but on a Micronaut bean
-Micronaut will also try to compile it with its own expression language. Prefer `${...}`: the specification parses
-the two identically.
-* A primitive class literal such as `double.class` cannot be read from an annotation member, so
-`expectedReturnType` and `expectedParamTypes` must use the wrapper types. `Double.class` matches a method declared
-with `double`.
-====
+WARNING: Any annotation string containing `#{...}` is treated by Micronaut as one of its own evaluated
+expressions. The processor reads the original text back out, so `#{...}` works in a plain holder class, but on a
+Micronaut bean Micronaut will also try to compile it with its own expression language. Prefer `${...}` for
+`@ELExpression`: the specification parses the two identically. An annotation of your own can use `#{...}` with
+the processor described in <<customAnnotations,Expressions in Custom Annotations>>.
 
 === What the processor generates
 
@@ -54,21 +51,52 @@ itself:
 public final class BookExpressions$Expression0 extends CompiledValueExpression {
 
     public BookExpressions$Expression0() {
-        super("${book.title}", java.lang.String.class);
+        super("${book.title}", "${book[\"title\"]}", java.lang.String.class); // <1>
     }
 
     @Override
     protected Object evaluate(ELContext context) {
-        return ((Book) ELResolution.resolveIdentifier(context, "book")).getTitle();
+        return ((Book) ELResolution.resolveIdentifier(context, "book")).getTitle(); // <2>
     }
 
     @Override
     public void setValue(ELContext context, Object value) {
-        ELResolution.setValue(context, (Book) ELResolution.resolveIdentifier(context, "book"), "title", value);
+        ELResolution.setValue(context, (Book) ELResolution.resolveIdentifier(context, "book"), "title", value); // <3>
     }
 }
 ----
 
-`getType`, `isReadOnly` and `getValueReference` are generated as well when the expression is an lvalue. An
+<1> The expression as written, its canonical form, which is what `equals` compares, and the expected type.
+<2> The identifier is resolved through the context once, then the property is read with a direct invocation.
+<3> `setValue`, `getType`, `isReadOnly` and `getValueReference` are generated when the expression is an lvalue. An
 expression that is not an lvalue inherits the base class behaviour, which rejects assignment with a
 `PropertyNotWritableException` as the specification requires.
+
+=== Errors at compilation time
+
+An expression that cannot be compiled fails the compilation of the class declaring it. The message carries the
+expression, the position of the error in it, and the class, so that the mistake never reaches a runtime:
+
+[source,text]
+----
+Expressions.java:7: error: Unexpected token RCURL('}') in the expression [${ book.title + }] at the position 16 // <1>
+public class Expressions {
+       ^
+----
+
+<1> The file and the line of the declaring class, the message of the parser, the expression and the position.
+
+The same holds for a composite method expression, a function that is not declared, a static field the imported
+class does not have, an assignment to something that is not an lvalue, or a construction mixing set elements and
+map entries.
+
+A member that the static type of a variable does not declare is a warning rather than an error, because a custom
+`jakarta.el.ELResolver` may serve it at runtime, which is where the access is then left:
+
+[source,text]
+----
+warning: The type example.Book does not declare the property 'titel'; the access is left to the resolvers at runtime
+----
+
+The types the standard resolvers read by key, index or name, maps, collections, arrays, resource bundles and
+optionals, are not reported.

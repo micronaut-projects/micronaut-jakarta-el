@@ -1,0 +1,25 @@
+plugins {
+    id "io.micronaut.build.internal.jakarta-el-test-suite"
+}
+
+// The examples of the guide, in Java. The guide includes them with the snippet macro, so they compile and run
+// with every build.
+dependencies {
+    testAnnotationProcessor projects.micronautJakartaElProcessor
+    testAnnotationProcessor mn.micronaut.inject.java
+    testAnnotationProcessor projects.testSuiteCustomAnnotation
+    testAnnotationProcessor platform(libs.micronaut.core)
+
+    testImplementation platform(libs.micronaut.core)
+    testImplementation projects.micronautJakartaEl
+    testImplementation projects.testSuiteCustomAnnotation
+    testImplementation mn.micronaut.core
+    testImplementation mn.micronaut.inject
+    testImplementation mn.micronaut.aop
+    testRuntimeOnly mn.micronaut.context
+    // only the example of parsing at runtime needs the interpreter
+    testRuntimeOnly projects.micronautJakartaElInterpreter
+    testImplementation platform(libs.junit.bom)
+    testImplementation libs.junit.jupiter
+    testRuntimeOnly libs.junit.jupiter.engine
+}

@@ -23,26 +23,28 @@ import java.lang.annotation.Target;
  * {@code fn} prefix and {@code java.util.Locale} is imported. Both {@code #{...}} and {@code ${...}} delimiters
  * are accepted.</p>
  */
+// tag::annotation[]
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-@Around
+@Around // <1>
 @InterceptorBinding
 public @interface Eligible {
 
     /**
      * @return The condition the parameters of the method must satisfy
      */
-    String value();
+    String value(); // <2>
 
     /**
      * @return The message of the rejection, an expression evaluating to a string, or empty for a default one
      */
-    String otherwise() default "";
+    String otherwise() default ""; // <3>
 
     /**
      * @return The name of the constant holding the compiled condition in the registry of the class, for the
      * code that wants to reference it directly; derived from the condition when empty
      */
-    String name() default "";
+    String name() default ""; // <4>
 }
+// end::annotation[]

@@ -36,11 +36,12 @@ import java.util.Locale;
  * <p>At runtime the text is read back from the annotation metadata and handed to
  * {@code jakarta.el.ExpressionFactory}, which returns the compiled expression: nothing is parsed.</p>
  */
+// tag::remapper[]
 public final class EligibleRemapper implements AnnotationRemapper {
 
     @Override
     public String getPackageName() {
-        return Eligible.class.getPackageName();
+        return Eligible.class.getPackageName(); // <1>
     }
 
     @Override
@@ -48,7 +49,7 @@ public final class EligibleRemapper implements AnnotationRemapper {
         if (!annotation.getAnnotationName().equals(Eligible.class.getName())) {
             return List.of(annotation);
         }
-        String condition = textOf(annotation.getValues().get(AnnotationMetadata.VALUE_MEMBER));
+        String condition = textOf(annotation.getValues().get(AnnotationMetadata.VALUE_MEMBER)); // <2>
         if (condition == null) {
             return List.of(annotation);
         }
@@ -62,8 +63,8 @@ public final class EligibleRemapper implements AnnotationRemapper {
         if (otherwise != null) {
             eligible.member("otherwise", otherwise);
         }
-        remapped.add(eligible.build());
-        remapped.add(AnnotationValue.builder(ELExpression.class)
+        remapped.add(eligible.build()); // <3>
+        remapped.add(AnnotationValue.builder(ELExpression.class) // <4>
             .value(condition)
             .member("expectedType", new AnnotationClassValue<>(Boolean.class))
             .member("name", name)
@@ -75,7 +76,7 @@ public final class EligibleRemapper implements AnnotationRemapper {
                 .member("name", name.isEmpty() ? "" : name + "_OTHERWISE")
                 .build());
         }
-        remapped.add(AnnotationValue.builder(ELEnvironment.class)
+        remapped.add(AnnotationValue.builder(ELEnvironment.class) // <5>
             .member("functions", AnnotationValue.builder(ELFunctions.class)
                 .value(EligibilityFunctions.class)
                 .member("prefix", "fn")
@@ -92,7 +93,7 @@ public final class EligibleRemapper implements AnnotationRemapper {
     private static String textOf(Object value) {
         String text;
         if (value instanceof EvaluatedExpressionReference reference) {
-            text = reference.annotationValue().toString();
+            text = reference.annotationValue().toString(); // <6>
         } else if (value instanceof String string) {
             text = string;
         } else {
@@ -102,6 +103,7 @@ public final class EligibleRemapper implements AnnotationRemapper {
         if (text.isEmpty()) {
             return null;
         }
-        return text.startsWith("${") ? "#" + text.substring(1) : text;
+        return text.startsWith("${") ? "#" + text.substring(1) : text; // <7>
     }
 }
+// end::remapper[]
