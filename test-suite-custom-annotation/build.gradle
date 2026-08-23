@@ -1,0 +1,14 @@
+plugins {
+    id "io.micronaut.build.internal.jakarta-el-test-suite"
+}
+
+// A library that ships a custom annotation whose value is a Jakarta Expression Language expression, and the
+// annotation processor that has the expression compiled at compilation time. It is built against public API
+// only: the annotation metadata SPI of micronaut-core and the annotations of micronaut-jakarta-el.
+dependencies {
+    implementation mn.micronaut.aop
+    implementation projects.micronautJakartaElAnnotations
+
+    // the processor runs on the annotation processor path, where micronaut-core-processor is present
+    compileOnly mn.micronaut.core.processor
+}

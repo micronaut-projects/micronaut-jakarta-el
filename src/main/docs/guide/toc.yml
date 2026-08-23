@@ -7,6 +7,8 @@ declaringExpressions:
   title: Declaring Expressions
 declaringBeans:
   title: Declaring Beans
+customAnnotations:
+  title: Expressions in Custom Annotations
 runtimeParsing:
   title: Parsing at Runtime
 reflection:

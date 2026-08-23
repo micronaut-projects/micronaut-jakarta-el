@@ -1,0 +1,72 @@
+Expressions are not limited to `@ELExpression`: any annotation can carry one, and have it compiled, with a small
+annotation processor. The `test-suite-custom-annotation` module of the repository is a complete example, used by
+`test-suite-java`.
+
+=== The annotation
+
+The annotation is an ordinary one, here an AOP binding, whose `value` is a condition over the parameters of the
+method:
+
+[source,java]
+----
+@Eligible("#{ customer.age >= 18 && customer.country == 'CZ' }")
+public String register(Customer customer) {
+    return "registered " + customer.name();
+}
+----
+
+=== The processor
+
+Micronaut treats any annotation string containing `#{...}` as one of its own evaluated expressions, and would
+fail to compile an expression of the Jakarta language. An `io.micronaut.inject.annotation.AnnotationRemapper`,
+which runs inside the annotation metadata builder before anything else sees the annotation, takes the text back
+and declares it:
+
+[source,java]
+----
+public final class EligibleRemapper implements AnnotationRemapper {
+
+    @Override
+    public String getPackageName() {
+        return Eligible.class.getPackageName();
+    }
+
+    @Override
+    public List<AnnotationValue<?>> remap(AnnotationValue<?> annotation, VisitorContext visitorContext) {
+        String condition = ...; // the text as written, taken back from the evaluated expression reference
+        return List.of(
+            AnnotationValue.builder(Eligible.class).value(condition).build(),
+            AnnotationValue.builder(ELExpression.class)
+                .value(condition)
+                .member("expectedType", new AnnotationClassValue<>(Boolean.class))
+                .build()
+        );
+    }
+}
+----
+
+It returns two annotations in place of the one it was given: the same `@Eligible` holding the text as written,
+and an `@ELExpression` declaring it, which is compiled into the registry of the class like any other. The remapper
+is registered in `META-INF/services/io.micronaut.inject.annotation.AnnotationRemapper`.
+
+A `${...}` is stored as `#{...}`: the specification treats the two alike, while Micronaut resolves a `${...}` in
+the metadata of a bean as a property placeholder.
+
+=== The runtime
+
+The text is read back from the annotation metadata and handed to `jakarta.el.ExpressionFactory`, which returns
+the compiled expression. The parameters of the invocation are bound by name:
+
+[source,java]
+----
+String condition = context.stringValue(Eligible.class).orElseThrow();
+CompiledELContext elContext = new CompiledELContext();
+context.getParameterValueMap().forEach(elContext::setBean);
+ValueExpression expression = ELManager.getExpressionFactory()
+    .createValueExpression(elContext, condition, Boolean.class);   // a lookup by text, not a parse
+if (!Boolean.TRUE.equals(expression.getValue(elContext))) {
+    throw new NotEligibleException(...);
+}
+----
+
+`Customer` is `@Introspected`, so `customer.age` is resolved through its bean introspection, without reflection.
