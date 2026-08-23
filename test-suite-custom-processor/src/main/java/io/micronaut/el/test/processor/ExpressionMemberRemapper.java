@@ -17,7 +17,7 @@ import java.util.Map;
 /**
  * The user's processor. Micronaut treats any annotation string containing {@code #{...}} as one of its own
  * evaluated expressions; this remapper takes the members it owns back and hands their expressions to
- * micronaut-expression-language through the public {@link ELExpression} annotation, declared beside the
+ * micronaut-jakarta-el through the public {@link ELExpression} annotation, declared beside the
  * annotation it came from, so that they are compiled at compilation time and found at runtime by their text
  * through the standard {@code jakarta.el.ExpressionFactory}.
  *
