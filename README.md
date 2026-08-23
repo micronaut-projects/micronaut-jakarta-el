@@ -1,4 +1,4 @@
-# Micronaut Expression Language
+# Micronaut Jakarta EL
 
 An implementation of the [Jakarta Expression Language 6.0](https://jakarta.ee/specifications/expression-language/6.0/jakarta-expression-language-spec-6.0)
 specification whose expressions and resolvers are generated at **compilation time** with
