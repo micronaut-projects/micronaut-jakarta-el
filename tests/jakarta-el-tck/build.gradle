@@ -1,5 +1,5 @@
 plugins {
-    id "io.micronaut.build.internal.jakarta-el-test-suite"
+    id "io.micronaut.build.internal.jakarta-el-native-test-suite"
 }
 
 description = """
@@ -81,4 +81,9 @@ tasks.named("test", Test) {
     }
     // The TCK asks the implementation for a VariableMapper to exercise the variable binding of the section 1.19.
     systemProperty "variable.mapper", "io.micronaut.el.runtime.MapVariableMapper"
+}
+
+// The native test binary does not inherit the system properties of the test task.
+tasks.named("nativeTest") {
+    runtimeArgs.add("-Dvariable.mapper=io.micronaut.el.runtime.MapVariableMapper")
 }

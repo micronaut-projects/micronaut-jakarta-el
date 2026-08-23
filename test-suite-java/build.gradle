@@ -1,5 +1,5 @@
 plugins {
-    id "io.micronaut.build.internal.jakarta-el-test-suite"
+    id "io.micronaut.build.internal.jakarta-el-native-test-suite"
 }
 
 dependencies {

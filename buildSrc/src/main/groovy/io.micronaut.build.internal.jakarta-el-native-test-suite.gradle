@@ -1,0 +1,27 @@
+// A test suite whose tests also run inside a GraalVM native image: `nativeTest` compiles the tests and
+// everything they reach into a native binary and runs them there. The GraalVM CI workflows pick the task up.
+plugins {
+    id 'io.micronaut.build.internal.jakarta-el-test-suite'
+    id 'org.graalvm.buildtools.native'
+}
+
+graalvmNative {
+    toolchainDetection = false
+    binaries.configureEach {
+        // the services of the module - the expression factory and the runtime parser - are registered
+        // through ServiceLoader, which native-image supports natively; the JUnit engine only needs its
+        // usual build-time initialization
+        buildArgs.add('--initialize-at-build-time=org.junit.platform.commons.logging.LoggerFactory$DelegatingLogger')
+    }
+}
+
+// An agent run, `-Pagent test`, collects reachability metadata while the tests run on the JVM. The agent
+// library ships with GraalVM only, so such a run must use the GraalVM JDK rather than the toolchain default.
+if (providers.gradleProperty('agent').present) {
+    tasks.withType(Test).configureEach {
+        String graalvmHome = System.getenv('GRAALVM_HOME')
+        if (graalvmHome) {
+            executable = "${graalvmHome}/bin/java"
+        }
+    }
+}

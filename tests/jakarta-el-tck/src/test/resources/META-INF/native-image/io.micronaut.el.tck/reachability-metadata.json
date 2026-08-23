@@ -1,0 +1,1174 @@
+{
+  "reflection": [
+    {
+      "type": "bogus"
+    },
+    {
+      "type": "boolean[]"
+    },
+    {
+      "type": "com.sun.beans.editors.PredicateEditor"
+    },
+    {
+      "type": "com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT$TCKBeanNameResolver",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT$TCKEvalListener",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.api.jakarta_el.elprocessor.ELClientIT",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.api.jakarta_el.elresolver.ELClientIT",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.api.jakarta_el.expression.ELClientIT",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT$ObjectAndType",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.api.jakarta_el.functionmapper.ELClientIT",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.api.jakarta_el.lambdaexpression.ELClientIT",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.api.jakarta_el.listelresolver.ELClientIT",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.api.jakarta_el.mapelresolver.ELClientIT",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.api.jakarta_el.methodinfo.ELClientIT",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.api.jakarta_el.methodreference.ELClientIT",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT$TestBean",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT$TestBeanBeanInfo",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT$TestBeanCustomizer",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.api.jakarta_el.recordelresolver.ELClientIT",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.api.jakarta_el.recordelresolver.ELClientIT$TestRecord",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.api.jakarta_el.resourcebundleelresolver.ELClientIT",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.api.jakarta_el.resourcebundleelresolver.ELClientIT$TckResourceBundle",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.api.jakarta_el.staticfieldelresolver.ELClientIT",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.api.jakarta_el.staticfieldelresolver.TCKELClass",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.api.jakarta_el.valueexpression.ELClientIT",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.api.jakarta_el.valueexpression.Worker",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.api.jakarta_el.variablemapper.ELClientIT",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.api.expression.ExpressionTest",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.api.resolver.BarELResolver",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.api.resolver.ResolverTest",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.elcontext.BarELContext",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.elcontext.BareBonesELContext",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.elcontext.FuncMapperELContext",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.elcontext.SimpleELContext",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.elcontext.SimpleELContext$Resolver",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.elcontext.VRContext",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.elcontext.VarMapperELContext",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.elresolver.EmployeeELResolver",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.elresolver.EnumELResolver",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.elresolver.FunctionELResolver",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.elresolver.VariableELResolver",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.elresolver.VectELResolver",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.functionmapper.TCKFunctionMapper",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.spec.Book",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.util.Customer",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.util.CustomerBeanInfo",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.util.CustomerCustomizer",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.util.DataBase",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.util.Date",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.util.ELTestUtil",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.util.ExprEval",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.util.Fault",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.util.MethodsBean",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.util.NameValuePair",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.util.Order",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.util.Product",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.util.ProductBeanInfo",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.util.ProductCustomizer",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.util.ResolverType",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.util.SimpleBean",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.util.SimpleBeanBeanInfo",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.util.SimpleBeanCustomizer",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.util.SimpleInterface",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.util.SimpleInterfaceBeanInfo",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.util.SimpleInterfaceCustomizer",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.util.TestNum",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.util.TypesBean",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.util.TypesBeanBeanInfo",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.util.TypesBeanCustomizer",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.common.util.Validator",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.spec.assignmentoperator.ELClientIT",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.spec.binaryoperator.ELClientIT",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.spec.coercion.ELClientIT",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.spec.coercion.ELClientIT$greeting",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.spec.coercion.ELClientIT$planets",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.spec.collectionoperators.ELClientIT",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.spec.concatoperator.ELClientIT",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.spec.conditionaloperator.ELClientIT",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.spec.emptyoperator.ELClientIT",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.spec.lambda.ELClientIT",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.spec.language.ELClientIT",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.spec.literal.ELClientIT",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.spec.mapper.ELClientIT",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.spec.relationaloperator.ELClientIT",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.spec.relationaloperator.ELClientIT$DougType",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.spec.relationaloperator.ELClientIT$NickType",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.spec.relationaloperator.ELClientIT$TestEnum",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.spec.semicolonoperator.ELClientIT",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.ts.tests.el.spec.unaryoperator.ELClientIT",
+      "allPublicMethods": true,
+      "allPublicFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "io.micronaut.el.CompiledExpressionFactory",
+      "methods": [
+        {
+          "name": "createMethodExpression",
+          "parameterTypes": [
+            "jakarta.el.ELContext",
+            "java.lang.String",
+            "java.lang.Class",
+            "java.lang.Class[]"
+          ]
+        },
+        {
+          "name": "createValueExpression",
+          "parameterTypes": [
+            "jakarta.el.ELContext",
+            "java.lang.String",
+            "java.lang.Class"
+          ]
+        },
+        {
+          "name": "createValueExpression",
+          "parameterTypes": [
+            "java.lang.Object",
+            "java.lang.Class"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "io.micronaut.el.interpreter.InterpretedMethodExpression",
+      "serializable": true
+    },
+    {
+      "type": "io.micronaut.el.interpreter.InterpretedValueExpression",
+      "serializable": true
+    },
+    {
+      "type": "io.micronaut.el.interpreter.InterpretingELExpressionParser",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "io.micronaut.el.runtime.CompiledMethodExpression",
+      "serializable": true
+    },
+    {
+      "type": "io.micronaut.el.runtime.CompiledValueExpression",
+      "serializable": true
+    },
+    {
+      "type": "io.micronaut.el.runtime.LiteralMethodExpression",
+      "serializable": true
+    },
+    {
+      "type": "io.micronaut.el.runtime.LiteralValueExpression",
+      "serializable": true
+    },
+    {
+      "type": "io.micronaut.el.runtime.MapVariableMapper",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "jakarta.el.BeanNameELResolver",
+      "methods": [
+        {
+          "name": "getType",
+          "parameterTypes": [
+            "jakarta.el.ELContext",
+            "java.lang.Object",
+            "java.lang.Object"
+          ]
+        },
+        {
+          "name": "getValue",
+          "parameterTypes": [
+            "jakarta.el.ELContext",
+            "java.lang.Object",
+            "java.lang.Object"
+          ]
+        },
+        {
+          "name": "isReadOnly",
+          "parameterTypes": [
+            "jakarta.el.ELContext",
+            "java.lang.Object",
+            "java.lang.Object"
+          ]
+        },
+        {
+          "name": "setValue",
+          "parameterTypes": [
+            "jakarta.el.ELContext",
+            "java.lang.Object",
+            "java.lang.Object",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "jakarta.el.ELContext"
+    },
+    {
+      "type": "jakarta.el.ELProcessor",
+      "methods": [
+        {
+          "name": "defineFunction",
+          "parameterTypes": [
+            "java.lang.String",
+            "java.lang.String",
+            "java.lang.String",
+            "java.lang.String"
+          ]
+        },
+        {
+          "name": "defineFunction",
+          "parameterTypes": [
+            "java.lang.String",
+            "java.lang.String",
+            "java.lang.reflect.Method"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "jakarta.el.ELResolver"
+    },
+    {
+      "type": "jakarta.el.Expression",
+      "serializable": true
+    },
+    {
+      "type": "jakarta.el.FunctionMapper"
+    },
+    {
+      "type": "jakarta.el.LambdaExpression",
+      "methods": [
+        {
+          "name": "invoke",
+          "parameterTypes": [
+            "jakarta.el.ELContext",
+            "java.lang.Object[]"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "jakarta.el.MethodExpression",
+      "serializable": true
+    },
+    {
+      "type": "jakarta.el.StandardELContext",
+      "methods": [
+        {
+          "name": "getContext",
+          "parameterTypes": [
+            "java.lang.Class"
+          ]
+        },
+        {
+          "name": "putContext",
+          "parameterTypes": [
+            "java.lang.Class",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "jakarta.el.ValueExpression",
+      "serializable": true
+    },
+    {
+      "type": "java.beans.BeanInfo"
+    },
+    {
+      "type": "java.beans.PropertyVetoException"
+    },
+    {
+      "type": "java.io.Serializable"
+    },
+    {
+      "type": "java.io.SerializableBeanInfo"
+    },
+    {
+      "type": "java.io.SerializableCustomizer"
+    },
+    {
+      "type": "java.lang.Boolean",
+      "serializable": true,
+      "jniAccessible": true,
+      "methods": [
+        {
+          "name": "getBoolean",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.lang.ClassLoader",
+      "fields": [
+        {
+          "name": "classLoaderValueMap"
+        }
+      ]
+    },
+    {
+      "type": "java.lang.Class[]",
+      "serializable": true
+    },
+    {
+      "type": "java.lang.Cloneable"
+    },
+    {
+      "type": "java.lang.CloneableBeanInfo"
+    },
+    {
+      "type": "java.lang.CloneableCustomizer"
+    },
+    {
+      "type": "java.lang.Comparable"
+    },
+    {
+      "type": "java.lang.Enum",
+      "serializable": true
+    },
+    {
+      "type": "java.lang.Exception"
+    },
+    {
+      "type": "java.lang.Integer",
+      "serializable": true,
+      "methods": [
+        {
+          "name": "compareTo",
+          "parameterTypes": [
+            "java.lang.Integer"
+          ]
+        },
+        {
+          "name": "valueOf",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.lang.Long",
+      "methods": [
+        {
+          "name": "compareTo",
+          "parameterTypes": [
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.lang.Number",
+      "serializable": true
+    },
+    {
+      "type": "java.lang.Object",
+      "serializable": true
+    },
+    {
+      "type": "java.lang.ObjectBeanInfo"
+    },
+    {
+      "type": "java.lang.ObjectCustomizer"
+    },
+    {
+      "type": "java.lang.Object[]",
+      "serializable": true
+    },
+    {
+      "type": "java.lang.Record"
+    },
+    {
+      "type": "java.lang.SecurityManager"
+    },
+    {
+      "type": "java.lang.String",
+      "serializable": true,
+      "methods": [
+        {
+          "name": "compareTo",
+          "parameterTypes": [
+            "java.lang.Object"
+          ]
+        },
+        {
+          "name": "equals",
+          "parameterTypes": [
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.lang.String[]"
+    },
+    {
+      "type": "java.lang.Throwable"
+    },
+    {
+      "type": "java.lang.constant.Constable"
+    },
+    {
+      "type": "java.lang.foo"
+    },
+    {
+      "type": "java.lang.invoke.MethodHandle"
+    },
+    {
+      "type": "java.lang.wect"
+    },
+    {
+      "type": "java.util.ArrayList",
+      "methods": [
+        {
+          "name": "add",
+          "parameterTypes": [
+            "java.lang.Object"
+          ]
+        },
+        {
+          "name": "get",
+          "parameterTypes": [
+            "int"
+          ]
+        },
+        {
+          "name": "size",
+          "parameterTypes": []
+        },
+        {
+          "name": "toArray",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.util.HashSet",
+      "serializable": true,
+      "methods": [
+        {
+          "name": "contains",
+          "parameterTypes": [
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.util.LinkedHashMap",
+      "methods": [
+        {
+          "name": "get",
+          "parameterTypes": [
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.util.LinkedHashSet",
+      "serializable": true
+    },
+    {
+      "type": "java.util.String"
+    },
+    {
+      "type": "java.util.TimeZone",
+      "methods": [
+        {
+          "name": "getRawOffset",
+          "parameterTypes": []
+        },
+        {
+          "name": "setRawOffset",
+          "parameterTypes": [
+            "int"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.util.TimeZoneBeanInfo"
+    },
+    {
+      "type": "java.util.TimeZoneCustomizer"
+    },
+    {
+      "type": "java.util.Vector",
+      "methods": [
+        {
+          "name": "add",
+          "parameterTypes": [
+            "int",
+            "java.lang.Object"
+          ]
+        },
+        {
+          "name": "add",
+          "parameterTypes": [
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.util.concurrent.ArrayBlockingQueue",
+      "serializable": true
+    },
+    {
+      "type": "java.util.concurrent.locks.AbstractOwnableSynchronizer",
+      "serializable": true
+    },
+    {
+      "type": "java.util.concurrent.locks.AbstractQueuedSynchronizer",
+      "serializable": true
+    },
+    {
+      "type": "java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject",
+      "serializable": true
+    },
+    {
+      "type": "java.util.concurrent.locks.ReentrantLock",
+      "serializable": true
+    },
+    {
+      "type": "java.util.concurrent.locks.ReentrantLock$NonfairSync",
+      "serializable": true
+    },
+    {
+      "type": "java.util.concurrent.locks.ReentrantLock$Sync",
+      "serializable": true
+    },
+    {
+      "type": "java.util.function.PredicateEditor"
+    },
+    {
+      "type": "jdk.internal.jrtfs.JrtFileSystemProvider"
+    },
+    {
+      "type": "jdk.internal.misc.Unsafe"
+    },
+    {
+      "type": "sun.security.provider.NativePRNG",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.security.SecureRandomParameters"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.SHA",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.text.resources.cldr.FormatData"
+    },
+    {
+      "type": "sun.text.resources.cldr.FormatData_en"
+    },
+    {
+      "type": "sun.util.calendar.ZoneInfo"
+    },
+    {
+      "type": "sun.util.calendar.ZoneInfoBeanInfo"
+    },
+    {
+      "type": "sun.util.calendar.ZoneInfoCustomizer"
+    },
+    {
+      "type": "sun.util.resources.LocaleNames"
+    },
+    {
+      "type": "sun.util.resources.LocaleNames_en"
+    },
+    {
+      "type": "sun.util.resources.cldr.CalendarData"
+    },
+    {
+      "type": "sun.util.resources.cldr.LocaleNames"
+    },
+    {
+      "type": "sun.util.resources.cldr.LocaleNames_en"
+    },
+    {
+      "type": {
+        "proxy": [
+          "java.util.function.Predicate"
+        ]
+      }
+    }
+  ],
+  "resources": [
+    {
+      "glob": "META-INF/micronaut"
+    },
+    {
+      "glob": "META-INF/services/io.micronaut.core.optim.StaticOptimizations$Loader"
+    },
+    {
+      "glob": "META-INF/services/io.micronaut.el.ELExpressionParser"
+    },
+    {
+      "glob": "META-INF/services/io.micronaut.el.ELExpressionSource"
+    },
+    {
+      "glob": "META-INF/services/jakarta.el.ExpressionFactory"
+    },
+    {
+      "glob": "META-INF/services/java.nio.channels.spi.SelectorProvider"
+    },
+    {
+      "glob": "META-INF/services/java.nio.file.spi.FileSystemProvider"
+    },
+    {
+      "glob": "META-INF/services/java.time.zone.ZoneRulesProvider"
+    },
+    {
+      "glob": "META-INF/services/java.util.spi.ResourceBundleControlProvider"
+    },
+    {
+      "glob": "META-INF/services/org.junit.platform.engine.TestEngine"
+    },
+    {
+      "glob": "META-INF/services/org.junit.platform.launcher.LauncherDiscoveryListener"
+    },
+    {
+      "glob": "META-INF/services/org.junit.platform.launcher.LauncherSessionListener"
+    },
+    {
+      "glob": "META-INF/services/org.junit.platform.launcher.PostDiscoveryFilter"
+    },
+    {
+      "glob": "META-INF/services/org.junit.platform.launcher.TestExecutionListener"
+    },
+    {
+      "glob": "META-INF/services/org.slf4j.spi.SLF4JServiceProvider"
+    },
+    {
+      "glob": "jakarta/el/PrivateMessages.properties"
+    },
+    {
+      "glob": "jakarta/el/PrivateMessages_en.properties"
+    },
+    {
+      "glob": "jakarta/el/PrivateMessages_en_CA.properties"
+    },
+    {
+      "glob": "junit-platform.properties"
+    },
+    {
+      "module": "java.logging",
+      "glob": "sun/util/logging/resources/logging_en.properties"
+    },
+    {
+      "module": "java.logging",
+      "glob": "sun/util/logging/resources/logging_en_CA.properties"
+    },
+    {
+      "bundle": "jakarta.el.PrivateMessages"
+    },
+    {
+      "bundle": "sun.util.logging.resources.logging"
+    }
+  ]
+}
