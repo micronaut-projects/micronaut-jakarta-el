@@ -15,6 +15,7 @@
  */
 package io.micronaut.el.runtime;
 
+import io.micronaut.core.annotation.Experimental;
 import jakarta.el.ValueExpression;
 import jakarta.el.VariableMapper;
 import org.jspecify.annotations.Nullable;
@@ -29,6 +30,7 @@ import java.util.Map;
  * @author Denis Stepanov
  * @since 1.0
  */
+@Experimental
 public final class MapVariableMapper extends VariableMapper {
 
     private final Map<String, ValueExpression> variables = new HashMap<>();

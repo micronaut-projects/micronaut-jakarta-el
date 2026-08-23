@@ -15,6 +15,7 @@
  */
 package io.micronaut.el;
 
+import io.micronaut.core.annotation.Experimental;
 import org.jspecify.annotations.Nullable;
 import io.micronaut.el.resolver.IntrospectionELResolver;
 import io.micronaut.el.runtime.MapVariableMapper;
@@ -40,6 +41,7 @@ import java.util.Map;
  * @author Denis Stepanov
  * @since 1.0
  */
+@Experimental
 public class CompiledELContext extends ELContext {
 
     private final Map<String, Object> beans = new HashMap<>();

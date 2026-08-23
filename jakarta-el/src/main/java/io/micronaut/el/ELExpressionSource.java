@@ -15,6 +15,7 @@
  */
 package io.micronaut.el;
 
+import io.micronaut.core.annotation.Experimental;
 import org.jspecify.annotations.Nullable;
 import jakarta.el.MethodExpression;
 import jakarta.el.ValueExpression;
@@ -32,6 +33,7 @@ import java.util.List;
  * @author Denis Stepanov
  * @since 1.0
  */
+@Experimental
 public interface ELExpressionSource {
 
     /**

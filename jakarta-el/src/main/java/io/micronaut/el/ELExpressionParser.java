@@ -15,6 +15,7 @@
  */
 package io.micronaut.el;
 
+import io.micronaut.core.annotation.Experimental;
 import jakarta.el.ELContext;
 import jakarta.el.MethodExpression;
 import jakarta.el.ValueExpression;
@@ -32,6 +33,7 @@ import org.jspecify.annotations.Nullable;
  * @since 1.0
  * @see CompiledExpressionFactory
  */
+@Experimental
 public interface ELExpressionParser {
 
     /**

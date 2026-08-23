@@ -5,6 +5,8 @@ specification whose expressions and resolvers are generated at **compilation tim
 [Micronaut SourceGen](https://micronaut-projects.github.io/micronaut-sourcegen/latest/guide/) and an annotation
 processor.
 
+The public API, annotations included, is marked `@Experimental`: it can change between minor versions until the first stable release.
+
 Nothing is parsed and nothing is resolved reflectively at runtime:
 
 * every declared expression becomes a generated `jakarta.el.ValueExpression` or `jakarta.el.MethodExpression`

@@ -15,6 +15,8 @@
  */
 package io.micronaut.el.parser.ast;
 
+import io.micronaut.core.annotation.Experimental;
+
 
 /**
  * The unary operators of the Jakarta Expression Language.
@@ -22,6 +24,7 @@ package io.micronaut.el.parser.ast;
  * @author Denis Stepanov
  * @since 1.0
  */
+@Experimental
 public enum UnaryOperator {
 
     /**

@@ -16,3 +16,6 @@ time becomes a direct Java invocation.
 
 The module passes the Jakarta Expression Language 6.0 Technology Compatibility Kit. See
 <<tck,Technology Compatibility Kit>>.
+
+NOTE: The public API, annotations included, is marked `@Experimental`: it can change between minor versions until the
+first stable release.

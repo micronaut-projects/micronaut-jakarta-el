@@ -15,6 +15,7 @@
  */
 package io.micronaut.el.parser.ast;
 
+import io.micronaut.core.annotation.Experimental;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
@@ -25,6 +26,7 @@ import java.util.List;
  * @author Denis Stepanov
  * @since 1.0
  */
+@Experimental
 public sealed interface ELNode {
 
     /**

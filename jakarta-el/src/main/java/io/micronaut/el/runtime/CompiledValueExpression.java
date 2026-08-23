@@ -15,6 +15,7 @@
  */
 package io.micronaut.el.runtime;
 
+import io.micronaut.core.annotation.Experimental;
 import org.jspecify.annotations.Nullable;
 import jakarta.el.ELContext;
 import jakarta.el.PropertyNotWritableException;
@@ -32,6 +33,7 @@ import java.util.Objects;
  * @author Denis Stepanov
  * @since 1.0
  */
+@Experimental
 public abstract class CompiledValueExpression extends ValueExpression implements CompiledExpression {
 
     private static final long serialVersionUID = 1L;

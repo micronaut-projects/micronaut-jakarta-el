@@ -15,6 +15,7 @@
  */
 package io.micronaut.el.annotation;
 
+import io.micronaut.core.annotation.Experimental;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Repeatable;
@@ -36,6 +37,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 @Repeatable(ELMethodExpressions.class)
+@Experimental
 public @interface ELMethodExpression {
 
     /**

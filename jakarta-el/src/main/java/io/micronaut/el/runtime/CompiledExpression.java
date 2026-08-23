@@ -15,6 +15,8 @@
  */
 package io.micronaut.el.runtime;
 
+import io.micronaut.core.annotation.Experimental;
+
 
 /**
  * A Jakarta Expression Language expression that was compiled at compilation time.
@@ -22,6 +24,7 @@ package io.micronaut.el.runtime;
  * @author Denis Stepanov
  * @since 1.0
  */
+@Experimental
 public interface CompiledExpression {
 
     /**

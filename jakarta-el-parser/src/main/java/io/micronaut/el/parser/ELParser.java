@@ -15,6 +15,7 @@
  */
 package io.micronaut.el.parser;
 
+import io.micronaut.core.annotation.Experimental;
 import io.micronaut.el.parser.ast.BinaryOperator;
 import io.micronaut.el.parser.ast.ELNode;
 import io.micronaut.el.parser.ast.UnaryOperator;
@@ -32,6 +33,7 @@ import java.util.List;
  * @author Denis Stepanov
  * @since 1.0
  */
+@Experimental
 public final class ELParser {
 
     private final String expression;

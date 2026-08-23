@@ -15,6 +15,7 @@
  */
 package io.micronaut.el.parser;
 
+import io.micronaut.core.annotation.Experimental;
 import jakarta.el.ELException;
 
 /**
@@ -23,6 +24,7 @@ import jakarta.el.ELException;
  * @author Denis Stepanov
  * @since 1.0
  */
+@Experimental
 public final class ELParsingException extends ELException {
 
     private static final long serialVersionUID = 1L;

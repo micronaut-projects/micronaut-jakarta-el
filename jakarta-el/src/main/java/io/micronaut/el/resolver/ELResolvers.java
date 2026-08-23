@@ -15,6 +15,7 @@
  */
 package io.micronaut.el.resolver;
 
+import io.micronaut.core.annotation.Experimental;
 import jakarta.el.ArrayELResolver;
 import jakarta.el.BeanELResolver;
 import jakarta.el.CompositeELResolver;
@@ -32,6 +33,7 @@ import jakarta.el.StaticFieldELResolver;
  * @author Denis Stepanov
  * @since 1.0
  */
+@Experimental
 public final class ELResolvers {
 
     private ELResolvers() {
