@@ -148,7 +148,7 @@ public final class ExpressionSourceWriter {
                     for (int i = values.size() - 1; i >= 0; i--) {
                         CompiledValue value = values.get(i);
                         result = new ExpressionDef.IfElse(
-                            sameType(value.definition().expectedType(), parameters.get(1)),
+                            requestedType(value.definition().requireExpectedType(), value.definition().inferred(), parameters.get(1)),
                             ClassTypeDef.of(className)
                                 .getStaticField(value.definition().constantName(), VALUE_EXPRESSION),
                             result
@@ -185,7 +185,7 @@ public final class ExpressionSourceWriter {
                             .map(type -> (ExpressionDef) ExpressionDef.constant(TypeDef.erasure(type)))
                             .toList();
                         ExpressionDef.ConditionExpressionDef matches = new ExpressionDef.And(
-                            sameType(method.definition().returnType(), parameters.get(1)),
+                            requestedType(method.definition().requireReturnType(), method.definition().inferred(), parameters.get(1)),
                             // the declared parameters are Object[]: the descriptor must not be inferred from
                             // the arguments, which the bytecode writer would emit as it is
                             ClassTypeDef.of(Arrays.class).invokeStatic("equals", List.of(OBJECT_ARRAY, OBJECT_ARRAY),
@@ -218,6 +218,18 @@ public final class ExpressionSourceWriter {
      * the coercion rules treat them alike, and the languages do not agree on which one an annotation names,
      * KSP reads a Kotlin {@code Double::class} as the wrapper while {@code Double::class.java} is the primitive.
      */
+    /**
+     * Whether the requested type selects the expression: its declared type, or, for a declaration whose type
+     * was inferred rather than written, also {@link Object}, the type a caller passes when it does not care.
+     */
+    private static ExpressionDef.ConditionExpressionDef requestedType(ClassElement declared, boolean inferred, ExpressionDef requested) {
+        ExpressionDef.ConditionExpressionDef matches = sameType(declared, requested);
+        if (inferred && !declared.getName().equals(Object.class.getName())) {
+            matches = new ExpressionDef.Or(matches, ExpressionDef.constant(TypeDef.OBJECT).equalsReferentially(requested));
+        }
+        return matches;
+    }
+
     private static ExpressionDef.ConditionExpressionDef sameType(ClassElement declared, ExpressionDef requested) {
         TypeDef type = TypeDef.erasure(declared);
         ExpressionDef.ConditionExpressionDef same = ExpressionDef.constant(type).equalsReferentially(requested);

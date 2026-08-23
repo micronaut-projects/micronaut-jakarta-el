@@ -41,6 +41,7 @@ public abstract class CompiledValueExpression extends ValueExpression implements
     private final String expressionString;
     private final String canonicalForm;
     private final Class<?> expectedType;
+    private final boolean coerced;
 
     /**
      * @param expressionString The original expression
@@ -56,9 +57,22 @@ public abstract class CompiledValueExpression extends ValueExpression implements
      * @param expectedType     The expected type of the evaluation result
      */
     protected CompiledValueExpression(String expressionString, String canonicalForm, Class<?> expectedType) {
+        this(expressionString, canonicalForm, expectedType, true);
+    }
+
+    /**
+     * @param expressionString The original expression
+     * @param canonicalForm    The canonical form of the expression, which is what equality compares
+     * @param expectedType     The expected type of the evaluation result
+     * @param coerced          Whether the result of the evaluation has to be coerced to the expected type, which
+     *                         the compiler knows not to be the case when the static type of the expression is
+     *                         the expected type
+     */
+    protected CompiledValueExpression(String expressionString, String canonicalForm, Class<?> expectedType, boolean coerced) {
         this.expressionString = Objects.requireNonNull(expressionString, "expressionString");
         this.canonicalForm = Objects.requireNonNull(canonicalForm, "canonicalForm");
         this.expectedType = Objects.requireNonNull(expectedType, "expectedType");
+        this.coerced = coerced;
     }
 
     /**
@@ -77,7 +91,7 @@ public abstract class CompiledValueExpression extends ValueExpression implements
         context.notifyBeforeEvaluation(expressionString);
         Object value = evaluate(context);
         context.notifyAfterEvaluation(expressionString);
-        return (T) ELSupport.coerceToType(context, value, expectedType);
+        return (T) (coerced ? ELSupport.coerceToType(context, value, expectedType) : value);
     }
 
     @Override

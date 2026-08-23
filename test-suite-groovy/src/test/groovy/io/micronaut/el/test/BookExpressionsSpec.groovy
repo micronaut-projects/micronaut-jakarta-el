@@ -34,6 +34,26 @@ class BookExpressionsSpec {
     }
 
     @Test
+    void evaluatesTheOperatorsInlinedFromThePrimitiveProperties() {
+        assertEquals(41d, factory.createValueExpression(context, '${book.unitPrice * 2 + 1}', Object).getValue(context))
+        assertEquals(-20d, factory.createValueExpression(context, '${-book.unitPrice}', Object).getValue(context))
+        assertEquals(true, factory.createValueExpression(context,
+            '${not (book.unitPrice > 15) or book.title == "Expression Language"}', Object).getValue(context))
+        assertEquals("Expression Language: 20.0",
+            factory.createValueExpression(context, '${book.title += ": " += book.unitPrice}', Object).getValue(context))
+    }
+
+    @Test
+    void evaluatesTheLambdaExpressionsCompiledToJavaLambdas() {
+        assertEquals(["new!", "sale!"], factory.createValueExpression(context,
+            '${book.tags.stream().filter(t -> t.length() > 1).map(t -> t += "!").toList()}', Object).getValue(context))
+        assertEquals(2L, factory.createValueExpression(context, '${book.count(t -> t.length() > 1)}', Object).getValue(context))
+        assertEquals(3L, factory.createValueExpression(context, '${(x -> y -> x + y)(1)(2)}', Object).getValue(context))
+        assertEquals(10L, factory.createValueExpression(context, '${((a, b, c, d) -> a + b + c + d)(1, 2, 3, 4)}', Object).getValue(context))
+        assertEquals(null, factory.createValueExpression(context, '${book.tags.stream().forEach(t -> t.length())}', Object).getValue(context))
+    }
+
+    @Test
     void theExpressionsAreCompiledRatherThanParsed() {
         assertTrue(factory.createValueExpression(context, '${book.title}', String) instanceof CompiledExpression)
     }

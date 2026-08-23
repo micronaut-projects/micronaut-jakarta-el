@@ -17,10 +17,12 @@ package io.micronaut.el.processor.writer;
 
 import io.micronaut.core.annotation.Generated;
 import io.micronaut.core.annotation.Internal;
+import io.micronaut.el.processor.compiler.ELCompilationException;
 import io.micronaut.el.processor.compiler.ELCompiler;
 import io.micronaut.el.processor.compiler.ELExpressionDefinition;
 import io.micronaut.el.parser.ELNodes;
 import io.micronaut.el.parser.ast.ELNode;
+import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.el.runtime.CompiledValueExpression;
 import io.micronaut.el.runtime.ELResolution;
 import io.micronaut.sourcegen.model.ClassDef;
@@ -59,17 +61,26 @@ public final class ValueExpressionWriter {
      * @param compiler   The compiler
      * @return The definition of the generated class
      */
-    public static ClassDef write(String className,
-                                 ELExpressionDefinition definition,
-                                 ELCompiler compiler) {
+    public static Written write(String className,
+                                ELExpressionDefinition definition,
+                                ELCompiler compiler) {
+        // the evaluation is compiled first: an omitted expected type is inferred from its static type, and the
+        // constructor tells the runtime whether the result already has the expected type
+        MethodDef evaluate = evaluate(definition, compiler);
+        if (definition.expectedType() == null) {
+            ClassElement inferred = compiler.inferredEvaluationType();
+            requireInferrable(inferred, definition.expression(), definition.node(), compiler, "expectedType");
+            definition = definition.inferring(inferred);
+        }
+        boolean coerced = !compiler.evaluatesTo(definition.requireExpectedType());
         ClassDef.ClassDefBuilder builder = ClassDef.builder(className)
             .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
             .addAnnotation(Generated.class)
             .superclass(ClassTypeDef.of(CompiledValueExpression.class))
             // the source writer interprets a '$' in the javadoc
             .addJavadoc("The compiled form of the expression <code>" + definition.expression().replace("$", "$$") + "</code>.")
-            .addMethod(constructor(definition))
-            .addMethod(evaluate(definition, compiler));
+            .addMethod(constructor(definition, coerced))
+            .addMethod(evaluate);
 
         ELNode node = unwrap(definition.node());
         if (isLValue(node)) {
@@ -78,16 +89,34 @@ public final class ValueExpressionWriter {
             builder.addMethod(getType(node, compiler));
             builder.addMethod(getValueReference(node, compiler));
         }
-        return builder.build();
+        return new Written(builder.build(), definition);
     }
 
-    private static MethodDef constructor(ELExpressionDefinition definition) {
+    /**
+     * An omitted type that inference resolved to {@link Object} because an identifier is not declared is an
+     * error: the declaration is missing either the type of the identifier or the expected type.
+     */
+    static void requireInferrable(ClassElement inferred, String expression, ELNode node, ELCompiler compiler, String member) {
+        if (!inferred.getName().equals(Object.class.getName())
+            || compiler.unresolvedIdentifiers().isEmpty()
+            || ELCompiler.hasAssignments(node)) {
+            return;
+        }
+        String identifier = compiler.unresolvedIdentifiers().iterator().next();
+        throw new ELCompilationException("Cannot infer the " + member + " of the expression '" + expression
+            + "': the identifier '" + identifier + "' is not declared, so the expression has no static type."
+            + " Declare the identifier with @ELVariable(name = \"" + identifier + "\", type = ...) in the"
+            + " @ELEnvironment, or declare " + member + " (Object.class accepts any result).");
+    }
+
+    private static MethodDef constructor(ELExpressionDefinition definition, boolean coerced) {
         return MethodDef.constructor()
             .addModifiers(Modifier.PUBLIC)
             .build((aThis, parameters) -> aThis.superRef().invokeSuperConstructor(
                 ExpressionDef.constant(definition.expression()),
                 ExpressionDef.constant(ELNodes.canonical(definition.node())),
-                ExpressionDef.constant(TypeDef.erasure(definition.expectedType()))
+                ExpressionDef.constant(TypeDef.erasure(definition.requireExpectedType())),
+                ExpressionDef.constant(coerced)
             ));
     }
 
@@ -97,8 +126,8 @@ public final class ValueExpressionWriter {
             .overrides()
             .addParameter(CONTEXT, EL_CONTEXT)
             .returns(TypeDef.OBJECT)
-            .build((aThis, parameters) ->
-                compiler.compile(definition.node(), parameters.get(0)).returning());
+            .build((aThis, parameters) -> compiler.compileEvaluation(definition.node(), parameters.get(0),
+                context -> compiler.compileTyped(definition.node(), context)));
     }
 
     private static MethodDef setValue(ELNode node, ELCompiler compiler) {
@@ -187,5 +216,14 @@ public final class ValueExpressionWriter {
 
     private static boolean isLValue(ELNode node) {
         return node instanceof ELNode.Identifier || node instanceof ELNode.Property;
+    }
+
+    /**
+     * A written expression class, with its definition: inference fills the expected type in.
+     *
+     * @param type       The generated class
+     * @param definition The definition, its expected type resolved
+     */
+    public record Written(ClassDef type, ELExpressionDefinition definition) {
     }
 }

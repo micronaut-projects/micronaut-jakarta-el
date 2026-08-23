@@ -62,7 +62,13 @@ public @interface ELExpression {
     String expression() default "";
 
     /**
-     * @return The expected type the evaluation result is coerced to
+     * The expected type the evaluation result is coerced to. When it is not declared, the compiler infers it
+     * from the static type of the expression: {@code ${book.discounted(10)}} is a {@code Double} because
+     * {@code discounted} returns one, and an expression whose type the compiler does not know is an
+     * {@code Object}. The generated {@code ExpressionFactory} then serves the expression for the inferred type
+     * and for {@code Object.class}.
+     *
+     * @return The expected type
      */
     Class<?> expectedType() default Object.class;
 

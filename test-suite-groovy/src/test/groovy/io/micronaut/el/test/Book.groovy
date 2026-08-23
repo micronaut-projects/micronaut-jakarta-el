@@ -20,4 +20,13 @@ class Book {
     double discounted(double percent) {
         unitPrice - (unitPrice * percent / 100)
     }
+
+    List<String> getTags() {
+        ["new", "sale", "b"]
+    }
+
+    @Executable
+    long count(java.util.function.Predicate<String> predicate) {
+        tags.stream().filter(predicate).count()
+    }
 }

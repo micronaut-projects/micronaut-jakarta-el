@@ -1,0 +1,37 @@
+[
+  {
+    "comment": "The intentionally dynamic examples: methods without @Executable are invoked through the reflective resolvers of the specification, and MethodExpression.getMethodInfo has a java.lang.reflect contract.",
+    "name": "io.micronaut.el.test.Book",
+    "allPublicMethods": true
+  },
+  {
+    "name": "io.micronaut.el.test.Inventory",
+    "allPublicMethods": true
+  },
+  {
+    "name": "io.micronaut.el.test.Author",
+    "allPublicMethods": true
+  },
+  {
+    "comment": "Invoked statically through an imported class, jakarta.el.StaticFieldELResolver.",
+    "name": "java.lang.Integer",
+    "methods": [
+      {
+        "name": "valueOf",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      }
+    ]
+  },
+  {
+    "comment": "Invoked inside a stored lambda, where the method of the java.lang.String argument resolves reflectively.",
+    "name": "java.lang.String",
+    "methods": [
+      {
+        "name": "length",
+        "parameterTypes": []
+      }
+    ]
+  }
+]

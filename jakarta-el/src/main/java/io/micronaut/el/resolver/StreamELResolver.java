@@ -68,7 +68,7 @@ public final class StreamELResolver extends ELResolver {
         }
         Object[] arguments = params == null ? NO_ARGUMENTS : params;
         String name = ELSupport.coerceToString(method);
-        if (base instanceof ELStream stream) {
+        if (base instanceof ELStream<?> stream) {
             context.setPropertyResolved(base, method);
             return stream.invokeOperation(name, arguments);
         }

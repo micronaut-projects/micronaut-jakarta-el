@@ -18,6 +18,9 @@ package io.micronaut.el.processor.compiler;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.el.parser.ast.ELNode;
 import io.micronaut.inject.ast.ClassElement;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Objects;
 
 import java.util.List;
 
@@ -26,6 +29,7 @@ import java.util.List;
  *
  * @param expression   The expression string
  * @param returnType   The expected return type
+ * @param inferred Whether the type was inferred from the static type of the expression rather than declared
  * @param parameterTypes The expected parameter types
  * @param constantName The name of the generated constant
  * @param node         The parsed expression
@@ -34,8 +38,26 @@ import java.util.List;
  */
 @Internal
 public record ELMethodExpressionDefinition(String expression,
-                                           ClassElement returnType,
+                                           @Nullable ClassElement returnType,
+                                           boolean inferred,
                                            List<ClassElement> parameterTypes,
                                            String constantName,
                                            ELNode node) {
+
+    /**
+     * A definition whose expected return type was omitted, resolved to the static type of the invocation.
+     *
+     * @param type The inferred type
+     * @return The definition with the type
+     */
+    public ELMethodExpressionDefinition inferring(ClassElement type) {
+        return new ELMethodExpressionDefinition(expression, type, true, parameterTypes, constantName, node);
+    }
+
+    /**
+     * @return The return type, which inference has resolved by the time a writer reads it
+     */
+    public ClassElement requireReturnType() {
+        return Objects.requireNonNull(returnType, "The return type has not been inferred yet");
+    }
 }

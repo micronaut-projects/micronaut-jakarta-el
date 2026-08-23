@@ -16,6 +16,7 @@
 package io.micronaut.el.runtime;
 
 import io.micronaut.core.annotation.Internal;
+import io.micronaut.el.CompiledELContext;
 import io.micronaut.el.ELBeanProvider;
 import org.jspecify.annotations.Nullable;
 import jakarta.el.ELClass;
@@ -29,6 +30,9 @@ import jakarta.el.PropertyNotFoundException;
 import jakarta.el.PropertyNotWritableException;
 import jakarta.el.ValueExpression;
 import jakarta.el.VariableMapper;
+
+import java.util.List;
+import java.util.Map;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -58,6 +62,13 @@ public final class ELResolution {
      */
     @Nullable
     public static Object resolveIdentifier(ELContext context, String name) {
+        if (context instanceof CompiledELContext compiled) {
+            // the bean of the context, unless a lambda argument or a variable shadows it, which resolveBean checks
+            Object bean = compiled.resolveBean(name);
+            if (bean != null) {
+                return bean;
+            }
+        }
         if (context.isLambdaArgument(name)) {
             return context.getLambdaArgument(name);
         }
@@ -85,6 +96,75 @@ public final class ELResolution {
             }
         }
         throw new PropertyNotFoundException("Cannot resolve the identifier '" + name + "'");
+    }
+
+    /**
+     * Evaluates an identifier the compiler knows to be a declared variable: the steps of the section 1.5.1 of
+     * the specification that can denote a variable, a lambda argument of an enclosing scope, the variable mapper
+     * and the resolvers, without the static imports, which the compiler resolves itself.
+     *
+     * @param context The context
+     * @param name    The identifier
+     * @return The value of the variable
+     */
+    @Nullable
+    public static Object resolveVariable(ELContext context, String name) {
+        if (context instanceof CompiledELContext compiled) {
+            // the bean name resolver of the context would return it, unless a lambda argument or a variable
+            // shadows it, which resolveBean checks; a null bean takes the full path, which yields null too
+            Object bean = compiled.resolveBean(name);
+            if (bean != null) {
+                return bean;
+            }
+        }
+        if (context.isLambdaArgument(name)) {
+            return context.getLambdaArgument(name);
+        }
+        VariableMapper variableMapper = context.getVariableMapper();
+        if (variableMapper != null) {
+            ValueExpression expression = variableMapper.resolveVariable(name);
+            if (expression != null) {
+                return expression.getValue(context);
+            }
+        }
+        context.setPropertyResolved(false);
+        Object value = context.getELResolver().getValue(context, null, name);
+        if (context.isPropertyResolved()) {
+            return value;
+        }
+        throw new PropertyNotFoundException("Cannot resolve the variable '" + name + "'");
+    }
+
+    /**
+     * Reads the value of a key of a map, as the {@code jakarta.el.MapELResolver} does for a base the compiler
+     * knows to be a map; a null base or key is null, section 1.6 of the specification.
+     *
+     * @param map The map
+     * @param key The key
+     * @return The value
+     */
+    @Nullable
+    public static Object mapValue(@Nullable Map<?, ?> map, @Nullable Object key) {
+        return map == null || key == null ? null : map.get(key);
+    }
+
+    /**
+     * Reads an element of a list, as the {@code jakarta.el.ListELResolver} does for a base the compiler knows
+     * to be a list: the index is coerced to an integer, an index out of the bounds of the list reads as null,
+     * and so does a null base or index, section 1.6 of the specification.
+     *
+     * @param list  The list
+     * @param index The index
+     * @return The element
+     */
+    @Nullable
+    public static Object listElement(@Nullable List<?> list, @Nullable Object index) {
+        if (list == null || index == null) {
+            return null;
+        }
+        Number number = ELSupport.coerceToNumber(index, int.class);
+        int position = number == null ? 0 : number.intValue();
+        return position < 0 || position >= list.size() ? null : list.get(position);
     }
 
     /**

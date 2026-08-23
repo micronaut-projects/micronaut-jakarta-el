@@ -35,6 +35,13 @@ public final class MapVariableMapper extends VariableMapper {
 
     private final Map<String, ValueExpression> variables = new HashMap<>();
 
+    /**
+     * @return Whether the mapper holds no variable
+     */
+    public boolean isEmpty() {
+        return variables.isEmpty();
+    }
+
     @Override
     @Nullable
     public ValueExpression resolveVariable(String variable) {

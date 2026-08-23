@@ -21,6 +21,7 @@ import io.micronaut.el.processor.compiler.ELCompiler;
 import io.micronaut.el.processor.compiler.ELMethodExpressionDefinition;
 import io.micronaut.el.parser.ELNodes;
 import io.micronaut.el.parser.ast.ELNode;
+import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.el.runtime.CompiledMethodExpression;
 import io.micronaut.el.runtime.ELResolution;
 import io.micronaut.sourcegen.model.ClassDef;
@@ -61,10 +62,16 @@ public final class MethodExpressionWriter {
      * @param compiler   The compiler
      * @return The definition of the generated class
      */
-    public static ClassDef write(String className,
-                                 ELMethodExpressionDefinition definition,
-                                 ELCompiler compiler) {
+    public static Written write(String className,
+                                ELMethodExpressionDefinition definition,
+                                ELCompiler compiler) {
         ELNode node = unwrap(definition.node());
+        if (definition.returnType() == null) {
+            // an omitted return type is inferred from the static type of the invocation
+            ClassElement inferred = compiler.inferredType(node);
+            ValueExpressionWriter.requireInferrable(inferred, definition.expression(), node, compiler, "expectedReturnType");
+            definition = definition.inferring(inferred);
+        }
         ClassDef.ClassDefBuilder builder = ClassDef.builder(className)
             .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
             .addAnnotation(Generated.class)
@@ -78,7 +85,7 @@ public final class MethodExpressionWriter {
         if (node instanceof ELNode.Method method) {
             builder.addMethod(evaluateArguments(method, compiler));
         }
-        return builder.build();
+        return new Written(builder.build(), definition);
     }
 
     private static MethodDef constructor(ELMethodExpressionDefinition definition, ELNode node) {
@@ -90,7 +97,7 @@ public final class MethodExpressionWriter {
             .build((aThis, parameters) -> aThis.superRef().invokeSuperConstructor(
                 ExpressionDef.constant(definition.expression()),
                 ExpressionDef.constant(ELNodes.canonical(definition.node())),
-                ExpressionDef.constant(TypeDef.erasure(definition.returnType())),
+                ExpressionDef.constant(TypeDef.erasure(definition.requireReturnType())),
                 CLASS_ARRAY.instantiate(parameterTypes),
                 ExpressionDef.constant(node instanceof ELNode.Method)
             ));
@@ -125,8 +132,9 @@ public final class MethodExpressionWriter {
                 ExpressionDef context = parameters.get(0);
                 ExpressionDef arguments = parameters.get(1);
                 return switch (node) {
-                    case ELNode.Method method -> compiler.invokeRuntime(EL_RESOLUTION, "invoke", TypeDef.OBJECT,
-                        invocation(compiler, context, method).toArray(ExpressionDef[]::new)).returning();
+                    case ELNode.Method method -> compiler.compileEvaluation(method, context,
+                        ctx -> new ELCompiler.Typed(compiler.invokeRuntime(EL_RESOLUTION, "invoke", TypeDef.OBJECT,
+                            invocation(compiler, ctx, method).toArray(ExpressionDef[]::new)), null));
                     case ELNode.Property property -> compiler.invokeRuntime(EL_RESOLUTION, "invokeWithParams", TypeDef.OBJECT,
                         context,
                         compiler.compile(property.base(), context),
@@ -178,5 +186,14 @@ public final class MethodExpressionWriter {
 
     private static ELNode unwrap(ELNode node) {
         return node instanceof ELNode.Eval eval ? eval.expression() : node;
+    }
+
+    /**
+     * A written method expression class, with its definition: inference fills the return type in.
+     *
+     * @param type       The generated class
+     * @param definition The definition, its return type resolved
+     */
+    public record Written(ClassDef type, ELMethodExpressionDefinition definition) {
     }
 }

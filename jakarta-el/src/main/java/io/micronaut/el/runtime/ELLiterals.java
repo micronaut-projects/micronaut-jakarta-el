@@ -87,6 +87,6 @@ public final class ELLiterals {
         if (Double.isInfinite(value)) {
             return new BigDecimal(image);
         }
-        return Double.valueOf(value);
+        return value;
     }
 }

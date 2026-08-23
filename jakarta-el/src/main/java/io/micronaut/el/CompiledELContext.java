@@ -17,14 +17,14 @@ package io.micronaut.el;
 
 import io.micronaut.core.annotation.Experimental;
 import org.jspecify.annotations.Nullable;
-import io.micronaut.el.resolver.IntrospectionELResolver;
 import io.micronaut.el.runtime.MapVariableMapper;
+import io.micronaut.el.resolver.ELResolverChain;
 import io.micronaut.el.resolver.ELResolvers;
 import jakarta.el.BeanNameELResolver;
 import jakarta.el.BeanNameResolver;
-import jakarta.el.CompositeELResolver;
 import jakarta.el.ELContext;
 import jakarta.el.ELResolver;
+import jakarta.el.EvaluationListener;
 import jakarta.el.FunctionMapper;
 import jakarta.el.VariableMapper;
 
@@ -44,26 +44,90 @@ import java.util.Map;
 @Experimental
 public class CompiledELContext extends ELContext {
 
+    private static final FunctionMapper NO_FUNCTIONS = new NoFunctionMapper();
+
     private final Map<String, Object> beans = new HashMap<>();
     private final ELResolver resolver;
-    private final FunctionMapper functionMapper = new NoFunctionMapper();
-    private final VariableMapper variableMapper = new MapVariableMapper();
+    private final MapVariableMapper variableMapper = new MapVariableMapper();
+    private int lambdaScopes;
+    private boolean listeners;
 
     /**
      * Creates a context using the standard chain of resolvers.
      */
     public CompiledELContext() {
-        this(new IntrospectionELResolver());
+        this(new ELResolver[0]);
     }
 
     /**
      * @param first The resolvers consulted before the standard ones
      */
     public CompiledELContext(ELResolver... first) {
-        CompositeELResolver composite = new CompositeELResolver();
-        composite.add(new BeanNameELResolver(new LocalBeanNameResolver()));
-        composite.add(ELResolvers.standard(first));
-        this.resolver = composite;
+        // the standard chain is shared, a chain nested in a chain is flattened for the coercions
+        this.resolver = new ELResolverChain(new BeanNameELResolver(new LocalBeanNameResolver()),
+            first.length == 0 ? ELResolvers.standard() : ELResolvers.standard(first));
+    }
+
+    /**
+     * Resolves a declared variable the way {@code ELResolution.resolveVariable} does, from the beans of this
+     * context directly when nothing can shadow them: no lambda scope is open and the variable mapper holds no
+     * variable.
+     *
+     * @param name The name of the variable
+     * @return The bean, or {@code null} when the name is not a bean of this context or may be shadowed, in which
+     * case the resolution goes through the mapper and the resolvers
+     */
+    @Nullable
+    public Object resolveBean(String name) {
+        if (lambdaScopes == 0 && variableMapper.isEmpty()) {
+            return beans.get(name);
+        }
+        return null;
+    }
+
+    @Override
+    public boolean isLambdaArgument(String arg) {
+        // the scopes are a stack of maps in the superclass, walked on every identifier otherwise
+        return lambdaScopes > 0 && super.isLambdaArgument(arg);
+    }
+
+    @Override
+    public void addEvaluationListener(EvaluationListener listener) {
+        listeners = true;
+        super.addEvaluationListener(listener);
+    }
+
+    @Override
+    public void notifyBeforeEvaluation(String expression) {
+        if (listeners) {
+            super.notifyBeforeEvaluation(expression);
+        }
+    }
+
+    @Override
+    public void notifyAfterEvaluation(String expression) {
+        if (listeners) {
+            super.notifyAfterEvaluation(expression);
+        }
+    }
+
+    @Override
+    public void notifyPropertyResolved(@Nullable Object base, @Nullable Object property) {
+        if (listeners) {
+            super.notifyPropertyResolved(base, property);
+        }
+    }
+
+    @Override
+    public void enterLambdaScope(Map<String, Object> args) {
+        lambdaScopes++;
+        super.enterLambdaScope(args);
+    }
+
+    @Override
+    public void exitLambdaScope() {
+        lambdaScopes--;
+        super.exitLambdaScope();
     }
 
     /**
@@ -94,7 +158,7 @@ public class CompiledELContext extends ELContext {
 
     @Override
     public FunctionMapper getFunctionMapper() {
-        return functionMapper;
+        return NO_FUNCTIONS;
     }
 
     @Override

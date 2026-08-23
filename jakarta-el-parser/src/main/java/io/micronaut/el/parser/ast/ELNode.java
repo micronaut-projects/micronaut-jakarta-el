@@ -30,11 +30,71 @@ import java.util.List;
 public sealed interface ELNode {
 
     /**
+     * @return The kind of the node, which an evaluator switches on: a switch on an enum is a table switch,
+     * where a pattern switch over the sealed types is a linear classification through a method handle
+     */
+    Kind kind();
+
+    /**
+     * The kinds of nodes, one per record.
+     */
+    enum Kind {
+        /** Composite. */
+        COMPOSITE,
+        /** LiteralText. */
+        LITERAL_TEXT,
+        /** Eval. */
+        EVAL,
+        /** NullLiteral. */
+        NULL_LITERAL,
+        /** BooleanLiteral. */
+        BOOLEAN_LITERAL,
+        /** IntegerLiteral. */
+        INTEGER_LITERAL,
+        /** FloatingPointLiteral. */
+        FLOATING_POINT_LITERAL,
+        /** StringLiteral. */
+        STRING_LITERAL,
+        /** Identifier. */
+        IDENTIFIER,
+        /** Function. */
+        FUNCTION,
+        /** Property. */
+        PROPERTY,
+        /** Method. */
+        METHOD,
+        /** Call. */
+        CALL,
+        /** Unary. */
+        UNARY,
+        /** Binary. */
+        BINARY,
+        /** Ternary. */
+        TERNARY,
+        /** Assign. */
+        ASSIGN,
+        /** Semicolon. */
+        SEMICOLON,
+        /** Lambda. */
+        LAMBDA,
+        /** SetData. */
+        SET_DATA,
+        /** ListData. */
+        LIST_DATA,
+        /** MapData. */
+        MAP_DATA
+    }
+
+    /**
      * A composite expression, as described in the section 1.2.3 of the specification.
      *
      * @param parts The literal-expressions and the eval-expressions
      */
     record Composite(List<ELNode> parts) implements ELNode {
+        @Override
+        public Kind kind() {
+            return Kind.COMPOSITE;
+        }
     }
 
     /**
@@ -43,6 +103,10 @@ public sealed interface ELNode {
      * @param text The text of the expression
      */
     record LiteralText(String text) implements ELNode {
+        @Override
+        public Kind kind() {
+            return Kind.LITERAL_TEXT;
+        }
     }
 
     /**
@@ -51,12 +115,20 @@ public sealed interface ELNode {
      * @param expression The expression
      */
     record Eval(ELNode expression) implements ELNode {
+        @Override
+        public Kind kind() {
+            return Kind.EVAL;
+        }
     }
 
     /**
      * The {@code null} literal.
      */
     record NullLiteral() implements ELNode {
+        @Override
+        public Kind kind() {
+            return Kind.NULL_LITERAL;
+        }
     }
 
     /**
@@ -65,22 +137,67 @@ public sealed interface ELNode {
      * @param value The value
      */
     record BooleanLiteral(boolean value) implements ELNode {
+        @Override
+        public Kind kind() {
+            return Kind.BOOLEAN_LITERAL;
+        }
     }
 
     /**
      * An integer literal.
      *
      * @param image The literal as it appears in the expression
+     * @param value The value of the literal, a {@link Long} unless it does not fit in one, then a
+     *              {@link java.math.BigInteger}, computed once when the expression is parsed
      */
-    record IntegerLiteral(String image) implements ELNode {
+    record IntegerLiteral(String image, Number value) implements ELNode {
+
+        /**
+         * @param image The literal as it appears in the expression
+         */
+        public IntegerLiteral(String image) {
+            this(image, integerValue(image));
+        }
+
+        private static Number integerValue(String image) {
+            try {
+                return Long.valueOf(image);
+            } catch (NumberFormatException e) {
+                return new java.math.BigInteger(image);
+            }
+        }
+
+        @Override
+        public Kind kind() {
+            return Kind.INTEGER_LITERAL;
+        }
     }
 
     /**
      * A floating point literal.
      *
      * @param image The literal as it appears in the expression
+     * @param value The value of the literal, a {@link Double} unless it does not fit in one, then a
+     *              {@link java.math.BigDecimal}, computed once when the expression is parsed
      */
-    record FloatingPointLiteral(String image) implements ELNode {
+    record FloatingPointLiteral(String image, Number value) implements ELNode {
+
+        /**
+         * @param image The literal as it appears in the expression
+         */
+        public FloatingPointLiteral(String image) {
+            this(image, floatingPointValue(image));
+        }
+
+        private static Number floatingPointValue(String image) {
+            double value = Double.parseDouble(image);
+            return Double.isInfinite(value) ? new java.math.BigDecimal(image) : Double.valueOf(value);
+        }
+
+        @Override
+        public Kind kind() {
+            return Kind.FLOATING_POINT_LITERAL;
+        }
     }
 
     /**
@@ -89,6 +206,10 @@ public sealed interface ELNode {
      * @param value The value, with the escape sequences resolved
      */
     record StringLiteral(String value) implements ELNode {
+        @Override
+        public Kind kind() {
+            return Kind.STRING_LITERAL;
+        }
     }
 
     /**
@@ -97,6 +218,10 @@ public sealed interface ELNode {
      * @param name The name
      */
     record Identifier(String name) implements ELNode {
+        @Override
+        public Kind kind() {
+            return Kind.IDENTIFIER;
+        }
     }
 
     /**
@@ -109,6 +234,10 @@ public sealed interface ELNode {
     record Function(String prefix,
                     String localName,
                     List<List<ELNode>> invocations) implements ELNode {
+        @Override
+        public Kind kind() {
+            return Kind.FUNCTION;
+        }
     }
 
     /**
@@ -118,6 +247,10 @@ public sealed interface ELNode {
      * @param property The property expression
      */
     record Property(ELNode base, ELNode property) implements ELNode {
+        @Override
+        public Kind kind() {
+            return Kind.PROPERTY;
+        }
     }
 
     /**
@@ -130,6 +263,10 @@ public sealed interface ELNode {
     record Method(ELNode base,
                   ELNode property,
                   List<ELNode> arguments) implements ELNode {
+        @Override
+        public Kind kind() {
+            return Kind.METHOD;
+        }
     }
 
     /**
@@ -139,6 +276,10 @@ public sealed interface ELNode {
      * @param arguments The arguments
      */
     record Call(ELNode target, List<ELNode> arguments) implements ELNode {
+        @Override
+        public Kind kind() {
+            return Kind.CALL;
+        }
     }
 
     /**
@@ -148,6 +289,10 @@ public sealed interface ELNode {
      * @param operand  The operand
      */
     record Unary(UnaryOperator operator, ELNode operand) implements ELNode {
+        @Override
+        public Kind kind() {
+            return Kind.UNARY;
+        }
     }
 
     /**
@@ -160,6 +305,10 @@ public sealed interface ELNode {
     record Binary(BinaryOperator operator,
                   ELNode left,
                   ELNode right) implements ELNode {
+        @Override
+        public Kind kind() {
+            return Kind.BINARY;
+        }
     }
 
     /**
@@ -172,6 +321,10 @@ public sealed interface ELNode {
     record Ternary(ELNode condition,
                    ELNode ifTrue,
                    ELNode ifFalse) implements ELNode {
+        @Override
+        public Kind kind() {
+            return Kind.TERNARY;
+        }
     }
 
     /**
@@ -181,6 +334,10 @@ public sealed interface ELNode {
      * @param value  The assigned expression
      */
     record Assign(ELNode target, ELNode value) implements ELNode {
+        @Override
+        public Kind kind() {
+            return Kind.ASSIGN;
+        }
     }
 
     /**
@@ -190,6 +347,10 @@ public sealed interface ELNode {
      * @param right The returned expression
      */
     record Semicolon(ELNode left, ELNode right) implements ELNode {
+        @Override
+        public Kind kind() {
+            return Kind.SEMICOLON;
+        }
     }
 
     /**
@@ -199,6 +360,10 @@ public sealed interface ELNode {
      * @param body       The body
      */
     record Lambda(List<String> parameters, ELNode body) implements ELNode {
+        @Override
+        public Kind kind() {
+            return Kind.LAMBDA;
+        }
     }
 
     /**
@@ -207,6 +372,10 @@ public sealed interface ELNode {
      * @param elements The elements
      */
     record SetData(List<ELNode> elements) implements ELNode {
+        @Override
+        public Kind kind() {
+            return Kind.SET_DATA;
+        }
     }
 
     /**
@@ -215,6 +384,10 @@ public sealed interface ELNode {
      * @param elements The elements
      */
     record ListData(List<ELNode> elements) implements ELNode {
+        @Override
+        public Kind kind() {
+            return Kind.LIST_DATA;
+        }
     }
 
     /**
@@ -223,6 +396,10 @@ public sealed interface ELNode {
      * @param entries The entries
      */
     record MapData(List<MapEntry> entries) implements ELNode {
+        @Override
+        public Kind kind() {
+            return Kind.MAP_DATA;
+        }
 
         /**
          * An entry of a map construction.

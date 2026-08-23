@@ -17,14 +17,21 @@ package io.micronaut.el.runtime;
 
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.reflect.ReflectionUtils;
+import jakarta.el.ELContext;
+import jakarta.el.ELException;
+import jakarta.el.LambdaExpression;
 import jakarta.el.MethodNotFoundException;
 import org.jspecify.annotations.Nullable;
 
+import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Selects the method a method expression refers to, as described in the section 1.6 of the Jakarta
@@ -46,7 +53,93 @@ public final class ELMethods {
     private static final int COERCIBLE = 2;
     private static final int NO_MATCH = -1;
 
+    /**
+     * The public methods of a class by name, each as its accessible declaration with its parameter types read
+     * once: {@code Class.getMethods()} copies every method on every call, which is what makes the reflective
+     * resolvers of the specification slow.
+     */
+    private static final ClassValue<Map<String, List<Candidate>>> METHODS = new ClassValue<>() {
+        @Override
+        protected Map<String, List<Candidate>> computeValue(Class<?> type) {
+            Map<String, List<Candidate>> byName = new HashMap<>();
+            for (Method method : type.getMethods()) {
+                Method declaration = accessible(method);
+                byName.computeIfAbsent(method.getName(), name -> new ArrayList<>(2))
+                    .add(new Candidate(declaration, declaration.getParameterTypes(), declaration.isVarArgs(),
+                        Modifier.isStatic(declaration.getModifiers())));
+            }
+            return byName;
+        }
+    };
+
     private ELMethods() {
+    }
+
+    /**
+     * Finds a method by name and arguments, as {@link #findMethod(Class, String, Class[], Object[])} does, or
+     * returns {@code null} when the type declares no public method of the name.
+     *
+     * @param type       The type of the base object, or the class for a static method
+     * @param name       The name of the method
+     * @param paramTypes The parameter types provided at parse time, can be {@code null}
+     * @param arguments  The evaluated arguments, can be {@code null}
+     * @param isStatic   Whether to look for a static method
+     * @return The method, or {@code null} when the type declares no method of the name
+     */
+    @Nullable
+    public static Method findMethodOrNull(Class<?> type,
+                                          String name,
+                                          Class<?> @Nullable [] paramTypes,
+                                          Object @Nullable [] arguments,
+                                          boolean isStatic) {
+        List<Candidate> candidates = METHODS.get(type).get(name);
+        if (candidates == null) {
+            return null;
+        }
+        return select(type, name, candidates, paramTypes, arguments, isStatic);
+    }
+
+    /**
+     * Invokes a method reflectively, the arguments coerced to the parameter types as described in the section
+     * 1.23 of the specification, the variable arity arguments packed into an array, the exceptions of the
+     * method unwrapped.
+     *
+     * @param context The context
+     * @param method  The method
+     * @param base    The base object, or {@code null} for a static method
+     * @param values  The arguments
+     * @return The result of the invocation
+     */
+    @Nullable
+    public static Object invoke(ELContext context, Method method, @Nullable Object base, Object @Nullable [] values) {
+        Class<?>[] parameterTypes = method.getParameterTypes();
+        Object[] parameters = new Object[parameterTypes.length];
+        Object[] arguments = values == null ? new Object[0] : values;
+        int count = arguments.length;
+        int fixed = method.isVarArgs() ? parameterTypes.length - 1 : parameterTypes.length;
+        for (int i = 0; i < fixed && i < count; i++) {
+            parameters[i] = ELSupport.coerceToType(context, arguments[i], parameterTypes[i]);
+        }
+        if (method.isVarArgs()) {
+            Class<?> componentType = parameterTypes[fixed].getComponentType();
+            if (count == parameterTypes.length && arguments[fixed] != null && parameterTypes[fixed] == arguments[fixed].getClass()) {
+                parameters[fixed] = arguments[fixed];
+            } else {
+                Object varargs = Array.newInstance(componentType, Math.max(0, count - fixed));
+                for (int i = fixed; i < count; i++) {
+                    Array.set(varargs, i - fixed, ELSupport.coerceToType(context, arguments[i], componentType));
+                }
+                parameters[fixed] = varargs;
+            }
+        }
+        try {
+            return method.invoke(base, parameters);
+        } catch (IllegalAccessException | IllegalArgumentException e) {
+            throw new ELException(e);
+        } catch (InvocationTargetException e) {
+            Throwable cause = e.getCause();
+            throw cause instanceof ELException elException ? elException : new ELException(cause);
+        }
     }
 
     /**
@@ -62,31 +155,44 @@ public final class ELMethods {
                                     String name,
                                     Class<?> @Nullable [] paramTypes,
                                     Object @Nullable [] arguments) {
+        List<Candidate> candidates = METHODS.get(type).get(name);
+        if (candidates == null) {
+            throw notFound(type, name, paramTypes != null ? paramTypes.length : arguments == null ? 0 : arguments.length);
+        }
+        return select(type, name, candidates, paramTypes, arguments, false);
+    }
+
+    private static Method select(Class<?> type,
+                                 String name,
+                                 List<Candidate> candidates,
+                                 Class<?> @Nullable [] paramTypes,
+                                 Object @Nullable [] arguments,
+                                 boolean isStatic) {
         if (paramTypes != null) {
-            for (Method method : type.getMethods()) {
-                if (method.getName().equals(name) && sameTypes(method.getParameterTypes(), paramTypes)) {
-                    return accessible(method);
+            for (Candidate candidate : candidates) {
+                if ((!isStatic || candidate.isStatic()) && sameTypes(candidate.parameterTypes(), paramTypes)) {
+                    return candidate.method();
                 }
             }
             throw notFound(type, name, paramTypes.length);
         }
         Object[] values = arguments == null ? new Object[0] : arguments;
-        List<Method> best = new ArrayList<>();
+        List<Candidate> best = new ArrayList<>(1);
         long bestScore = Long.MAX_VALUE;
-        for (Method method : type.getMethods()) {
-            if (!method.getName().equals(name)) {
+        for (Candidate candidate : candidates) {
+            if (isStatic && !candidate.isStatic()) {
                 continue;
             }
-            long score = score(method, values);
+            long score = score(candidate, values);
             if (score == NO_MATCH) {
                 continue;
             }
             if (score < bestScore) {
                 bestScore = score;
                 best.clear();
-                best.add(method);
-            } else if (score == bestScore && !overrides(best, method)) {
-                best.add(method);
+                best.add(candidate);
+            } else if (score == bestScore && !overrides(best, candidate)) {
+                best.add(candidate);
             }
         }
         if (best.isEmpty()) {
@@ -96,7 +202,7 @@ public final class ELMethods {
             throw new MethodNotFoundException("The reference to the method '" + name + "' of " + type.getName()
                 + " is ambiguous, " + best.size() + " methods match the arguments");
         }
-        return accessible(best.get(0));
+        return best.get(0).method();
     }
 
     /**
@@ -167,9 +273,9 @@ public final class ELMethods {
     /**
      * Scores how well the arguments fit a method, the lower the better, {@link #NO_MATCH} when they do not fit.
      */
-    private static long score(Method method, Object[] arguments) {
-        Class<?>[] parameterTypes = method.getParameterTypes();
-        boolean varArgs = method.isVarArgs();
+    private static long score(Candidate candidate, Object[] arguments) {
+        Class<?>[] parameterTypes = candidate.parameterTypes();
+        boolean varArgs = candidate.varArgs();
         if (varArgs ? arguments.length < parameterTypes.length - 1 : arguments.length != parameterTypes.length) {
             return NO_MATCH;
         }
@@ -207,6 +313,10 @@ public final class ELMethods {
         if (parameterType.isAssignableFrom(argumentType)) {
             return ASSIGNABLE;
         }
+        if (argument instanceof LambdaExpression && parameterType.isInterface()) {
+            // the section 1.25.8 of the specification coerces a lambda expression to a functional interface
+            return COERCIBLE;
+        }
         return isCoercible(parameterType) ? COERCIBLE : NO_MATCH;
     }
 
@@ -222,9 +332,9 @@ public final class ELMethods {
     /**
      * A method inherited from a supertype is the same method for the purpose of the reference.
      */
-    private static boolean overrides(List<Method> methods, Method candidate) {
-        for (Method method : methods) {
-            if (Arrays.equals(method.getParameterTypes(), candidate.getParameterTypes())) {
+    private static boolean overrides(List<Candidate> candidates, Candidate candidate) {
+        for (Candidate other : candidates) {
+            if (Arrays.equals(other.parameterTypes(), candidate.parameterTypes())) {
                 return true;
             }
         }
@@ -234,5 +344,16 @@ public final class ELMethods {
     private static MethodNotFoundException notFound(Class<?> type, String name, int count) {
         return new MethodNotFoundException("Cannot find the method '" + name + "' of " + type.getName()
             + " accepting " + count + " argument(s)");
+    }
+
+    /**
+     * A public method of a class, with what the selection needs read once.
+     *
+     * @param method         The accessible declaration of the method
+     * @param parameterTypes Its parameter types
+     * @param varArgs        Whether it is of variable arity
+     * @param isStatic       Whether it is static
+     */
+    private record Candidate(Method method, Class<?>[] parameterTypes, boolean varArgs, boolean isStatic) {
     }
 }

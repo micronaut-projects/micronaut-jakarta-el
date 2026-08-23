@@ -35,7 +35,7 @@ import java.math.RoundingMode;
 @Internal
 public final class ELArithmetic {
 
-    private static final Long ZERO = Long.valueOf(0);
+    private static final Long ZERO = 0L;
 
     private ELArithmetic() {
     }
@@ -58,12 +58,12 @@ public final class ELArithmetic {
             if (ELSupport.isOperand(left, right, BigInteger.class)) {
                 return bigDecimal(left).add(bigDecimal(right));
             }
-            return Double.valueOf(doubleValue(left) + doubleValue(right));
+            return doubleValue(left) + doubleValue(right);
         }
         if (ELSupport.isOperand(left, right, BigInteger.class)) {
             return bigInteger(left).add(bigInteger(right));
         }
-        return Long.valueOf(longValue(left) + longValue(right));
+        return longValue(left) + longValue(right);
     }
 
     /**
@@ -84,12 +84,12 @@ public final class ELArithmetic {
             if (ELSupport.isOperand(left, right, BigInteger.class)) {
                 return bigDecimal(left).subtract(bigDecimal(right));
             }
-            return Double.valueOf(doubleValue(left) - doubleValue(right));
+            return doubleValue(left) - doubleValue(right);
         }
         if (ELSupport.isOperand(left, right, BigInteger.class)) {
             return bigInteger(left).subtract(bigInteger(right));
         }
-        return Long.valueOf(longValue(left) - longValue(right));
+        return longValue(left) - longValue(right);
     }
 
     /**
@@ -110,12 +110,12 @@ public final class ELArithmetic {
             if (ELSupport.isOperand(left, right, BigInteger.class)) {
                 return bigDecimal(left).multiply(bigDecimal(right));
             }
-            return Double.valueOf(doubleValue(left) * doubleValue(right));
+            return doubleValue(left) * doubleValue(right);
         }
         if (ELSupport.isOperand(left, right, BigInteger.class)) {
             return bigInteger(left).multiply(bigInteger(right));
         }
-        return Long.valueOf(longValue(left) * longValue(right));
+        return longValue(left) * longValue(right);
     }
 
     /**
@@ -132,7 +132,7 @@ public final class ELArithmetic {
         if (ELSupport.isOperand(left, right, BigDecimal.class) || ELSupport.isOperand(left, right, BigInteger.class)) {
             return bigDecimal(left).divide(bigDecimal(right), RoundingMode.HALF_UP);
         }
-        return Double.valueOf(doubleValue(left) / doubleValue(right));
+        return doubleValue(left) / doubleValue(right);
     }
 
     /**
@@ -147,12 +147,12 @@ public final class ELArithmetic {
             return ZERO;
         }
         if (ELSupport.isOperand(left, right, BigDecimal.class) || ELSupport.isFloatingPointOperand(left, right)) {
-            return Double.valueOf(doubleValue(left) % doubleValue(right));
+            return doubleValue(left) % doubleValue(right);
         }
         if (ELSupport.isOperand(left, right, BigInteger.class)) {
             return bigInteger(left).remainder(bigInteger(right));
         }
-        return Long.valueOf(longValue(left) % longValue(right));
+        return longValue(left) % longValue(right);
     }
 
     /**
@@ -173,27 +173,27 @@ public final class ELArithmetic {
         }
         if (value instanceof String string) {
             if (ELSupport.isFloatingPointNotation(string)) {
-                return Double.valueOf(-doubleValue(string));
+                return -doubleValue(string);
             }
-            return Long.valueOf(-longValue(string));
+            return -longValue(string);
         }
         if (value instanceof Byte aByte) {
-            return Byte.valueOf((byte) -aByte.byteValue());
+            return (byte) -aByte;
         }
         if (value instanceof Short aShort) {
-            return Short.valueOf((short) -aShort.shortValue());
+            return (short) -aShort;
         }
         if (value instanceof Integer anInteger) {
-            return Integer.valueOf(-anInteger.intValue());
+            return -anInteger;
         }
         if (value instanceof Long aLong) {
-            return Long.valueOf(-aLong.longValue());
+            return -aLong;
         }
         if (value instanceof Float aFloat) {
-            return Float.valueOf(-aFloat.floatValue());
+            return -aFloat;
         }
         if (value instanceof Double aDouble) {
-            return Double.valueOf(-aDouble.doubleValue());
+            return -aDouble;
         }
         throw new ELException("Cannot apply the unary minus operator to " + value.getClass().getName());
     }
@@ -220,11 +220,18 @@ public final class ELArithmetic {
     }
 
     private static double doubleValue(@Nullable Object value) {
+        // a number needs no coercion, which would box it again
+        if (value instanceof Number number) {
+            return number.doubleValue();
+        }
         Number number = ELSupport.coerceToNumber(value, double.class);
         return number == null ? 0d : number.doubleValue();
     }
 
     private static long longValue(@Nullable Object value) {
+        if (value instanceof Number number) {
+            return number.longValue();
+        }
         Number number = ELSupport.coerceToNumber(value, long.class);
         return number == null ? 0L : number.longValue();
     }

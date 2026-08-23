@@ -18,7 +18,6 @@ package io.micronaut.el.resolver;
 import io.micronaut.core.annotation.Experimental;
 import jakarta.el.ArrayELResolver;
 import jakarta.el.BeanELResolver;
-import jakarta.el.CompositeELResolver;
 import jakarta.el.ELResolver;
 import jakarta.el.ListELResolver;
 import jakarta.el.MapELResolver;
@@ -26,6 +25,9 @@ import jakarta.el.OptionalELResolver;
 import jakarta.el.RecordELResolver;
 import jakarta.el.ResourceBundleELResolver;
 import jakarta.el.StaticFieldELResolver;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The factory of the standard resolver chain of the module.
@@ -35,6 +37,30 @@ import jakarta.el.StaticFieldELResolver;
  */
 @Experimental
 public final class ELResolvers {
+
+    /**
+     * The resolvers of the specification that follow the introspections, which hold no state and are shared by
+     * every chain.
+     */
+    private static final List<ELResolver> SPECIFICATION = List.of(
+        new StreamELResolver(),
+        new ReflectiveMethodELResolver(),
+        new StaticFieldELResolver(),
+        new MapELResolver(),
+        new ResourceBundleELResolver(),
+        new ListELResolver(),
+        new ArrayELResolver(),
+        new RecordELResolver(),
+        new OptionalELResolver(),
+        new BeanELResolver()
+    );
+
+    private static final IntrospectionELResolver INTROSPECTIONS = new IntrospectionELResolver();
+
+    /**
+     * The standard chain itself, shared: it holds no state.
+     */
+    private static final ELResolverChain STANDARD = new ELResolverChain(standardResolvers(INTROSPECTIONS));
 
     private ELResolvers() {
     }
@@ -46,7 +72,7 @@ public final class ELResolvers {
      * @return The resolver chain
      */
     public static ELResolver standard() {
-        return standard(new IntrospectionELResolver());
+        return STANDARD;
     }
 
     /**
@@ -56,19 +82,19 @@ public final class ELResolvers {
      * @return The resolver chain
      */
     public static ELResolver standard(ELResolver... first) {
-        CompositeELResolver composite = new CompositeELResolver();
-        for (ELResolver resolver : first) {
-            composite.add(resolver);
-        }
-        composite.add(new StreamELResolver());
-        composite.add(new StaticFieldELResolver());
-        composite.add(new MapELResolver());
-        composite.add(new ResourceBundleELResolver());
-        composite.add(new ListELResolver());
-        composite.add(new ArrayELResolver());
-        composite.add(new RecordELResolver());
-        composite.add(new OptionalELResolver());
-        composite.add(new BeanELResolver());
-        return composite;
+        return new ELResolverChain(standardResolvers(first));
+    }
+
+    /**
+     * The resolvers of the standard chain, in order, for a chain that adds resolvers in front of them.
+     *
+     * @param first The resolvers to consult first
+     * @return The resolvers
+     */
+    public static List<ELResolver> standardResolvers(ELResolver... first) {
+        List<ELResolver> resolvers = new ArrayList<>(first.length + SPECIFICATION.size());
+        resolvers.addAll(List.of(first));
+        resolvers.addAll(SPECIFICATION);
+        return resolvers;
     }
 }

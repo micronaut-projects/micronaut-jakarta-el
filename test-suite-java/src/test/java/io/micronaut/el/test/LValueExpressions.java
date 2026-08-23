@@ -11,7 +11,7 @@ import io.micronaut.el.annotation.ELVariable;
 })
 @ELExpression(value = "${book.title}", expectedType = String.class, name = "title")
 @ELExpression(value = "${book.category}", expectedType = String.class, name = "category")
-@ELExpression(value = "${counter}", name = "counter")
+@ELExpression(value = "${counter}", expectedType = Object.class, name = "counter")
 @ELExpression(value = "${1 + 1}", name = "notAnLValue")
 @ELMethodExpression(value = "${book.describe}", expectedReturnType = String.class, name = "describe")
 @ELMethodExpression(value = "${book.discounted(50)}", expectedReturnType = Double.class, name = "halfPrice")

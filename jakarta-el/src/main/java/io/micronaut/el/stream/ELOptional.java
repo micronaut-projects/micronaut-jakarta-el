@@ -24,38 +24,44 @@ import jakarta.el.LambdaExpression;
 import jakarta.el.MethodNotFoundException;
 
 import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * The {@code Optional} implementation class described in the section 2.3.3.2 of the Jakarta Expression
  * Language specification.
  *
+ * @param <T> The type of the value
  * @author Denis Stepanov
  * @since 1.0
  */
 @Internal
-public final class ELOptional {
+public final class ELOptional<T> {
 
-    private static final ELOptional EMPTY = new ELOptional(null);
+    private static final ELOptional<?> EMPTY = new ELOptional<>(null);
 
-    private final @Nullable Object value;
+    private final @Nullable T value;
 
-    private ELOptional(@Nullable Object value) {
+    private ELOptional(@Nullable T value) {
         this.value = value;
     }
 
     /**
+     * @param <T> The type of the value
      * @return An empty optional
      */
-    public static ELOptional empty() {
-        return EMPTY;
+    @SuppressWarnings("unchecked")
+    public static <T> ELOptional<T> empty() {
+        return (ELOptional<T>) EMPTY;
     }
 
     /**
      * @param value The value, can be {@code null}
+     * @param <T>   The type of the value
      * @return An optional holding the value
      */
-    public static ELOptional of(@Nullable Object value) {
-        return value == null ? EMPTY : new ELOptional(value);
+    public static <T> ELOptional<T> of(@Nullable T value) {
+        return value == null ? empty() : new ELOptional<>(value);
     }
 
     /**
@@ -68,7 +74,7 @@ public final class ELOptional {
     /**
      * @return The value held by the optional
      */
-    public Object get() {
+    public T get() {
         if (value == null) {
             throw new ELException("The optional is empty");
         }
@@ -79,8 +85,15 @@ public final class ELOptional {
      * @param consumer The consumer invoked with the value when it is present
      */
     public void ifPresent(LambdaExpression consumer) {
+        ifPresent(consumer::invoke);
+    }
+
+    /**
+     * @param consumer The consumer invoked with the value when it is present, as compiled from a lambda expression
+     */
+    public void ifPresent(Consumer<? super T> consumer) {
         if (value != null) {
-            consumer.invoke(value);
+            consumer.accept(value);
         }
     }
 
@@ -99,7 +112,16 @@ public final class ELOptional {
      */
     @Nullable
     public Object orElseGet(LambdaExpression other) {
-        return value == null ? other.invoke() : value;
+        return orElseGet(other::invoke);
+    }
+
+    /**
+     * @param other The supplier invoked when the optional is empty, as compiled from a lambda expression
+     * @return The value held by the optional or the supplied value
+     */
+    @Nullable
+    public Object orElseGet(Supplier<?> other) {
+        return value == null ? other.get() : value;
     }
 
     /**

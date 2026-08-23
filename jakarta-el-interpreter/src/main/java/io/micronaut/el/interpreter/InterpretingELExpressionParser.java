@@ -23,6 +23,9 @@ import jakarta.el.ELContext;
 import jakarta.el.ELException;
 import jakarta.el.MethodExpression;
 import jakarta.el.ValueExpression;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -37,12 +40,23 @@ import org.jspecify.annotations.Nullable;
 @Internal
 public final class InterpretingELExpressionParser implements ELExpressionParser {
 
+    /**
+     * The number of parsed expressions kept: the syntax trees are immutable and an application evaluates the
+     * same strings repeatedly, so a bounded cache saves the parse, as the other implementations do.
+     */
+    private static final int CACHE_SIZE = 2048;
+
+    private final Map<String, Parsed> parsed = new ConcurrentHashMap<>();
+
     @Override
     public ValueExpression createValueExpression(@Nullable ELContext context,
                                                  String expression,
                                                  Class<?> expectedType) {
-        ELNode node = ELParser.parse(expression);
-        return new InterpretedValueExpression(expression, expectedType, node, ELInterpreter.of(context, node));
+        Parsed entry = parse(expression);
+        ELInterpreter interpreter = entry.root() == null
+            ? ELInterpreter.of(context, entry.node())
+            : ELInterpreter.sharing(entry.root());
+        return new InterpretedValueExpression(expression, expectedType, entry.node(), interpreter);
     }
 
     @Override
@@ -50,13 +64,28 @@ public final class InterpretingELExpressionParser implements ELExpressionParser 
                                                    String expression,
                                                    Class<?> expectedReturnType,
                                                    Class<?>[] expectedParamTypes) {
-        ELNode node = ELParser.parse(expression);
+        ELNode node = parse(expression).node();
         if (node instanceof ELNode.Composite) {
             throw new ELException("A method expression must consist of a single eval-expression: " + expression);
         }
         requireMethodReference(expression, node);
         return new InterpretedMethodExpression(expression, expectedReturnType, expectedParamTypes, node,
             ELInterpreter.of(context, node));
+    }
+
+    private Parsed parse(String expression) {
+        Parsed entry = parsed.get(expression);
+        if (entry == null) {
+            ELNode node = ELParser.parse(expression);
+            // an expression without functions evaluates the same way under every context, so its evaluators
+            // are compiled once and shared by the expressions created from the string
+            entry = new Parsed(node, ELInterpreter.containsFunction(node) ? null : ELInterpreter.of(null, node).compile(node));
+            if (parsed.size() >= CACHE_SIZE) {
+                parsed.clear();
+            }
+            parsed.put(expression, entry);
+        }
+        return entry;
     }
 
     /**
@@ -71,5 +100,14 @@ public final class InterpretingELExpressionParser implements ELExpressionParser 
         }
         throw new ELException("The expression '" + expression
             + "' is not a method expression, it does not reference a method");
+    }
+
+    /**
+     * A parsed expression, with its evaluators when they can be shared.
+     *
+     * @param node The syntax tree
+     * @param root The evaluators compiled from it, {@code null} when the expression binds functions
+     */
+    private record Parsed(ELNode node, ELInterpreter.@Nullable Evaluator root) {
     }
 }

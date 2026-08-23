@@ -56,6 +56,12 @@ public @interface ELMethodExpression {
     /**
      * @return The expected return type of the invoked method
      */
+    /**
+     * When it is not declared, the compiler infers it from the static type of the invocation, the same way
+     * {@code ELExpression.expectedType} is inferred.
+     *
+     * @return The expected return type the result of the invocation is coerced to
+     */
     Class<?> expectedReturnType() default Object.class;
 
     /**

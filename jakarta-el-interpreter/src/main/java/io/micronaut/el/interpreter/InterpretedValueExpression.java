@@ -58,7 +58,7 @@ final class InterpretedValueExpression extends ValueExpression {
     @SuppressWarnings("unchecked")
     public <T> T getValue(ELContext context) {
         context.notifyBeforeEvaluation(expressionString);
-        Object value = interpreter().evaluate(context, node());
+        Object value = interpreter().evaluateRoot(context, node());
         context.notifyAfterEvaluation(expressionString);
         return (T) ELSupport.coerceToType(context, value, expectedType);
     }

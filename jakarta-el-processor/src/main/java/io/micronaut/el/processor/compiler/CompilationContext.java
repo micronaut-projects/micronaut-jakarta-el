@@ -57,7 +57,8 @@ public final class CompilationContext {
     private final List<String> importedPackages;
     private final List<ClassElement> staticImports;
     private final Map<String, MethodElement> functions;
-    private final Deque<List<String>> lambdaScopes = new ArrayDeque<>();
+    private final Deque<Map<String, ELCompiler.Typed>> lambdaScopes = new ArrayDeque<>();
+    private final Deque<Boolean> valueLambdas = new ArrayDeque<>();
     private final Map<String, ClassElement> resolvedClasses = new HashMap<>();
 
     /**
@@ -116,21 +117,42 @@ public final class CompilationContext {
      * @return True when the name is a parameter of one of the enclosing lambda expressions
      */
     public boolean isLambdaParameter(String name) {
-        for (List<String> scope : lambdaScopes) {
-            if (scope.contains(name)) {
-                return true;
+        return lambdaParameter(name) != null;
+    }
+
+    /**
+     * @param name The name
+     * @return The compiled parameter of the innermost enclosing lambda expression declaring the name, or
+     * {@code null} when no enclosing lambda expression declares it
+     */
+    public ELCompiler.@Nullable Typed lambdaParameter(String name) {
+        for (Map<String, ELCompiler.Typed> scope : lambdaScopes) {
+            ELCompiler.Typed parameter = scope.get(name);
+            if (parameter != null) {
+                return parameter;
             }
         }
-        return false;
+        return null;
+    }
+
+    /**
+     * @return Whether the compilation is inside the body of a lambda expression compiled to a value, which may
+     * be invoked later, with another context, so that nothing of the evaluation can be shared with it
+     */
+    public boolean inValueLambda() {
+        return valueLambdas.contains(Boolean.TRUE);
     }
 
     /**
      * Enters the scope of a lambda expression.
      *
-     * @param parameters The formal parameters
+     * @param parameters        The formal parameters by name, compiled to the Java parameters holding them
+     * @param withinEvaluation  Whether the lambda runs within the evaluation it is written in, as a Java lambda
+     *                          passed to a method does, rather than as a value invoked later
      */
-    public void enterLambdaScope(List<String> parameters) {
+    public void enterLambdaScope(Map<String, ELCompiler.Typed> parameters, boolean withinEvaluation) {
         lambdaScopes.push(parameters);
+        valueLambdas.push(!withinEvaluation);
     }
 
     /**
@@ -138,6 +160,7 @@ public final class CompilationContext {
      */
     public void exitLambdaScope() {
         lambdaScopes.pop();
+        valueLambdas.pop();
     }
 
     /**

@@ -15,6 +15,9 @@
  */
 package io.micronaut.el.processor.visitor;
 
+import java.io.IOException;
+import java.io.Writer;
+
 import io.micronaut.core.annotation.AnnotationClassValue;
 import io.micronaut.core.annotation.AnnotationMetadata;
 import io.micronaut.core.annotation.AnnotationValue;
@@ -186,21 +189,26 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
             List<ClassDef> generated = new ArrayList<>();
 
             List<ExpressionSourceWriter.CompiledValue> compiledValues = new ArrayList<>(expressions.size());
+            Set<String> constantNames = new HashSet<>();
             for (int i = 0; i < expressions.size(); i++) {
                 Declared<ELExpression> declared = expressions.get(i);
-                ELExpressionDefinition definition = valueDefinition(declared.annotation(), i, context);
+                ELExpressionDefinition definition = valueDefinition(declared.annotation(), declared.owner(), constantNames, context);
                 String className = prefix + "$Expression" + i;
-                generated.add(ValueExpressionWriter.write(className, definition, compilerFor(declared.owner(), element, compilers, context)));
-                compiledValues.add(new ExpressionSourceWriter.CompiledValue(definition, className));
+                ValueExpressionWriter.Written written = ValueExpressionWriter.write(className, definition,
+                    compilerFor(declared.owner(), element, compilers, context));
+                generated.add(written.type());
+                compiledValues.add(new ExpressionSourceWriter.CompiledValue(written.definition(), className));
             }
 
             List<ExpressionSourceWriter.CompiledMethod> compiledMethods = new ArrayList<>(methodExpressions.size());
             for (int i = 0; i < methodExpressions.size(); i++) {
                 Declared<ELMethodExpression> declared = methodExpressions.get(i);
-                ELMethodExpressionDefinition definition = methodDefinition(declared.annotation(), i, context);
+                ELMethodExpressionDefinition definition = methodDefinition(declared.annotation(), declared.owner(), constantNames, context);
                 String className = prefix + "$MethodExpression" + i;
-                generated.add(MethodExpressionWriter.write(className, definition, compilerFor(declared.owner(), element, compilers, context)));
-                compiledMethods.add(new ExpressionSourceWriter.CompiledMethod(definition, className));
+                MethodExpressionWriter.Written written = MethodExpressionWriter.write(className, definition,
+                    compilerFor(declared.owner(), element, compilers, context));
+                generated.add(written.type());
+                compiledMethods.add(new ExpressionSourceWriter.CompiledMethod(written.definition(), className));
             }
 
             String sourceClassName = prefix + "$ELExpressions";
@@ -209,6 +217,7 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
                 sourceGenerator.write(classDef, context, element);
             }
             context.visitServiceDescriptor(ELExpressionSource.class.getName(), sourceClassName, element);
+            visitNativeImageProperties(sourceClassName, generated, element, context);
         } catch (ELParsingException | ELCompilationException | ProcessingException e) {
             processed.remove(element.getName());
             throw new ProcessingException(element, reportable(e), e);
@@ -220,6 +229,29 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
             }
             throw new ProcessingException(element, "Failed to generate the expressions: " + reportable(e), e);
         }
+    }
+
+    /**
+     * Marks the generated classes for build-time initialization in a GraalVM native image.
+     *
+     * <p>The classes are immutable singletons created in their static initializers. GraalVM simulates such
+     * initializers and folds the constants of the registry into the code that reads them, so the singletons
+     * end up in the image heap - which the image builder only allows for classes explicitly declared safe to
+     * initialize at build time. The properties file makes that declaration, and keeps a native image build
+     * configuration-free.</p>
+     */
+    private static void visitNativeImageProperties(String sourceClassName, List<ClassDef> generated, ClassElement element, VisitorContext context) {
+        String classes = generated.stream()
+            .map(ClassDef::getName)
+            .collect(java.util.stream.Collectors.joining(","));
+        context.visitMetaInfFile("native-image/io.micronaut.el.generated/" + sourceClassName + "/native-image.properties", element)
+            .ifPresent(file -> {
+                try (Writer writer = file.openWriter()) {
+                    writer.write("Args = --initialize-at-build-time=" + classes + "\n");
+                } catch (IOException e) {
+                    throw new ProcessingException(element, "Failed to write the native-image properties: " + e.getMessage(), e);
+                }
+            });
     }
 
     /**
@@ -272,30 +304,27 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
     }
 
     private ELExpressionDefinition valueDefinition(AnnotationValue<ELExpression> annotation,
-                                                   int index,
+                                                   Element owner,
+                                                   Set<String> used,
                                                    VisitorContext context) {
         String expression = expressionOf(annotation).orElseThrow(() ->
             new ELCompilationException("The expression of @ELExpression is required"));
-        ClassElement expectedType = ELTypes.resolveMember(annotation, "expectedType", context)
-            .orElseGet(() -> ClassElement.of(Object.class));
-        String name = annotation.stringValue("name")
-            .filter(value -> !value.isEmpty())
-            .orElseGet(() -> "EXPRESSION_" + index);
-        return new ELExpressionDefinition(expression, expectedType, constantName(name), ELParser.parse(expression));
+        // an omitted type is inferred from the static type of the expression once it is compiled
+        ClassElement expectedType = ELTypes.resolveMember(annotation, "expectedType", context).orElse(null);
+        String name = uniqueConstantName(annotation, owner, expression, used);
+        return new ELExpressionDefinition(expression, expectedType, false, name, ELParser.parse(expression));
     }
 
     private ELMethodExpressionDefinition methodDefinition(AnnotationValue<ELMethodExpression> annotation,
-                                                          int index,
+                                                          Element owner,
+                                                          Set<String> used,
                                                           VisitorContext context) {
         String expression = expressionOf(annotation).orElseThrow(() ->
             new ELCompilationException("The expression of @ELMethodExpression is required"));
-        ClassElement returnType = ELTypes.resolveMember(annotation, "expectedReturnType", context)
-            .orElseGet(() -> ClassElement.of(Object.class));
+        ClassElement returnType = ELTypes.resolveMember(annotation, "expectedReturnType", context).orElse(null);
         List<ClassElement> parameterTypes = ELTypes.resolveMembers(annotation, "expectedParamTypes", context);
-        String name = annotation.stringValue("name")
-            .filter(value -> !value.isEmpty())
-            .orElseGet(() -> "METHOD_EXPRESSION_" + index);
-        return new ELMethodExpressionDefinition(expression, returnType, parameterTypes, constantName(name),
+        String name = uniqueConstantName(annotation, owner, expression, used);
+        return new ELMethodExpressionDefinition(expression, returnType, false, parameterTypes, name,
             ELParser.parseEval(expression));
     }
 
@@ -357,6 +386,36 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
             .filter(resolved -> !resolved.getName().equals("void"))
             .orElseThrow(() -> new ELCompilationException("The class of @ELFunctions is required"));
         ELFunctionBinder.bind(type, declared.stringValue("prefix").orElse(""), false, functions);
+    }
+
+    /**
+     * The name of the constant holding a compiled expression in the generated registry. The declared
+     * {@code name} wins; without one the name is derived from the declaration: the name of the method, field
+     * or parameter the expression is declared on, or, for an expression declared on the class itself, from the
+     * text of the expression. A name a previous expression of the class already took gets a numeric suffix.
+     */
+    private static String uniqueConstantName(AnnotationValue<?> annotation, Element owner, String expression, Set<String> used) {
+        String base = annotation.stringValue("name")
+            .filter(value -> !value.isEmpty())
+            .map(ELExpressionVisitor::constantName)
+            .orElseGet(() -> owner instanceof ClassElement
+                ? derivedFromExpression(expression)
+                : constantName(owner.getName()));
+        String name = base;
+        for (int i = 2; !used.add(name); i++) {
+            name = base + "_" + i;
+        }
+        return name;
+    }
+
+    private static String derivedFromExpression(String expression) {
+        String text = expression.replace("${", " ").replace("#{", " ").replace("}", " ").trim();
+        String derived = constantName(text);
+        if (derived.length() > 44) {
+            int cut = derived.lastIndexOf('_', 44);
+            derived = derived.substring(0, cut > 20 ? cut : 44);
+        }
+        return derived;
     }
 
     private static String constantName(String name) {

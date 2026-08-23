@@ -48,6 +48,15 @@ class CompilationErrorsTest {
     }
 
     @Test
+    void anOmittedExpectedTypeWithAnUndeclaredIdentifierIsReported() {
+        String error = compile("@ELExpression(\"${ customer.age }\")");
+        assertTrue(error.contains("Cannot infer the expectedType"), error);
+        assertTrue(error.contains("the identifier 'customer' is not declared"), error);
+        assertTrue(error.contains("@ELVariable(name = \"customer\""), error);
+        assertTrue(error.contains("Object.class accepts any result"), error);
+    }
+
+    @Test
     void aSyntaxErrorIsReportedWithTheExpressionAndThePosition() {
         String error = compile("@ELExpression(\"${ book.title + }\")");
         assertTrue(error.contains("Expressions.java"), error);

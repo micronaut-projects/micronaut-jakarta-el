@@ -18,12 +18,16 @@ package io.micronaut.el.processor.compiler;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.el.parser.ast.ELNode;
 import io.micronaut.inject.ast.ClassElement;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Objects;
 
 /**
  * A value expression declared with {@code io.micronaut.el.annotation.ELExpression}.
  *
  * @param expression   The expression string
  * @param expectedType The expected type of the evaluation result
+ * @param inferred Whether the type was inferred from the static type of the expression rather than declared
  * @param constantName The name of the generated constant
  * @param node         The parsed expression
  * @author Denis Stepanov
@@ -31,7 +35,25 @@ import io.micronaut.inject.ast.ClassElement;
  */
 @Internal
 public record ELExpressionDefinition(String expression,
-                                     ClassElement expectedType,
+                                     @Nullable ClassElement expectedType,
+                                     boolean inferred,
                                      String constantName,
                                      ELNode node) {
+
+    /**
+     * A definition whose expected type was omitted, resolved to the static type of the expression.
+     *
+     * @param type The inferred type
+     * @return The definition with the type
+     */
+    public ELExpressionDefinition inferring(ClassElement type) {
+        return new ELExpressionDefinition(expression, type, true, constantName, node);
+    }
+
+    /**
+     * @return The expected type, which inference has resolved by the time a writer reads it
+     */
+    public ClassElement requireExpectedType() {
+        return Objects.requireNonNull(expectedType, "The expected type has not been inferred yet");
+    }
 }

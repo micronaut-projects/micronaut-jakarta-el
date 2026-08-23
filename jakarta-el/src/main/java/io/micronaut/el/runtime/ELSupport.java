@@ -16,6 +16,7 @@
 package io.micronaut.el.runtime;
 
 import io.micronaut.core.annotation.Internal;
+import io.micronaut.el.resolver.ELResolverChain;
 import org.jspecify.annotations.Nullable;
 import jakarta.el.ELContext;
 import jakarta.el.ELException;
@@ -66,6 +67,10 @@ public final class ELSupport {
         }
         if (context != null) {
             ELResolver resolver = context.getELResolver();
+            if (resolver instanceof ELResolverChain chain && !chain.converts()) {
+                // none of the resolvers converts: the coercion is the one of the specification
+                return coerce(value, type);
+            }
             if (resolver != null) {
                 boolean resolvedSave = context.isPropertyResolved();
                 try {
@@ -210,17 +215,14 @@ public final class ELSupport {
      */
     @Nullable
     public static Boolean coerceToBoolean(@Nullable Object value, boolean primitive) {
-        if (value == null) {
-            return primitive ? Boolean.FALSE : null;
-        }
-        if ("".equals(value)) {
-            return Boolean.FALSE;
-        }
         if (value instanceof Boolean aBoolean) {
             return aBoolean;
         }
+        if (value == null) {
+            return primitive ? Boolean.FALSE : null;
+        }
         if (value instanceof String string) {
-            return Boolean.valueOf(string);
+            return string.isEmpty() ? Boolean.FALSE : Boolean.valueOf(string);
         }
         throw cannotCoerce(value, Boolean.class);
     }
@@ -233,7 +235,7 @@ public final class ELSupport {
      */
     public static boolean toBoolean(@Nullable Object value) {
         Boolean result = coerceToBoolean(value, true);
-        return result != null && result.booleanValue();
+        return result != null && result;
     }
 
     /**
@@ -249,7 +251,7 @@ public final class ELSupport {
             return null;
         }
         if (value == null || "".equals(value)) {
-            return Character.valueOf((char) 0);
+            return (char) 0;
         }
         if (value instanceof Character character) {
             return character;
@@ -258,10 +260,10 @@ public final class ELSupport {
             throw cannotCoerce(value, Character.class);
         }
         if (value instanceof Number number) {
-            return Character.valueOf((char) number.shortValue());
+            return (char) number.shortValue();
         }
         if (value instanceof String string) {
-            return Character.valueOf(string.charAt(0));
+            return string.charAt(0);
         }
         throw cannotCoerce(value, Character.class);
     }
@@ -285,7 +287,7 @@ public final class ELSupport {
             return fromLong(0L, boxed);
         }
         if (value instanceof Character character) {
-            return fromNumber(Short.valueOf((short) character.charValue()), boxed);
+            return fromNumber((short) character.charValue(), boxed);
         }
         if (value instanceof Boolean) {
             throw cannotCoerce(value, type);
@@ -458,7 +460,7 @@ public final class ELSupport {
             return number(left, Long.class).equals(number(right, Long.class));
         }
         if (left instanceof Boolean || right instanceof Boolean) {
-            return Boolean.valueOf(toBoolean(left)).equals(Boolean.valueOf(toBoolean(right)));
+            return toBoolean(left) == toBoolean(right);
         }
         if (left instanceof Enum<?> anEnum) {
             return anEnum.equals(coerceToEnum(right, (Class<? extends Enum>) anEnum.getDeclaringClass()));
@@ -491,7 +493,8 @@ public final class ELSupport {
      * @return The result of the comparison
      */
     public static boolean lessThan(@Nullable Object left, @Nullable Object right) {
-        if (equals(left, right) || left == null || right == null) {
+        // the section 1.9.1 of the specification: the same object, or a null, is not less than the other
+        if (left == right || left == null || right == null) {
             return false;
         }
         return compare(left, right) < 0;
@@ -505,7 +508,7 @@ public final class ELSupport {
      * @return The result of the comparison
      */
     public static boolean greaterThan(@Nullable Object left, @Nullable Object right) {
-        if (equals(left, right) || left == null || right == null) {
+        if (left == right || left == null || right == null) {
             return false;
         }
         return compare(left, right) > 0;
@@ -519,7 +522,7 @@ public final class ELSupport {
      * @return The result of the comparison
      */
     public static boolean lessThanOrEqual(@Nullable Object left, @Nullable Object right) {
-        if (equals(left, right)) {
+        if (left == right) {
             return true;
         }
         if (left == null || right == null) {
@@ -536,7 +539,7 @@ public final class ELSupport {
      * @return The result of the comparison
      */
     public static boolean greaterThanOrEqual(@Nullable Object left, @Nullable Object right) {
-        if (equals(left, right)) {
+        if (left == right) {
             return true;
         }
         if (left == null || right == null) {
@@ -554,20 +557,20 @@ public final class ELSupport {
      */
     @SuppressWarnings({"unchecked", "rawtypes", "java:S3776"})
     public static int compare(@Nullable Object left, @Nullable Object right) {
-        if (equals(left, right)) {
+        if (left == right) {
             return 0;
         }
         if (isOperand(left, right, BigDecimal.class)) {
             return ((BigDecimal) number(left, BigDecimal.class)).compareTo((BigDecimal) number(right, BigDecimal.class));
         }
         if (isFloatingPointInstance(left, right)) {
-            return Double.compare(number(left, Double.class).doubleValue(), number(right, Double.class).doubleValue());
+            return Double.compare(doubleValue(left), doubleValue(right));
         }
         if (isOperand(left, right, BigInteger.class)) {
             return ((BigInteger) number(left, BigInteger.class)).compareTo((BigInteger) number(right, BigInteger.class));
         }
         if (isWholeNumberOperand(left, right)) {
-            return Long.compare(number(left, Long.class).longValue(), number(right, Long.class).longValue());
+            return Long.compare(longValue(left), longValue(right));
         }
         if (left instanceof String || right instanceof String) {
             return coerceToString(left).compareTo(coerceToString(right));
@@ -579,6 +582,20 @@ public final class ELSupport {
             return -comparable.compareTo(left);
         }
         throw new ELException("Cannot compare " + left + " to " + right);
+    }
+
+    /**
+     * A number as a double, without the boxing of the general coercion when it already is a number.
+     */
+    private static double doubleValue(@Nullable Object value) {
+        return value instanceof Number number ? number.doubleValue() : number(value, Double.class).doubleValue();
+    }
+
+    /**
+     * A number as a long, without the boxing of the general coercion when it already is a number.
+     */
+    private static long longValue(@Nullable Object value) {
+        return value instanceof Number number ? number.longValue() : number(value, Long.class).longValue();
     }
 
     /**
@@ -710,28 +727,28 @@ public final class ELSupport {
             return new BigDecimal(value.doubleValue());
         }
         if (type == Byte.class) {
-            return Byte.valueOf(value.byteValue());
+            return value.byteValue();
         }
         if (type == Short.class) {
-            return Short.valueOf(value.shortValue());
+            return value.shortValue();
         }
         if (type == Integer.class) {
-            return Integer.valueOf(value.intValue());
+            return value.intValue();
         }
         if (type == Long.class) {
-            return Long.valueOf(value.longValue());
+            return value.longValue();
         }
         if (type == Float.class) {
-            return Float.valueOf(value.floatValue());
+            return value.floatValue();
         }
         if (type == Double.class) {
-            return Double.valueOf(value.doubleValue());
+            return value.doubleValue();
         }
         throw cannotCoerce(value, type);
     }
 
     private static Number fromLong(long value, Class<?> type) {
-        return fromNumber(Long.valueOf(value), type);
+        return fromNumber(value, type);
     }
 
     private static Number fromString(String value, Class<?> type) {

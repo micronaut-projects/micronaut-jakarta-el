@@ -21,7 +21,6 @@ import io.micronaut.el.parser.ast.ELNode;
 import io.micronaut.el.runtime.ELArithmetic;
 import io.micronaut.el.runtime.ELCollections;
 import io.micronaut.el.runtime.ELLambdas;
-import io.micronaut.el.runtime.ELLiterals;
 import io.micronaut.el.runtime.ELResolution;
 import io.micronaut.el.runtime.ELSupport;
 import jakarta.el.ELClass;
@@ -58,9 +57,335 @@ final class ELInterpreter {
     private static final Object[] NO_ARGUMENTS = new Object[0];
 
     private final Map<ELNode.Function, Method> functions;
+    @Nullable
+    private Evaluator root;
 
     private ELInterpreter(Map<ELNode.Function, Method> functions) {
         this.functions = functions;
+    }
+
+    /**
+     * Evaluates the expression, through the evaluators compiled from its tree on the first evaluation.
+     *
+     * @param context The context
+     * @param node    The parsed expression
+     * @return The result of the evaluation
+     */
+    @Nullable
+    Object evaluateRoot(ELContext context, ELNode node) {
+        Evaluator evaluator = root;
+        if (evaluator == null) {
+            evaluator = compile(node);
+            root = evaluator;
+        }
+        return evaluator.evaluate(context);
+    }
+
+    @SuppressWarnings("java:S1541")
+    Evaluator compile(ELNode node) {
+        return switch (node.kind()) {
+            case COMPOSITE -> {
+                Evaluator[] parts = compileAll(((ELNode.Composite) node).parts());
+                yield new Evaluator() {
+                    @Override
+                    Object evaluate(ELContext context) {
+                        StringBuilder builder = new StringBuilder();
+                        for (Evaluator part : parts) {
+                            builder.append(ELSupport.coerceToString(part.evaluate(context)));
+                        }
+                        return builder.toString();
+                    }
+                };
+            }
+            case LITERAL_TEXT -> new Constant(((ELNode.LiteralText) node).text());
+            case EVAL -> compile(((ELNode.Eval) node).expression());
+            case NULL_LITERAL -> new Constant(null);
+            case BOOLEAN_LITERAL -> new Constant(((ELNode.BooleanLiteral) node).value());
+            case INTEGER_LITERAL -> new Constant(((ELNode.IntegerLiteral) node).value());
+            case FLOATING_POINT_LITERAL -> new Constant(((ELNode.FloatingPointLiteral) node).value());
+            case STRING_LITERAL -> new Constant(((ELNode.StringLiteral) node).value());
+            case IDENTIFIER -> {
+                String name = ((ELNode.Identifier) node).name();
+                yield new Evaluator() {
+                    @Override
+                    @Nullable
+                    Object evaluate(ELContext context) {
+                        return ELResolution.resolveIdentifier(context, name);
+                    }
+                };
+            }
+            case FUNCTION -> {
+                ELNode.Function function = (ELNode.Function) node;
+                yield new Evaluator() {
+                    @Override
+                    @Nullable
+                    Object evaluate(ELContext context) {
+                        return evaluateFunction(context, function);
+                    }
+                };
+            }
+            case PROPERTY -> {
+                ELNode.Property property = (ELNode.Property) node;
+                Evaluator base = compile(property.base());
+                Evaluator name = compile(property.property());
+                yield new Evaluator() {
+                    @Override
+                    @Nullable
+                    Object evaluate(ELContext context) {
+                        return ELResolution.getValue(context, base.evaluate(context), name.evaluate(context));
+                    }
+                };
+            }
+            case METHOD -> {
+                ELNode.Method method = (ELNode.Method) node;
+                Evaluator base = compile(method.base());
+                Evaluator name = compile(method.property());
+                Evaluator[] arguments = compileAll(method.arguments());
+                yield new Evaluator() {
+                    @Override
+                    @Nullable
+                    Object evaluate(ELContext context) {
+                        return ELResolution.invokeWithParams(context, base.evaluate(context), name.evaluate(context),
+                            evaluateAll(context, arguments));
+                    }
+                };
+            }
+            case CALL -> {
+                ELNode.Call call = (ELNode.Call) node;
+                Evaluator target = compile(call.target());
+                Evaluator[] arguments = compileAll(call.arguments());
+                yield new Evaluator() {
+                    @Override
+                    @Nullable
+                    Object evaluate(ELContext context) {
+                        return ELResolution.invokeCallable(context, target.evaluate(context), evaluateAll(context, arguments));
+                    }
+                };
+            }
+            case UNARY -> compileUnary((ELNode.Unary) node);
+            case BINARY -> compileBinary((ELNode.Binary) node);
+            case TERNARY -> {
+                ELNode.Ternary ternary = (ELNode.Ternary) node;
+                Evaluator condition = compile(ternary.condition());
+                Evaluator ifTrue = compile(ternary.ifTrue());
+                Evaluator ifFalse = compile(ternary.ifFalse());
+                yield new Evaluator() {
+                    @Override
+                    @Nullable
+                    Object evaluate(ELContext context) {
+                        return ELSupport.toBoolean(condition.evaluate(context)) ? ifTrue.evaluate(context) : ifFalse.evaluate(context);
+                    }
+                };
+            }
+            case ASSIGN -> {
+                ELNode.Assign assign = (ELNode.Assign) node;
+                yield new Evaluator() {
+                    @Override
+                    @Nullable
+                    Object evaluate(ELContext context) {
+                        return evaluateAssign(context, assign);
+                    }
+                };
+            }
+            case SEMICOLON -> {
+                ELNode.Semicolon semicolon = (ELNode.Semicolon) node;
+                Evaluator left = compile(semicolon.left());
+                Evaluator right = compile(semicolon.right());
+                yield new Evaluator() {
+                    @Override
+                    @Nullable
+                    Object evaluate(ELContext context) {
+                        return ELSupport.sequence(left.evaluate(context), right.evaluate(context));
+                    }
+                };
+            }
+            case LAMBDA -> {
+                ELNode.Lambda lambda = (ELNode.Lambda) node;
+                Evaluator body = compile(lambda.body());
+                yield new Evaluator() {
+                    @Override
+                    Object evaluate(ELContext context) {
+                        return ELLambdas.create(context, lambda.parameters(), body::evaluate);
+                    }
+                };
+            }
+            case SET_DATA -> {
+                Evaluator[] elements = compileAll(((ELNode.SetData) node).elements());
+                yield new Evaluator() {
+                    @Override
+                    Object evaluate(ELContext context) {
+                        return ELCollections.set(evaluateAll(context, elements));
+                    }
+                };
+            }
+            case LIST_DATA -> {
+                Evaluator[] elements = compileAll(((ELNode.ListData) node).elements());
+                yield new Evaluator() {
+                    @Override
+                    Object evaluate(ELContext context) {
+                        return ELCollections.list(evaluateAll(context, elements));
+                    }
+                };
+            }
+            case MAP_DATA -> {
+                List<ELNode.MapData.MapEntry> entries = ((ELNode.MapData) node).entries();
+                Evaluator[] keys = new Evaluator[entries.size()];
+                Evaluator[] values = new Evaluator[entries.size()];
+                for (int i = 0; i < entries.size(); i++) {
+                    keys[i] = compile(entries.get(i).key());
+                    ELNode value = entries.get(i).value();
+                    values[i] = value == null ? new Constant(null) : compile(value);
+                }
+                yield new Evaluator() {
+                    @Override
+                    Object evaluate(ELContext context) {
+                        Map<Object, Object> map = new LinkedHashMap<>();
+                        for (int i = 0; i < keys.length; i++) {
+                            map.put(keys[i].evaluate(context), values[i].evaluate(context));
+                        }
+                        return map;
+                    }
+                };
+            }
+        };
+    }
+
+    private Evaluator compileUnary(ELNode.Unary unary) {
+        Evaluator operand = compile(unary.operand());
+        return switch (unary.operator()) {
+            case NEGATE -> new Evaluator() {
+                @Override
+                Object evaluate(ELContext context) {
+                    return ELArithmetic.negate(operand.evaluate(context));
+                }
+            };
+            case NOT -> new Evaluator() {
+                @Override
+                Object evaluate(ELContext context) {
+                    return ELSupport.not(operand.evaluate(context));
+                }
+            };
+            case EMPTY -> new Evaluator() {
+                @Override
+                Object evaluate(ELContext context) {
+                    return ELSupport.isEmpty(operand.evaluate(context));
+                }
+            };
+        };
+    }
+
+    /**
+     * One class of evaluator per operator, so that the evaluation of the operands is a call site of its own.
+     */
+    @SuppressWarnings("java:S1541")
+    private Evaluator compileBinary(ELNode.Binary binary) {
+        Evaluator left = compile(binary.left());
+        Evaluator right = compile(binary.right());
+        return switch (binary.operator()) {
+            case AND -> new Evaluator() {
+                @Override
+                Object evaluate(ELContext context) {
+                    return ELSupport.toBoolean(left.evaluate(context)) && ELSupport.toBoolean(right.evaluate(context));
+                }
+            };
+            case OR -> new Evaluator() {
+                @Override
+                Object evaluate(ELContext context) {
+                    return ELSupport.toBoolean(left.evaluate(context)) || ELSupport.toBoolean(right.evaluate(context));
+                }
+            };
+            case ADD -> new Evaluator() {
+                @Override
+                Object evaluate(ELContext context) {
+                    return ELArithmetic.add(left.evaluate(context), right.evaluate(context));
+                }
+            };
+            case SUBTRACT -> new Evaluator() {
+                @Override
+                Object evaluate(ELContext context) {
+                    return ELArithmetic.subtract(left.evaluate(context), right.evaluate(context));
+                }
+            };
+            case MULTIPLY -> new Evaluator() {
+                @Override
+                Object evaluate(ELContext context) {
+                    return ELArithmetic.multiply(left.evaluate(context), right.evaluate(context));
+                }
+            };
+            case DIVIDE -> new Evaluator() {
+                @Override
+                Object evaluate(ELContext context) {
+                    return ELArithmetic.divide(left.evaluate(context), right.evaluate(context));
+                }
+            };
+            case MODULO -> new Evaluator() {
+                @Override
+                Object evaluate(ELContext context) {
+                    return ELArithmetic.mod(left.evaluate(context), right.evaluate(context));
+                }
+            };
+            case CONCAT -> new Evaluator() {
+                @Override
+                Object evaluate(ELContext context) {
+                    return ELArithmetic.concat(left.evaluate(context), right.evaluate(context));
+                }
+            };
+            case LESS_THAN -> new Evaluator() {
+                @Override
+                Object evaluate(ELContext context) {
+                    return ELSupport.lessThan(left.evaluate(context), right.evaluate(context));
+                }
+            };
+            case GREATER_THAN -> new Evaluator() {
+                @Override
+                Object evaluate(ELContext context) {
+                    return ELSupport.greaterThan(left.evaluate(context), right.evaluate(context));
+                }
+            };
+            case LESS_THAN_OR_EQUAL -> new Evaluator() {
+                @Override
+                Object evaluate(ELContext context) {
+                    return ELSupport.lessThanOrEqual(left.evaluate(context), right.evaluate(context));
+                }
+            };
+            case GREATER_THAN_OR_EQUAL -> new Evaluator() {
+                @Override
+                Object evaluate(ELContext context) {
+                    return ELSupport.greaterThanOrEqual(left.evaluate(context), right.evaluate(context));
+                }
+            };
+            case EQUAL -> new Evaluator() {
+                @Override
+                Object evaluate(ELContext context) {
+                    return ELSupport.equals(left.evaluate(context), right.evaluate(context));
+                }
+            };
+            case NOT_EQUAL -> new Evaluator() {
+                @Override
+                Object evaluate(ELContext context) {
+                    return ELSupport.notEquals(left.evaluate(context), right.evaluate(context));
+                }
+            };
+        };
+    }
+
+    private Evaluator[] compileAll(List<ELNode> nodes) {
+        Evaluator[] evaluators = new Evaluator[nodes.size()];
+        for (int i = 0; i < evaluators.length; i++) {
+            evaluators[i] = compile(nodes.get(i));
+        }
+        return evaluators;
+    }
+
+    private static Object[] evaluateAll(ELContext context, Evaluator[] evaluators) {
+        if (evaluators.length == 0) {
+            return NO_ARGUMENTS;
+        }
+        Object[] values = new Object[evaluators.length];
+        for (int i = 0; i < evaluators.length; i++) {
+            values[i] = evaluators[i].evaluate(context);
+        }
+        return values;
     }
 
     /**
@@ -72,6 +397,36 @@ final class ELInterpreter {
      */
     static ELInterpreter of(@Nullable ELContext context, ELNode node) {
         return new ELInterpreter(bindFunctions(context, node));
+    }
+
+    /**
+     * Creates an interpreter for a parsed expression holding no function, whose compiled evaluators are
+     * therefore the same for every context and shared through the cache of the parser.
+     *
+     * @param root The evaluators compiled from the expression
+     * @return The interpreter
+     */
+    static ELInterpreter sharing(Evaluator root) {
+        ELInterpreter interpreter = new ELInterpreter(Map.of());
+        interpreter.root = root;
+        return interpreter;
+    }
+
+    /**
+     * @param node The parsed expression
+     * @return Whether the expression invokes a function, which is bound against the context the expression is
+     * created for
+     */
+    static boolean containsFunction(ELNode node) {
+        if (node instanceof ELNode.Function) {
+            return true;
+        }
+        for (ELNode child : children(node)) {
+            if (containsFunction(child)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -90,6 +445,9 @@ final class ELInterpreter {
         }
         FunctionMapper functionMapper = context.getFunctionMapper();
         if (functionMapper == null) {
+            return Map.of();
+        }
+        if (!containsFunction(node)) {
             return Map.of();
         }
         Map<ELNode.Function, Method> bindings = new IdentityHashMap<>();
@@ -153,39 +511,55 @@ final class ELInterpreter {
     @Nullable
     @SuppressWarnings("java:S1541")
     Object evaluate(ELContext context, ELNode node) {
-        return switch (node) {
-            case ELNode.Composite composite -> evaluateComposite(context, composite);
-            case ELNode.LiteralText literalText -> literalText.text();
-            case ELNode.Eval eval -> evaluate(context, eval.expression());
-            case ELNode.NullLiteral ignored -> null;
-            case ELNode.BooleanLiteral literal -> literal.value();
-            case ELNode.IntegerLiteral literal -> ELLiterals.integerValue(literal.image());
-            case ELNode.FloatingPointLiteral literal -> ELLiterals.floatingPointValue(literal.image());
-            case ELNode.StringLiteral literal -> literal.value();
-            case ELNode.Identifier identifier -> ELResolution.resolveIdentifier(context, identifier.name());
-            case ELNode.Function function -> evaluateFunction(context, function);
-            case ELNode.Property property ->
-                ELResolution.getValue(context, evaluate(context, property.base()), evaluate(context, property.property()));
-            case ELNode.Method method -> ELResolution.invokeWithParams(
-                context,
-                evaluate(context, method.base()),
-                evaluate(context, method.property()),
-                evaluateAll(context, method.arguments()));
-            case ELNode.Call call ->
-                ELResolution.invokeCallable(context, evaluate(context, call.target()), evaluateAll(context, call.arguments()));
-            case ELNode.Unary unary -> evaluateUnary(context, unary);
-            case ELNode.Binary binary -> evaluateBinary(context, binary);
-            case ELNode.Ternary ternary -> ELSupport.toBoolean(evaluate(context, ternary.condition()))
-                ? evaluate(context, ternary.ifTrue())
-                : evaluate(context, ternary.ifFalse());
-            case ELNode.Assign assign -> evaluateAssign(context, assign);
-            case ELNode.Semicolon semicolon ->
-                ELSupport.sequence(evaluate(context, semicolon.left()), evaluate(context, semicolon.right()));
-            case ELNode.Lambda lambda ->
-                ELLambdas.create(context, lambda.parameters(), lambdaContext -> evaluate(lambdaContext, lambda.body()));
-            case ELNode.SetData setData -> ELCollections.set(evaluateAll(context, setData.elements()));
-            case ELNode.ListData listData -> ELCollections.list(evaluateAll(context, listData.elements()));
-            case ELNode.MapData mapData -> evaluateMap(context, mapData);
+        // a switch on the kind is a table switch; a pattern switch over the sealed types dispatches through a
+        // method handle that classifies the node by scanning the case labels, which dominated the evaluation
+        return switch (node.kind()) {
+            case COMPOSITE -> evaluateComposite(context, (ELNode.Composite) node);
+            case LITERAL_TEXT -> ((ELNode.LiteralText) node).text();
+            case EVAL -> evaluate(context, ((ELNode.Eval) node).expression());
+            case NULL_LITERAL -> null;
+            case BOOLEAN_LITERAL -> ((ELNode.BooleanLiteral) node).value();
+            case INTEGER_LITERAL -> ((ELNode.IntegerLiteral) node).value();
+            case FLOATING_POINT_LITERAL -> ((ELNode.FloatingPointLiteral) node).value();
+            case STRING_LITERAL -> ((ELNode.StringLiteral) node).value();
+            case IDENTIFIER -> ELResolution.resolveIdentifier(context, ((ELNode.Identifier) node).name());
+            case FUNCTION -> evaluateFunction(context, (ELNode.Function) node);
+            case PROPERTY -> {
+                ELNode.Property property = (ELNode.Property) node;
+                yield ELResolution.getValue(context, evaluate(context, property.base()), evaluate(context, property.property()));
+            }
+            case METHOD -> {
+                ELNode.Method method = (ELNode.Method) node;
+                yield ELResolution.invokeWithParams(
+                    context,
+                    evaluate(context, method.base()),
+                    evaluate(context, method.property()),
+                    evaluateAll(context, method.arguments()));
+            }
+            case CALL -> {
+                ELNode.Call call = (ELNode.Call) node;
+                yield ELResolution.invokeCallable(context, evaluate(context, call.target()), evaluateAll(context, call.arguments()));
+            }
+            case UNARY -> evaluateUnary(context, (ELNode.Unary) node);
+            case BINARY -> evaluateBinary(context, (ELNode.Binary) node);
+            case TERNARY -> {
+                ELNode.Ternary ternary = (ELNode.Ternary) node;
+                yield ELSupport.toBoolean(evaluate(context, ternary.condition()))
+                    ? evaluate(context, ternary.ifTrue())
+                    : evaluate(context, ternary.ifFalse());
+            }
+            case ASSIGN -> evaluateAssign(context, (ELNode.Assign) node);
+            case SEMICOLON -> {
+                ELNode.Semicolon semicolon = (ELNode.Semicolon) node;
+                yield ELSupport.sequence(evaluate(context, semicolon.left()), evaluate(context, semicolon.right()));
+            }
+            case LAMBDA -> {
+                ELNode.Lambda lambda = (ELNode.Lambda) node;
+                yield ELLambdas.create(context, lambda.parameters(), lambdaContext -> evaluate(lambdaContext, lambda.body()));
+            }
+            case SET_DATA -> ELCollections.set(evaluateAll(context, ((ELNode.SetData) node).elements()));
+            case LIST_DATA -> ELCollections.list(evaluateAll(context, ((ELNode.ListData) node).elements()));
+            case MAP_DATA -> evaluateMap(context, (ELNode.MapData) node);
         };
     }
 
@@ -420,5 +794,31 @@ final class ELInterpreter {
      * @param property The property
      */
     record Target(@Nullable Object base, @Nullable Object property) {
+    }
+
+    /**
+     * An evaluator compiled from a node: the node is classified once, and the evaluation of its children is a
+     * virtual call from a call site specific to the kind of the parent, which the JIT compiler inlines, where
+     * a walk of the tree classifies every node on every evaluation from a single call site.
+     */
+    abstract static class Evaluator {
+
+        @Nullable
+        abstract Object evaluate(ELContext context);
+    }
+
+    private static final class Constant extends Evaluator {
+        @Nullable
+        private final Object value;
+
+        Constant(@Nullable Object value) {
+            this.value = value;
+        }
+
+        @Override
+        @Nullable
+        Object evaluate(ELContext context) {
+            return value;
+        }
     }
 }

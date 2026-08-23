@@ -53,6 +53,18 @@ class BeanFunctionsTest {
     }
 
     @Test
+    void anArgumentTheFunctionCannotTakeIsReported() {
+        try (io.micronaut.annotation.processing.test.JavaParser parser = new io.micronaut.annotation.processing.test.JavaParser()) {
+            RuntimeException failure = org.junit.jupiter.api.Assertions.assertThrows(RuntimeException.class,
+                () -> parser.generate("io.micronaut.el.test.functions.Expressions",
+                    source("${ pricing:quote(book.unitPrice, 3) }")));
+            String error = failure.getMessage();
+            org.junit.jupiter.api.Assertions.assertTrue(error.contains("cannot be coerced"), error);
+            org.junit.jupiter.api.Assertions.assertTrue(error.contains("quote"), error);
+        }
+    }
+
+    @Test
     void anInstanceMethodOfTheBeanIsAFunction() {
         try (JavaParser parser = new JavaParser()) {
             Iterable<? extends JavaFileObject> generated = parser.generate(PACKAGE + ".Expressions",

@@ -30,7 +30,10 @@ import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The {@link ELResolver} resolving the types annotated with {@link io.micronaut.core.annotation.Introspected}
@@ -49,6 +52,13 @@ public final class IntrospectionELResolver extends ELResolver {
 
     private final BeanIntrospector introspector;
     private final boolean readOnly;
+
+    /**
+     * What the resolver needs of a class, read once: the introspection, its properties by name and its methods
+     * by name. {@code BeanIntrospector.findIntrospection} loads the introspection through an {@code Optional}
+     * on every call, and the methods of a name are otherwise filtered from all the methods on every invocation.
+     */
+    private final Map<Class<?>, Introspected> introspected = new ConcurrentHashMap<>();
 
     /**
      * Creates a resolver using the shared introspector.
@@ -130,15 +140,15 @@ public final class IntrospectionELResolver extends ELResolver {
         if (base == null || !(method instanceof String name)) {
             return null;
         }
-        BeanIntrospection<Object> introspection = findIntrospection(base.getClass());
-        if (introspection == null) {
+        BeanMethod<Object, Object>[] named = introspected(base.getClass()).methods().get(name);
+        if (named == null) {
             return null;
         }
         Object[] arguments = params == null ? new Object[0] : params;
         // Coercing the arguments is part of selecting the overload, so it happens before the resolver commits:
         // an overload the arguments do not fit is skipped, and when none fits the resolver declines and the
         // standard resolvers get their chance.
-        for (BeanMethod<Object, Object> candidate : candidates(introspection, name, arguments)) {
+        for (BeanMethod<Object, Object> candidate : named.length == 1 ? List.of(named[0]) : candidates(named, arguments)) {
             Object[] coerced = coerce(context, candidate.getArguments(), arguments);
             if (coerced != null) {
                 context.setPropertyResolved(base, method);
@@ -159,16 +169,11 @@ public final class IntrospectionELResolver extends ELResolver {
      * specification prefers them: a fixed arity overload whose parameters accept the arguments as they are,
      * then the other fixed arity overloads of the same arity, then the variable arity ones.
      */
-    private static List<BeanMethod<Object, Object>> candidates(BeanIntrospection<Object> introspection,
-                                                               String name,
-                                                               Object[] arguments) {
+    private static List<BeanMethod<Object, Object>> candidates(BeanMethod<Object, Object>[] named, Object[] arguments) {
         List<BeanMethod<Object, Object>> exact = new ArrayList<>(2);
         List<BeanMethod<Object, Object>> fixedArity = new ArrayList<>(2);
         List<BeanMethod<Object, Object>> variableArity = new ArrayList<>(2);
-        for (BeanMethod<Object, Object> beanMethod : introspection.getBeanMethods()) {
-            if (!beanMethod.getName().equals(name)) {
-                continue;
-            }
+        for (BeanMethod<Object, Object> beanMethod : named) {
             Argument<?>[] parameters = beanMethod.getArguments();
             if (parameters.length == arguments.length) {
                 (accepts(parameters, arguments) ? exact : fixedArity).add(beanMethod);
@@ -247,21 +252,57 @@ public final class IntrospectionELResolver extends ELResolver {
         if (base == null || !(property instanceof String name)) {
             return null;
         }
-        BeanIntrospection<Object> introspection = findIntrospection(base.getClass());
-        if (introspection == null) {
-            return null;
+        return introspected(base.getClass()).properties().get(name);
+    }
+
+    private Introspected introspected(Class<?> type) {
+        Introspected entry = introspected.get(type);
+        if (entry == null) {
+            entry = Introspected.of(findIntrospection(type));
+            introspected.put(type, entry);
         }
-        return introspection.getProperty(name).orElse(null);
+        return entry;
     }
 
     @Nullable
     @SuppressWarnings("unchecked")
     private BeanIntrospection<Object> findIntrospection(Class<?> type) {
-        // BeanIntrospector already holds the references in a map it builds once, there is nothing to cache here
         return introspector.findIntrospection((Class<Object>) type).orElse(null);
     }
 
     private boolean isReadOnly(BeanProperty<Object, Object> beanProperty) {
         return readOnly || beanProperty.isReadOnly();
+    }
+
+    /**
+     * The introspection of a class as the resolver reads it.
+     *
+     * @param introspection The introspection, {@code null} when the class has none
+     * @param properties    The properties by name
+     * @param methods       The methods by name
+     */
+    private record Introspected(@Nullable BeanIntrospection<Object> introspection,
+                                Map<String, BeanProperty<Object, Object>> properties,
+                                Map<String, BeanMethod<Object, Object>[]> methods) {
+
+        private static final Introspected NONE = new Introspected(null, Map.of(), Map.of());
+
+        @SuppressWarnings("unchecked")
+        static Introspected of(@Nullable BeanIntrospection<Object> introspection) {
+            if (introspection == null) {
+                return NONE;
+            }
+            Map<String, BeanProperty<Object, Object>> properties = new HashMap<>();
+            for (BeanProperty<Object, Object> property : introspection.getBeanProperties()) {
+                properties.put(property.getName(), property);
+            }
+            Map<String, List<BeanMethod<Object, Object>>> byName = new HashMap<>();
+            for (BeanMethod<Object, Object> method : introspection.getBeanMethods()) {
+                byName.computeIfAbsent(method.getName(), name -> new ArrayList<>(1)).add(method);
+            }
+            Map<String, BeanMethod<Object, Object>[]> methods = new HashMap<>();
+            byName.forEach((name, list) -> methods.put(name, list.toArray(new BeanMethod[0])));
+            return new Introspected(introspection, properties, methods);
+        }
     }
 }

@@ -6,6 +6,7 @@ import io.micronaut.el.runtime.CompiledExpression
 import jakarta.el.ELException
 import jakarta.el.ExpressionFactory
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -39,6 +40,36 @@ class BookExpressionsTest {
                 String::class.java
             ).getValue(context)
         )
+    }
+
+    @Test
+    fun `evaluates the operators inlined from the primitive properties`() {
+        assertEquals(41.0, factory.createValueExpression(context, "\${book.unitPrice * 2 + 1}", Any::class.java).getValue(context))
+        assertEquals(-20.0, factory.createValueExpression(context, "\${-book.unitPrice}", Any::class.java).getValue(context))
+        assertEquals(
+            true,
+            factory.createValueExpression(
+                context,
+                "\${not (book.unitPrice > 15) or book.title == 'Expression Language'}",
+                Any::class.java
+            ).getValue(context)
+        )
+        assertEquals(
+            "Expression Language: 20.0",
+            factory.createValueExpression(context, "\${book.title += ': ' += book.unitPrice}", Any::class.java).getValue(context)
+        )
+    }
+
+    @Test
+    fun `evaluates the lambda expressions compiled to Java lambdas`() {
+        assertEquals(
+            listOf("new!", "sale!"),
+            factory.createValueExpression(context, "\${book.tags.stream().filter(t -> t.length() > 1).map(t -> t += '!').toList()}", Any::class.java).getValue(context)
+        )
+        assertEquals(2L, factory.createValueExpression(context, "\${book.count(t -> t.length() > 1)}", Any::class.java).getValue(context))
+        assertEquals(3L, factory.createValueExpression(context, "\${(x -> y -> x + y)(1)(2)}", Any::class.java).getValue(context))
+        assertEquals(10L, factory.createValueExpression(context, "\${((a, b, c, d) -> a + b + c + d)(1, 2, 3, 4)}", Any::class.java).getValue(context))
+        assertNull(factory.createValueExpression(context, "\${book.tags.stream().forEach(t -> t.length())}", Any::class.java).getValue<Any?>(context))
     }
 
     @Test
