@@ -7,7 +7,8 @@ final class TextFunctions {
     private TextFunctions() {
     }
 
-    static String shout(String text) { // <1>
+    @ELFunction // <1>
+    static String shout(String text) {
         text.toUpperCase() + "!"
     }
 

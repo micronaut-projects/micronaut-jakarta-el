@@ -322,14 +322,23 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
                     .annotated(metadata -> metadata.hasAnnotation("kotlin.jvm.JvmStatic"))));
             }
         }
+        // once a method of the class is annotated, only the annotated methods are functions
+        boolean explicit = candidates.stream().anyMatch(method -> method.hasAnnotation(ELFunction.class));
         for (MethodElement method : candidates) {
             if (!method.isPublic() || !(ELTypes.isStatic(method) || method.getDeclaringType().equals(type))) {
                 continue;
             }
-            String localName = method.stringValue(ELFunction.class)
-                .filter(value -> !value.isEmpty())
-                .orElseGet(method::getName);
-            functions.put(CompilationContext.qualifiedFunctionName(prefix, localName), method);
+            AnnotationValue<ELFunction> function = method.getAnnotation(ELFunction.class);
+            if (explicit && function == null) {
+                continue;
+            }
+            String localName = method.getName();
+            String functionPrefix = prefix;
+            if (function != null) {
+                localName = function.stringValue().filter(value -> !value.isEmpty()).orElse(localName);
+                functionPrefix = function.stringValue("prefix").filter(value -> !value.isEmpty()).orElse(prefix);
+            }
+            functions.put(CompilationContext.qualifiedFunctionName(functionPrefix, localName), method);
         }
     }
 

@@ -5,7 +5,8 @@ import io.micronaut.el.annotation.ELFunction
 object TextFunctions {
 
     @JvmStatic
-    fun shout(text: String): String = text.uppercase() + "!" // <1>
+    @ELFunction // <1>
+    fun shout(text: String): String = text.uppercase() + "!"
 
     @JvmStatic
     @ELFunction("initials") // <2>

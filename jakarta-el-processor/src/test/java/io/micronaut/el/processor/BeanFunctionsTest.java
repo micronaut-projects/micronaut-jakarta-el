@@ -26,7 +26,7 @@ class BeanFunctionsTest {
 
             @ELEnvironment(
                 variables = @ELVariable(name = "book", type = Book.class),
-                functions = @ELFunctions(value = PricingService.class, prefix = "pricing")
+                functions = @ELFunctions(PricingService.class)
             )
             @ELExpression(value = "%s", expectedType = Object.class)
             public class Expressions {
@@ -37,8 +37,11 @@ class BeanFunctionsTest {
             }
 
             class PricingService {
+                @ELFunction(prefix = "pricing")
                 public double quote(Book book, int quantity) { return book.getUnitPrice() * quantity; }
-                public static String currency() { return "EUR"; }
+                @ELFunction(value = "currency", prefix = "pricing")
+                public static String currencyCode() { return "EUR"; }
+                public String internal() { return "not a function"; }
             }
             """.formatted(expression);
     }
@@ -71,6 +74,12 @@ class BeanFunctionsTest {
     void aCallToAFunctionTheBeanDoesNotDeclareFails() {
         String error = failure("${pricing:discount(book)}");
         assertTrue(error.contains("The function 'pricing:discount' is not declared"), error);
+    }
+
+    @Test
+    void aMethodWithoutTheAnnotationIsNotAFunctionOnceAnotherMethodHasIt() {
+        String error = failure("${pricing:internal()}");
+        assertTrue(error.contains("The function 'pricing:internal' is not declared"), error);
     }
 
     @Test

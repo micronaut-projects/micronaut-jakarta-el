@@ -1,5 +1,6 @@
 package example;
 
+import io.micronaut.el.annotation.ELFunction;
 import jakarta.inject.Singleton;
 
 @Singleton // <1>
@@ -7,11 +8,13 @@ public class PricingService {
 
     private final double discount = 0.1;
 
-    public double quote(Book book, int quantity) { // <2>
+    @ELFunction(prefix = "pricing") // <2>
+    public double quote(Book book, int quantity) {
         return book.getUnitPrice() * quantity * (1 - discount);
     }
 
-    public static String currency() { // <3>
+    @ELFunction(prefix = "pricing") // <3>
+    public static String currency() {
         return "EUR";
     }
 }

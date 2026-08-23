@@ -7,6 +7,7 @@ public final class TextFunctions {
     private TextFunctions() {
     }
 
+    @ELFunction
     public static int length(String value) {
         return value == null ? 0 : value.length();
     }

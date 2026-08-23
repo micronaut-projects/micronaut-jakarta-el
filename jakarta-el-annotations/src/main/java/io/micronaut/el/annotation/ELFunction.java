@@ -23,7 +23,21 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Overrides the Jakarta Expression Language name of a static method exposed with {@link ELFunctions}.
+ * Declares a method of a class listed with {@link ELFunctions} as a Jakarta Expression Language function, with
+ * its own name and namespace prefix.
+ *
+ * <p>Once a method of the class carries this annotation, only the annotated methods of the class are functions:
+ * a bean exposing one operation does not expose every public method it has. A class with no annotated method
+ * exposes all its public static methods, and the public instance methods it declares.</p>
+ *
+ * <pre>{@code
+ * @Singleton
+ * public class PricingService {
+ *
+ *     @ELFunction(prefix = "pricing")
+ *     public double quote(Book book, int quantity) { ... }
+ * }
+ * }</pre>
  *
  * @author Denis Stepanov
  * @since 1.0
@@ -38,4 +52,9 @@ public @interface ELFunction {
      * @return The local name of the function, defaults to the method name
      */
     String value() default "";
+
+    /**
+     * @return The namespace prefix of the function, defaults to the prefix {@link ELFunctions} gives the class
+     */
+    String prefix() default "";
 }

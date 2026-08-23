@@ -50,7 +50,8 @@ public @interface ELFunctions {
     Class<?> value();
 
     /**
-     * @return The namespace prefix of the functions, empty for functions without a namespace
+     * @return The namespace prefix of the functions, empty for functions without a namespace; a method sets its
+     * own with {@link ELFunction#prefix()}
      */
     String prefix() default "";
 }

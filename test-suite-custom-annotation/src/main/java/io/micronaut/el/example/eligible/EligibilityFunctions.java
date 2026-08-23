@@ -10,6 +10,7 @@ public final class EligibilityFunctions {
     private EligibilityFunctions() {
     }
 
+    @ELFunction
     public static boolean adult(int age) {
         return age >= 18;
     }
