@@ -29,12 +29,17 @@ import java.lang.annotation.Target;
  * provides the variable types, the imported classes and the functions that are known when the
  * expressions are compiled.</p>
  *
+ * <p>An environment declared on a field, a method or a parameter applies to the expressions declared on that
+ * member, on top of the environment of the class. The expressions declared on a method, or on one of its
+ * parameters, additionally see the parameters of the method as variables, under their names and with their
+ * declared types, unless a variable of the same name is declared explicitly.</p>
+ *
  * @author Denis Stepanov
  * @since 1.0
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
+@Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE, ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER})
 @Experimental
 public @interface ELEnvironment {
 

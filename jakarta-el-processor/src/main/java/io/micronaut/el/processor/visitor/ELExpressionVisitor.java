@@ -40,6 +40,7 @@ import io.micronaut.el.processor.writer.ExpressionSourceWriter;
 import io.micronaut.el.processor.writer.MethodExpressionWriter;
 import io.micronaut.el.processor.writer.ValueExpressionWriter;
 import io.micronaut.inject.ast.ClassElement;
+import io.micronaut.inject.ast.Element;
 import io.micronaut.inject.ast.FieldElement;
 import io.micronaut.inject.ast.ElementQuery;
 import io.micronaut.inject.ast.MethodElement;
@@ -53,6 +54,7 @@ import io.micronaut.sourcegen.generator.SourceGenerators;
 import io.micronaut.sourcegen.model.ClassDef;
 
 import java.lang.annotation.Annotation;
+import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -133,32 +135,32 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
         if (!processed.add(element.getName())) {
             return;
         }
-        List<AnnotationValue<ELExpression>> expressions = declaredOn(element, ELExpression.class);
-        List<AnnotationValue<ELMethodExpression>> methodExpressions =
-            declaredOn(element, ELMethodExpression.class);
+        List<Declared<ELExpression>> expressions = declaredOn(element, ELExpression.class);
+        List<Declared<ELMethodExpression>> methodExpressions = declaredOn(element, ELMethodExpression.class);
         if (expressions.isEmpty() && methodExpressions.isEmpty()) {
             return;
         }
         SourceGenerator sourceGenerator = generatorFor(context);
         try {
-            CompilationContext compilationContext = environmentOf(element, context);
-            ELCompiler compiler = new ELCompiler(compilationContext);
+            Map<Element, ELCompiler> compilers = new LinkedHashMap<>();
             String prefix = element.getPackageName() + "." + element.getSimpleName();
 
             List<ExpressionSourceWriter.CompiledValue> compiledValues = new ArrayList<>(expressions.size());
             for (int i = 0; i < expressions.size(); i++) {
-                ELExpressionDefinition definition = valueDefinition(expressions.get(i), i, context);
+                Declared<ELExpression> declared = expressions.get(i);
+                ELExpressionDefinition definition = valueDefinition(declared.annotation(), i, context);
                 String className = prefix + "$Expression" + i;
-                ClassDef classDef = ValueExpressionWriter.write(className, definition, compiler);
+                ClassDef classDef = ValueExpressionWriter.write(className, definition, compilerFor(declared.owner(), element, compilers, context));
                 sourceGenerator.write(classDef, context, element);
                 compiledValues.add(new ExpressionSourceWriter.CompiledValue(definition, className));
             }
 
             List<ExpressionSourceWriter.CompiledMethod> compiledMethods = new ArrayList<>(methodExpressions.size());
             for (int i = 0; i < methodExpressions.size(); i++) {
-                ELMethodExpressionDefinition definition = methodDefinition(methodExpressions.get(i), i, context);
+                Declared<ELMethodExpression> declared = methodExpressions.get(i);
+                ELMethodExpressionDefinition definition = methodDefinition(declared.annotation(), i, context);
                 String className = prefix + "$MethodExpression" + i;
-                ClassDef classDef = MethodExpressionWriter.write(className, definition, compiler);
+                ClassDef classDef = MethodExpressionWriter.write(className, definition, compilerFor(declared.owner(), element, compilers, context));
                 sourceGenerator.write(classDef, context, element);
                 compiledMethods.add(new ExpressionSourceWriter.CompiledMethod(definition, className));
             }
@@ -189,28 +191,49 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
     }
 
     /**
-     * The declarations of an annotation on the class and on its declared fields, methods and parameters, in
-     * that order. An expression declared twice is compiled once.
+     * A declaration of an expression and the element it is declared on, whose environment compiles it.
      */
-    private static <A extends Annotation> List<AnnotationValue<A>> declaredOn(ClassElement element, Class<A> annotation) {
-        List<AnnotationValue<A>> declared = new ArrayList<>(element.getAnnotationValuesByType(annotation));
+    private record Declared<A extends Annotation>(AnnotationValue<A> annotation, Element owner) {
+    }
+
+    /**
+     * The declarations of an annotation on the class and on its declared fields, methods and parameters, in
+     * that order. An expression declared twice with the same types is compiled once.
+     */
+    private static <A extends Annotation> List<Declared<A>> declaredOn(ClassElement element, Class<A> annotation) {
+        List<Declared<A>> declared = new ArrayList<>();
+        collect(element, annotation, declared);
         for (FieldElement field : element.getEnclosedElements(ElementQuery.ALL_FIELDS.onlyDeclared())) {
-            declared.addAll(field.getAnnotationValuesByType(annotation));
+            collect(field, annotation, declared);
         }
         for (MethodElement method : element.getEnclosedElements(ElementQuery.ALL_METHODS.onlyDeclared())) {
-            declared.addAll(method.getAnnotationValuesByType(annotation));
+            collect(method, annotation, declared);
             for (ParameterElement parameter : method.getParameters()) {
-                declared.addAll(parameter.getAnnotationValuesByType(annotation));
+                collect(parameter, annotation, declared);
             }
         }
-        Map<String, AnnotationValue<A>> distinct = new LinkedHashMap<>();
-        for (AnnotationValue<A> value : declared) {
-            String key = expressionOf(value).orElse("") + "|"
-                + value.annotationClassValue("expectedType").map(AnnotationClassValue::getName).orElse("")
-                + "|" + value.annotationClassValue("expectedReturnType").map(AnnotationClassValue::getName).orElse("");
+        Map<String, Declared<A>> distinct = new LinkedHashMap<>();
+        for (Declared<A> value : declared) {
+            String key = expressionOf(value.annotation()).orElse("") + "|"
+                + value.annotation().annotationClassValue("expectedType").map(AnnotationClassValue::getName).orElse("")
+                + "|" + value.annotation().annotationClassValue("expectedReturnType").map(AnnotationClassValue::getName).orElse("");
             distinct.putIfAbsent(key, value);
         }
         return new ArrayList<>(distinct.values());
+    }
+
+    private static <A extends Annotation> void collect(Element owner, Class<A> annotation, List<Declared<A>> into) {
+        for (AnnotationValue<A> value : owner.getAnnotationValuesByType(annotation)) {
+            into.add(new Declared<>(value, owner));
+        }
+    }
+
+    /**
+     * The compiler of the expressions declared on an element: the environment of the class, the environment of
+     * the element, and, for a method or one of its parameters, the parameters of the method as variables.
+     */
+    private ELCompiler compilerFor(Element owner, ClassElement element, Map<Element, ELCompiler> compilers, VisitorContext context) {
+        return compilers.computeIfAbsent(owner, key -> new ELCompiler(environmentOf(element, owner, context)));
     }
 
     private ELExpressionDefinition valueDefinition(AnnotationValue<ELExpression> annotation,
@@ -241,32 +264,52 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
             ELParser.parseEval(expression));
     }
 
-    private CompilationContext environmentOf(ClassElement element, VisitorContext context) {
+    private CompilationContext environmentOf(ClassElement element, Element owner, VisitorContext context) {
         Map<String, ClassElement> variables = new LinkedHashMap<>();
         Map<String, ClassElement> importedClasses = new LinkedHashMap<>();
         List<String> importedPackages = new ArrayList<>();
         List<ClassElement> staticImports = new ArrayList<>();
         Map<String, MethodElement> functions = new LinkedHashMap<>();
 
-        AnnotationValue<ELEnvironment> environment = element.getAnnotation(ELEnvironment.class);
-        if (environment != null) {
-            for (AnnotationValue<ELVariable> variable : ELTypes.nested(environment, "variables", ELVariable.class)) {
-                String name = variable.stringValue("name").orElseThrow(() ->
-                    new ELCompilationException("The name of @ELVariable is required"));
-                ClassElement type = ELTypes.resolveMember(variable, "type", context).orElseThrow(() ->
-                    new ELCompilationException("The type of the variable '" + name + "' is required"));
-                variables.put(name, type);
-            }
-            for (ClassElement imported : ELTypes.resolveMembers(environment, "imports", context)) {
-                importedClasses.put(imported.getSimpleName(), imported);
-            }
-            importedPackages.addAll(List.of(environment.stringValues("importPackages")));
-            staticImports.addAll(ELTypes.resolveMembers(environment, "staticImports", context));
-            for (AnnotationValue<ELFunctions> declared : ELTypes.nested(environment, "functions", ELFunctions.class)) {
-                registerFunctions(declared, context, functions);
+        MethodElement method = owner instanceof MethodElement methodElement ? methodElement
+            : owner instanceof ParameterElement parameter ? parameter.getMethodElement() : null;
+        if (method != null) {
+            for (ParameterElement parameter : method.getParameters()) {
+                variables.put(parameter.getName(), parameter.getGenericType());
             }
         }
-        return new CompilationContext(context, variables, importedClasses, importedPackages, staticImports, functions);
+        declare(element.getAnnotation(ELEnvironment.class), context, variables, importedClasses, importedPackages, staticImports, functions);
+        if (owner != element) {
+            declare(owner.getAnnotation(ELEnvironment.class), context, variables, importedClasses, importedPackages, staticImports, functions);
+        }
+        return new CompilationContext(context, owner, variables, importedClasses, importedPackages, staticImports, functions);
+    }
+
+    private void declare(@Nullable AnnotationValue<ELEnvironment> environment,
+                         VisitorContext context,
+                         Map<String, ClassElement> variables,
+                         Map<String, ClassElement> importedClasses,
+                         List<String> importedPackages,
+                         List<ClassElement> staticImports,
+                         Map<String, MethodElement> functions) {
+        if (environment == null) {
+            return;
+        }
+        for (AnnotationValue<ELVariable> variable : ELTypes.nested(environment, "variables", ELVariable.class)) {
+            String name = variable.stringValue("name").orElseThrow(() ->
+                new ELCompilationException("The name of @ELVariable is required"));
+            ClassElement type = ELTypes.resolveMember(variable, "type", context).orElseThrow(() ->
+                new ELCompilationException("The type of the variable '" + name + "' is required"));
+            variables.put(name, type);
+        }
+        for (ClassElement imported : ELTypes.resolveMembers(environment, "imports", context)) {
+            importedClasses.put(imported.getSimpleName(), imported);
+        }
+        importedPackages.addAll(List.of(environment.stringValues("importPackages")));
+        staticImports.addAll(ELTypes.resolveMembers(environment, "staticImports", context));
+        for (AnnotationValue<ELFunctions> declared : ELTypes.nested(environment, "functions", ELFunctions.class)) {
+            registerFunctions(declared, context, functions);
+        }
     }
 
     private void registerFunctions(AnnotationValue<ELFunctions> declared,
