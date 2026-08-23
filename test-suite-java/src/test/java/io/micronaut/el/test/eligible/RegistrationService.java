@@ -6,12 +6,14 @@ import jakarta.inject.Singleton;
 @Singleton
 public class RegistrationService {
 
-    @Eligible("#{ customer.age >= 18 && customer.country == 'CZ' }")
+    @Eligible(value = "#{ fn:adult(customer.age) && fn:inEurope(customer.country) }",
+              otherwise = "#{ customer.name += ' must be an adult in Europe' }",
+              name = "REGISTER")
     public String register(Customer customer) {
         return "registered " + customer.name();
     }
 
-    @Eligible("${ amount > 0 && customer.age >= 18 }")
+    @Eligible(value = "${ amount > 0 && customer.country == Locale.GERMANY.country }")
     public String deposit(Customer customer, long amount) {
         return "deposited " + amount + " for " + customer.name();
     }

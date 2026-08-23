@@ -14,32 +14,40 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Evaluates the condition of {@link Eligible} before the method runs, with the parameters of the invocation
- * bound by name. The expression comes precompiled from the registry: {@code createValueExpression} is a lookup
- * by the text of the condition, not a parse, and is done once per method.
+ * bound by name, and the message of the rejection when it does not hold. The expressions come precompiled from
+ * the registry: {@code createValueExpression} is a lookup by text, not a parse, done once per expression.
  */
 @Singleton
 @InterceptorBean(Eligible.class)
 public class EligibleInterceptor implements MethodInterceptor<Object, Object> {
 
-    private final Map<String, ValueExpression> conditions = new ConcurrentHashMap<>();
+    private final Map<String, ValueExpression> expressions = new ConcurrentHashMap<>();
 
     @Override
     public Object intercept(MethodInvocationContext<Object, Object> context) {
-        String condition = context.stringValue(Eligible.class).orElseThrow();
         CompiledELContext elContext = new CompiledELContext();
         context.getParameterValueMap().forEach(elContext::setBean);
-        ValueExpression expression = conditions.computeIfAbsent(condition, text ->
-            ELManager.getExpressionFactory().createValueExpression(elContext, text, Boolean.class));
-        if (!Boolean.TRUE.equals(expression.getValue(elContext))) {
-            throw new NotEligibleException(context.getMethodName() + " requires " + condition);
+
+        String condition = context.stringValue(Eligible.class).orElseThrow();
+        if (Boolean.TRUE.equals(expression(elContext, condition, Boolean.class).getValue(elContext))) {
+            return context.proceed();
         }
-        return context.proceed();
+        String message = context.stringValue(Eligible.class, "otherwise")
+            .filter(otherwise -> !otherwise.isEmpty())
+            .map(otherwise -> expression(elContext, otherwise, String.class).<String>getValue(elContext))
+            .orElse(context.getMethodName() + " requires " + condition);
+        throw new NotEligibleException(message);
+    }
+
+    private ValueExpression expression(CompiledELContext elContext, String text, Class<?> expectedType) {
+        return expressions.computeIfAbsent(text, key ->
+            ELManager.getExpressionFactory().createValueExpression(elContext, key, expectedType));
     }
 
     /**
-     * @return The compiled conditions evaluated so far, by their text
+     * @return The compiled expressions evaluated so far, by their text
      */
-    public Map<String, ValueExpression> getConditions() {
-        return conditions;
+    public Map<String, ValueExpression> getExpressions() {
+        return expressions;
     }
 }
