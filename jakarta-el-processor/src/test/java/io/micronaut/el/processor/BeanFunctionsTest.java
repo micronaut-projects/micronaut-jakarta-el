@@ -11,8 +11,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * The functions declared on a bean: the instance methods it declares are functions, and a call that does not
- * match a function fails the compilation.
+ * The functions declared on a bean with @ELFunction: they are found without any declaration, in the order the
+ * classes of the module happen to be visited, the instance methods are invoked on the bean, and a call that
+ * does not match a function fails the compilation.
  */
 class BeanFunctionsTest {
 
@@ -24,11 +25,8 @@ class BeanFunctionsTest {
 
             import io.micronaut.el.annotation.*;
 
-            @ELEnvironment(
-                variables = @ELVariable(name = "book", type = Book.class),
-                functions = @ELFunctions(PricingService.class)
-            )
-            @ELExpression(value = "%s", expectedType = Object.class)
+            @ELEnvironment(variables = @ELVariable(name = "book", type = Book.class))
+            @ELExpression(expression = "%s", expectedType = Object.class)
             public class Expressions {
             }
 
@@ -39,7 +37,7 @@ class BeanFunctionsTest {
             class PricingService {
                 @ELFunction(prefix = "pricing")
                 public double quote(Book book, int quantity) { return book.getUnitPrice() * quantity; }
-                @ELFunction(value = "currency", prefix = "pricing")
+                @ELFunction(name = "currency", prefix = "pricing")
                 public static String currencyCode() { return "EUR"; }
                 public String internal() { return "not a function"; }
             }

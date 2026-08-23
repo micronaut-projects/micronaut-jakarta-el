@@ -13,8 +13,8 @@ class PricingService {
         book.unitPrice * quantity * (1 - discount)
     }
 
-    @ELFunction(prefix = "pricing") // <3>
-    static String currency() {
+    @ELFunction(prefix = "pricing", name = "currency") // <3>
+    static String currencyCode() {
         "EUR"
     }
 }

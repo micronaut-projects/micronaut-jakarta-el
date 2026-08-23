@@ -23,5 +23,16 @@ import java.util.List;
     expectedType = List.class,
     name = "EXPENSIVE_TITLES"
 )
+@ELExpression(expression = "${(price -> price * 2)(book.unitPrice)}", expectedType = double.class, name = "DOUBLED") // <7>
+@ELExpression(
+    expression = "${discount = (price, percent) -> price * (100 - percent) / 100; discount(book.unitPrice, 25)}", // <8>
+    expectedType = double.class,
+    name = "DISCOUNTED"
+)
+@ELExpression(
+    expression = "${books.stream().sorted((a, b) -> a.unitPrice - b.unitPrice).map(b -> b.title).toList()}", // <9>
+    expectedType = List.class,
+    name = "BY_PRICE"
+)
 public class CatalogExpressions {
 }

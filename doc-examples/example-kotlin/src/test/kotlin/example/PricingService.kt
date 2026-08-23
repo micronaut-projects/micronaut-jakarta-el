@@ -13,7 +13,7 @@ class PricingService {
 
     companion object {
         @JvmStatic
-        @ELFunction(prefix = "pricing") // <3>
-        fun currency(): String = "EUR"
+        @ELFunction(prefix = "pricing", name = "currency") // <3>
+        fun currencyCode(): String = "EUR"
     }
 }

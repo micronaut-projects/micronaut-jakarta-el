@@ -22,5 +22,8 @@ class CatalogExpressionsTest {
         assertEquals("JE", CatalogExpressions$ELExpressions.INITIALS.getValue(context));
         assertEquals(25d, CatalogExpressions$ELExpressions.FLOOR_PRICE.getValue(context));
         assertEquals(List.of("Jakarta EL"), CatalogExpressions$ELExpressions.EXPENSIVE_TITLES.getValue(context));
+        assertEquals(40d, CatalogExpressions$ELExpressions.DOUBLED.getValue(context));
+        assertEquals(15d, CatalogExpressions$ELExpressions.DISCOUNTED.getValue(context));
+        assertEquals(List.of("Leaflet", "Jakarta EL"), CatalogExpressions$ELExpressions.BY_PRICE.getValue(context));
     }
 }

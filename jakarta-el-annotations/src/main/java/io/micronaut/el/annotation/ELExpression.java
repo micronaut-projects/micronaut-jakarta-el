@@ -16,6 +16,8 @@
 package io.micronaut.el.annotation;
 
 import io.micronaut.core.annotation.Experimental;
+import io.micronaut.context.annotation.AliasFor;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Repeatable;
@@ -51,7 +53,13 @@ public @interface ELExpression {
      *
      * @return The expression
      */
-    String value();
+    String value() default "";
+
+    /**
+     * @return The expression, an alias of {@link #value()}
+     */
+    @AliasFor(member = "value")
+    String expression() default "";
 
     /**
      * @return The expected type the evaluation result is coerced to

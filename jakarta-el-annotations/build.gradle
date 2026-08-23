@@ -4,4 +4,6 @@ plugins {
 
 dependencies {
     api mn.micronaut.core
+    // @AliasFor
+    api mn.micronaut.inject
 }

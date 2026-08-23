@@ -13,8 +13,8 @@ public class PricingService {
         return book.getUnitPrice() * quantity * (1 - discount);
     }
 
-    @ELFunction(prefix = "pricing") // <3>
-    public static String currency() {
+    @ELFunction(prefix = "pricing", name = "currency") // <3>
+    public static String currencyCode() {
         return "EUR";
     }
 }

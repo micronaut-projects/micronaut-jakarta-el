@@ -17,22 +17,20 @@ package io.micronaut.el.processor.compiler;
 
 import io.micronaut.core.annotation.Internal;
 
-
 /**
- * An exception raised when an expression cannot be compiled.
+ * A function that no declaration, and no discovery, provides. The visitor retries the class once every class of
+ * the compilation is visited, as the function may be declared in a class not yet seen.
  *
  * @author Denis Stepanov
  * @since 1.0
  */
 @Internal
-public class ELCompilationException extends RuntimeException {
-
-    private static final long serialVersionUID = 1L;
+public final class ELUndeclaredFunctionException extends ELCompilationException {
 
     /**
-     * @param message The message
+     * @param qualifiedName The qualified name of the function
      */
-    public ELCompilationException(String message) {
-        super(message);
+    public ELUndeclaredFunctionException(String qualifiedName) {
+        super("The function '" + qualifiedName + "' is not declared. Declare it with @ELFunction, or list its class with @ELFunctions.");
     }
 }

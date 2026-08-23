@@ -16,6 +16,8 @@
 package io.micronaut.el.annotation;
 
 import io.micronaut.core.annotation.Experimental;
+import io.micronaut.context.annotation.AliasFor;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -45,9 +47,15 @@ import java.lang.annotation.Target;
 public @interface ELFunctions {
 
     /**
-     * @return The class declaring the public static methods to expose as functions
+     * @return The class declaring the methods to expose as functions
      */
-    Class<?> value();
+    Class<?> value() default void.class;
+
+    /**
+     * @return The class declaring the methods to expose as functions, an alias of {@link #value()}
+     */
+    @AliasFor(member = "value")
+    Class<?> type() default void.class;
 
     /**
      * @return The namespace prefix of the functions, empty for functions without a namespace; a method sets its

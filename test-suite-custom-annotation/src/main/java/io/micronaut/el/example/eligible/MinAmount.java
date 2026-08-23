@@ -1,5 +1,7 @@
 package io.micronaut.el.example.eligible;
 
+import io.micronaut.context.annotation.AliasFor;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -29,7 +31,13 @@ public @interface MinAmount {
     /**
      * @return The minimum
      */
-    long value();
+    long value() default 0;
+
+    /**
+     * @return The minimum, an alias of {@link #value()}
+     */
+    @AliasFor(member = "value")
+    long minimum() default 0;
 
     /**
      * @return Whether the minimum itself is accepted

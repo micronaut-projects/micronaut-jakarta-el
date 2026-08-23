@@ -12,11 +12,16 @@ time.
 available to the expressions, as described in the section 1.24 of the specification. Among several overloads,
 `Math.max` here, the one whose parameters fit the static types of the arguments best is selected at compilation
 time.
-<3> `functions` exposes the public static methods of a class as functions, optionally under a namespace prefix,
-which a method can override with `@ELFunction`.
+<3> `functions` lists a class whose public static methods are functions without any annotation, optionally under
+a namespace prefix; `type` is an alias of `value`. A class declaring its functions with `@ELFunction` needs no
+listing.
 <4> A function is called with its prefix.
 <5> A static method of an imported class is called through the class name.
 <6> The collection operations of the chapter 2 of the specification, lambdas included, compile like the rest.
+<7> A lambda expression invoked immediately, and `expression` as an alias of `value`.
+<8> A lambda expression assigned to a variable and invoked by name; the semicolon operator evaluates the
+assignment, then the call.
+<9> A lambda expression with two parameters, passed to the `sorted` operation as its comparator.
 
 The functions are plain static methods:
 
@@ -24,8 +29,9 @@ snippet::example.TextFunctions[project-base="doc-examples/example", title="TextF
 
 <1> `@ELFunction` declares the method as a function, under its own name. Once a method of the class is
 annotated, only the annotated methods are functions; a class with no annotated method exposes all its public
-static methods.
-<2> `@ELFunction` can give a function another name, and a namespace prefix of its own.
+static methods, when listed with `@ELFunctions`.
+<2> `@ELFunction` can give a function another name, with `name`, an alias of `value`, and a namespace prefix of
+its own.
 
 === Functions on beans
 
@@ -34,15 +40,17 @@ on the instance the `ELContext` provides at evaluation time, which is how a Micr
 
 snippet::example.PricingService[project-base="doc-examples/example", title="PricingService"]
 
-<1> An ordinary bean.
+<1> An ordinary bean: nothing lists it anywhere. A function declared with `@ELFunction` is found by the
+expressions of the module declaring it, and of every module depending on it, because the processor indexes the
+classes declaring functions. The module declaring them has to run the annotation processor.
 <2> `@ELFunction` declares the method as a function, here with its namespace prefix; an instance method is invoked
 on the instance. Once a method of the class is annotated, only the annotated methods are functions: a bean does
 not expose every public method it has.
-<3> A static method is a function as well, invoked directly.
+<3> A static method is a function as well, invoked directly, here under another name.
 
 snippet::example.PricingExpressions[project-base="doc-examples/example", title="PricingExpressions"]
 
-<1> The bean is listed in the environment like any class of functions; the prefix comes from the methods.
+<1> The environment declares the variable only: the functions need no declaration.
 <2> A call of the instance function, with the parameters compiled against its signature: a call that does not
 match the function, in name or in number of arguments, fails the compilation.
 <3> Both kinds mix in one expression.

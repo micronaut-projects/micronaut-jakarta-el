@@ -2,6 +2,7 @@ package io.micronaut.el.example.eligible;
 
 import io.micronaut.aop.Around;
 import io.micronaut.aop.InterceptorBinding;
+import io.micronaut.context.annotation.AliasFor;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -34,7 +35,13 @@ public @interface Eligible {
     /**
      * @return The condition the parameters of the method must satisfy
      */
-    String value(); // <2>
+    String value() default ""; // <2>
+
+    /**
+     * @return The condition, an alias of {@link #value()}
+     */
+    @AliasFor(member = "value")
+    String condition() default "";
 
     /**
      * @return The message of the rejection, an expression evaluating to a string, or empty for a default one

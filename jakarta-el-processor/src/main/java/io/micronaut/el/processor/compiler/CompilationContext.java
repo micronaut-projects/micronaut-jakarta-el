@@ -51,6 +51,7 @@ public final class CompilationContext {
 
     private final VisitorContext visitorContext;
     private final Element originatingElement;
+    private final ELFunctionDiscovery discovery;
     private final Map<String, ClassElement> variables;
     private final Map<String, ClassElement> importedClasses;
     private final List<String> importedPackages;
@@ -62,6 +63,7 @@ public final class CompilationContext {
     /**
      * @param visitorContext  The visitor context
      * @param originatingElement The element the expressions are declared on
+     * @param discovery          The functions discovered without a declaration
      * @param variables       The types of the variables by name
      * @param importedClasses The imported classes by simple name
      * @param importedPackages The imported packages
@@ -70,6 +72,7 @@ public final class CompilationContext {
      */
     public CompilationContext(VisitorContext visitorContext,
                               Element originatingElement,
+                              ELFunctionDiscovery discovery,
                               Map<String, ClassElement> variables,
                               Map<String, ClassElement> importedClasses,
                               List<String> importedPackages,
@@ -77,6 +80,7 @@ public final class CompilationContext {
                               Map<String, MethodElement> functions) {
         this.visitorContext = visitorContext;
         this.originatingElement = originatingElement;
+        this.discovery = discovery;
         this.variables = new LinkedHashMap<>(variables);
         this.importedClasses = new LinkedHashMap<>(importedClasses);
         this.importedPackages = new ArrayList<>(importedPackages);
@@ -201,7 +205,9 @@ public final class CompilationContext {
      */
     @Nullable
     public MethodElement resolveFunction(String prefix, String localName) {
-        return functions.get(qualifiedFunctionName(prefix, localName));
+        String qualifiedName = qualifiedFunctionName(prefix, localName);
+        MethodElement declared = functions.get(qualifiedName);
+        return declared != null ? declared : discovery.find(visitorContext, qualifiedName);
     }
 
     /**

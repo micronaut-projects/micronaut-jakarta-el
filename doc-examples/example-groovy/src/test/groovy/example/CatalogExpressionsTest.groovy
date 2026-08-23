@@ -22,5 +22,10 @@ class CatalogExpressionsTest {
         assertEquals(25d, factory.createValueExpression(context, '${Math.max(book.unitPrice, 25)}', double).getValue(context))
         assertEquals(["Jakarta EL"], factory.createValueExpression(context,
             '${books.stream().filter(b -> b.unitPrice > 10).map(b -> b.title).toList()}', List).getValue(context))
+        assertEquals(40d, factory.createValueExpression(context, '${(price -> price * 2)(book.unitPrice)}', double).getValue(context))
+        assertEquals(15d, factory.createValueExpression(context,
+            '${discount = (price, percent) -> price * (100 - percent) / 100; discount(book.unitPrice, 25)}', double).getValue(context))
+        assertEquals(["Leaflet", "Jakarta EL"], factory.createValueExpression(context,
+            '${books.stream().sorted((a, b) -> a.unitPrice - b.unitPrice).map(b -> b.title).toList()}', List).getValue(context))
     }
 }

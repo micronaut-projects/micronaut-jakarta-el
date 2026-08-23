@@ -7,7 +7,6 @@ import io.micronaut.core.annotation.AnnotationValueBuilder;
 import io.micronaut.core.expressions.EvaluatedExpressionReference;
 import io.micronaut.el.annotation.ELEnvironment;
 import io.micronaut.el.annotation.ELExpression;
-import io.micronaut.el.annotation.ELFunctions;
 import io.micronaut.inject.annotation.AnnotationRemapper;
 import io.micronaut.inject.visitor.VisitorContext;
 
@@ -28,9 +27,9 @@ import java.util.Locale;
  *     <li>the same {@code @Eligible}, holding the text as written;</li>
  *     <li>an {@link ELExpression} for the condition, expected to be a {@link Boolean}, and one for the message,
  *     expected to be a {@link String}, which micronaut-jakarta-el compiles into the registry of the class;</li>
- *     <li>an {@link ELEnvironment} binding the functions of {@link EligibilityFunctions} and importing
- *     {@link Locale}, which applies to the expressions declared on the same method. The parameters of the method
- *     are typed variables without any declaration.</li>
+ *     <li>an {@link ELEnvironment} importing {@link Locale}, which applies to the expressions declared on the
+ *     same method. The parameters of the method are typed variables, and the functions of
+ *     {@link EligibilityFunctions} are found, without any declaration.</li>
  * </ul>
  *
  * <p>At runtime the text is read back from the annotation metadata and handed to
@@ -77,10 +76,6 @@ public final class EligibleRemapper implements AnnotationRemapper {
                 .build());
         }
         remapped.add(AnnotationValue.builder(ELEnvironment.class) // <5>
-            .member("functions", AnnotationValue.builder(ELFunctions.class)
-                .value(EligibilityFunctions.class)
-                .member("prefix", "fn")
-                .build())
             .member("imports", new AnnotationClassValue<>(Locale.class))
             .build());
         return remapped;

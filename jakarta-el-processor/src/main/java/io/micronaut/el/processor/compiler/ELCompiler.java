@@ -412,9 +412,8 @@ public final class ELCompiler {
             );
         }
         if (!function.prefix().isEmpty()) {
-            throw new ELCompilationException("The function '"
-                + CompilationContext.qualifiedFunctionName(function.prefix(), function.localName())
-                + "' is not declared. Declare it with @ELFunctions.");
+            throw new ELUndeclaredFunctionException(
+                CompilationContext.qualifiedFunctionName(function.prefix(), function.localName()));
         }
         String name = function.localName();
         if (!context.isLambdaParameter(name) && context.variableType(name) == null) {

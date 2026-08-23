@@ -24,7 +24,6 @@ import io.micronaut.el.ELExpressionSource;
 import io.micronaut.el.annotation.ELEnvironment;
 import io.micronaut.el.annotation.ELExpression;
 import io.micronaut.el.annotation.ELExpressions;
-import io.micronaut.el.annotation.ELFunction;
 import io.micronaut.el.annotation.ELFunctions;
 import io.micronaut.el.annotation.ELMethodExpression;
 import io.micronaut.el.annotation.ELMethodExpressions;
@@ -32,6 +31,9 @@ import io.micronaut.el.annotation.ELVariable;
 import io.micronaut.el.processor.compiler.CompilationContext;
 import io.micronaut.el.processor.compiler.ELCompilationException;
 import io.micronaut.el.processor.compiler.ELCompiler;
+import io.micronaut.el.processor.compiler.ELFunctionDiscovery;
+import io.micronaut.el.processor.compiler.ELUndeclaredFunctionException;
+import io.micronaut.el.processor.compiler.ELFunctionBinder;
 import io.micronaut.el.processor.compiler.ELExpressionDefinition;
 import io.micronaut.el.processor.compiler.ELMethodExpressionDefinition;
 import io.micronaut.el.parser.ELParser;
@@ -73,6 +75,7 @@ import java.util.Set;
 public final class ELExpressionVisitor implements TypeElementVisitor<Object, Object> {
 
     private final Set<String> processed = new HashSet<>();
+    private final List<ClassElement> pending = new ArrayList<>();
 
     @Override
     public VisitorKind getVisitorKind() {
@@ -82,6 +85,7 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
     @Override
     public void start(VisitorContext visitorContext) {
         processed.clear();
+        pending.clear();
     }
 
     @Override
@@ -135,6 +139,39 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
         if (!processed.add(element.getName())) {
             return;
         }
+        try {
+            compile(element, context);
+        } catch (ProcessingException e) {
+            if (e.getCause() instanceof ELUndeclaredFunctionException && context.getLanguage() != VisitorContext.Language.KOTLIN) {
+                // the function may be declared in a class of the module not visited yet: Groovy visits the
+                // classes one source file at a time; the class is retried once every class is visited (KSP
+                // does not let an element be used after the round, and visits every class first anyway)
+                processed.remove(element.getName());
+                pending.add(element);
+                return;
+            }
+            // reported at the declaring class, as it is: the processors of the languages would format it
+            context.fail(String.valueOf(e.getMessage()), element);
+        }
+    }
+
+    @Override
+    public void finish(VisitorContext context) {
+        List<ClassElement> retried = new ArrayList<>(pending);
+        pending.clear();
+        for (ClassElement element : retried) {
+            if (!processed.add(element.getName())) {
+                continue;
+            }
+            try {
+                compile(element, context);
+            } catch (ProcessingException e) {
+                context.fail(String.valueOf(e.getMessage()), element);
+            }
+        }
+    }
+
+    private void compile(ClassElement element, VisitorContext context) {
         List<Declared<ELExpression>> expressions = declaredOn(element, ELExpression.class);
         List<Declared<ELMethodExpression>> methodExpressions = declaredOn(element, ELMethodExpression.class);
         if (expressions.isEmpty() && methodExpressions.isEmpty()) {
@@ -144,14 +181,16 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
         try {
             Map<Element, ELCompiler> compilers = new LinkedHashMap<>();
             String prefix = element.getPackageName() + "." + element.getSimpleName();
+            // every expression is compiled before anything is written: a class retried later must not find
+            // its first classes generated already
+            List<ClassDef> generated = new ArrayList<>();
 
             List<ExpressionSourceWriter.CompiledValue> compiledValues = new ArrayList<>(expressions.size());
             for (int i = 0; i < expressions.size(); i++) {
                 Declared<ELExpression> declared = expressions.get(i);
                 ELExpressionDefinition definition = valueDefinition(declared.annotation(), i, context);
                 String className = prefix + "$Expression" + i;
-                ClassDef classDef = ValueExpressionWriter.write(className, definition, compilerFor(declared.owner(), element, compilers, context));
-                sourceGenerator.write(classDef, context, element);
+                generated.add(ValueExpressionWriter.write(className, definition, compilerFor(declared.owner(), element, compilers, context)));
                 compiledValues.add(new ExpressionSourceWriter.CompiledValue(definition, className));
             }
 
@@ -160,14 +199,15 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
                 Declared<ELMethodExpression> declared = methodExpressions.get(i);
                 ELMethodExpressionDefinition definition = methodDefinition(declared.annotation(), i, context);
                 String className = prefix + "$MethodExpression" + i;
-                ClassDef classDef = MethodExpressionWriter.write(className, definition, compilerFor(declared.owner(), element, compilers, context));
-                sourceGenerator.write(classDef, context, element);
+                generated.add(MethodExpressionWriter.write(className, definition, compilerFor(declared.owner(), element, compilers, context)));
                 compiledMethods.add(new ExpressionSourceWriter.CompiledMethod(definition, className));
             }
 
             String sourceClassName = prefix + "$ELExpressions";
-            sourceGenerator.write(
-                ExpressionSourceWriter.write(sourceClassName, compiledValues, compiledMethods), context, element);
+            generated.add(ExpressionSourceWriter.write(sourceClassName, compiledValues, compiledMethods));
+            for (ClassDef classDef : generated) {
+                sourceGenerator.write(classDef, context, element);
+            }
             context.visitServiceDescriptor(ELExpressionSource.class.getName(), sourceClassName, element);
         } catch (ELParsingException | ELCompilationException | ProcessingException e) {
             processed.remove(element.getName());
@@ -183,11 +223,12 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
     }
 
     /**
-     * The annotation processor formats the messages it reports, and an expression may well contain a
-     * {@code %}, as in {@code formatter.format('%1$.2f', value)}.
+     * The message of a failure, reported through {@link VisitorContext#fail} which prints it as it is: an
+     * expression may well contain a {@code %}, as in {@code formatter.format('%1$.2f', value)}, and the
+     * processors of the languages would format it otherwise.
      */
     private static String reportable(Exception e) {
-        return String.valueOf(e.getMessage()).replace("%", "%%");
+        return String.valueOf(e.getMessage());
     }
 
     /**
@@ -276,7 +317,7 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
         if (owner != element) {
             declare(owner.getAnnotation(ELEnvironment.class), context, variables, importedClasses, importedPackages, staticImports, functions);
         }
-        return new CompilationContext(context, owner, variables, importedClasses, importedPackages, staticImports, functions);
+        return new CompilationContext(context, owner, ELFunctionDiscovery.current(), variables, importedClasses, importedPackages, staticImports, functions);
     }
 
     private void declare(@Nullable AnnotationValue<ELEnvironment> environment,
@@ -311,35 +352,7 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
                                    Map<String, MethodElement> functions) {
         ClassElement type = ELTypes.resolveMember(declared, "value", context).orElseThrow(() ->
             new ELCompilationException("The class of @ELFunctions is required"));
-        String prefix = declared.stringValue("prefix").orElse("");
-        // the public static methods of the class, and the public instance methods it declares itself, which are
-        // invoked on the instance the context provides at runtime; the @JvmStatic functions of a Kotlin companion
-        // object are the static methods of the class
-        List<MethodElement> candidates = new ArrayList<>(type.getEnclosedElements(ElementQuery.ALL_METHODS.onlyAccessible()));
-        for (ClassElement inner : type.getEnclosedElements(ElementQuery.ALL_INNER_CLASSES)) {
-            if (ELTypes.isCompanion(inner)) {
-                candidates.addAll(inner.getEnclosedElements(ElementQuery.ALL_METHODS.onlyAccessible()
-                    .annotated(metadata -> metadata.hasAnnotation("kotlin.jvm.JvmStatic"))));
-            }
-        }
-        // once a method of the class is annotated, only the annotated methods are functions
-        boolean explicit = candidates.stream().anyMatch(method -> method.hasAnnotation(ELFunction.class));
-        for (MethodElement method : candidates) {
-            if (!method.isPublic() || !(ELTypes.isStatic(method) || method.getDeclaringType().equals(type))) {
-                continue;
-            }
-            AnnotationValue<ELFunction> function = method.getAnnotation(ELFunction.class);
-            if (explicit && function == null) {
-                continue;
-            }
-            String localName = method.getName();
-            String functionPrefix = prefix;
-            if (function != null) {
-                localName = function.stringValue().filter(value -> !value.isEmpty()).orElse(localName);
-                functionPrefix = function.stringValue("prefix").filter(value -> !value.isEmpty()).orElse(prefix);
-            }
-            functions.put(CompilationContext.qualifiedFunctionName(functionPrefix, localName), method);
-        }
+        ELFunctionBinder.bind(type, declared.stringValue("prefix").orElse(""), false, functions);
     }
 
     private static String constantName(String name) {

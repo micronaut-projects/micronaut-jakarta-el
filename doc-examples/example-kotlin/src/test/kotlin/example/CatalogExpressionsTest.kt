@@ -19,5 +19,10 @@ class CatalogExpressionsTest {
         assertEquals(25.0, factory.createValueExpression(context, "\${Math.max(book.unitPrice, 25)}", Double::class.java).getValue(context))
         assertEquals(listOf("Jakarta EL"), factory.createValueExpression(context,
             "\${books.stream().filter(b -> b.unitPrice > 10).map(b -> b.title).toList()}", List::class.java).getValue(context))
+        assertEquals(40.0, factory.createValueExpression(context, "\${(price -> price * 2)(book.unitPrice)}", Double::class.java).getValue(context))
+        assertEquals(15.0, factory.createValueExpression(context,
+            "\${discount = (price, percent) -> price * (100 - percent) / 100; discount(book.unitPrice, 25)}", Double::class.java).getValue(context))
+        assertEquals(listOf("Leaflet", "Jakarta EL"), factory.createValueExpression(context,
+            "\${books.stream().sorted((a, b) -> a.unitPrice - b.unitPrice).map(b -> b.title).toList()}", List::class.java).getValue(context))
     }
 }
