@@ -1,5 +1,5 @@
 plugins {
-    id "io.micronaut.build.internal.expression-language-test-suite"
+    id "io.micronaut.build.internal.jakarta-el-test-suite"
 }
 
 description = """
@@ -36,8 +36,8 @@ repositories {
 dependencies {
     tckBundle "jakarta.el:jakarta-expression-language-tck:$elTckVersion@zip"
 
-    testImplementation projects.micronautExpressionLanguage
-    testImplementation projects.micronautExpressionLanguageInterpreter
+    testImplementation projects.micronautJakartaEl
+    testImplementation projects.micronautJakartaElInterpreter
     testImplementation platform(libs.junit.bom)
     testImplementation libs.junit.jupiter
     testRuntimeOnly libs.junit.jupiter.engine

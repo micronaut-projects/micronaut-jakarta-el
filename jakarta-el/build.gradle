@@ -1,10 +1,11 @@
 plugins {
-    id "io.micronaut.build.internal.expression-language-module"
+    id "io.micronaut.build.internal.jakarta-el-module"
 }
 
 dependencies {
-    api projects.micronautExpressionLanguage
-    api projects.micronautExpressionLanguageParser
+    api libs.managed.jakarta.el
+    api mn.micronaut.core
+    api projects.micronautJakartaElAnnotations
 
     testImplementation platform(libs.junit.bom)
     testImplementation libs.junit.jupiter

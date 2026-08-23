@@ -214,6 +214,6 @@ public class CompiledExpressionFactory extends ExpressionFactory {
     private static ELException notCompiled(String expression) {
         return new ELException("The expression '" + expression
             + "' was not compiled. Declare it with @ELExpression so that it is compiled at compilation time, or add"
-            + " the micronaut-expression-language-interpreter module to parse it at runtime.");
+            + " the micronaut-jakarta-el-interpreter module to parse it at runtime.");
     }
 }

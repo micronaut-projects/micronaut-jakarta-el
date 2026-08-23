@@ -1,12 +1,12 @@
 plugins {
-    id "io.micronaut.build.internal.expression-language-module"
+    id "io.micronaut.build.internal.jakarta-el-module"
 }
 
 dependencies {
     api mn.micronaut.core.processor
     api mnSourcegen.micronaut.sourcegen.generator
-    api projects.micronautExpressionLanguage
-    api projects.micronautExpressionLanguageParser
+    api projects.micronautJakartaEl
+    api projects.micronautJakartaElParser
 
     // The Java source writer produces readable sources for a Java build; the bytecode writer is used for the
     // languages whose source writer cannot emit these classes yet. Both are needed on the compile classpath of a

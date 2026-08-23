@@ -17,14 +17,14 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = 'expression-language-parent'
+rootProject.name = 'jakarta-el-parent'
 
-include 'expression-language'
-include 'expression-language-annotations'
-include 'expression-language-bom'
-include 'expression-language-interpreter'
-include 'expression-language-parser'
-include 'expression-language-processor'
+include 'jakarta-el'
+include 'jakarta-el-annotations'
+include 'jakarta-el-bom'
+include 'jakarta-el-interpreter'
+include 'jakarta-el-parser'
+include 'jakarta-el-processor'
 include 'test-suite-groovy'
 include 'test-suite-java'
 include 'test-suite-kotlin'

@@ -18,11 +18,11 @@ Nothing is parsed and nothing is resolved reflectively at runtime:
 
 | Module                                      | Description                                                                             |
 |---------------------------------------------|-----------------------------------------------------------------------------------------|
-| `micronaut-expression-language-annotations` | The annotations used to declare beans, expressions and their environment                 |
-| `micronaut-expression-language`             | The runtime: the resolvers, the coercion rules and the compiled expression base classes  |
-| `micronaut-expression-language-parser`      | The lexer, the parser and the abstract syntax tree, with no dependency on the code generator |
-| `micronaut-expression-language-processor`   | The annotation processor: the compiler and the writers                                   |
-| `micronaut-expression-language-interpreter` | Optional. Parses and evaluates at runtime the expressions that were not compiled          |
+| `micronaut-jakarta-el-annotations` | The annotations used to declare beans, expressions and their environment                 |
+| `micronaut-jakarta-el`             | The runtime: the resolvers, the coercion rules and the compiled expression base classes  |
+| `micronaut-jakarta-el-parser`      | The lexer, the parser and the abstract syntax tree, with no dependency on the code generator |
+| `micronaut-jakarta-el-processor`   | The annotation processor: the compiler and the writers                                   |
+| `micronaut-jakarta-el-interpreter` | Optional. Parses and evaluates at runtime the expressions that were not compiled          |
 
 The parser is a module of its own because the compiler is not its only consumer: the interpreter uses the same
 abstract syntax tree, and so can any code that needs to inspect an expression without generating one.
@@ -98,7 +98,7 @@ Compiling every expression is only possible when every expression is known at co
 string is built at runtime, add the interpreter module:
 
 ```groovy
-runtimeOnly("io.micronaut.el:micronaut-expression-language-interpreter")
+runtimeOnly("io.micronaut.el:micronaut-jakarta-el-interpreter")
 ```
 
 It registers an `ELExpressionParser` service, which `CompiledExpressionFactory` consults for the expressions that no

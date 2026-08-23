@@ -59,7 +59,7 @@ jobs:
   publish-results:
     name: Publish the Jakarta Expression Language TCK results
     needs: el-tck
-    if: success() && github.event_name == 'push' && github.repository == 'micronaut-projects/micronaut-expression-language'
+    if: success() && github.event_name == 'push' && github.repository == 'micronaut-projects/micronaut-jakarta-el'
     runs-on: ubuntu-latest
     permissions:
       actions: read

@@ -1,0 +1,7 @@
+plugins {
+    id "io.micronaut.build.internal.jakarta-el-module"
+}
+
+dependencies {
+    api mn.micronaut.core
+}

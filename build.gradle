@@ -1,4 +1,4 @@
 plugins {
-    id "io.micronaut.build.internal.expression-language-base"
+    id "io.micronaut.build.internal.jakarta-el-base"
     id "io.micronaut.build.internal.parent"
 }

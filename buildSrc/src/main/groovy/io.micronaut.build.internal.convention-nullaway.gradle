@@ -1,7 +1,7 @@
 import net.ltgt.gradle.errorprone.CheckSeverity
 
 plugins {
-    id 'io.micronaut.build.internal.expression-language-base'
+    id 'io.micronaut.build.internal.jakarta-el-base'
     id 'net.ltgt.errorprone'
 }
 

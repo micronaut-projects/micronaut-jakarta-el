@@ -1,7 +1,7 @@
 Compiling every expression is only possible when every expression is known at compilation time. When an
 expression string is built at runtime, add the interpreter module:
 
-dependency:micronaut-expression-language-interpreter[scope="runtimeOnly", groupId="io.micronaut.el"]
+dependency:micronaut-jakarta-el-interpreter[scope="runtimeOnly", groupId="io.micronaut.el"]
 
 It registers an `ELExpressionParser` service, which `CompiledExpressionFactory` consults for the expressions that
 no generated source provides. Such an expression is parsed once, when it is created, and its tree is then
@@ -12,11 +12,11 @@ Without the module, an expression that was neither compiled nor a literal-expres
 [source]
 ----
 jakarta.el.ELException: The expression '${book.title}' was not compiled. Declare it with @ELExpression so that it
-is compiled at compilation time, or add the micronaut-expression-language-interpreter module to parse it at runtime.
+is compiled at compilation time, or add the micronaut-jakarta-el-interpreter module to parse it at runtime.
 ----
 
 The interpreter is not a second implementation of the language. It walks the same abstract syntax tree the
-compiler consumes, produced by the same `micronaut-expression-language-parser` module, and calls the same runtime
+compiler consumes, produced by the same `micronaut-jakarta-el-parser` module, and calls the same runtime
 as the generated code, so both share one definition of the semantics of the specification. The compiled path
 remains the fast one and the interpreted path is the fallback.
 

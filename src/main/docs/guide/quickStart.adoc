@@ -1,8 +1,8 @@
 Add the annotation processor and the runtime to your build:
 
-dependency:micronaut-expression-language-processor[scope="annotationProcessor", groupId="io.micronaut.el"]
+dependency:micronaut-jakarta-el-processor[scope="annotationProcessor", groupId="io.micronaut.el"]
 
-dependency:micronaut-expression-language[groupId="io.micronaut.el"]
+dependency:micronaut-jakarta-el[groupId="io.micronaut.el"]
 
 Declare a bean with Micronaut's `@Introspected` and the expressions that use it:
 
