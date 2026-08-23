@@ -14,7 +14,7 @@ available to the expressions, as described in the section 1.24 of the specificat
 time.
 <3> `functions` lists a class whose public static methods are functions without any annotation, optionally under
 a namespace prefix; `type` is an alias of `value`. A class declaring its functions with `@ELFunction` needs no
-listing.
+listing in its own module, and keeps the names and prefixes it declares when listed from another.
 <4> A function is called with its prefix.
 <5> A static method of an imported class is called through the class name.
 <6> The collection operations of the chapter 2 of the specification, lambdas included, compile like the rest.
@@ -40,9 +40,9 @@ on the instance the `ELContext` provides at evaluation time, which is how a Micr
 
 snippet::example.PricingService[project-base="doc-examples/example", title="PricingService"]
 
-<1> An ordinary bean: nothing lists it anywhere. A function declared with `@ELFunction` is found by the
-expressions of the module declaring it, and of every module depending on it, because the processor indexes the
-classes declaring functions. The module declaring them has to run the annotation processor.
+<1> An ordinary bean: nothing lists it. A function declared with `@ELFunction` is found by the expressions of
+the module declaring it, whatever the order of its classes; a function of another module is listed with
+`@ELFunctions(type = ...)`, and keeps the name and the prefix it declares.
 <2> `@ELFunction` declares the method as a function, here with its namespace prefix; an instance method is invoked
 on the instance. Once a method of the class is annotated, only the annotated methods are functions: a bean does
 not expose every public method it has.

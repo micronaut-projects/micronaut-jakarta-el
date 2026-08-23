@@ -3,8 +3,8 @@ package io.micronaut.el.example.eligible;
 import io.micronaut.el.annotation.ELFunction;
 
 /**
- * The functions available to the conditions of {@link Eligible}, under the {@code fn} prefix. They are found by
- * the expressions of any module depending on this one: nothing lists the class.
+ * The functions available to the conditions of {@link Eligible}, under the {@code fn} prefix, which the
+ * processor of the annotation lists for the expressions of the modules depending on this one.
  */
 // tag::functions[]
 public final class EligibilityFunctions {

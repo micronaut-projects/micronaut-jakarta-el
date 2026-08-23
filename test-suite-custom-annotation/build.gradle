@@ -6,10 +6,6 @@ plugins {
 // annotation processor that has the expression compiled at compilation time. It is built against public API
 // only: the annotation metadata SPI of micronaut-core and the annotations of micronaut-jakarta-el.
 dependencies {
-    // the processor indexes the functions the library declares with @ELFunction, for the modules depending on it
-    annotationProcessor projects.micronautJakartaElProcessor
-    annotationProcessor mn.micronaut.inject.java
-
     implementation mn.micronaut.aop
     implementation projects.micronautJakartaElAnnotations
     // the interpolation of the constraint messages evaluates the compiled expressions

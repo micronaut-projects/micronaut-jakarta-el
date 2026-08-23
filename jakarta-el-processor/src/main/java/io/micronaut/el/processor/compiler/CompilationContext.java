@@ -207,7 +207,7 @@ public final class CompilationContext {
     public MethodElement resolveFunction(String prefix, String localName) {
         String qualifiedName = qualifiedFunctionName(prefix, localName);
         MethodElement declared = functions.get(qualifiedName);
-        return declared != null ? declared : discovery.find(visitorContext, qualifiedName);
+        return declared != null ? declared : discovery.find(qualifiedName);
     }
 
     /**

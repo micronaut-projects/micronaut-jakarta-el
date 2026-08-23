@@ -350,8 +350,12 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
     private void registerFunctions(AnnotationValue<ELFunctions> declared,
                                    VisitorContext context,
                                    Map<String, MethodElement> functions) {
-        ClassElement type = ELTypes.resolveMember(declared, "value", context).orElseThrow(() ->
-            new ELCompilationException("The class of @ELFunctions is required"));
+        // the alias is resolved by the metadata builder for the annotations of the sources, not for the ones a
+        // remapper builds: both members are read
+        ClassElement type = ELTypes.resolveMember(declared, "value", context)
+            .or(() -> ELTypes.resolveMember(declared, "type", context))
+            .filter(resolved -> !resolved.getName().equals("void"))
+            .orElseThrow(() -> new ELCompilationException("The class of @ELFunctions is required"));
         ELFunctionBinder.bind(type, declared.stringValue("prefix").orElse(""), false, functions);
     }
 

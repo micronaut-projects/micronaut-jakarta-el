@@ -23,8 +23,7 @@ variables, the functions of the library and an imported class:
 
 snippet::example.RegistrationService[project-base="doc-examples/example", title="RegistrationService"]
 
-<1> The condition over the parameters of the method, calling two functions of the library under their prefix,
-which nothing had to list.
+<1> The condition over the parameters of the method, calling two functions of the library under their prefix.
 <2> The message of the rejection, another expression.
 <3> The name of the generated constant.
 <4> The `+${...}+` delimiters of the specification work too: the processor stores them as `+#{...}+`, which nothing in
@@ -60,17 +59,16 @@ include::{sourcedir}/test-suite-custom-annotation/src/main/java/io/micronaut/el/
 <3> The same annotation, holding the text.
 <4> An `@ELExpression` for every expression, with its expected type and its name, which is compiled into the
 registry of the class like any other declaration.
-<5> An `@ELEnvironment` beside them, importing a class; declared on the method, it applies to the expressions
-declared there. The parameters of the method are typed variables without any declaration, and so are the
-functions of the library, declared with `@ELFunction`:
+<5> An `@ELEnvironment` beside them, listing the functions of the library and importing a class; declared on the
+method, it applies to the expressions declared there. The parameters of the method are typed variables without
+any declaration. The functions declare their own names and prefix:
 
 [source,java]
 ----
 include::{sourcedir}/test-suite-custom-annotation/src/main/java/io/micronaut/el/example/eligible/EligibilityFunctions.java[tags=functions,indent=0]
 ----
 
-<1> A function under its own name, with its prefix; the library runs the annotation processor, which indexes
-the class for the modules depending on the library.
+<1> A function under its own name, with its prefix.
 <2> A function under another name.
 <6> Micronaut has already replaced a string containing `+#{...}+` by an evaluated expression reference when the
 remapper runs; the original text is inside it.

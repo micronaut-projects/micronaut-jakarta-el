@@ -27,21 +27,20 @@ import java.lang.annotation.Target;
 /**
  * Declares a method as a Jakarta Expression Language function, with its own name and namespace prefix.
  *
- * <p>An annotated function is found by the expressions of the module it is declared in, and of the modules
- * depending on it, without any declaration: the processor indexes the classes declaring annotated functions.
- * A class with no annotated method can still be listed with {@link ELFunctions}, which exposes all its public
- * static methods and the public instance methods it declares. Once a method of a class carries this annotation,
- * only the annotated methods of the class are functions: a bean exposing one operation does not expose every
- * public method it has.</p>
+ * <p>An annotated function is found by the expressions of the module it is declared in without any declaration;
+ * the functions of another module are listed with {@link ELFunctions}, which also exposes all the public static
+ * methods, and the public instance methods, of a class with no annotated method. Once a method of a class
+ * carries this annotation, only the annotated methods of the class are functions: a bean exposing one operation
+ * does not expose every public method it has.</p>
  *
  * <p>A static function is invoked directly. An instance function is invoked on the instance the
  * {@code jakarta.el.ELContext} provides at evaluation time, see {@code io.micronaut.el.ELBeanProvider}.</p>
  *
  * <pre>{@code
- * @Singleton
+ * &#64;Singleton
  * public class PricingService {
  *
- *     @ELFunction(prefix = "pricing")
+ *     &#64;ELFunction(prefix = "pricing")
  *     public double quote(Book book, int quantity) { ... }
  * }
  * }</pre>

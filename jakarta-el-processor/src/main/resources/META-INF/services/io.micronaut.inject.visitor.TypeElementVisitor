@@ -1,2 +1,2 @@
 io.micronaut.el.processor.visitor.ELExpressionVisitor
-io.micronaut.el.processor.visitor.ELFunctionIndexVisitor
+io.micronaut.el.processor.visitor.ELFunctionVisitor
