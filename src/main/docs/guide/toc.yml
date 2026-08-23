@@ -1,5 +1,7 @@
 introduction:
   title: Introduction
+whyCompiled:
+  title: Why Micronaut Jakarta EL?
 releaseHistory: Release History
 quickStart:
   title: Quick Start
@@ -7,16 +9,10 @@ declaringExpressions:
   title: Declaring Expressions
 declaringBeans:
   title: Declaring Beans
-customAnnotations:
-  title: Expressions in Custom Annotations
+examples:
+  title: Examples and Use Cases
 runtimeParsing:
   title: Parsing at Runtime
 reflection:
   title: When Reflection Is Used
-languageSupport:
-  title: Language Support
-specification:
-  title: Specification Coverage
-tck:
-  title: Technology Compatibility Kit
 repository: Repository

@@ -2,7 +2,6 @@ package io.micronaut.el.example.eligible;
 
 import io.micronaut.core.annotation.AnnotationClassValue;
 import io.micronaut.core.annotation.AnnotationValue;
-import io.micronaut.core.expressions.EvaluatedExpressionReference;
 import io.micronaut.el.annotation.ELEnvironment;
 import io.micronaut.el.annotation.ELExpression;
 import io.micronaut.el.annotation.ELVariable;
@@ -55,21 +54,13 @@ public final class MinAmountRemapper implements AnnotationRemapper {
     }
 
     private static String textOf(Object value) {
-        String text;
-        if (value instanceof EvaluatedExpressionReference reference) {
-            text = reference.annotationValue().toString();
-        } else if (value instanceof String string) {
-            text = string;
-        } else {
-            return null;
+        if (value instanceof String text) {
+            // stored with ${...} as #{...}, which nothing in Micronaut resolves as a property placeholder;
+            // a message template uses ${...}, so, unlike a whole-expression member, it never reaches the
+            // metadata builder as an evaluated expression reference
+            return text.replace("${", "#{");
         }
-        // stored with every ${...} as #{...}, which nothing in Micronaut resolves as a property placeholder
-        StringBuilder stored = new StringBuilder(text);
-        int i = 0;
-        while ((i = stored.indexOf("${", i)) >= 0) {
-            stored.setCharAt(i, '#');
-        }
-        return stored.toString();
+        return null;
     }
 
 

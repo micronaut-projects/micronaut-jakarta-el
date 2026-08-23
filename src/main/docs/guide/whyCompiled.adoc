@@ -1,0 +1,94 @@
+The goal of this module is to be a complete build-time implementation of Jakarta Expression Language 6.0 that
+does not parse, walk trees or use reflection at runtime. The reasons to prefer it over an interpreting
+implementation are outlined below.
+
+==== Runtime Performance
+
+The `EvaluationBenchmark` JMH benchmark evaluates the same set of expressions — from a property read to a stream
+pipeline with two lambda expressions — with compiled Micronaut Jakarta EL, with its runtime interpreter, with
+Eclipse Expressly (the reference implementation) and with Apache Tomcat Jasper EL, each against the context it
+provides by default. The figure that sums a run up is the geometric mean of the average evaluation times over
+all the benchmarks; its ratio reads as "how many times slower than the compiled expressions, on average".
+
+// results:start
+OpenJDK 25.0.2 on Apple Silicon, JMH 1.37, 1 fork, 3 warmup and 5 measurement iterations of 1 s, average time:
+
+[cols="3,1,1"]
+|===
+|Implementation |Geometric mean of the average times |Relative to the compiled stack
+
+|Micronaut compiled
+|8.63 ns
+|1.0x
+
+|Micronaut interpreted
+|82.9 ns
+|9.6x
+
+|Eclipse Expressly
+|367 ns
+|42.5x
+
+|Tomcat Jasper EL
+|449 ns
+|52.0x
+
+|===
+// results:end
+
+image::evaluation-benchmark-aggregate.svg[Geometric mean of the evaluation times per implementation, link="../img/evaluation-benchmark-results.svg"]
+
+In this run a compiled expression evaluated in 8.6 ns on average — about 43 times faster than the reference implementation and 52 times faster than Tomcat's. The gap is narrowest, around 6x, where every implementation resolves at runtime (a bean not declared with a type), and widest — one hundred times and more — wherever the others fall back to reflection: a method call on a `List` or a `String`, a lambda expression coerced to a functional interface, a stream pipeline. The interpreter of this module, the fallback for expressions created at runtime, averaged 83 ns — itself over 4 times faster than the reference implementation — because it walks its trees against the same compiled runtime.
+
+Click the chart for the chart of every benchmark; the `benchmarks` module of the repository holds the harness,
+every figure with its error in its `README.md`, and runs with `./gradlew :micronaut-benchmarks:jmh`.
+
+==== No Reflection
+
+A declared variable's properties and methods compile to direct invocations, dynamic types resolve through the
+bean introspections Micronaut already generates, operators whose operand types are known compile to the Java
+operators, and a lambda expression passed to a method becomes a Java lambda implementing the parameter's
+functional interface — no `LambdaExpression`, no argument maps, no `java.lang.reflect.Proxy`. The paths a
+typical expression takes use no reflection at all, which also means nothing to configure for a GraalVM native
+image; the few reflective paths that remain are the ones the specification defines in reflective terms, listed
+in <<reflection,When Reflection Is Used>>. This is verified continuously: the Java test suite and the complete
+TCK also run compiled into a native image, with `./gradlew nativeTest`.
+
+==== Type Safety
+
+The expressions are checked when the class compiles, not when a request arrives:
+
+* a property or method a declared type does not have is a compilation error, and a member served by a custom
+resolver at runtime is a warning;
+* an argument whose static type cannot be coerced to a function's parameter is a compilation error;
+* an omitted `expectedType` is inferred from the static type of the expression, and an expression whose type
+cannot be determined because an identifier is undeclared is a compilation error telling you what to declare;
+* a syntax error reports the expression and the position, on the class that declares it.
+
+==== Smaller Runtime
+
+An application that declares its expressions in source ships no parser: the parser is a build-time module the
+runtime never sees. An expression is a generated class, and looking one up by its string through the standard
+`jakarta.el.ExpressionFactory` is a `switch`, not a parse.
+
+==== How It Works
+
+For the expression of the <<quickStart,Quick Start>> the annotation processor generates:
+
+[source,java]
+----
+@ELEnvironment(variables = @ELVariable(name = "book", type = Book.class))
+@ELExpression("Book: ${book.title} costs ${book.unitPrice}")
+
+protected Object evaluate(ELContext context) {
+    Book shared0 = (Book) ELResolution.resolveVariable(context, "book");
+    return "Book: " + Objects.toString(shared0.getTitle(), "")
+        + " costs " + String.valueOf(shared0.getUnitPrice());
+}
+----
+
+The string was parsed once, by the processor. `book` is resolved once and its getters are called directly; the
+concatenation is Java's own; the result is returned without a coercion because its type is already the expected
+one. What remains at runtime is one shared module — the coercions, the operators on values typed only at
+evaluation time, the resolution for what stays dynamic and the typed stream API — and the interpreter walks its
+trees against that same runtime, which is why it too stays well ahead of the other implementations.

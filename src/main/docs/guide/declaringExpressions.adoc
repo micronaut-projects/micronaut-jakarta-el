@@ -1,3 +1,33 @@
+The module ships one small set of annotations, all in `io.micronaut.el.annotation`:
+
+|===
+|Annotation |Use it to
+
+|api:el.annotation.ELExpression[]
+|Declare a value expression to compile — `+${book.title}+`, a composite, a literal. Repeatable; goes on a type,
+field, method or parameter.
+
+|api:el.annotation.ELMethodExpression[]
+|Declare a method expression — one that names a method to invoke, such as `+${book.discounted(10)}+` — when the
+caller needs a `jakarta.el.MethodExpression` rather than a value.
+
+|api:el.annotation.ELEnvironment[]
+|Describe the world the expressions of a class or member live in: the typed variables, the imported classes and
+packages, the static imports and the function libraries.
+
+|api:el.annotation.ELVariable[]
+|Give one variable a name and a static type inside an `@ELEnvironment`, so its properties and methods compile to
+direct calls and are checked at compilation time.
+
+|api:el.annotation.ELFunctions[]
+|Register a class of functions for the expressions, optionally under a namespace prefix — every public static
+method becomes a function.
+
+|api:el.annotation.ELFunction[]
+|Mark a single method as a function, with its own name and prefix, when the class should not export every
+static method — also works on instance methods of beans.
+|===
+
 An expression is declared with `@ELExpression`, which is repeatable, on a type, a field, a method or a parameter.
 The element is only a holder: the processor generates one class per expression, plus a registry per declaring
 class that maps each expression string to its implementation.
@@ -9,7 +39,7 @@ this way is still looked up in the `ELContext` at evaluation time, but every pro
 and coercion applied to it is resolved statically. A member the type does not declare is reported at compilation
 time.
 <2> `imports`, `importPackages` and `staticImports` make classes, packages and statically imported fields
-available to the expressions, as described in the section 1.24 of the specification. Among several overloads,
+available to the expressions, the way the language defines static references. Among several overloads,
 `Math.max` here, the one whose parameters fit the static types of the arguments best is selected at compilation
 time.
 <3> `functions` lists a class whose public static methods are functions without any annotation, optionally under
@@ -81,7 +111,7 @@ WARNING: Any annotation string containing `+#{...}+` is treated by Micronaut as 
 expressions. The processor reads the original text back out, so `+#{...}+` works in a plain holder class, but on a
 Micronaut bean Micronaut will also try to compile it with its own expression language. Prefer `+${...}+` for
 `@ELExpression`: the specification parses the two identically. An annotation of your own can use `+#{...}+` with
-the processor described in <<customAnnotations,Expressions in Custom Annotations>>.
+the processor described in <<examples,Examples and Use Cases>>.
 
 === What the processor generates
 
@@ -142,3 +172,14 @@ warning: The type example.Book does not declare the property 'titel'; the access
 
 The types the standard resolvers read by key, index or name, maps, collections, arrays, resource bundles and
 optionals, are not reported.
+
+=== The expected type
+
+`expectedType` names the type the result of every evaluation is coerced to, with the standard coercion rules of
+the language. It can be omitted: the compiler then infers it from the static type of the expression —
+`${book.discounted(10)}` is a `Double` because `discounted` returns one, a comparison is a `Boolean`, a
+composite expression is a `String`, and an expression whose type the compiler does not know is an `Object`. The
+same applies to `expectedReturnType` of an `@ELMethodExpression`, inferred from the invocation. The generated
+`ExpressionFactory` serves an expression with an inferred type for that type, its primitive counterpart and
+`Object.class`.
+

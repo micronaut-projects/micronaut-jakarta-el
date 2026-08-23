@@ -1,11 +1,66 @@
-Expressions are not limited to `@ELExpression`: any annotation can carry one, and have it compiled, with a small
-annotation processor. The `test-suite-custom-annotation` module of the repository is the library of this
-example, and the `doc-examples` modules use it.
+Jakarta Expression Language earns its place wherever your application wants a little logic as data: readable at
+the declaration, changeable without touching the surrounding Java, and — with this module — compiled and
+type-checked at build time, so a typo fails the build instead of a request, and evaluated in nanoseconds without
+parsing or reflection. Some places it fits:
 
-=== The annotation
+==== Business rules on methods
 
-The annotation is an ordinary one, here an AOP binding, whose members are conditions and messages over the
-parameters of the method:
+Guard an operation with the rule written right where the operation is declared: a customer must be an adult and
+live in Europe before registering, an order must stay under a credit limit, a discount only applies on weekdays.
+
+[source,java]
+----
+@Eligible(value = "#{ fn:adult(customer.age) && fn:inEurope(customer.country) }",
+          otherwise = "#{ customer.name += ' must be an adult in Europe' }")
+public String register(Customer customer) { ... }
+----
+
+The parameters of the method are the variables of the expressions; the functions under `fn:` come from a shared
+library of the rules of the domain.
+
+==== Validation messages
+
+A constraint in the style of Jakarta Validation, whose message is a template over the attributes of the
+constraint and the validated value:
+
+[source,java]
+----
+@MinAmount(value = 100)
+long amount
+// its default message: "Must be greater than ${inclusive == true ? 'or equal to ' : ''}{value}"
+----
+
+The `{value}` attribute interpolates first, the expression sees `inclusive` and `validatedValue` as typed
+variables, and each segment of the template is compiled at build time.
+
+==== Feature flags and routing conditions
+
+Any annotation that decides something can carry the decision as an expression — which customers see a feature,
+which handler takes a message, what gets audited:
+
+[source,java]
+----
+@FeatureFlag("#{ customer.plan == 'PRO' or fn:betaTester(customer.id) }")
+public Dashboard newDashboard(Customer customer) { ... }
+----
+
+==== Rules that only exist at runtime
+
+When the expression itself is data — a discount rule from a database, a condition an operator edits — add the
+<<runtimeParsing,interpreter module>> and create the expression from its string with the standard
+`jakarta.el.ExpressionFactory`; everything an application declares in source stays compiled.
+
+=== Building your own annotation
+
+`@Eligible` and `@MinAmount` above are not part of this module: they are ordinary user annotations, and the rest
+of this chapter walks through building them. Everything shown exists as working code — the
+`test-suite-custom-annotation` module of the repository is the library declaring them, and the `doc-examples`
+modules use it.
+
+==== The annotation
+
+Declare the annotation as you would any other — here it also binds an AOP interceptor, so that the condition
+guards the method call. Its members are plain strings holding the expressions:
 
 [source,java]
 ----
@@ -15,11 +70,13 @@ include::{sourcedir}/test-suite-custom-annotation/src/main/java/io/micronaut/el/
 <1> The annotation binds an interceptor, which is where the expressions are evaluated.
 <2> The condition the parameters of the method must satisfy.
 <3> A second expression, the message of the rejection, evaluating to a string.
-<4> The name of the constant holding the compiled condition in the registry of the class, for the code that wants
-to reference it directly.
+<4> An optional name for the constants holding the compiled expressions in the generated registry of the class;
+without it the names are derived from the declaration.
 
-Used on a bean, with the `+#{...}+` delimiters Micronaut would otherwise claim, the parameters of the method as
-variables, the functions of the library and an imported class:
+Using it looks like this. The parameters of the method are typed variables inside the expressions — `customer`
+is the `Customer` parameter, so `customer.age` compiles to a direct call of `getAge()` and a misspelt property
+is a compilation error. The functions of the library are available under their prefix, and imported classes by
+their simple name:
 
 snippet::example.RegistrationService[project-base="doc-examples/example", title="RegistrationService"]
 
@@ -41,7 +98,7 @@ include::{sourcedir}/test-suite-custom-annotation/src/main/java/io/micronaut/el/
 
 <1> The template: literal text, the `{value}` attribute and an expression over the `inclusive` attribute.
 
-=== The processor
+==== The processor
 
 Micronaut treats any annotation string containing `+#{...}+` as one of its own evaluated expressions, and would
 fail to compile an expression of the Jakarta language. An `io.micronaut.inject.annotation.AnnotationRemapper`,
@@ -87,7 +144,7 @@ include::{sourcedir}/test-suite-custom-annotation/src/main/java/io/micronaut/el/
 factory for.
 <2> The attributes of the constraint, and the validated value, are the variables of the expressions.
 
-=== The runtime
+==== The runtime
 
 The text is read back from the annotation metadata and handed to `jakarta.el.ExpressionFactory`, which returns
 the compiled expression. The parameters of the invocation are bound by name:
@@ -110,7 +167,8 @@ include::{sourcedir}/test-suite-custom-annotation/src/main/java/io/micronaut/el/
 
 <1> The attributes of the constraint first: `{value}` becomes `100`.
 <2> The attributes and the validated value are the variables of the expressions.
-<3> Every expression of the template is found precompiled under its text, evaluated, and replaced.
+<3> Every expression of the template — written with either delimiter, looked up precompiled under its
+`+#{...}+` text — is evaluated into its place, with the same matcher idiom as the attributes.
 
 snippet::example.EligibleTest[project-base="doc-examples/example", title="EligibleTest"]
 

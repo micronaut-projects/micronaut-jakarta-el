@@ -14,8 +14,12 @@ replaces the reflective lookups of `jakarta.el.BeanELResolver`;
 * every property access, method invocation, function call and static reference whose type is known at compilation
 time becomes a direct Java invocation.
 
-The module passes the Jakarta Expression Language 6.0 Technology Compatibility Kit. See
-<<tck,Technology Compatibility Kit>>.
+The annotation processor runs for Java, Groovy and Kotlin and produces the same expression classes for all
+three; a Java build additionally gets them as readable generated sources.
+
+The implementation passes the Jakarta Expression Language 6.0 Technology Compatibility Kit — 360 tests, no
+failures, none skipped — on every build; the `tests/jakarta-el-tck` module of the repository runs it, and a
+workflow publishes the evidence of each run.
 
 NOTE: The public API, annotations included, is marked `@Experimental`: it can change between minor versions until the
 first stable release.

@@ -1,58 +1,20 @@
-The module is built so that the paths a typical expression takes are reflection free, but it does not claim to
-avoid reflection everywhere. The reflective paths are the ones the specification itself defines in reflective
-terms; they are not a fallback for work that could have been generated.
+The paths a typical expression takes — declared variables, introspected beans, operators, lambda expressions,
+streams, the expression lookup itself — use no reflection at all, which is what the <<whyCompiled,benchmarks>>
+measure and what makes the module work in a GraalVM native image without configuration.
 
-=== Without reflection
+Reflection remains only where the specification itself defines a behaviour in reflective terms:
 
-|===
-|Path |Mechanism
+* invoking a method of a type that has no bean introspection, or reading its properties, through the standard
+resolvers — annotate the type with `@Introspected` (and methods with `@Executable`) to move it to the generated
+dispatch instead;
+* a `jakarta.el.FunctionMapper`, `MethodExpression.getMethodInfo` and `getMethodReference`, whose contracts are
+`java.lang.reflect` types;
+* coercing a `LambdaExpression` held in a variable to a functional interface (a lambda written in place is
+compiled to the interface directly), and coercing a string through a `PropertyEditor`;
+* array access, which the JDK only exposes reflectively.
 
-|A property or method of a variable whose type is declared with `@ELVariable`
-|Compiled to a direct Java invocation
-
-|A property of an `@Introspected` type resolved dynamically
-|The generated `BeanIntrospection` dispatch table
-
-|A method of an `@Introspected` type annotated with `@Executable`
-|The generated `BeanIntrospection` dispatch table
-
-|A function declared with `@ELFunctions`
-|Compiled to a direct static invocation
-
-|An operator, a coercion, a collection operation, a lambda expression
-|Compiled to a direct call into the runtime
-
-|Locating a compiled expression by its string
-|A generated `switch`, with no lookup and no parsing
-|===
-
-=== With reflection
-
-|===
-|Path |Why
-
-|A `MethodExpression` on a type that is not introspected, or on a method that is not `@Executable`
-|The section 1.6 of the specification resolves the method against the base object at invocation time, so
-`ELMethods` selects it with `Class.getMethods()` and invokes it with `Method.invoke`
-
-|A function resolved at runtime through a `jakarta.el.FunctionMapper`
-|The contract of the mapper is `java.lang.reflect.Method`
-
-|`MethodExpression.getMethodInfo` and `MethodExpression.getMethodReference`
-|Both return reflective metadata by contract
-
-|A type with no `BeanIntrospection`, reached through the standard chain
-|`jakarta.el.BeanELResolver` is reflective by design
-
-|Coercing a lambda expression to a functional interface, section 1.25.8
-|A `java.lang.reflect.Proxy` implements the interface
-
-|Coercing a string to a type with a `PropertyEditor`, section 1.25.9
-|`PropertyEditorManager` is the mechanism the specification names
-
-|Reading and writing array elements and the `length` property
-|`java.lang.reflect.Array`, which is how the JDK exposes arrays
-|===
+Even these are served through a per-class method cache, so they stay fast — the `staticMethod` and
+`stringMethods` benchmarks run them — but a native image needs the involved types registered for reflection.
 
 TIP: To keep a method invocation off the reflective path, annotate the method with `@Executable` so that it
 enters the bean introspection of its type.
