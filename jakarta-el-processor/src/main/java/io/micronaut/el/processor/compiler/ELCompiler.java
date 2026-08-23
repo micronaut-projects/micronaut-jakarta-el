@@ -397,8 +397,16 @@ public final class ELCompiler {
                     + "' expects " + declared.getParameters().length + " argument(s) but "
                     + arguments.size() + " were given");
             }
+            if (!ELTypes.isStatic(declared)) {
+                // a function declared on a bean is invoked on the instance the context provides
+                ClassElement bean = declared.getDeclaringType();
+                ExpressionDef provider = runtime(EL_RESOLUTION, "functionProvider", TypeDef.erasure(bean),
+                    ctx, ExpressionDef.constant(TypeDef.erasure(bean)));
+                return new Typed(provider.invoke(declared, coercedArguments(declared, arguments, ctx)),
+                    declared.getReturnType());
+            }
             return new Typed(
-                ClassTypeDef.of(declared.getDeclaringType()).invokeStatic(declared,
+                ELTypes.staticOwner(declared).invokeStatic(declared,
                     coercedArguments(declared, arguments, ctx)),
                 declared.getReturnType()
             );

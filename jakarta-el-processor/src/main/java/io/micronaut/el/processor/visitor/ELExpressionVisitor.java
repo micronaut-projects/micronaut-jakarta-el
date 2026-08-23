@@ -312,8 +312,18 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
         ClassElement type = ELTypes.resolveMember(declared, "value", context).orElseThrow(() ->
             new ELCompilationException("The class of @ELFunctions is required"));
         String prefix = declared.stringValue("prefix").orElse("");
-        for (MethodElement method : type.getEnclosedElements(ElementQuery.ALL_METHODS.onlyAccessible())) {
-            if (!method.isPublic() || !ELTypes.isStatic(method)) {
+        // the public static methods of the class, and the public instance methods it declares itself, which are
+        // invoked on the instance the context provides at runtime; the @JvmStatic functions of a Kotlin companion
+        // object are the static methods of the class
+        List<MethodElement> candidates = new ArrayList<>(type.getEnclosedElements(ElementQuery.ALL_METHODS.onlyAccessible()));
+        for (ClassElement inner : type.getEnclosedElements(ElementQuery.ALL_INNER_CLASSES)) {
+            if (ELTypes.isCompanion(inner)) {
+                candidates.addAll(inner.getEnclosedElements(ElementQuery.ALL_METHODS.onlyAccessible()
+                    .annotated(metadata -> metadata.hasAnnotation("kotlin.jvm.JvmStatic"))));
+            }
+        }
+        for (MethodElement method : candidates) {
+            if (!method.isPublic() || !(ELTypes.isStatic(method) || method.getDeclaringType().equals(type))) {
                 continue;
             }
             String localName = method.stringValue(ELFunction.class)

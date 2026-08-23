@@ -24,6 +24,7 @@ import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.ast.FieldElement;
 import io.micronaut.inject.ast.PrimitiveElement;
 import io.micronaut.inject.visitor.VisitorContext;
+import io.micronaut.sourcegen.model.ClassTypeDef;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
@@ -39,6 +40,8 @@ import java.util.Optional;
  */
 @Internal
 public final class ELTypes {
+
+    private static final String COMPANION = "$Companion";
 
     private ELTypes() {
     }
@@ -116,6 +119,30 @@ public final class ELTypes {
      */
     public static boolean isStatic(MethodElement method) {
         return method.isStatic() || method.hasAnnotation("kotlin.jvm.JvmStatic");
+    }
+
+    /**
+     * The class a static function is invoked on. A {@code @JvmStatic} function of a Kotlin companion object is
+     * declared on the companion, while the JVM static method it generates belongs to the enclosing class.
+     *
+     * @param method The method
+     * @return The class declaring the static method on the JVM
+     */
+    public static ClassTypeDef staticOwner(MethodElement method) {
+        ClassElement declaring = method.getDeclaringType();
+        if (method.hasAnnotation("kotlin.jvm.JvmStatic") && isCompanion(declaring)) {
+            String name = declaring.getName();
+            return ClassTypeDef.of(name.substring(0, name.length() - COMPANION.length()));
+        }
+        return ClassTypeDef.of(declaring);
+    }
+
+    /**
+     * @param type The type
+     * @return Whether the type is the companion object of a Kotlin class; KSP names it {@code Outer$Companion}
+     */
+    public static boolean isCompanion(ClassElement type) {
+        return type.getName().endsWith(COMPANION);
     }
 
     /**

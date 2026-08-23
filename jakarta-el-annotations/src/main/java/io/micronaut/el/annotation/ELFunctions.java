@@ -22,7 +22,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Maps the public static methods of a class to Jakarta Expression Language functions.
+ * Maps the public static methods of a class, and the public instance methods it declares, to Jakarta
+ * Expression Language functions.
+ *
+ * <p>A static method is invoked directly. An instance method is invoked on the instance the
+ * {@code jakarta.el.ELContext} provides at evaluation time: the one registered under the type with
+ * {@code putContext}, or the one an {@code io.micronaut.el.ELBeanProvider} registered in the context returns,
+ * which is how the functions declared on a Micronaut bean reach the bean.</p>
  *
  * <p>Functions are resolved and bound at compilation time, which replaces the
  * {@code jakarta.el.FunctionMapper} lookup performed by an interpreting implementation.</p>

@@ -16,6 +16,7 @@
 package io.micronaut.el.runtime;
 
 import io.micronaut.core.annotation.Internal;
+import io.micronaut.el.ELBeanProvider;
 import org.jspecify.annotations.Nullable;
 import jakarta.el.ELClass;
 import jakarta.el.ELContext;
@@ -486,6 +487,32 @@ public final class ELResolution {
                                              ELClass base,
                                              String method) {
         return getValueRequired(context, base, method);
+    }
+
+    /**
+     * The instance a function declared on a bean is invoked on: the one registered in the context under its
+     * type, or the one the {@link ELBeanProvider} registered in the context returns.
+     *
+     * @param context The context
+     * @param type    The type declaring the function
+     * @param <T>     The type declaring the function
+     * @return The instance
+     */
+    public static <T> T functionProvider(ELContext context, Class<T> type) {
+        Object registered = context.getContext(type);
+        if (registered != null) {
+            return type.cast(registered);
+        }
+        Object provider = context.getContext(ELBeanProvider.class);
+        if (provider instanceof ELBeanProvider beanProvider) {
+            T instance = beanProvider.get(type);
+            if (instance != null) {
+                return instance;
+            }
+        }
+        throw new ELException("No instance of " + type.getName() + " is available to the functions it declares."
+            + " Register one with ELContext.putContext(" + type.getSimpleName() + ".class, instance), or a"
+            + " provider with ELContext.putContext(ELBeanProvider.class, provider)");
     }
 
     private static PropertyNotFoundException propertyNotFound(@Nullable Object base, @Nullable Object property) {

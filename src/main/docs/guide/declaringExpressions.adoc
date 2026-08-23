@@ -24,6 +24,35 @@ snippet::example.TextFunctions[project-base="doc-examples/example", title="TextF
 <1> A public static method is a function under its own name.
 <2> `@ELFunction` gives a function another name.
 
+=== Functions on beans
+
+A function does not have to be static. The public instance methods a class declares are functions too, invoked
+on the instance the `ELContext` provides at evaluation time, which is how a Micronaut bean offers functions:
+
+snippet::example.PricingService[project-base="doc-examples/example", title="PricingService"]
+
+<1> An ordinary bean.
+<2> A public instance method is a function, invoked on the instance.
+<3> A public static method is a function, invoked directly.
+
+snippet::example.PricingExpressions[project-base="doc-examples/example", title="PricingExpressions"]
+
+<1> The bean is declared like any class of functions.
+<2> A call of the instance function, with the parameters compiled against its signature: a call that does not
+match the function, in name or in number of arguments, fails the compilation.
+<3> Both kinds mix in one expression.
+
+snippet::example.PricingExpressionsTest[project-base="doc-examples/example", title="PricingExpressionsTest"]
+
+<1> A Micronaut application registers its bean context as the api:el.ELBeanProvider[] of the `ELContext`, once,
+and every bean can declare functions.
+<2> The function is invoked on the bean.
+<3> Without a container, the instance is registered under its type with the standard `putContext`.
+<4> With neither, the evaluation fails with an `ELException` saying so.
+
+NOTE: A function on a bean is a compiled construct: the interpreter resolves functions through the
+`jakarta.el.FunctionMapper` of the context, which the specification defines over static methods only.
+
 `@ELEnvironment` is the compilation time counterpart of the `jakarta.el.ELContext`. It is declared on the class,
 or on the member holding the expressions, in which case it applies to those on top of the environment of the
 class. The expressions declared on a method, or on one of its parameters, additionally see the parameters of the
