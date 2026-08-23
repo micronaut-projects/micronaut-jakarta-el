@@ -28,6 +28,18 @@ snippet::example.RegistrationService[project-base="doc-examples/example", title=
 <3> The name of the generated constant.
 <4> The `+${...}+` delimiters of the specification work too: the processor stores them as `+#{...}+`, which nothing in
 Micronaut resolves as a property placeholder.
+<5> A constraint in the style of Jakarta Validation on a parameter: its message is a template over the
+attributes of the constraint, `{value}`, and the expressions of the specification, which see those attributes
+and the validated value as typed variables.
+
+The constraint declares its message with a default in the style of the constraints of Jakarta Validation:
+
+[source,java]
+----
+include::{sourcedir}/test-suite-custom-annotation/src/main/java/io/micronaut/el/example/eligible/MinAmount.java[tags=annotation,indent=0]
+----
+
+<1> The template: literal text, the `{value}` attribute and an expression over the `inclusive` attribute.
 
 === The processor
 
@@ -55,6 +67,18 @@ remapper runs; the original text is inside it.
 <7> A `+${...}+` is stored as `+#{...}+`: the specification treats the two alike, while Micronaut resolves a `+${...}+`
 in the metadata of a bean as a property placeholder.
 
+The processor of the constraint declares every `+${...}+` segment of the message with the attributes of the
+constraint and the validated value as typed variables:
+
+[source,java]
+----
+include::{sourcedir}/test-suite-custom-annotation/src/main/java/io/micronaut/el/example/eligible/MinAmountRemapper.java[tags=remapper,indent=0]
+----
+
+<1> Each segment is an expression of its own, keyed by its exact text, which is what the interpolation asks the
+factory for.
+<2> The attributes of the constraint, and the validated value, are the variables of the expressions.
+
 === The runtime
 
 The text is read back from the annotation metadata and handed to `jakarta.el.ExpressionFactory`, which returns
@@ -66,10 +90,24 @@ snippet::example.EligibleInterceptor[project-base="doc-examples/example", title=
 <2> The parameters of the invocation become the variables of the expressions, under their names.
 <3> The condition, read back from the metadata exactly as written.
 <4> `createValueExpression` is a lookup by text, not a parse, done once per expression.
+<5> The constraints of the parameters are checked against the values of the invocation.
+<6> A violated constraint reports its interpolated message.
+
+The message is interpolated as the Bean Validation specification orders it:
+
+[source,java]
+----
+include::{sourcedir}/test-suite-custom-annotation/src/main/java/io/micronaut/el/example/eligible/ConstraintMessages.java[tags=messages,indent=0]
+----
+
+<1> The attributes of the constraint first: `{value}` becomes `100`.
+<2> The attributes and the validated value are the variables of the expressions.
+<3> Every expression of the template is found precompiled under its text, evaluated, and replaced.
 
 snippet::example.EligibleTest[project-base="doc-examples/example", title="EligibleTest"]
 
 <1> The condition holds and the method runs.
 <2> The condition does not hold and the message is the evaluation of the second expression.
+<4> The constraint is violated and its message is interpolated: `Must be greater than or equal to 100`.
 <3> The compiled expressions carry the expected types the processor declared; in Java and Kotlin the registry of
 the class also exposes them under the names the annotation gave them.

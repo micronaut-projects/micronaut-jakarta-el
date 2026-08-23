@@ -8,6 +8,8 @@ plugins {
 dependencies {
     implementation mn.micronaut.aop
     implementation projects.micronautJakartaElAnnotations
+    // the interpolation of the constraint messages evaluates the compiled expressions
+    implementation projects.micronautJakartaEl
 
     // the processor runs on the annotation processor path, where micronaut-core-processor is present
     compileOnly mn.micronaut.core.processor

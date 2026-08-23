@@ -18,7 +18,11 @@ class EligibleTest {
             }
             assertEquals("Bob must be an adult in Europe", rejected.message) // <2>
 
-            assertEquals("deposited 50 for Ann", service.deposit(Customer("Ann", 34, "DE"), 50))
+            assertEquals("deposited 100 for Ann", service.deposit(Customer("Ann", 34, "DE"), 100))
+            val tooSmall = assertThrows(NotEligibleException::class.java) {
+                service.deposit(Customer("Ann", 34, "DE"), 99)
+            }
+            assertEquals("Must be greater than or equal to 100", tooSmall.message) // <4>
         }
     }
 

@@ -19,7 +19,10 @@ class EligibleTest {
                 () -> service.register(new Customer("Bob", 15, "CZ")));
             assertEquals("Bob must be an adult in Europe", rejected.getMessage()); // <2>
 
-            assertEquals("deposited 50 for Ann", service.deposit(new Customer("Ann", 34, "DE"), 50));
+            assertEquals("deposited 100 for Ann", service.deposit(new Customer("Ann", 34, "DE"), 100));
+            NotEligibleException tooSmall = assertThrows(NotEligibleException.class,
+                () -> service.deposit(new Customer("Ann", 34, "DE"), 99));
+            assertEquals("Must be greater than or equal to 100", tooSmall.getMessage()); // <4>
         }
     }
 

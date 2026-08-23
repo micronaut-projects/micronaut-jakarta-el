@@ -1,1 +1,2 @@
 io.micronaut.el.example.eligible.EligibleRemapper
+io.micronaut.el.example.eligible.MinAmountRemapper

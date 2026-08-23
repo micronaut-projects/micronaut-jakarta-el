@@ -1,6 +1,7 @@
 package example
 
 import io.micronaut.el.example.eligible.Eligible
+import io.micronaut.el.example.eligible.MinAmount
 import jakarta.inject.Singleton
 
 @Singleton
@@ -13,8 +14,11 @@ class RegistrationService {
         "registered " + customer.name
     }
 
-    @Eligible('${ amount > 0 && customer.country == Locale.GERMANY.country }') // <4>
-    String deposit(Customer customer, long amount) {
+    @Eligible('${ customer.country == Locale.GERMANY.country }') // <4>
+    String deposit(Customer customer,
+                   @MinAmount(value = 100L, inclusive = true,
+                              message = "Must be greater than \${inclusive == true ? 'or equal to ' : ''}{value}") // <5>
+                   long amount) {
         "deposited " + amount + " for " + customer.name
     }
 }
