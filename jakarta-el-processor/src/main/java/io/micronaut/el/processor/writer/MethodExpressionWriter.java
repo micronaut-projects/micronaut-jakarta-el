@@ -125,14 +125,14 @@ public final class MethodExpressionWriter {
                 ExpressionDef context = parameters.get(0);
                 ExpressionDef arguments = parameters.get(1);
                 return switch (node) {
-                    case ELNode.Method method -> EL_RESOLUTION.invokeStatic("invoke", TypeDef.OBJECT,
-                        invocation(compiler, context, method)).returning();
-                    case ELNode.Property property -> EL_RESOLUTION.invokeStatic("invokeWithParams", TypeDef.OBJECT,
+                    case ELNode.Method method -> compiler.invokeRuntime(EL_RESOLUTION, "invoke", TypeDef.OBJECT,
+                        invocation(compiler, context, method).toArray(ExpressionDef[]::new)).returning();
+                    case ELNode.Property property -> compiler.invokeRuntime(EL_RESOLUTION, "invokeWithParams", TypeDef.OBJECT,
                         context,
                         compiler.compile(property.base(), context),
                         compiler.compile(property.property(), context),
                         arguments).returning();
-                    default -> EL_RESOLUTION.invokeStatic("invokeMethodExpression", TypeDef.OBJECT,
+                    default -> compiler.invokeRuntime(EL_RESOLUTION, "invokeMethodExpression", TypeDef.OBJECT,
                         context, compiler.compile(node, context), arguments).returning();
                 };
             });

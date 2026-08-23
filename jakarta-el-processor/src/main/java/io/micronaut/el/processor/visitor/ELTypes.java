@@ -19,12 +19,16 @@ import io.micronaut.core.annotation.AnnotationClassValue;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.inject.ast.ClassElement;
+import io.micronaut.inject.ast.ElementModifier;
+import io.micronaut.inject.ast.MethodElement;
+import io.micronaut.inject.ast.FieldElement;
 import io.micronaut.inject.ast.PrimitiveElement;
 import io.micronaut.inject.visitor.VisitorContext;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.Optional;
 
 /**
@@ -34,7 +38,7 @@ import java.util.Optional;
  * @since 1.0
  */
 @Internal
-final class ELTypes {
+public final class ELTypes {
 
     private ELTypes() {
     }
@@ -101,5 +105,29 @@ final class ELTypes {
                                                                   String member,
                                                                   Class<T> type) {
         return annotation.getAnnotations(member, type);
+    }
+
+    /**
+     * Whether the method is invoked statically. KSP reports the {@code @JvmStatic} functions of a Kotlin object
+     * as instance methods, while the class has the static bridge the JVM invokes.
+     *
+     * @param method The method
+     * @return True if the method is static on the JVM
+     */
+    public static boolean isStatic(MethodElement method) {
+        return method.isStatic() || method.hasAnnotation("kotlin.jvm.JvmStatic");
+    }
+
+    /**
+     * Whether the field is a public static field of the class. The visibility is read from the modifiers: KSP
+     * reports a public field of a Java library class as private through {@code isPublic()} and
+     * {@code isPrivate()}, while its modifiers are right.
+     *
+     * @param field The field
+     * @return True if the field is readable statically
+     */
+    public static boolean isPublicStatic(FieldElement field) {
+        Set<ElementModifier> modifiers = field.getModifiers();
+        return modifiers.contains(ElementModifier.STATIC) && modifiers.contains(ElementModifier.PUBLIC);
     }
 }

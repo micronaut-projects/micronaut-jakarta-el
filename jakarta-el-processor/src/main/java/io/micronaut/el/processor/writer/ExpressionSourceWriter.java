@@ -20,6 +20,10 @@ import io.micronaut.core.annotation.Internal;
 import io.micronaut.el.ELExpressionSource;
 import io.micronaut.el.processor.compiler.ELExpressionDefinition;
 import io.micronaut.el.processor.compiler.ELMethodExpressionDefinition;
+import io.micronaut.core.reflect.ClassUtils;
+import io.micronaut.core.reflect.ReflectionUtils;
+import io.micronaut.inject.ast.ClassElement;
+import org.jspecify.annotations.Nullable;
 import io.micronaut.sourcegen.model.ClassDef;
 import io.micronaut.sourcegen.model.ClassTypeDef;
 import io.micronaut.sourcegen.model.ExpressionDef;
@@ -144,8 +148,7 @@ public final class ExpressionSourceWriter {
                     for (int i = values.size() - 1; i >= 0; i--) {
                         CompiledValue value = values.get(i);
                         result = new ExpressionDef.IfElse(
-                            ExpressionDef.constant(TypeDef.erasure(value.definition().expectedType()))
-                                .equalsReferentially(parameters.get(1)),
+                            sameType(value.definition().expectedType(), parameters.get(1)),
                             ClassTypeDef.of(className)
                                 .getStaticField(value.definition().constantName(), VALUE_EXPRESSION),
                             result
@@ -182,10 +185,12 @@ public final class ExpressionSourceWriter {
                             .map(type -> (ExpressionDef) ExpressionDef.constant(TypeDef.erasure(type)))
                             .toList();
                         ExpressionDef.ConditionExpressionDef matches = new ExpressionDef.And(
-                            ExpressionDef.constant(TypeDef.erasure(method.definition().returnType()))
-                                .equalsReferentially(parameters.get(1)),
-                            ClassTypeDef.of(Arrays.class).invokeStatic("equals", TypeDef.Primitive.BOOLEAN,
-                                CLASS_ARRAY.instantiate(parameterTypes), parameters.get(2)).isTrue()
+                            sameType(method.definition().returnType(), parameters.get(1)),
+                            // the declared parameters are Object[]: the descriptor must not be inferred from
+                            // the arguments, which the bytecode writer would emit as it is
+                            ClassTypeDef.of(Arrays.class).invokeStatic("equals", List.of(OBJECT_ARRAY, OBJECT_ARRAY),
+                                TypeDef.Primitive.BOOLEAN,
+                                List.of(CLASS_ARRAY.instantiate(parameterTypes), parameters.get(2))).isTrue()
                         );
                         result = new ExpressionDef.IfElse(
                             matches,
@@ -208,6 +213,39 @@ public final class ExpressionSourceWriter {
      * @param definition The declared expression
      * @param className  The name of the generated class
      */
+    /**
+     * Whether the requested type is the declared one, a primitive and its wrapper being the same expectation:
+     * the coercion rules treat them alike, and the languages do not agree on which one an annotation names,
+     * KSP reads a Kotlin {@code Double::class} as the wrapper while {@code Double::class.java} is the primitive.
+     */
+    private static ExpressionDef.ConditionExpressionDef sameType(ClassElement declared, ExpressionDef requested) {
+        TypeDef type = TypeDef.erasure(declared);
+        ExpressionDef.ConditionExpressionDef same = ExpressionDef.constant(type).equalsReferentially(requested);
+        TypeDef counterpart = counterpartOf(declared);
+        if (counterpart == null) {
+            return same;
+        }
+        return new ExpressionDef.Or(same, ExpressionDef.constant(counterpart).equalsReferentially(requested));
+    }
+
+    @Nullable
+    private static TypeDef counterpartOf(ClassElement declared) {
+        String name = declared.getName();
+        if (declared.isArray() || name.equals("void")) {
+            return null;
+        }
+        if (declared.isPrimitive()) {
+            return ClassUtils.getPrimitiveType(name)
+                .<TypeDef>map(primitive -> ClassTypeDef.of(ReflectionUtils.getWrapperType(primitive)))
+                .orElse(null);
+        }
+        return ClassUtils.forName(name, null)
+            .map(ReflectionUtils::getPrimitiveType)
+            .filter(Class::isPrimitive)
+            .<TypeDef>map(TypeDef::primitive)
+            .orElse(null);
+    }
+
     public record CompiledValue(ELExpressionDefinition definition, String className) {
     }
 

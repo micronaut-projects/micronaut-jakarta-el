@@ -52,6 +52,20 @@ public final class ELLambdas {
     }
 
     /**
+     * Creates a lambda expression described in the section 1.20 of the specification. This is the form the
+     * generated code calls: the methods the generated code calls are never overloaded, and take arrays rather
+     * than generic collections, so that their descriptors are the same in source and in bytecode.
+     *
+     * @param context          The context
+     * @param formalParameters The formal parameters
+     * @param body             The compiled body
+     * @return The lambda expression
+     */
+    public static LambdaExpression lambda(ELContext context, String[] formalParameters, ELLambdaBody body) {
+        return create(context, List.of(formalParameters), body);
+    }
+
+    /**
      * The value expression holding the compiled body of a lambda expression.
      */
     private static final class BodyValueExpression extends ValueExpression {

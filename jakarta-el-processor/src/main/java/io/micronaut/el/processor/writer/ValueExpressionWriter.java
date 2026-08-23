@@ -27,6 +27,7 @@ import io.micronaut.sourcegen.model.ClassDef;
 import io.micronaut.sourcegen.model.ClassTypeDef;
 import io.micronaut.sourcegen.model.ExpressionDef;
 import io.micronaut.sourcegen.model.MethodDef;
+import io.micronaut.sourcegen.model.StatementDef;
 import io.micronaut.sourcegen.model.TypeDef;
 import jakarta.el.ELContext;
 import jakarta.el.ValueReference;
@@ -111,10 +112,11 @@ public final class ValueExpressionWriter {
                 ExpressionDef context = parameters.get(0);
                 ELCompiler.LValue lValue = lValueOf(compiler, node, context);
                 if (lValue.base() == null) {
-                    return EL_RESOLUTION.invokeStatic("setIdentifier", TypeDef.VOID,
+                    // a void invocation is a statement, and is never wrapped in a cast
+                    return (StatementDef) compiler.invokeRuntime(EL_RESOLUTION, "setIdentifier", TypeDef.VOID,
                         context, lValue.property(), parameters.get(1));
                 }
-                return EL_RESOLUTION.invokeStatic("setValue", TypeDef.VOID,
+                return (StatementDef) compiler.invokeRuntime(EL_RESOLUTION, "setValue", TypeDef.VOID,
                     context, lValue.base(), lValue.property(), parameters.get(1));
             });
     }
@@ -129,10 +131,10 @@ public final class ValueExpressionWriter {
                 ExpressionDef context = parameters.get(0);
                 ELCompiler.LValue lValue = lValueOf(compiler, node, context);
                 if (lValue.base() == null) {
-                    return EL_RESOLUTION.invokeStatic("isIdentifierReadOnly", TypeDef.Primitive.BOOLEAN,
+                    return compiler.invokeRuntime(EL_RESOLUTION, "isIdentifierReadOnly", TypeDef.Primitive.BOOLEAN,
                         context, lValue.property()).returning();
                 }
-                return EL_RESOLUTION.invokeStatic("isReadOnly", TypeDef.Primitive.BOOLEAN,
+                return compiler.invokeRuntime(EL_RESOLUTION, "isReadOnly", TypeDef.Primitive.BOOLEAN,
                     context, lValue.base(), lValue.property()).returning();
             });
     }
@@ -147,10 +149,10 @@ public final class ValueExpressionWriter {
                 ExpressionDef context = parameters.get(0);
                 ELCompiler.LValue lValue = lValueOf(compiler, node, context);
                 if (lValue.base() == null) {
-                    return EL_RESOLUTION.invokeStatic("getIdentifierType", CLASS_TYPE,
+                    return compiler.invokeRuntime(EL_RESOLUTION, "getIdentifierType", CLASS_TYPE,
                         context, lValue.property()).returning();
                 }
-                return EL_RESOLUTION.invokeStatic("getType", CLASS_TYPE,
+                return compiler.invokeRuntime(EL_RESOLUTION, "getType", CLASS_TYPE,
                     context, lValue.base(), lValue.property()).returning();
             });
     }

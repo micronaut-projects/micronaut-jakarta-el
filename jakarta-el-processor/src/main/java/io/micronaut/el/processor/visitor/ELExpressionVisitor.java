@@ -191,12 +191,6 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
     }
 
     /**
-     * A declaration of an expression and the element it is declared on, whose environment compiles it.
-     */
-    private record Declared<A extends Annotation>(AnnotationValue<A> annotation, Element owner) {
-    }
-
-    /**
      * The declarations of an annotation on the class and on its declared fields, methods and parameters, in
      * that order. An expression declared twice with the same types is compiled once.
      */
@@ -318,8 +312,8 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
         ClassElement type = ELTypes.resolveMember(declared, "value", context).orElseThrow(() ->
             new ELCompilationException("The class of @ELFunctions is required"));
         String prefix = declared.stringValue("prefix").orElse("");
-        for (MethodElement method : type.getEnclosedElements(ElementQuery.ALL_METHODS.onlyStatic().onlyAccessible())) {
-            if (!method.isPublic()) {
+        for (MethodElement method : type.getEnclosedElements(ElementQuery.ALL_METHODS.onlyAccessible())) {
+            if (!method.isPublic() || !ELTypes.isStatic(method)) {
                 continue;
             }
             String localName = method.stringValue(ELFunction.class)
@@ -350,5 +344,15 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
         if (!constant.isEmpty() && constant.charAt(constant.length() - 1) != '_') {
             constant.append('_');
         }
+    }
+
+    /**
+     * A declaration of an expression and the element it is declared on, whose environment compiles it.
+     *
+     * @param annotation The declaration
+     * @param owner      The element it is declared on
+     * @param <A>        The annotation type
+     */
+    private record Declared<A extends Annotation>(AnnotationValue<A> annotation, Element owner) {
     }
 }

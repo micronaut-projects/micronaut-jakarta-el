@@ -17,6 +17,7 @@ package io.micronaut.el.processor.compiler;
 
 import io.micronaut.core.annotation.Internal;
 import org.jspecify.annotations.Nullable;
+import io.micronaut.el.processor.visitor.ELTypes;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.Element;
 import io.micronaut.inject.ast.ElementQuery;
@@ -163,8 +164,9 @@ public final class CompilationContext {
     public FieldElement resolveStaticField(String name) {
         for (ClassElement staticImport : staticImports) {
             Optional<FieldElement> field = staticImport
-                .getEnclosedElement(ElementQuery.ALL_FIELDS.onlyStatic().onlyAccessible()
-                    .includeEnumConstants().named(name));
+                .getEnclosedElements(ElementQuery.ALL_FIELDS.includeEnumConstants().named(name)).stream()
+                .filter(ELTypes::isPublicStatic)
+                .findFirst();
             if (field.isPresent()) {
                 return field.get();
             }
@@ -183,8 +185,8 @@ public final class CompilationContext {
     public MethodElement resolveStaticMethod(String name, int arguments) {
         for (ClassElement staticImport : staticImports) {
             for (MethodElement method : staticImport
-                .getEnclosedElements(ElementQuery.ALL_METHODS.onlyStatic().onlyAccessible().named(name))) {
-                if (method.getParameters().length == arguments) {
+                .getEnclosedElements(ElementQuery.ALL_METHODS.onlyAccessible().named(name))) {
+                if (method.getParameters().length == arguments && ELTypes.isStatic(method)) {
                     return method;
                 }
             }
