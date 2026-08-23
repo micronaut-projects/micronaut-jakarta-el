@@ -18,6 +18,7 @@ package io.micronaut.el.processor.compiler;
 import io.micronaut.core.annotation.Internal;
 import org.jspecify.annotations.Nullable;
 import io.micronaut.inject.ast.ClassElement;
+import io.micronaut.inject.ast.Element;
 import io.micronaut.inject.ast.ElementQuery;
 import io.micronaut.inject.ast.FieldElement;
 import io.micronaut.inject.ast.MethodElement;
@@ -48,6 +49,7 @@ public final class CompilationContext {
     private static final String DEFAULT_PACKAGE = "java.lang";
 
     private final VisitorContext visitorContext;
+    private final Element originatingElement;
     private final Map<String, ClassElement> variables;
     private final Map<String, ClassElement> importedClasses;
     private final List<String> importedPackages;
@@ -58,6 +60,7 @@ public final class CompilationContext {
 
     /**
      * @param visitorContext  The visitor context
+     * @param originatingElement The element the expressions are declared on
      * @param variables       The types of the variables by name
      * @param importedClasses The imported classes by simple name
      * @param importedPackages The imported packages
@@ -65,17 +68,26 @@ public final class CompilationContext {
      * @param functions       The functions by qualified name
      */
     public CompilationContext(VisitorContext visitorContext,
+                              Element originatingElement,
                               Map<String, ClassElement> variables,
                               Map<String, ClassElement> importedClasses,
                               List<String> importedPackages,
                               List<ClassElement> staticImports,
                               Map<String, MethodElement> functions) {
         this.visitorContext = visitorContext;
+        this.originatingElement = originatingElement;
         this.variables = new LinkedHashMap<>(variables);
         this.importedClasses = new LinkedHashMap<>(importedClasses);
         this.importedPackages = new ArrayList<>(importedPackages);
         this.staticImports = List.copyOf(staticImports);
         this.functions = new LinkedHashMap<>(functions);
+    }
+
+    /**
+     * @return The element the expressions are declared on, where the diagnostics are reported
+     */
+    public Element getOriginatingElement() {
+        return originatingElement;
     }
 
     /**

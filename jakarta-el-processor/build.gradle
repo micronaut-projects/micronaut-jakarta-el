@@ -18,3 +18,8 @@ dependencies {
     testImplementation libs.junit.jupiter
     testRuntimeOnly libs.junit.jupiter.engine
 }
+
+dependencies {
+    // compiles sources in memory with the Micronaut annotation processors, this one included
+    testImplementation mn.micronaut.inject.java.test
+}

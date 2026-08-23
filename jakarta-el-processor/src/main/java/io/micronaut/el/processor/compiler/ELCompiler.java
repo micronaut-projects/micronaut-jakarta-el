@@ -47,6 +47,8 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.ResourceBundle;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -275,6 +277,7 @@ public final class ELCompiler {
             if (reader != null) {
                 return new Typed(base.expression().invoke(reader), reader.getReturnType());
             }
+            warnUnknownMember(base.type(), "property", propertyName);
         }
         return dynamic(runtime(EL_RESOLUTION, "getValue", TypeDef.OBJECT,
             ctx, base.expression(), compile(property.property(), ctx)));
@@ -311,9 +314,35 @@ public final class ELCompiler {
                     target.getReturnType()
                 );
             }
+            warnUnknownMember(base.type(), "method", methodName + "(" + method.arguments().size() + " argument(s))");
         }
         return dynamic(runtime(EL_RESOLUTION, "invoke", TypeDef.OBJECT,
             arguments(ctx, base.expression(), compile(method.property(), ctx), method.arguments())));
+    }
+
+    /**
+     * A member the static type of the base does not declare is almost always a mistake, so it is reported, as a
+     * warning: a custom {@code jakarta.el.ELResolver} may well serve it at runtime, which is where the access is
+     * then resolved. The types the standard resolvers read dynamically, by key, index or name, are not reported.
+     */
+    private void warnUnknownMember(ClassElement type, String kind, String member) {
+        if (isResolvedDynamically(type)) {
+            return;
+        }
+        context.getVisitorContext().warn("The type " + type.getName() + " does not declare the " + kind + " '"
+            + member + "'; the access is left to the resolvers at runtime", context.getOriginatingElement());
+    }
+
+    private static boolean isResolvedDynamically(ClassElement type) {
+        return type.isArray()
+            || type.isPrimitive()
+            || type.getName().equals(Object.class.getName())
+            || type.isAssignable(Map.class)
+            || type.isAssignable(Collection.class)
+            || type.isAssignable(ResourceBundle.class)
+            || type.isAssignable(Optional.class)
+            || type.isAssignable("jakarta.el.ELClass")
+            || type.isAssignable("jakarta.el.LambdaExpression");
     }
 
     private Typed compileFunction(ELNode.Function function, ExpressionDef ctx) {
