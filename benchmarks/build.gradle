@@ -1,0 +1,83 @@
+plugins {
+    id "io.micronaut.build.internal.jakarta-el-base"
+    id "java"
+    id "me.champeau.jmh" version "0.7.3"
+}
+
+configurations.all {
+    resolutionStrategy.preferProjectModules()
+}
+
+dependencies {
+    jmhAnnotationProcessor libs.jmh.generator.annprocess
+    jmhAnnotationProcessor projects.micronautJakartaElProcessor
+    jmhAnnotationProcessor mn.micronaut.inject.java
+    jmhAnnotationProcessor platform(libs.micronaut.core)
+
+    jmh platform(libs.micronaut.core)
+    jmh projects.micronautJakartaEl
+    jmh projects.micronautJakartaElInterpreter
+    jmh mn.micronaut.core
+    jmh mn.micronaut.inject
+    jmh mn.micronaut.context
+    jmh libs.jmh.core
+    jmh libs.expressly
+    jmh(libs.tomcat.jasper.el) {
+        // the benchmark compiles against the Jakarta EL API the module depends on
+        exclude group: "org.apache.tomcat", module: "tomcat-el-api"
+    }
+}
+
+jmh {
+    includes = [".*EvaluationBenchmark.*"]
+    fork = 3
+    warmupIterations = 5
+    iterations = 5
+    warmup = "1s"
+    timeOnIteration = "1s"
+    benchmarkMode = ["avgt"]
+    timeUnit = "ns"
+    resultFormat = "JSON"
+    duplicateClassesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.named("jmh").configure { task ->
+    def stringProperty = { String name ->
+        def value = providers.gradleProperty(name).orNull
+        value == null || value.isBlank() ? null : value
+    }
+    def csvProperty = { String name ->
+        def value = stringProperty(name)
+        value == null ? null : value.split(",").collect { it.trim() }.findAll { !it.isEmpty() }
+    }
+    def includesOverride = csvProperty("jmh.includes")
+    if (includesOverride != null) {
+        task.includes.set(includesOverride)
+    }
+    def forksOverride = stringProperty("jmh.forks")
+    if (forksOverride != null) {
+        task.fork.set(Integer.parseInt(forksOverride))
+    }
+    def warmupIterationsOverride = stringProperty("jmh.warmupIterations")
+    if (warmupIterationsOverride != null) {
+        task.warmupIterations.set(Integer.parseInt(warmupIterationsOverride))
+    }
+    def iterationsOverride = stringProperty("jmh.iterations")
+    if (iterationsOverride != null) {
+        task.iterations.set(Integer.parseInt(iterationsOverride))
+    }
+    def profilersOverride = csvProperty("jmh.profilers")
+    if (profilersOverride != null) {
+        task.profilers.set(profilersOverride)
+    }
+    def jvmArgsOverride = csvProperty("jmh.jvmArgs")
+    if (jvmArgsOverride != null) {
+        task.jvmArgs.set(jvmArgsOverride)
+    }
+    def stacks = csvProperty("jmh.param.stack")
+    if (stacks != null) {
+        def property = objects.listProperty(String)
+        property.set(stacks)
+        task.benchmarkParameters.set(["stack": property])
+    }
+}

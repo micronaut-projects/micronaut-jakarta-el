@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="316" viewBox="0 0 1180 316" role="img" aria-labelledby="title desc">
+  <title id="title">EvaluationBenchmark results</title>
+  <desc id="desc">JMH results of evaluating the same Jakarta Expression Language expressions with the compiled and the interpreted Micronaut Jakarta EL, Eclipse Expressly and Apache Tomcat Jasper EL.</desc>
+  <style>
+    .bg { fill: #ffffff; }
+    .title { font: 700 24px Arial, Helvetica, sans-serif; fill: #1f2937; }
+    .subtitle { font: 400 13px Arial, Helvetica, sans-serif; fill: #4b5563; }
+    .panel-title { font: 700 15px Arial, Helvetica, sans-serif; fill: #111827; }
+    .subtle { font: 400 12px Arial, Helvetica, sans-serif; fill: #6b7280; }
+    .label { font: 400 12px Arial, Helvetica, sans-serif; fill: #374151; }
+    .value { font: 700 11px Arial, Helvetica, sans-serif; fill: #111827; }
+    .tick { font: 400 11px Arial, Helvetica, sans-serif; fill: #6b7280; }
+    .legend { font: 400 12px Arial, Helvetica, sans-serif; fill: #374151; }
+    .grid { stroke: #e5e7eb; stroke-width: 1; }
+  </style>
+  <rect class="bg" x="0" y="0" width="1180" height="316"/>
+  <text x="32" y="34" class="title">EvaluationBenchmark results</text>
+  <text x="32" y="56" class="subtitle">OpenJDK 25.0.2 on Apple Silicon, JMH 1.37, 1 fork, 3 warmup and 5 measurement iterations of 1 s, average time</text>
+  <rect x="32" y="75" width="13" height="13" fill="#4E79A7" rx="2"/>
+  <text x="52" y="86" class="legend">Micronaut Jakarta EL, compiled</text>
+  <rect x="290" y="75" width="13" height="13" fill="#A0CBE8" rx="2"/>
+  <text x="310" y="86" class="legend">Micronaut Jakarta EL, interpreted</text>
+  <rect x="569" y="75" width="13" height="13" fill="#F28E2B" rx="2"/>
+  <text x="589" y="86" class="legend">Eclipse Expressly (reference implementation)</text>
+  <rect x="925" y="75" width="13" height="13" fill="#E15759" rx="2"/>
+  <text x="945" y="86" class="legend">Apache Tomcat Jasper EL</text>
+  <text x="32" y="130" class="panel-title">all benchmarks: geometric mean of the average times</text>
+  <text x="32" y="146" class="subtle">ns/op, lower is better</text>
+  <line class="grid" x1="332.0" y1="156" x2="332.0" y2="252"/>
+  <text x="332.0" y="266" class="tick" text-anchor="middle">0</text>
+  <line class="grid" x1="695.0" y1="156" x2="695.0" y2="252"/>
+  <text x="695.0" y="266" class="tick" text-anchor="middle">250</text>
+  <line class="grid" x1="1058.0" y1="156" x2="1058.0" y2="252"/>
+  <text x="1058.0" y="266" class="tick" text-anchor="middle">500</text>
+  <text x="324" y="169" class="label" text-anchor="end">Micronaut Jakarta EL, compiled</text>
+  <rect x="332" y="156" width="12.5" height="18" fill="#4E79A7" rx="2"/>
+  <text x="350.5" y="169" class="value">8.63 ns/op, 1.0x the compiled stack</text>
+  <text x="324" y="193" class="label" text-anchor="end">Micronaut Jakarta EL, interpreted</text>
+  <rect x="332" y="180" width="120.4" height="18" fill="#A0CBE8" rx="2"/>
+  <text x="458.4" y="193" class="value">82.9 ns/op, 9.6x the compiled stack</text>
+  <text x="324" y="217" class="label" text-anchor="end">Eclipse Expressly (reference implementation)</text>
+  <rect x="332" y="204" width="533.1" height="18" fill="#F28E2B" rx="2"/>
+  <text x="871.1" y="217" class="value">367 ns/op, 42.5x the compiled stack</text>
+  <text x="324" y="241" class="label" text-anchor="end">Apache Tomcat Jasper EL</text>
+  <rect x="332" y="228" width="651.5" height="18" fill="#E15759" rx="2"/>
+  <text x="989.5" y="241" class="value">449 ns/op, 52.0x the compiled stack</text>
+</svg>

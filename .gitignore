@@ -21,4 +21,10 @@ target/
 /buildSrc/gradle.properties
 
 # Downloaded by the docs task from micronaut-docs
-src/main/docs/resources/
+src/main/docs/resources/css/
+src/main/docs/resources/js/
+src/main/docs/resources/style/
+src/main/docs/resources/img/micronaut-logo*.svg
+
+# Written by the native test binary
+test-results-native/

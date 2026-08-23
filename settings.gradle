@@ -19,6 +19,7 @@ dependencyResolutionManagement {
 
 rootProject.name = 'jakarta-el-parent'
 
+include 'benchmarks'
 include 'jakarta-el'
 include 'jakarta-el-annotations'
 include 'jakarta-el-bom'
