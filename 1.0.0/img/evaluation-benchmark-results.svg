@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="3628" viewBox="0 0 1180 3628" role="img" aria-labelledby="title desc">
+  <title id="title">EvaluationBenchmark results</title>
+  <desc id="desc">JMH results of evaluating the same Jakarta Expression Language expressions with the compiled and the interpreted Micronaut Jakarta EL, Eclipse Expressly and Apache Tomcat Jasper EL.</desc>
+  <style>
+    .bg { fill: #ffffff; }
+    .title { font: 700 24px Arial, Helvetica, sans-serif; fill: #1f2937; }
+    .subtitle { font: 400 13px Arial, Helvetica, sans-serif; fill: #4b5563; }
+    .panel-title { font: 700 15px Arial, Helvetica, sans-serif; fill: #111827; }
+    .subtle { font: 400 12px Arial, Helvetica, sans-serif; fill: #6b7280; }
+    .label { font: 400 12px Arial, Helvetica, sans-serif; fill: #374151; }
+    .value { font: 700 11px Arial, Helvetica, sans-serif; fill: #111827; }
+    .tick { font: 400 11px Arial, Helvetica, sans-serif; fill: #6b7280; }
+    .legend { font: 400 12px Arial, Helvetica, sans-serif; fill: #374151; }
+    .grid { stroke: #e5e7eb; stroke-width: 1; }
+  </style>
+  <rect class="bg" x="0" y="0" width="1180" height="3628"/>
+  <text x="32" y="34" class="title">EvaluationBenchmark results</text>
+  <text x="32" y="56" class="subtitle">OpenJDK 25.0.2 on Apple Silicon, JMH 1.37, 1 fork, 3 warmup and 5 measurement iterations of 1 s, average time</text>
+  <rect x="32" y="75" width="13" height="13" fill="#4E79A7" rx="2"/>
+  <text x="52" y="86" class="legend">Micronaut Jakarta EL, compiled</text>
+  <rect x="290" y="75" width="13" height="13" fill="#A0CBE8" rx="2"/>
+  <text x="310" y="86" class="legend">Micronaut Jakarta EL, interpreted</text>
+  <rect x="569" y="75" width="13" height="13" fill="#F28E2B" rx="2"/>
+  <text x="589" y="86" class="legend">Eclipse Expressly (reference implementation)</text>
+  <rect x="925" y="75" width="13" height="13" fill="#E15759" rx="2"/>
+  <text x="945" y="86" class="legend">Apache Tomcat Jasper EL</text>
+  <text x="32" y="130" class="panel-title">all benchmarks: geometric mean of the average times</text>
+  <text x="32" y="146" class="subtle">ns/op, lower is better</text>
+  <line class="grid" x1="332.0" y1="156" x2="332.0" y2="252"/>
+  <text x="332.0" y="266" class="tick" text-anchor="middle">0</text>
+  <line class="grid" x1="695.0" y1="156" x2="695.0" y2="252"/>
+  <text x="695.0" y="266" class="tick" text-anchor="middle">250</text>
+  <line class="grid" x1="1058.0" y1="156" x2="1058.0" y2="252"/>
+  <text x="1058.0" y="266" class="tick" text-anchor="middle">500</text>
+  <text x="324" y="169" class="label" text-anchor="end">Micronaut Jakarta EL, compiled</text>
+  <rect x="332" y="156" width="12.5" height="18" fill="#4E79A7" rx="2"/>
+  <text x="350.5" y="169" class="value">8.63 ns/op, 1.0x the compiled stack</text>
+  <text x="324" y="193" class="label" text-anchor="end">Micronaut Jakarta EL, interpreted</text>
+  <rect x="332" y="180" width="120.4" height="18" fill="#A0CBE8" rx="2"/>
+  <text x="458.4" y="193" class="value">82.9 ns/op, 9.6x the compiled stack</text>
+  <text x="324" y="217" class="label" text-anchor="end">Eclipse Expressly (reference implementation)</text>
+  <rect x="332" y="204" width="533.1" height="18" fill="#F28E2B" rx="2"/>
+  <text x="871.1" y="217" class="value">367 ns/op, 42.5x the compiled stack</text>
+  <text x="324" y="241" class="label" text-anchor="end">Apache Tomcat Jasper EL</text>
+  <rect x="332" y="228" width="651.5" height="18" fill="#E15759" rx="2"/>
+  <text x="989.5" y="241" class="value">449 ns/op, 52.0x the compiled stack</text>
+  <text x="32" y="314" class="panel-title">property: ${book.title}</text>
+  <text x="32" y="330" class="subtle">ns/op, lower is better</text>
+  <line class="grid" x1="332.0" y1="340" x2="332.0" y2="436"/>
+  <text x="332.0" y="450" class="tick" text-anchor="middle">0</text>
+  <line class="grid" x1="695.0" y1="340" x2="695.0" y2="436"/>
+  <text x="695.0" y="450" class="tick" text-anchor="middle">100</text>
+  <line class="grid" x1="1058.0" y1="340" x2="1058.0" y2="436"/>
+  <text x="1058.0" y="450" class="tick" text-anchor="middle">200</text>
+  <text x="324" y="353" class="label" text-anchor="end">Micronaut Jakarta EL, compiled</text>
+  <rect x="332" y="340" width="16.7" height="18" fill="#4E79A7" rx="2"/>
+  <text x="354.7" y="353" class="value">4.59 ± 0.04 ns/op</text>
+  <text x="324" y="377" class="label" text-anchor="end">Micronaut Jakarta EL, interpreted</text>
+  <rect x="332" y="364" width="55.9" height="18" fill="#A0CBE8" rx="2"/>
+  <text x="393.9" y="377" class="value">15.4 ± 0.58 ns/op</text>
+  <text x="324" y="401" class="label" text-anchor="end">Eclipse Expressly (reference implementation)</text>
+  <rect x="332" y="388" width="366.4" height="18" fill="#F28E2B" rx="2"/>
+  <text x="704.4" y="401" class="value">101 ± 2.22 ns/op</text>
+  <text x="324" y="425" class="label" text-anchor="end">Apache Tomcat Jasper EL</text>
+  <rect x="332" y="412" width="432.3" height="18" fill="#E15759" rx="2"/>
+  <text x="770.3" y="425" class="value">119 ± 11.7 ns/op</text>
+  <text x="32" y="498" class="panel-title">nested property: ${book.author.name}</text>
+  <text x="32" y="514" class="subtle">ns/op, lower is better</text>
+  <line class="grid" x1="332.0" y1="524" x2="332.0" y2="620"/>
+  <text x="332.0" y="634" class="tick" text-anchor="middle">0</text>
+  <line class="grid" x1="695.0" y1="524" x2="695.0" y2="620"/>
+  <text x="695.0" y="634" class="tick" text-anchor="middle">100</text>
+  <line class="grid" x1="1058.0" y1="524" x2="1058.0" y2="620"/>
+  <text x="1058.0" y="634" class="tick" text-anchor="middle">200</text>
+  <text x="324" y="537" class="label" text-anchor="end">Micronaut Jakarta EL, compiled</text>
+  <rect x="332" y="524" width="16.9" height="18" fill="#4E79A7" rx="2"/>
+  <text x="354.9" y="537" class="value">4.67 ± 0.08 ns/op</text>
+  <text x="324" y="561" class="label" text-anchor="end">Micronaut Jakarta EL, interpreted</text>
+  <rect x="332" y="548" width="116.2" height="18" fill="#A0CBE8" rx="2"/>
+  <text x="454.2" y="561" class="value">32.0 ± 1.27 ns/op</text>
+  <text x="324" y="585" class="label" text-anchor="end">Eclipse Expressly (reference implementation)</text>
+  <rect x="332" y="572" width="569.0" height="18" fill="#F28E2B" rx="2"/>
+  <text x="907.0" y="585" class="value">157 ± 3.00 ns/op</text>
+  <text x="324" y="609" class="label" text-anchor="end">Apache Tomcat Jasper EL</text>
+  <rect x="332" y="596" width="617.1" height="18" fill="#E15759" rx="2"/>
+  <text x="955.1" y="609" class="value">170 ± 5.01 ns/op</text>
+  <text x="32" y="682" class="panel-title">composite: Book: ${book.title} costs ${book.unitPrice}</text>
+  <text x="32" y="698" class="subtle">ns/op, lower is better</text>
+  <line class="grid" x1="332.0" y1="708" x2="332.0" y2="804"/>
+  <text x="332.0" y="818" class="tick" text-anchor="middle">0</text>
+  <line class="grid" x1="695.0" y1="708" x2="695.0" y2="804"/>
+  <text x="695.0" y="818" class="tick" text-anchor="middle">250</text>
+  <line class="grid" x1="1058.0" y1="708" x2="1058.0" y2="804"/>
+  <text x="1058.0" y="818" class="tick" text-anchor="middle">500</text>
+  <text x="324" y="721" class="label" text-anchor="end">Micronaut Jakarta EL, compiled</text>
+  <rect x="332" y="708" width="40.5" height="18" fill="#4E79A7" rx="2"/>
+  <text x="378.5" y="721" class="value">27.9 ± 0.39 ns/op</text>
+  <text x="324" y="745" class="label" text-anchor="end">Micronaut Jakarta EL, interpreted</text>
+  <rect x="332" y="732" width="275.2" height="18" fill="#A0CBE8" rx="2"/>
+  <text x="613.2" y="745" class="value">190 ± 6.42 ns/op</text>
+  <text x="324" y="769" class="label" text-anchor="end">Eclipse Expressly (reference implementation)</text>
+  <rect x="332" y="756" width="440.6" height="18" fill="#F28E2B" rx="2"/>
+  <text x="778.6" y="769" class="value">303 ± 15.6 ns/op</text>
+  <text x="324" y="793" class="label" text-anchor="end">Apache Tomcat Jasper EL</text>
+  <rect x="332" y="780" width="615.7" height="18" fill="#E15759" rx="2"/>
+  <text x="953.7" y="793" class="value">424 ± 19.3 ns/op</text>
+  <text x="32" y="866" class="panel-title">arithmetic: ${book.unitPrice * 2 + 1 &gt; 10 ? 'expensive' : 'cheap'}</text>
+  <text x="32" y="882" class="subtle">ns/op, lower is better</text>
+  <line class="grid" x1="332.0" y1="892" x2="332.0" y2="988"/>
+  <text x="332.0" y="1002" class="tick" text-anchor="middle">0</text>
+  <line class="grid" x1="695.0" y1="892" x2="695.0" y2="988"/>
+  <text x="695.0" y="1002" class="tick" text-anchor="middle">250</text>
+  <line class="grid" x1="1058.0" y1="892" x2="1058.0" y2="988"/>
+  <text x="1058.0" y="1002" class="tick" text-anchor="middle">500</text>
+  <text x="324" y="905" class="label" text-anchor="end">Micronaut Jakarta EL, compiled</text>
+  <rect x="332" y="892" width="4.9" height="18" fill="#4E79A7" rx="2"/>
+  <text x="342.9" y="905" class="value">3.35 ± 0.12 ns/op</text>
+  <text x="324" y="929" class="label" text-anchor="end">Micronaut Jakarta EL, interpreted</text>
+  <rect x="332" y="916" width="38.9" height="18" fill="#A0CBE8" rx="2"/>
+  <text x="376.9" y="929" class="value">26.8 ± 0.79 ns/op</text>
+  <text x="324" y="953" class="label" text-anchor="end">Eclipse Expressly (reference implementation)</text>
+  <rect x="332" y="940" width="164.5" height="18" fill="#F28E2B" rx="2"/>
+  <text x="502.5" y="953" class="value">113 ± 1.47 ns/op</text>
+  <text x="324" y="977" class="label" text-anchor="end">Apache Tomcat Jasper EL</text>
+  <rect x="332" y="964" width="393.5" height="18" fill="#E15759" rx="2"/>
+  <text x="731.5" y="977" class="value">271 ± 12.0 ns/op</text>
+  <text x="32" y="1050" class="panel-title">comparison: ${book.pages &gt;= 300 and book.author.born &lt; 1980}</text>
+  <text x="32" y="1066" class="subtle">ns/op, lower is better</text>
+  <line class="grid" x1="332.0" y1="1076" x2="332.0" y2="1172"/>
+  <text x="332.0" y="1186" class="tick" text-anchor="middle">0</text>
+  <line class="grid" x1="695.0" y1="1076" x2="695.0" y2="1172"/>
+  <text x="695.0" y="1186" class="tick" text-anchor="middle">500</text>
+  <line class="grid" x1="1058.0" y1="1076" x2="1058.0" y2="1172"/>
+  <text x="1058.0" y="1186" class="tick" text-anchor="middle">1,000</text>
+  <text x="324" y="1089" class="label" text-anchor="end">Micronaut Jakarta EL, compiled</text>
+  <rect x="332" y="1076" width="2.6" height="18" fill="#4E79A7" rx="2"/>
+  <text x="340.6" y="1089" class="value">3.52 ± 0.07 ns/op</text>
+  <text x="324" y="1113" class="label" text-anchor="end">Micronaut Jakarta EL, interpreted</text>
+  <rect x="332" y="1100" width="46.8" height="18" fill="#A0CBE8" rx="2"/>
+  <text x="384.8" y="1113" class="value">64.4 ± 1.86 ns/op</text>
+  <text x="324" y="1137" class="label" text-anchor="end">Eclipse Expressly (reference implementation)</text>
+  <rect x="332" y="1124" width="172.6" height="18" fill="#F28E2B" rx="2"/>
+  <text x="510.6" y="1137" class="value">238 ± 11.8 ns/op</text>
+  <text x="324" y="1161" class="label" text-anchor="end">Apache Tomcat Jasper EL</text>
+  <rect x="332" y="1148" width="384.3" height="18" fill="#E15759" rx="2"/>
+  <text x="722.3" y="1161" class="value">529 ± 21.8 ns/op</text>
+  <text x="32" y="1234" class="panel-title">method call: ${book.discounted(10)}</text>
+  <text x="32" y="1250" class="subtle">ns/op, lower is better</text>
+  <line class="grid" x1="332.0" y1="1260" x2="332.0" y2="1356"/>
+  <text x="332.0" y="1370" class="tick" text-anchor="middle">0</text>
+  <line class="grid" x1="695.0" y1="1260" x2="695.0" y2="1356"/>
+  <text x="695.0" y="1370" class="tick" text-anchor="middle">250</text>
+  <line class="grid" x1="1058.0" y1="1260" x2="1058.0" y2="1356"/>
+  <text x="1058.0" y="1370" class="tick" text-anchor="middle">500</text>
+  <text x="324" y="1273" class="label" text-anchor="end">Micronaut Jakarta EL, compiled</text>
+  <rect x="332" y="1260" width="4.8" height="18" fill="#4E79A7" rx="2"/>
+  <text x="342.8" y="1273" class="value">3.29 ± 0.04 ns/op</text>
+  <text x="324" y="1297" class="label" text-anchor="end">Micronaut Jakarta EL, interpreted</text>
+  <rect x="332" y="1284" width="58.6" height="18" fill="#A0CBE8" rx="2"/>
+  <text x="396.6" y="1297" class="value">40.4 ± 1.89 ns/op</text>
+  <text x="324" y="1321" class="label" text-anchor="end">Eclipse Expressly (reference implementation)</text>
+  <rect x="332" y="1308" width="436.0" height="18" fill="#F28E2B" rx="2"/>
+  <text x="774.0" y="1321" class="value">300 ± 8.14 ns/op</text>
+  <text x="324" y="1345" class="label" text-anchor="end">Apache Tomcat Jasper EL</text>
+  <rect x="332" y="1332" width="470.1" height="18" fill="#E15759" rx="2"/>
+  <text x="808.1" y="1345" class="value">324 ± 14.8 ns/op</text>
+  <text x="32" y="1418" class="panel-title">map access: ${book.attributes['isbn']}</text>
+  <text x="32" y="1434" class="subtle">ns/op, lower is better</text>
+  <line class="grid" x1="332.0" y1="1444" x2="332.0" y2="1540"/>
+  <text x="332.0" y="1554" class="tick" text-anchor="middle">0</text>
+  <line class="grid" x1="695.0" y1="1444" x2="695.0" y2="1540"/>
+  <text x="695.0" y="1554" class="tick" text-anchor="middle">100</text>
+  <line class="grid" x1="1058.0" y1="1444" x2="1058.0" y2="1540"/>
+  <text x="1058.0" y="1554" class="tick" text-anchor="middle">200</text>
+  <text x="324" y="1457" class="label" text-anchor="end">Micronaut Jakarta EL, compiled</text>
+  <rect x="332" y="1444" width="18.1" height="18" fill="#4E79A7" rx="2"/>
+  <text x="356.1" y="1457" class="value">4.99 ± 0.05 ns/op</text>
+  <text x="324" y="1481" class="label" text-anchor="end">Micronaut Jakarta EL, interpreted</text>
+  <rect x="332" y="1468" width="146.7" height="18" fill="#A0CBE8" rx="2"/>
+  <text x="484.7" y="1481" class="value">40.4 ± 0.85 ns/op</text>
+  <text x="324" y="1505" class="label" text-anchor="end">Eclipse Expressly (reference implementation)</text>
+  <rect x="332" y="1492" width="431.9" height="18" fill="#F28E2B" rx="2"/>
+  <text x="769.9" y="1505" class="value">119 ± 3.71 ns/op</text>
+  <text x="324" y="1529" class="label" text-anchor="end">Apache Tomcat Jasper EL</text>
+  <rect x="332" y="1516" width="456.4" height="18" fill="#E15759" rx="2"/>
+  <text x="794.4" y="1529" class="value">126 ± 3.30 ns/op</text>
+  <text x="32" y="1602" class="panel-title">stream: ${book.tags.stream().filter(t -&gt; t.length() &gt; 2).map(t -&gt; t += '!').toList()}</text>
+  <text x="32" y="1618" class="subtle">ns/op, lower is better</text>
+  <line class="grid" x1="332.0" y1="1628" x2="332.0" y2="1724"/>
+  <text x="332.0" y="1738" class="tick" text-anchor="middle">0</text>
+  <line class="grid" x1="695.0" y1="1628" x2="695.0" y2="1724"/>
+  <text x="695.0" y="1738" class="tick" text-anchor="middle">2,500</text>
+  <line class="grid" x1="1058.0" y1="1628" x2="1058.0" y2="1724"/>
+  <text x="1058.0" y="1738" class="tick" text-anchor="middle">5,000</text>
+  <text x="324" y="1641" class="label" text-anchor="end">Micronaut Jakarta EL, compiled</text>
+  <rect x="332" y="1628" width="6.6" height="18" fill="#4E79A7" rx="2"/>
+  <text x="344.6" y="1641" class="value">45.5 ± 1.78 ns/op</text>
+  <text x="324" y="1665" class="label" text-anchor="end">Micronaut Jakarta EL, interpreted</text>
+  <rect x="332" y="1652" width="70.7" height="18" fill="#A0CBE8" rx="2"/>
+  <text x="408.7" y="1665" class="value">487 ± 7.15 ns/op</text>
+  <text x="324" y="1689" class="label" text-anchor="end">Eclipse Expressly (reference implementation)</text>
+  <rect x="332" y="1676" width="412.7" height="18" fill="#F28E2B" rx="2"/>
+  <text x="750.7" y="1689" class="value">2,842 ± 14.2 ns/op</text>
+  <text x="324" y="1713" class="label" text-anchor="end">Apache Tomcat Jasper EL</text>
+  <rect x="332" y="1700" width="496.6" height="18" fill="#E15759" rx="2"/>
+  <text x="834.6" y="1713" class="value">3,420 ± 58.3 ns/op</text>
+  <text x="32" y="1786" class="panel-title">lambda: ${(x -&gt; x * 2 + book.pages)(book.pages)}</text>
+  <text x="32" y="1802" class="subtle">ns/op, lower is better</text>
+  <line class="grid" x1="332.0" y1="1812" x2="332.0" y2="1908"/>
+  <text x="332.0" y="1922" class="tick" text-anchor="middle">0</text>
+  <line class="grid" x1="695.0" y1="1812" x2="695.0" y2="1908"/>
+  <text x="695.0" y="1922" class="tick" text-anchor="middle">250</text>
+  <line class="grid" x1="1058.0" y1="1812" x2="1058.0" y2="1908"/>
+  <text x="1058.0" y="1922" class="tick" text-anchor="middle">500</text>
+  <text x="324" y="1825" class="label" text-anchor="end">Micronaut Jakarta EL, compiled</text>
+  <rect x="332" y="1812" width="8.2" height="18" fill="#4E79A7" rx="2"/>
+  <text x="346.2" y="1825" class="value">5.68 ± 0.13 ns/op</text>
+  <text x="324" y="1849" class="label" text-anchor="end">Micronaut Jakarta EL, interpreted</text>
+  <rect x="332" y="1836" width="173.3" height="18" fill="#A0CBE8" rx="2"/>
+  <text x="511.3" y="1849" class="value">119 ± 1.22 ns/op</text>
+  <text x="324" y="1873" class="label" text-anchor="end">Eclipse Expressly (reference implementation)</text>
+  <rect x="332" y="1860" width="440.1" height="18" fill="#F28E2B" rx="2"/>
+  <text x="778.1" y="1873" class="value">303 ± 16.2 ns/op</text>
+  <text x="324" y="1897" class="label" text-anchor="end">Apache Tomcat Jasper EL</text>
+  <rect x="332" y="1884" width="517.8" height="18" fill="#E15759" rx="2"/>
+  <text x="855.8" y="1897" class="value">357 ± 11.9 ns/op</text>
+  <text x="32" y="1970" class="panel-title">math: ${(book.unitPrice * book.pages - 100) / 3 mod 7 + -book.pages}</text>
+  <text x="32" y="1986" class="subtle">ns/op, lower is better</text>
+  <line class="grid" x1="332.0" y1="1996" x2="332.0" y2="2092"/>
+  <text x="332.0" y="2106" class="tick" text-anchor="middle">0</text>
+  <line class="grid" x1="695.0" y1="1996" x2="695.0" y2="2092"/>
+  <text x="695.0" y="2106" class="tick" text-anchor="middle">250</text>
+  <line class="grid" x1="1058.0" y1="1996" x2="1058.0" y2="2092"/>
+  <text x="1058.0" y="2106" class="tick" text-anchor="middle">500</text>
+  <text x="324" y="2009" class="label" text-anchor="end">Micronaut Jakarta EL, compiled</text>
+  <rect x="332" y="1996" width="13.4" height="18" fill="#4E79A7" rx="2"/>
+  <text x="351.4" y="2009" class="value">9.24 ± 0.33 ns/op</text>
+  <text x="324" y="2033" class="label" text-anchor="end">Micronaut Jakarta EL, interpreted</text>
+  <rect x="332" y="2020" width="103.5" height="18" fill="#A0CBE8" rx="2"/>
+  <text x="441.5" y="2033" class="value">71.3 ± 1.66 ns/op</text>
+  <text x="324" y="2057" class="label" text-anchor="end">Eclipse Expressly (reference implementation)</text>
+  <rect x="332" y="2044" width="402.6" height="18" fill="#F28E2B" rx="2"/>
+  <text x="740.6" y="2057" class="value">277 ± 11.3 ns/op</text>
+  <text x="324" y="2081" class="label" text-anchor="end">Apache Tomcat Jasper EL</text>
+  <rect x="332" y="2068" width="431.6" height="18" fill="#E15759" rx="2"/>
+  <text x="769.6" y="2081" class="value">297 ± 7.16 ns/op</text>
+  <text x="32" y="2154" class="panel-title">complex: ${book.pages &gt; 100 and book.unitPrice &lt; 50 ? book.title += ' (' += ... : 'none'}</text>
+  <text x="32" y="2170" class="subtle">ns/op, lower is better</text>
+  <line class="grid" x1="332.0" y1="2180" x2="332.0" y2="2276"/>
+  <text x="332.0" y="2290" class="tick" text-anchor="middle">0</text>
+  <line class="grid" x1="695.0" y1="2180" x2="695.0" y2="2276"/>
+  <text x="695.0" y="2290" class="tick" text-anchor="middle">1,000</text>
+  <line class="grid" x1="1058.0" y1="2180" x2="1058.0" y2="2276"/>
+  <text x="1058.0" y="2290" class="tick" text-anchor="middle">2,000</text>
+  <text x="324" y="2193" class="label" text-anchor="end">Micronaut Jakarta EL, compiled</text>
+  <rect x="332" y="2180" width="5.7" height="18" fill="#4E79A7" rx="2"/>
+  <text x="343.7" y="2193" class="value">15.7 ± 1.39 ns/op</text>
+  <text x="324" y="2217" class="label" text-anchor="end">Micronaut Jakarta EL, interpreted</text>
+  <rect x="332" y="2204" width="66.6" height="18" fill="#A0CBE8" rx="2"/>
+  <text x="404.6" y="2217" class="value">183 ± 3.00 ns/op</text>
+  <text x="324" y="2241" class="label" text-anchor="end">Eclipse Expressly (reference implementation)</text>
+  <rect x="332" y="2228" width="237.8" height="18" fill="#F28E2B" rx="2"/>
+  <text x="575.8" y="2241" class="value">655 ± 19.9 ns/op</text>
+  <text x="324" y="2265" class="label" text-anchor="end">Apache Tomcat Jasper EL</text>
+  <rect x="332" y="2252" width="449.2" height="18" fill="#E15759" rx="2"/>
+  <text x="787.2" y="2265" class="value">1,237 ± 15.4 ns/op</text>
+  <text x="32" y="2338" class="panel-title">list index: ${book.tags[1]}</text>
+  <text x="32" y="2354" class="subtle">ns/op, lower is better</text>
+  <line class="grid" x1="332.0" y1="2364" x2="332.0" y2="2460"/>
+  <text x="332.0" y="2474" class="tick" text-anchor="middle">0</text>
+  <line class="grid" x1="695.0" y1="2364" x2="695.0" y2="2460"/>
+  <text x="695.0" y="2474" class="tick" text-anchor="middle">100</text>
+  <line class="grid" x1="1058.0" y1="2364" x2="1058.0" y2="2460"/>
+  <text x="1058.0" y="2474" class="tick" text-anchor="middle">200</text>
+  <text x="324" y="2377" class="label" text-anchor="end">Micronaut Jakarta EL, compiled</text>
+  <rect x="332" y="2364" width="18.3" height="18" fill="#4E79A7" rx="2"/>
+  <text x="356.3" y="2377" class="value">5.03 ± 0.09 ns/op</text>
+  <text x="324" y="2401" class="label" text-anchor="end">Micronaut Jakarta EL, interpreted</text>
+  <rect x="332" y="2388" width="164.8" height="18" fill="#A0CBE8" rx="2"/>
+  <text x="502.8" y="2401" class="value">45.4 ± 1.68 ns/op</text>
+  <text x="324" y="2425" class="label" text-anchor="end">Eclipse Expressly (reference implementation)</text>
+  <rect x="332" y="2412" width="456.7" height="18" fill="#F28E2B" rx="2"/>
+  <text x="794.7" y="2425" class="value">126 ± 4.22 ns/op</text>
+  <text x="324" y="2449" class="label" text-anchor="end">Apache Tomcat Jasper EL</text>
+  <rect x="332" y="2436" width="487.3" height="18" fill="#E15759" rx="2"/>
+  <text x="825.3" y="2449" class="value">134 ± 4.30 ns/op</text>
+  <text x="32" y="2522" class="panel-title">static method: ${Integer.toHexString(book.pages)}</text>
+  <text x="32" y="2538" class="subtle">ns/op, lower is better</text>
+  <line class="grid" x1="332.0" y1="2548" x2="332.0" y2="2644"/>
+  <text x="332.0" y="2658" class="tick" text-anchor="middle">0</text>
+  <line class="grid" x1="695.0" y1="2548" x2="695.0" y2="2644"/>
+  <text x="695.0" y="2658" class="tick" text-anchor="middle">1,250</text>
+  <line class="grid" x1="1058.0" y1="2548" x2="1058.0" y2="2644"/>
+  <text x="1058.0" y="2658" class="tick" text-anchor="middle">2,500</text>
+  <text x="324" y="2561" class="label" text-anchor="end">Micronaut Jakarta EL, compiled</text>
+  <rect x="332" y="2548" width="2.8" height="18" fill="#4E79A7" rx="2"/>
+  <text x="340.8" y="2561" class="value">9.53 ± 0.62 ns/op</text>
+  <text x="324" y="2585" class="label" text-anchor="end">Micronaut Jakarta EL, interpreted</text>
+  <rect x="332" y="2572" width="42.4" height="18" fill="#A0CBE8" rx="2"/>
+  <text x="380.4" y="2585" class="value">146 ± 5.30 ns/op</text>
+  <text x="324" y="2609" class="label" text-anchor="end">Eclipse Expressly (reference implementation)</text>
+  <rect x="332" y="2596" width="711.3" height="18" fill="#F28E2B" rx="2"/>
+  <text x="1049.3" y="2609" class="value">2,449 ± 25.7 ns/op</text>
+  <text x="324" y="2633" class="label" text-anchor="end">Apache Tomcat Jasper EL</text>
+  <rect x="332" y="2620" width="458.1" height="18" fill="#E15759" rx="2"/>
+  <text x="796.1" y="2633" class="value">1,577 ± 58.7 ns/op</text>
+  <text x="32" y="2706" class="panel-title">string methods: ${book.title.toUpperCase().substring(0, 3) += '...'}</text>
+  <text x="32" y="2722" class="subtle">ns/op, lower is better</text>
+  <line class="grid" x1="332.0" y1="2732" x2="332.0" y2="2828"/>
+  <text x="332.0" y="2842" class="tick" text-anchor="middle">0</text>
+  <line class="grid" x1="695.0" y1="2732" x2="695.0" y2="2828"/>
+  <text x="695.0" y="2842" class="tick" text-anchor="middle">1,000</text>
+  <line class="grid" x1="1058.0" y1="2732" x2="1058.0" y2="2828"/>
+  <text x="1058.0" y="2842" class="tick" text-anchor="middle">2,000</text>
+  <text x="324" y="2745" class="label" text-anchor="end">Micronaut Jakarta EL, compiled</text>
+  <rect x="332" y="2732" width="12.6" height="18" fill="#4E79A7" rx="2"/>
+  <text x="350.6" y="2745" class="value">34.7 ± 7.21 ns/op</text>
+  <text x="324" y="2769" class="label" text-anchor="end">Micronaut Jakarta EL, interpreted</text>
+  <rect x="332" y="2756" width="91.8" height="18" fill="#A0CBE8" rx="2"/>
+  <text x="429.8" y="2769" class="value">253 ± 24.2 ns/op</text>
+  <text x="324" y="2793" class="label" text-anchor="end">Eclipse Expressly (reference implementation)</text>
+  <rect x="332" y="2780" width="656.2" height="18" fill="#F28E2B" rx="2"/>
+  <text x="994.2" y="2793" class="value">1,808 ± 90.8 ns/op</text>
+  <text x="324" y="2817" class="label" text-anchor="end">Apache Tomcat Jasper EL</text>
+  <rect x="332" y="2804" width="689.2" height="18" fill="#E15759" rx="2"/>
+  <text x="1027.2" y="2817" class="value">1,899 ± 95.5 ns/op</text>
+  <text x="32" y="2890" class="panel-title">empty: ${empty book.tags or book.tags.size() &gt; 2}</text>
+  <text x="32" y="2906" class="subtle">ns/op, lower is better</text>
+  <line class="grid" x1="332.0" y1="2916" x2="332.0" y2="3012"/>
+  <text x="332.0" y="3026" class="tick" text-anchor="middle">0</text>
+  <line class="grid" x1="695.0" y1="2916" x2="695.0" y2="3012"/>
+  <text x="695.0" y="3026" class="tick" text-anchor="middle">1,000</text>
+  <line class="grid" x1="1058.0" y1="2916" x2="1058.0" y2="3012"/>
+  <text x="1058.0" y="3026" class="tick" text-anchor="middle">2,000</text>
+  <text x="324" y="2929" class="label" text-anchor="end">Micronaut Jakarta EL, compiled</text>
+  <rect x="332" y="2916" width="1.3" height="18" fill="#4E79A7" rx="2"/>
+  <text x="339.3" y="2929" class="value">3.52 ± 0.05 ns/op</text>
+  <text x="324" y="2953" class="label" text-anchor="end">Micronaut Jakarta EL, interpreted</text>
+  <rect x="332" y="2940" width="34.6" height="18" fill="#A0CBE8" rx="2"/>
+  <text x="372.6" y="2953" class="value">95.4 ± 79.4 ns/op</text>
+  <text x="324" y="2977" class="label" text-anchor="end">Eclipse Expressly (reference implementation)</text>
+  <rect x="332" y="2964" width="530.1" height="18" fill="#F28E2B" rx="2"/>
+  <text x="868.1" y="2977" class="value">1,460 ± 64.7 ns/op</text>
+  <text x="324" y="3001" class="label" text-anchor="end">Apache Tomcat Jasper EL</text>
+  <rect x="332" y="2988" width="603.4" height="18" fill="#E15759" rx="2"/>
+  <text x="941.4" y="3001" class="value">1,662 ± 52.7 ns/op</text>
+  <text x="32" y="3074" class="panel-title">undeclared bean: ${order.customer.name}</text>
+  <text x="32" y="3090" class="subtle">ns/op, lower is better</text>
+  <line class="grid" x1="332.0" y1="3100" x2="332.0" y2="3196"/>
+  <text x="332.0" y="3210" class="tick" text-anchor="middle">0</text>
+  <line class="grid" x1="695.0" y1="3100" x2="695.0" y2="3196"/>
+  <text x="695.0" y="3210" class="tick" text-anchor="middle">100</text>
+  <line class="grid" x1="1058.0" y1="3100" x2="1058.0" y2="3196"/>
+  <text x="1058.0" y="3210" class="tick" text-anchor="middle">200</text>
+  <text x="324" y="3113" class="label" text-anchor="end">Micronaut Jakarta EL, compiled</text>
+  <rect x="332" y="3100" width="68.7" height="18" fill="#4E79A7" rx="2"/>
+  <text x="406.7" y="3113" class="value">18.9 ± 0.61 ns/op</text>
+  <text x="324" y="3137" class="label" text-anchor="end">Micronaut Jakarta EL, interpreted</text>
+  <rect x="332" y="3124" width="114.0" height="18" fill="#A0CBE8" rx="2"/>
+  <text x="452.0" y="3137" class="value">31.4 ± 1.39 ns/op</text>
+  <text x="324" y="3161" class="label" text-anchor="end">Eclipse Expressly (reference implementation)</text>
+  <rect x="332" y="3148" width="575.4" height="18" fill="#F28E2B" rx="2"/>
+  <text x="913.4" y="3161" class="value">159 ± 4.20 ns/op</text>
+  <text x="324" y="3185" class="label" text-anchor="end">Apache Tomcat Jasper EL</text>
+  <rect x="332" y="3172" width="604.7" height="18" fill="#E15759" rx="2"/>
+  <text x="942.7" y="3185" class="value">167 ± 4.03 ns/op</text>
+  <text x="32" y="3258" class="panel-title">custom functional interface: ${book.adjusted((p, q) -&gt; p * q + 1)}</text>
+  <text x="32" y="3274" class="subtle">ns/op, lower is better</text>
+  <line class="grid" x1="332.0" y1="3284" x2="332.0" y2="3380"/>
+  <text x="332.0" y="3394" class="tick" text-anchor="middle">0</text>
+  <line class="grid" x1="695.0" y1="3284" x2="695.0" y2="3380"/>
+  <text x="695.0" y="3394" class="tick" text-anchor="middle">250</text>
+  <line class="grid" x1="1058.0" y1="3284" x2="1058.0" y2="3380"/>
+  <text x="1058.0" y="3394" class="tick" text-anchor="middle">500</text>
+  <text x="324" y="3297" class="label" text-anchor="end">Micronaut Jakarta EL, compiled</text>
+  <rect x="332" y="3284" width="6.3" height="18" fill="#4E79A7" rx="2"/>
+  <text x="344.3" y="3297" class="value">4.32 ± 0.05 ns/op</text>
+  <text x="324" y="3321" class="label" text-anchor="end">Micronaut Jakarta EL, interpreted</text>
+  <rect x="332" y="3308" width="236.4" height="18" fill="#A0CBE8" rx="2"/>
+  <text x="574.4" y="3321" class="value">163 ± 2.95 ns/op</text>
+  <text x="324" y="3345" class="label" text-anchor="end">Eclipse Expressly (reference implementation)</text>
+  <rect x="332" y="3332" width="673.3" height="18" fill="#F28E2B" rx="2"/>
+  <text x="1011.3" y="3345" class="value">464 ± 15.7 ns/op</text>
+  <text x="324" y="3369" class="label" text-anchor="end">Apache Tomcat Jasper EL</text>
+  <rect x="332" y="3356" width="684.0" height="18" fill="#E15759" rx="2"/>
+  <text x="1022.0" y="3369" class="value">471 ± 16.9 ns/op</text>
+  <text x="32" y="3442" class="panel-title">create and evaluate: factory.createValueExpression(...).getValue(...)</text>
+  <text x="32" y="3458" class="subtle">ns/op, lower is better</text>
+  <line class="grid" x1="332.0" y1="3468" x2="332.0" y2="3564"/>
+  <text x="332.0" y="3578" class="tick" text-anchor="middle">0</text>
+  <line class="grid" x1="695.0" y1="3468" x2="695.0" y2="3564"/>
+  <text x="695.0" y="3578" class="tick" text-anchor="middle">250</text>
+  <line class="grid" x1="1058.0" y1="3468" x2="1058.0" y2="3564"/>
+  <text x="1058.0" y="3578" class="tick" text-anchor="middle">500</text>
+  <text x="324" y="3481" class="label" text-anchor="end">Micronaut Jakarta EL, compiled</text>
+  <rect x="332" y="3468" width="49.9" height="18" fill="#4E79A7" rx="2"/>
+  <text x="387.9" y="3481" class="value">34.4 ± 3.13 ns/op</text>
+  <text x="324" y="3505" class="label" text-anchor="end">Micronaut Jakarta EL, interpreted</text>
+  <rect x="332" y="3492" width="303.2" height="18" fill="#A0CBE8" rx="2"/>
+  <text x="641.2" y="3505" class="value">209 ± 2.91 ns/op</text>
+  <text x="324" y="3529" class="label" text-anchor="end">Eclipse Expressly (reference implementation)</text>
+  <rect x="332" y="3516" width="493.8" height="18" fill="#F28E2B" rx="2"/>
+  <text x="831.8" y="3529" class="value">340 ± 3.41 ns/op</text>
+  <text x="324" y="3553" class="label" text-anchor="end">Apache Tomcat Jasper EL</text>
+  <rect x="332" y="3540" width="669.6" height="18" fill="#E15759" rx="2"/>
+  <text x="1007.6" y="3553" class="value">461 ± 125 ns/op</text>
+</svg>
