@@ -1,4 +1,11 @@
+<!-- Checklist: https://github.com/micronaut-projects/micronaut-core/wiki/New-Module-Checklist -->
+
 # Micronaut Jakarta EL
+
+[![Maven Central](https://img.shields.io/maven-central/v/io.micronaut.el/micronaut-jakarta-el.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.micronaut.el%22%20AND%20a:%22micronaut-jakarta-el%22)
+[![Build Status](https://github.com/micronaut-projects/micronaut-jakarta-el/workflows/Java%20CI/badge.svg)](https://github.com/micronaut-projects/micronaut-jakarta-el/actions)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=micronaut-projects_micronaut-jakarta-el&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=micronaut-projects_micronaut-jakarta-el)
+[![Revved up by Develocity](https://img.shields.io/badge/Revved%20up%20by-Develocity-06A0CE?logo=Gradle&labelColor=02303A)](https://ge.micronaut.io/scans)
 
 An implementation of the [Jakarta Expression Language 6.0](https://jakarta.ee/specifications/expression-language/6.0/jakarta-expression-language-spec-6.0)
 specification whose expressions and resolvers are generated at **compilation time** with
@@ -15,6 +22,12 @@ Nothing is parsed and nothing is resolved reflectively at runtime:
   `jakarta.el.BeanELResolver`;
 * every property access, method invocation, function call and static reference whose type is known at compilation
   time becomes a direct Java invocation.
+
+## Documentation
+
+See the [Documentation](https://micronaut-projects.github.io/micronaut-jakarta-el/latest/guide/) for more information.
+
+See the [Snapshot Documentation](https://micronaut-projects.github.io/micronaut-jakarta-el/snapshot/guide/) for the current development docs.
 
 ## Modules
 
@@ -254,3 +267,18 @@ The TCK runs as part of `./gradlew build`.
 
 The build applies the Micronaut build conventions: Checkstyle, Spotless, Javadoc, the BOM and NullAway with
 [JSpecify](https://jspecify.dev) annotations.
+
+## Snapshots and Releases
+
+Snapshots are automatically published to [Sonatype Snapshots](https://central.sonatype.com/repository/maven-snapshots/io/micronaut/el/) using [GitHub Actions](https://github.com/micronaut-projects/micronaut-jakarta-el/actions).
+
+See the documentation in the [Micronaut Docs](https://docs.micronaut.io/latest/guide/index.html#usingsnapshots) for how to configure your build to use snapshots.
+
+Releases are published to Maven Central via [GitHub Actions](https://github.com/micronaut-projects/micronaut-jakarta-el/actions).
+
+Releases are completely automated. To perform a release use the following steps:
+
+* [Publish the draft release](https://github.com/micronaut-projects/micronaut-jakarta-el/releases). There should be already a draft release created, edit and publish it. The Git Tag should start with `v`. For example `v1.0.0`.
+* [Monitor the Workflow](https://github.com/micronaut-projects/micronaut-jakarta-el/actions?query=workflow%3ARelease) to check it passed successfully.
+* If everything went fine, [publish to Maven Central](https://github.com/micronaut-projects/micronaut-jakarta-el/actions?query=workflow%3A"Maven+Central+Sync").
+* Celebrate!
