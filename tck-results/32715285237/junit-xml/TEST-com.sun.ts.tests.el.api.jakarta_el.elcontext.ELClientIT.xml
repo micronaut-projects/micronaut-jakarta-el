@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT" tests="6" skipped="0" failures="0" errors="0" timestamp="SANITIZED" hostname="SANITIZED" time="0">
+  <properties/>
+  <testcase name="elContextPutGetContextTest()" classname="com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT" time="0"/>
+  <testcase name="elContextPutContextNPETest()" classname="com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT" time="0"/>
+  <testcase name="elContextGetContextNPETest()" classname="com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT" time="0"/>
+  <testcase name="elContextAddGetListenersTest()" classname="com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT" time="0"/>
+  <testcase name="elContextIsSetPropertyResolvedTest()" classname="com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT" time="0"/>
+  <testcase name="elContextGetSetLocaleTest()" classname="com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT" time="0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT logStartTest
+INFO: STARTING TEST : elContextPutGetContextTest()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT logFinishTest
+INFO: FINISHED TEST : elContextPutGetContextTest()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT logStartTest
+INFO: STARTING TEST : elContextPutContextNPETest()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT elContextPutContextNPETest
+INFO: Testing: ELContext.putContext(String.class, null)
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.common.util.ELTestUtil checkForException
+INFO: Test PASSED
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT elContextPutContextNPETest
+INFO: Testing: ELContext.putContext(null, testStrg)
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.common.util.ELTestUtil checkForException
+INFO: Test PASSED
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT logFinishTest
+INFO: FINISHED TEST : elContextPutContextNPETest()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT logStartTest
+INFO: STARTING TEST : elContextGetContextNPETest()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT elContextGetContextNPETest
+INFO: Testing: ELContext.getContext(null)
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.common.util.ELTestUtil checkForException
+INFO: Test PASSED
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT logFinishTest
+INFO: FINISHED TEST : elContextGetContextNPETest()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT logStartTest
+INFO: STARTING TEST : elContextAddGetListenersTest()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT logFinishTest
+INFO: FINISHED TEST : elContextAddGetListenersTest()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT logStartTest
+INFO: STARTING TEST : elContextIsSetPropertyResolvedTest()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT logFinishTest
+INFO: FINISHED TEST : elContextIsSetPropertyResolvedTest()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT logStartTest
+INFO: STARTING TEST : elContextGetSetLocaleTest()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT logFinishTest
+INFO: FINISHED TEST : elContextGetSetLocaleTest()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT cleanup
+INFO: Cleanup method called
+]]></system-err>
+</testsuite>

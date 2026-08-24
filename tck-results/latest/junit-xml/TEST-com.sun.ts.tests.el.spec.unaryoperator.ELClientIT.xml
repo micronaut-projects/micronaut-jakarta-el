@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.sun.ts.tests.el.spec.unaryoperator.ELClientIT" tests="13" skipped="0" failures="0" errors="0" timestamp="SANITIZED" hostname="SANITIZED" time="0">
+  <properties/>
+  <testcase name="elDoubleUnaryTest()" classname="com.sun.ts.tests.el.spec.unaryoperator.ELClientIT" time="0"/>
+  <testcase name="elBigDecimalUnaryTest()" classname="com.sun.ts.tests.el.spec.unaryoperator.ELClientIT" time="0"/>
+  <testcase name="elLongUnaryTest()" classname="com.sun.ts.tests.el.spec.unaryoperator.ELClientIT" time="0"/>
+  <testcase name="elBooleanUnaryTrueTest()" classname="com.sun.ts.tests.el.spec.unaryoperator.ELClientIT" time="0"/>
+  <testcase name="elDoubleStringUnaryTest()" classname="com.sun.ts.tests.el.spec.unaryoperator.ELClientIT" time="0"/>
+  <testcase name="elBooleanUnaryFalseTest()" classname="com.sun.ts.tests.el.spec.unaryoperator.ELClientIT" time="0"/>
+  <testcase name="elShortUnaryTest()" classname="com.sun.ts.tests.el.spec.unaryoperator.ELClientIT" time="0"/>
+  <testcase name="elLongStringUnaryTest()" classname="com.sun.ts.tests.el.spec.unaryoperator.ELClientIT" time="0"/>
+  <testcase name="elIntegerUnaryTest()" classname="com.sun.ts.tests.el.spec.unaryoperator.ELClientIT" time="0"/>
+  <testcase name="elByteUnaryTest()" classname="com.sun.ts.tests.el.spec.unaryoperator.ELClientIT" time="0"/>
+  <testcase name="elFloatUnaryTest()" classname="com.sun.ts.tests.el.spec.unaryoperator.ELClientIT" time="0"/>
+  <testcase name="elBigIntegerUnaryTest()" classname="com.sun.ts.tests.el.spec.unaryoperator.ELClientIT" time="0"/>
+  <testcase name="elNullUnaryTest()" classname="com.sun.ts.tests.el.spec.unaryoperator.ELClientIT" time="0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.unaryoperator.ELClientIT logStartTest
+INFO: STARTING TEST : elDoubleUnaryTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.unaryoperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elDoubleUnaryTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.unaryoperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.unaryoperator.ELClientIT logStartTest
+INFO: STARTING TEST : elBigDecimalUnaryTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.unaryoperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elBigDecimalUnaryTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.unaryoperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.unaryoperator.ELClientIT logStartTest
+INFO: STARTING TEST : elLongUnaryTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.unaryoperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elLongUnaryTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.unaryoperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.unaryoperator.ELClientIT logStartTest
+INFO: STARTING TEST : elBooleanUnaryTrueTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.unaryoperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elBooleanUnaryTrueTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.unaryoperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.unaryoperator.ELClientIT logStartTest
+INFO: STARTING TEST : elDoubleStringUnaryTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.unaryoperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elDoubleStringUnaryTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.unaryoperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.unaryoperator.ELClientIT logStartTest
+INFO: STARTING TEST : elBooleanUnaryFalseTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.unaryoperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elBooleanUnaryFalseTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.unaryoperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.unaryoperator.ELClientIT logStartTest
+INFO: STARTING TEST : elShortUnaryTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.unaryoperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elShortUnaryTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.unaryoperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.unaryoperator.ELClientIT logStartTest
+INFO: STARTING TEST : elLongStringUnaryTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.unaryoperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elLongStringUnaryTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.unaryoperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.unaryoperator.ELClientIT logStartTest
+INFO: STARTING TEST : elIntegerUnaryTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.unaryoperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elIntegerUnaryTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.unaryoperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.unaryoperator.ELClientIT logStartTest
+INFO: STARTING TEST : elByteUnaryTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.unaryoperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elByteUnaryTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.unaryoperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.unaryoperator.ELClientIT logStartTest
+INFO: STARTING TEST : elFloatUnaryTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.unaryoperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elFloatUnaryTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.unaryoperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.unaryoperator.ELClientIT logStartTest
+INFO: STARTING TEST : elBigIntegerUnaryTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.unaryoperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elBigIntegerUnaryTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.unaryoperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.unaryoperator.ELClientIT logStartTest
+INFO: STARTING TEST : elNullUnaryTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.unaryoperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elNullUnaryTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.unaryoperator.ELClientIT cleanup
+INFO: Cleanup method called
+]]></system-err>
+</testsuite>

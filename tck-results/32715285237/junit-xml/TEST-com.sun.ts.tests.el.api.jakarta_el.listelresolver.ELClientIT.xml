@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.sun.ts.tests.el.api.jakarta_el.listelresolver.ELClientIT" tests="5" skipped="0" failures="0" errors="0" timestamp="SANITIZED" hostname="SANITIZED" time="0">
+  <properties/>
+  <testcase name="listELResolverIAETest()" classname="com.sun.ts.tests.el.api.jakarta_el.listelresolver.ELClientIT" time="0"/>
+  <testcase name="listELResolverNPETest()" classname="com.sun.ts.tests.el.api.jakarta_el.listelresolver.ELClientIT" time="0"/>
+  <testcase name="listELResolverTest()" classname="com.sun.ts.tests.el.api.jakarta_el.listelresolver.ELClientIT" time="0"/>
+  <testcase name="listELResolverPNFETest()" classname="com.sun.ts.tests.el.api.jakarta_el.listelresolver.ELClientIT" time="0"/>
+  <testcase name="listELResolverPNWETest()" classname="com.sun.ts.tests.el.api.jakarta_el.listelresolver.ELClientIT" time="0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.listelresolver.ELClientIT logStartTest
+INFO: STARTING TEST : listELResolverIAETest()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.listelresolver.ELClientIT logFinishTest
+INFO: FINISHED TEST : listELResolverIAETest()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.listelresolver.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.listelresolver.ELClientIT logStartTest
+INFO: STARTING TEST : listELResolverNPETest()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.listelresolver.ELClientIT logFinishTest
+INFO: FINISHED TEST : listELResolverNPETest()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.listelresolver.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.listelresolver.ELClientIT logStartTest
+INFO: STARTING TEST : listELResolverTest()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.listelresolver.ELClientIT logFinishTest
+INFO: FINISHED TEST : listELResolverTest()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.listelresolver.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.listelresolver.ELClientIT logStartTest
+INFO: STARTING TEST : listELResolverPNFETest()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.listelresolver.ELClientIT logFinishTest
+INFO: FINISHED TEST : listELResolverPNFETest()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.listelresolver.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.listelresolver.ELClientIT logStartTest
+INFO: STARTING TEST : listELResolverPNWETest()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.listelresolver.ELClientIT logFinishTest
+INFO: FINISHED TEST : listELResolverPNWETest()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.listelresolver.ELClientIT cleanup
+INFO: Cleanup method called
+]]></system-err>
+</testsuite>

@@ -1,0 +1,496 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" tests="70" skipped="0" failures="0" errors="0" timestamp="SANITIZED" hostname="SANITIZED" time="0">
+  <properties/>
+  <testcase name="elIntegerGreaterThanEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elEqualOperandGreaterThanOrEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elBigIntegerLessThanTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elFloatLessThanTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elEnumEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elBigIntegerGreaterThanTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elEqualOperandLessThanOrEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elIntegerGreaterThanTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elOtherLessThanTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elNullOperandLessThanOrEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elStringEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elBigDecimalLessThanEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elByteLessThanEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elDoubleGreaterThanTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elOtherNotEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elFloatNotEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elBigDecimalLessThanTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elShortLessThanEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elStringLessThanEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elBigIntegerEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elByteGreaterThanTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elOtherGreaterThanEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elOtherGreaterThanTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elStringGreaterThanEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elDoubleLessThanTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elShortEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elNullOperandGreaterThanOrEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elEnumNotEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elNullOperandNotEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elLongLessThanEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elIntegerEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elDoubleGreaterThanEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elBigDecimalEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elOtherLessThanEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elFloatEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elLongGreaterThanEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elByteEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elLongGreaterThanTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elShortGreaterThanEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elShortGreaterThanTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elBigIntegerNotEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elIntegerNotEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elShortNotEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elByteGreaterThanEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elStringNotEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elShortLessThanTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elDoubleNotEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elFloatGreaterThanTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elNullOperandEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elLongLessThanTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elLongEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elBigIntegerGreaterThanEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elOtherEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elIntegerLessThanEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elLongNotEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elByteLessThanTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elBooleanEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elFloatGreaterThanEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elByteNotEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elStringGreaterThanTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elBigDecimalNotEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elBigIntegerLessThanEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elStringLessThanTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elBigDecimalGreaterThanTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elBooleanNotEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elIntegerLessThanTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elDoubleLessThanEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elFloatLessThanEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elDoubleEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <testcase name="elBigDecimalGreaterThanEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elIntegerGreaterThanEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elIntegerGreaterThanEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elEqualOperandGreaterThanOrEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elEqualOperandGreaterThanOrEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elBigIntegerLessThanTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elBigIntegerLessThanTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elFloatLessThanTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elFloatLessThanTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elEnumEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elEnumEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elBigIntegerGreaterThanTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elBigIntegerGreaterThanTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elEqualOperandLessThanOrEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elEqualOperandLessThanOrEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elIntegerGreaterThanTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elIntegerGreaterThanTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elOtherLessThanTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elOtherLessThanTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elNullOperandLessThanOrEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elNullOperandLessThanOrEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elStringEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elStringEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elBigDecimalLessThanEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elBigDecimalLessThanEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elByteLessThanEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elByteLessThanEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elDoubleGreaterThanTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elDoubleGreaterThanTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elOtherNotEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elOtherNotEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elFloatNotEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elFloatNotEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elBigDecimalLessThanTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elBigDecimalLessThanTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elShortLessThanEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elShortLessThanEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elStringLessThanEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elStringLessThanEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elBigIntegerEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elBigIntegerEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elByteGreaterThanTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elByteGreaterThanTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elOtherGreaterThanEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elOtherGreaterThanEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elOtherGreaterThanTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elOtherGreaterThanTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elStringGreaterThanEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elStringGreaterThanEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elDoubleLessThanTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elDoubleLessThanTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elShortEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elShortEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elNullOperandGreaterThanOrEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elNullOperandGreaterThanOrEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elEnumNotEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elEnumNotEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elNullOperandNotEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elNullOperandNotEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elLongLessThanEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elLongLessThanEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elIntegerEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elIntegerEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elDoubleGreaterThanEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elDoubleGreaterThanEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elBigDecimalEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elBigDecimalEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elOtherLessThanEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elOtherLessThanEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elFloatEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elFloatEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elLongGreaterThanEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elLongGreaterThanEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elByteEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elByteEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elLongGreaterThanTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elLongGreaterThanTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elShortGreaterThanEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elShortGreaterThanEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elShortGreaterThanTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elShortGreaterThanTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elBigIntegerNotEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elBigIntegerNotEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elIntegerNotEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elIntegerNotEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elShortNotEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elShortNotEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elByteGreaterThanEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elByteGreaterThanEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elStringNotEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elStringNotEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elShortLessThanTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elShortLessThanTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elDoubleNotEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elDoubleNotEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elFloatGreaterThanTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elFloatGreaterThanTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elNullOperandEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elNullOperandEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elLongLessThanTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elLongLessThanTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elLongEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elLongEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elBigIntegerGreaterThanEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elBigIntegerGreaterThanEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elOtherEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elOtherEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elIntegerLessThanEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elIntegerLessThanEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elLongNotEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elLongNotEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elByteLessThanTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elByteLessThanTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elBooleanEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elBooleanEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elFloatGreaterThanEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elFloatGreaterThanEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elByteNotEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elByteNotEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elStringGreaterThanTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elStringGreaterThanTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elBigDecimalNotEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elBigDecimalNotEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elBigIntegerLessThanEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elBigIntegerLessThanEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elStringLessThanTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elStringLessThanTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elBigDecimalGreaterThanTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elBigDecimalGreaterThanTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elBooleanNotEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elBooleanNotEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elIntegerLessThanTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elIntegerLessThanTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elDoubleLessThanEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elDoubleLessThanEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elFloatLessThanEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elFloatLessThanEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elDoubleEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elDoubleEqualToTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logStartTest
+INFO: STARTING TEST : elBigDecimalGreaterThanEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elBigDecimalGreaterThanEqualTest()
+Aug 23, 2026 9:19:00 PM com.sun.ts.tests.el.spec.relationaloperator.ELClientIT cleanup
+INFO: Cleanup method called
+]]></system-err>
+</testsuite>

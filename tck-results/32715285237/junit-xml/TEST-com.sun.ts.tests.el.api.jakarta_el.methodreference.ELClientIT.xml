@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.sun.ts.tests.el.api.jakarta_el.methodreference.ELClientIT" tests="1" skipped="0" failures="0" errors="0" timestamp="SANITIZED" hostname="SANITIZED" time="0">
+  <properties/>
+  <testcase name="methodReferenceTest()" classname="com.sun.ts.tests.el.api.jakarta_el.methodreference.ELClientIT" time="0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.methodreference.ELClientIT logStartTest
+INFO: STARTING TEST : methodReferenceTest()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.methodreference.ELClientIT logFinishTest
+INFO: FINISHED TEST : methodReferenceTest()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.methodreference.ELClientIT cleanup
+INFO: Cleanup method called
+]]></system-err>
+</testsuite>

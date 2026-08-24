@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.sun.ts.tests.el.api.jakarta_el.lambdaexpression.ELClientIT" tests="2" skipped="0" failures="0" errors="0" timestamp="SANITIZED" hostname="SANITIZED" time="0">
+  <properties/>
+  <testcase name="invokeNPETest()" classname="com.sun.ts.tests.el.api.jakarta_el.lambdaexpression.ELClientIT" time="0"/>
+  <testcase name="invokeELETest()" classname="com.sun.ts.tests.el.api.jakarta_el.lambdaexpression.ELClientIT" time="0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.lambdaexpression.ELClientIT logStartTest
+INFO: STARTING TEST : invokeNPETest()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.common.util.ELTestUtil checkForException
+INFO: Test PASSED
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.lambdaexpression.ELClientIT logFinishTest
+INFO: FINISHED TEST : invokeNPETest()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.lambdaexpression.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.lambdaexpression.ELClientIT logStartTest
+INFO: STARTING TEST : invokeELETest()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.lambdaexpression.ELClientIT invokeELETest
+INFO: Test PASSED
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.lambdaexpression.ELClientIT logFinishTest
+INFO: FINISHED TEST : invokeELETest()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.lambdaexpression.ELClientIT cleanup
+INFO: Cleanup method called
+]]></system-err>
+</testsuite>

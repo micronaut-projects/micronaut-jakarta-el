@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT" tests="8" skipped="0" failures="0" errors="0" timestamp="SANITIZED" hostname="SANITIZED" time="0">
+  <properties/>
+  <testcase name="optionalELResolverObjectInvoke()" classname="com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT" time="0"/>
+  <testcase name="optionalELResolverObjectNonNullTest()" classname="com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT" time="0"/>
+  <testcase name="optionalELResolverEmptyNullTest()" classname="com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT" time="0"/>
+  <testcase name="optionalELResolverObjectInvokeInvalid()" classname="com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT" time="0"/>
+  <testcase name="optionalELResolverEmptyNonNullTest()" classname="com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT" time="0"/>
+  <testcase name="optionalELResolverEmptyInvokeInvalid()" classname="com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT" time="0"/>
+  <testcase name="optionalELResolverEmptyInvoke()" classname="com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT" time="0"/>
+  <testcase name="optionalELResolverObjectNullTest()" classname="com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT" time="0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT logStartTest
+INFO: STARTING TEST : optionalELResolverObjectInvoke()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT logFinishTest
+INFO: FINISHED TEST : optionalELResolverObjectInvoke()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT logStartTest
+INFO: STARTING TEST : optionalELResolverObjectNonNullTest()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT logFinishTest
+INFO: FINISHED TEST : optionalELResolverObjectNonNullTest()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT logStartTest
+INFO: STARTING TEST : optionalELResolverEmptyNullTest()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT logFinishTest
+INFO: FINISHED TEST : optionalELResolverEmptyNullTest()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT logStartTest
+INFO: STARTING TEST : optionalELResolverObjectInvokeInvalid()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT logFinishTest
+INFO: FINISHED TEST : optionalELResolverObjectInvokeInvalid()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT logStartTest
+INFO: STARTING TEST : optionalELResolverEmptyNonNullTest()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT logFinishTest
+INFO: FINISHED TEST : optionalELResolverEmptyNonNullTest()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT logStartTest
+INFO: STARTING TEST : optionalELResolverEmptyInvokeInvalid()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT logFinishTest
+INFO: FINISHED TEST : optionalELResolverEmptyInvokeInvalid()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT logStartTest
+INFO: STARTING TEST : optionalELResolverEmptyInvoke()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT logFinishTest
+INFO: FINISHED TEST : optionalELResolverEmptyInvoke()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT logStartTest
+INFO: STARTING TEST : optionalELResolverObjectNullTest()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT logFinishTest
+INFO: FINISHED TEST : optionalELResolverObjectNullTest()
+Aug 23, 2026 9:18:56 PM com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT cleanup
+INFO: Cleanup method called
+]]></system-err>
+</testsuite>

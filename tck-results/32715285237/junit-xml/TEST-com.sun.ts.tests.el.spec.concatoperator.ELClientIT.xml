@@ -1,0 +1,1173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.sun.ts.tests.el.spec.concatoperator.ELClientIT" tests="9" skipped="0" failures="0" errors="0" timestamp="SANITIZED" hostname="SANITIZED" time="0">
+  <properties/>
+  <testcase name="elBigDecimalConcatenationTest()" classname="com.sun.ts.tests.el.spec.concatoperator.ELClientIT" time="0"/>
+  <testcase name="elByteConcatenationTest()" classname="com.sun.ts.tests.el.spec.concatoperator.ELClientIT" time="0"/>
+  <testcase name="elShortConcatenationTest()" classname="com.sun.ts.tests.el.spec.concatoperator.ELClientIT" time="0"/>
+  <testcase name="elLongConcatenationTest()" classname="com.sun.ts.tests.el.spec.concatoperator.ELClientIT" time="0"/>
+  <testcase name="elIntegerConcatenationTest()" classname="com.sun.ts.tests.el.spec.concatoperator.ELClientIT" time="0"/>
+  <testcase name="elBooleanConcatenationTest()" classname="com.sun.ts.tests.el.spec.concatoperator.ELClientIT" time="0"/>
+  <testcase name="elBigIntegerConcatenationTest()" classname="com.sun.ts.tests.el.spec.concatoperator.ELClientIT" time="0"/>
+  <testcase name="elDoubleConcatenationTest()" classname="com.sun.ts.tests.el.spec.concatoperator.ELClientIT" time="0"/>
+  <testcase name="elFloatConcatenationTest()" classname="com.sun.ts.tests.el.spec.concatoperator.ELClientIT" time="0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.spec.concatoperator.ELClientIT logStartTest
+INFO: STARTING TEST : elBigDecimalConcatenationTest()
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: *** Start "BigDecimal" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: types are BigDecimal and java.math.BigDecimal
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: result is 10.5311
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: *** End "BigDecimal" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: *** Start "BigDecimal" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: types are BigDecimal and java.lang.Double
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: result is 10.5311.0
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: *** End "BigDecimal" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: *** Start "BigDecimal" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: types are BigDecimal and java.lang.Float
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: result is 10.5311.0
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: *** End "BigDecimal" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: *** Start "BigDecimal" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: types are BigDecimal and java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: result is 10.5311.0
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: *** End "BigDecimal" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: *** Start "BigDecimal" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: types are BigDecimal and java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: result is 10.5311e0
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: *** End "BigDecimal" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: *** Start "BigDecimal" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: types are BigDecimal and java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: result is 10.5311E0
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: *** End "BigDecimal" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: *** Start "BigDecimal" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: types are BigDecimal and java.math.BigInteger
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: result is 10.5311
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: *** End "BigDecimal" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: *** Start "BigDecimal" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: types are BigDecimal and java.lang.Long
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: result is 10.5311
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: *** End "BigDecimal" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: *** Start "BigDecimal" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: types are BigDecimal and java.lang.Integer
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: result is 10.5311
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: *** End "BigDecimal" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: *** Start "BigDecimal" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: types are BigDecimal and java.lang.Short
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: result is 10.5311
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: *** End "BigDecimal" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: *** Start "BigDecimal" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: types are BigDecimal and java.lang.Byte
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: result is 10.5311
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigDecimal
+INFO: *** End "BigDecimal" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.spec.concatoperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elBigDecimalConcatenationTest()
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.spec.concatoperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.spec.concatoperator.ELClientIT logStartTest
+INFO: STARTING TEST : elByteConcatenationTest()
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testByte
+INFO: *** Start "Byte" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testByte
+INFO: Skip BigDecimal Data type already tested for this in the BigDecimal tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testByte
+INFO: *** Start "Byte" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testByte
+INFO: Skip Double Data type already tested for this in the Double tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testByte
+INFO: *** Start "Byte" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testByte
+INFO: Skip Float Data type already tested for this in the Float tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testByte
+INFO: *** Start "Byte" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testByte
+INFO: Skip String Data type already tested for this in the String tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testByte
+INFO: *** Start "Byte" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testByte
+INFO: Skip String Data type already tested for this in the String tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testByte
+INFO: *** Start "Byte" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testByte
+INFO: Skip String Data type already tested for this in the String tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testByte
+INFO: *** Start "Byte" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testByte
+INFO: Skip BigInteger Data type already tested for this in the BigInteger tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testByte
+INFO: *** Start "Byte" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testByte
+INFO: Skip Long Data type already tested for this in the Long tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testByte
+INFO: *** Start "Byte" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testByte
+INFO: Skip Integer Data type already tested for this in the Integer tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testByte
+INFO: *** Start "Byte" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testByte
+INFO: Skip Short Data type already tested for this in the Short tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testByte
+INFO: *** Start "Byte" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testByte
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testByte
+INFO: types are  Byte and java.lang.Byte
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testByte
+INFO: result is 21
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testByte
+INFO: *** End "Byte" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.spec.concatoperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elByteConcatenationTest()
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.spec.concatoperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.spec.concatoperator.ELClientIT logStartTest
+INFO: STARTING TEST : elShortConcatenationTest()
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testShort
+INFO: *** Start "Short" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testShort
+INFO: Skip BigDecimal Data type already tested for this in the BigDecimal tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testShort
+INFO: *** Start "Short" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testShort
+INFO: Skip Double Data type already tested for this in the Double tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testShort
+INFO: *** Start "Short" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testShort
+INFO: Skip Float Data type already tested for this in the Float tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testShort
+INFO: *** Start "Short" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testShort
+INFO: Skip String Data type already tested for this in the String tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testShort
+INFO: *** Start "Short" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testShort
+INFO: Skip String Data type already tested for this in the String tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testShort
+INFO: *** Start "Short" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testShort
+INFO: Skip String Data type already tested for this in the String tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testShort
+INFO: *** Start "Short" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testShort
+INFO: Skip BigInteger Data type already tested for this in the BigInteger tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testShort
+INFO: *** Start "Short" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testShort
+INFO: Skip Long Data type already tested for this in the Long tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testShort
+INFO: *** Start "Short" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testShort
+INFO: Skip Integer Data type already tested for this in the Integer tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testShort
+INFO: *** Start "Short" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testShort
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testShort
+INFO: types are  Short and java.lang.Short
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testShort
+INFO: result is 21
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testShort
+INFO: *** End "Short" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testShort
+INFO: *** Start "Short" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testShort
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testShort
+INFO: types are  Short and java.lang.Byte
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testShort
+INFO: result is 21
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testShort
+INFO: *** End "Short" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.spec.concatoperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elShortConcatenationTest()
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.spec.concatoperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.spec.concatoperator.ELClientIT logStartTest
+INFO: STARTING TEST : elLongConcatenationTest()
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testLong
+INFO: *** Start "Long" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testLong
+INFO: Skip BigDecimal Data type already tested for this in the BigDecimal tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testLong
+INFO: *** Start "Long" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testLong
+INFO: Skip Double Data type already tested for this in the Double tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testLong
+INFO: *** Start "Long" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testLong
+INFO: Skip Float Data type already tested for this in the Float tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testLong
+INFO: *** Start "Long" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testLong
+INFO: Skip String Data type already tested for this in the String tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testLong
+INFO: *** Start "Long" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testLong
+INFO: Skip String Data type already tested for this in the String tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testLong
+INFO: *** Start "Long" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testLong
+INFO: Skip String Data type already tested for this in the String tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testLong
+INFO: *** Start "Long" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testLong
+INFO: Skip BigInteger Data type already tested for this in the BigInteger tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testLong
+INFO: *** Start "Long" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testLong
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testLong
+INFO: types are  Long and java.lang.Long
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testLong
+INFO: result is 250001
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testLong
+INFO: *** End "Long" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testLong
+INFO: *** Start "Long" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testLong
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testLong
+INFO: types are  Long and java.lang.Integer
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testLong
+INFO: result is 250001
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testLong
+INFO: *** End "Long" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testLong
+INFO: *** Start "Long" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testLong
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testLong
+INFO: types are  Long and java.lang.Short
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testLong
+INFO: result is 250001
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testLong
+INFO: *** End "Long" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testLong
+INFO: *** Start "Long" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testLong
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testLong
+INFO: types are  Long and java.lang.Byte
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testLong
+INFO: result is 250001
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testLong
+INFO: *** End "Long" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.spec.concatoperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elLongConcatenationTest()
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.spec.concatoperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.spec.concatoperator.ELClientIT logStartTest
+INFO: STARTING TEST : elIntegerConcatenationTest()
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testInteger
+INFO: *** Start "Integer" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testInteger
+INFO: Skip BigDecimal Data type already tested for this in the BigDecimal tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testInteger
+INFO: *** Start "Integer" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testInteger
+INFO: Skip Double Data type already tested for this in the Double tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testInteger
+INFO: *** Start "Integer" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testInteger
+INFO: Skip Float Data type already tested for this in the Float tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testInteger
+INFO: *** Start "Integer" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testInteger
+INFO: Skip String Data type already tested for this in the String tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testInteger
+INFO: *** Start "Integer" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testInteger
+INFO: Skip String Data type already tested for this in the String tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testInteger
+INFO: *** Start "Integer" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testInteger
+INFO: Skip String Data type already tested for this in the String tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testInteger
+INFO: *** Start "Integer" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testInteger
+INFO: Skip BigInteger Data type already tested for this in the BigInteger tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testInteger
+INFO: *** Start "Integer" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testInteger
+INFO: Skip Long Data type already tested for this in the Long tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testInteger
+INFO: *** Start "Integer" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testInteger
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testInteger
+INFO: types are  Integer and java.lang.Integer
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testInteger
+INFO: result is 251
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testInteger
+INFO: *** End "Integer" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testInteger
+INFO: *** Start "Integer" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testInteger
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testInteger
+INFO: types are  Integer and java.lang.Short
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testInteger
+INFO: result is 251
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testInteger
+INFO: *** End "Integer" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testInteger
+INFO: *** Start "Integer" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testInteger
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testInteger
+INFO: types are  Integer and java.lang.Byte
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testInteger
+INFO: result is 251
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testInteger
+INFO: *** End "Integer" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.spec.concatoperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elIntegerConcatenationTest()
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.spec.concatoperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.spec.concatoperator.ELClientIT logStartTest
+INFO: STARTING TEST : elBooleanConcatenationTest()
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBoolean
+INFO: *** Start "Boolean" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBoolean
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBoolean
+INFO: types are  Boolean and java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBoolean
+INFO: *** End "Boolean" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBoolean
+INFO: *** Start "Boolean" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBoolean
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBoolean
+INFO: types are  Boolean and java.lang.Boolean
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBoolean
+INFO: *** End "Boolean" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.spec.concatoperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elBooleanConcatenationTest()
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.spec.concatoperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.spec.concatoperator.ELClientIT logStartTest
+INFO: STARTING TEST : elBigIntegerConcatenationTest()
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigInteger
+INFO: *** Start "BigInteger" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigInteger
+INFO: Skip BigDecimal Data type already tested for this in the BigDecimal tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigInteger
+INFO: *** Start "BigInteger" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigInteger
+INFO: Skip Double Data type already tested for this in the Double tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigInteger
+INFO: *** Start "BigInteger" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigInteger
+INFO: Skip Float Data type already tested for this in the Float tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigInteger
+INFO: *** Start "BigInteger" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigInteger
+INFO: Skip String Data type already tested for this in the String tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigInteger
+INFO: *** Start "BigInteger" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigInteger
+INFO: Skip String Data type already tested for this in the String tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigInteger
+INFO: *** Start "BigInteger" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigInteger
+INFO: Skip String Data type already tested for this in the String tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigInteger
+INFO: *** Start "BigInteger" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigInteger
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigInteger
+INFO: types are BigInteger and java.math.BigInteger
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigInteger
+INFO: result is 105311
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigInteger
+INFO: *** End "BigInteger" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigInteger
+INFO: *** Start "BigInteger" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigInteger
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigInteger
+INFO: types are BigInteger and java.lang.Long
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigInteger
+INFO: result is 105311
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigInteger
+INFO: *** End "BigInteger" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigInteger
+INFO: *** Start "BigInteger" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigInteger
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigInteger
+INFO: types are BigInteger and java.lang.Integer
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigInteger
+INFO: result is 105311
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigInteger
+INFO: *** End "BigInteger" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigInteger
+INFO: *** Start "BigInteger" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigInteger
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigInteger
+INFO: types are BigInteger and java.lang.Short
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigInteger
+INFO: result is 105311
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigInteger
+INFO: *** End "BigInteger" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigInteger
+INFO: *** Start "BigInteger" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigInteger
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigInteger
+INFO: types are BigInteger and java.lang.Byte
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigInteger
+INFO: result is 105311
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testBigInteger
+INFO: *** End "BigInteger" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.spec.concatoperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elBigIntegerConcatenationTest()
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.spec.concatoperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.spec.concatoperator.ELClientIT logStartTest
+INFO: STARTING TEST : elDoubleConcatenationTest()
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: *** Start "Double"Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: Skip BigDecimal Data type already tested for this in the BigDecimal tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: *** Start "Double"Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: types are Double and java.lang.Double
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: result is 2.51.0
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: *** End "Double" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: *** Start "Double"Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: Skip Float Data type already tested for this in the Float tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: *** Start "Double"Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: types are Double and java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: result is 2.51.0
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: *** End "Double" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: *** Start "Double"Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: types are Double and java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: result is 2.51e0
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: *** End "Double" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: *** Start "Double"Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: types are Double and java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: result is 2.51E0
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: *** End "Double" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: *** Start "Double"Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: types are Double and java.math.BigInteger
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: result is 2.51
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: *** End "Double" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: *** Start "Double"Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: types are Double and java.lang.Long
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: result is 2.51
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: *** End "Double" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: *** Start "Double"Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: types are Double and java.lang.Integer
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: result is 2.51
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: *** End "Double" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: *** Start "Double"Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: types are Double and java.lang.Short
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: result is 2.51
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: *** End "Double" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: *** Start "Double"Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: types are Double and java.lang.Byte
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: result is 2.51
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testDouble
+INFO: *** End "Double" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.spec.concatoperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elDoubleConcatenationTest()
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.spec.concatoperator.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.spec.concatoperator.ELClientIT logStartTest
+INFO: STARTING TEST : elFloatConcatenationTest()
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: Skip BigDecimal for Float tests we already tested for this in the BigDecimal tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: types are Float and java.lang.Double
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: result is 1.000051.0
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** End "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: types are Float and java.lang.Float
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: result is 1.000051.0
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** End "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: types are Float and java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: result is 1.000051.0
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** End "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: types are Float and java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: result is 1.000051e0
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** End "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: types are Float and java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: result is 1.000051E0
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** End "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: types are Float and java.math.BigInteger
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: result is 1.000051
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** End "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: types are Float and java.lang.Long
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: result is 1.000051
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** End "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: types are Float and java.lang.Integer
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: result is 1.000051
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** End "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: types are Float and java.lang.Short
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: result is 1.000051
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** End "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: types are Float and java.lang.Byte
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: result is 1.000051
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** End "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: Skip BigDecimal for Float tests we already tested for this in the BigDecimal tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: types are Float and java.lang.Double
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: result is 1.5E-41.0
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** End "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: types are Float and java.lang.Float
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: result is 1.5E-41.0
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** End "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: types are Float and java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: result is 1.5E-41.0
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** End "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: types are Float and java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: result is 1.5E-41e0
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** End "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: types are Float and java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: result is 1.5E-41E0
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** End "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: types are Float and java.math.BigInteger
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: result is 1.5E-41
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** End "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: types are Float and java.lang.Long
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: result is 1.5E-41
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** End "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: types are Float and java.lang.Integer
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: result is 1.5E-41
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** End "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: types are Float and java.lang.Short
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: result is 1.5E-41
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** End "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: types are Float and java.lang.Byte
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: result is 1.5E-41
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** End "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: Skip BigDecimal for Float tests we already tested for this in the BigDecimal tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: types are Float and java.lang.Double
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: result is 15000.01.0
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** End "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: types are Float and java.lang.Float
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: result is 15000.01.0
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** End "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: types are Float and java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: result is 15000.01.0
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** End "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: types are Float and java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: result is 15000.01e0
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** End "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: types are Float and java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: result is 15000.01E0
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** End "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: types are Float and java.math.BigInteger
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: result is 15000.01
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** End "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: types are Float and java.lang.Long
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: result is 15000.01
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** End "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: types are Float and java.lang.Integer
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: result is 15000.01
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** End "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: types are Float and java.lang.Short
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: result is 15000.01
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** End "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: types are Float and java.lang.Byte
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: result is 15000.01
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** End "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: Skip BigDecimal for Float tests we already tested for this in the BigDecimal tests.
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: types are Float and java.lang.Double
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: result is 15000.01.0
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** End "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: types are Float and java.lang.Float
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: result is 15000.01.0
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** End "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: types are Float and java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: result is 15000.01.0
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** End "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: types are Float and java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: result is 15000.01e0
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** End "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: types are Float and java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: result is 15000.01E0
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** End "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: types are Float and java.math.BigInteger
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: result is 15000.01
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** End "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: types are Float and java.lang.Long
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: result is 15000.01
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** End "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: types are Float and java.lang.Integer
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: result is 15000.01
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** End "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: types are Float and java.lang.Short
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: result is 15000.01
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** End "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** Start "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: expression to be evaluated is #{A += B}
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: types are Float and java.lang.Byte
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: result is 15000.01
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator runConcatenationTest
+INFO: Setting Expected Type: java.lang.String
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.common.util.Validator testFloat
+INFO: *** End "Float" Test Sequence ***
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.spec.concatoperator.ELClientIT logFinishTest
+INFO: FINISHED TEST : elFloatConcatenationTest()
+Aug 23, 2026 9:18:58 PM com.sun.ts.tests.el.spec.concatoperator.ELClientIT cleanup
+INFO: Cleanup method called
+]]></system-err>
+</testsuite>
