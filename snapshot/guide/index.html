@@ -1,0 +1,2866 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <title>Micronaut Jakarta EL</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen, print" title="Style" charset="utf-8" />
+    <link rel="stylesheet" href="../css/custom.css" type="text/css" media="screen, print" title="Style" charset="utf-8" />
+    <link rel="stylesheet" href="../css/pdf.css" type="text/css" media="print" title="PDF" charset="utf-8" />
+    <link rel="stylesheet" href="../css/highlight/agate.css">
+    <script src="../js/highlight.pack.js"></script>
+    <script src="../js/guide.js"></script>
+    <script src="../js/multi-language-sample.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <link rel="stylesheet" href="../css/multi-language-sample.css"/>
+    <script src="../js/docs.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.11/clipboard.min.js"></script>
+    <script type="text/javascript">
+        function addJsClass(el) {
+            var classes = document.body.className.split(" ");
+            classes.push("js");
+            document.body.className = classes.join(" ");
+        }
+    </script>
+    <style type="text/css">
+        .lang-java { display: block }; .lang-python { display: block }; .lang-kotlin { display: block }; .lang-groovy { display: block }; 
+    </style>
+</head>
+
+<body class="body" id="docs" onload="addJsClass();" onhashchange="highlightMenu()">
+
+<div id="table-of-content-nav-link" class="desktop">
+    <a id="theme-switcher" title="Switch to dark theme" href="javascript:switchTheme(true)"><i class="fa fa-moon-o"></i></a>
+    <a title="Collapse/Open Table of contents" title="Hide Table of Contents" href="javascript:hideTableOfContents();" class="button">[ + ]</a>
+</div>
+
+<div id="main">
+    <div id="navigation" class="no-print">
+        <div class="navTitle">
+            <span id="logo"><a href="http://micronaut.io" title="Go to Micronaut Website"><img src="../img/micronaut-logo-white.svg" alt="Micronaut"/></a></span>
+        </div>
+        <div class="navLinks">
+            <ul>
+                    <li><div id="nav-summary" onmouseover="toggleNavSummary(false)" onmouseout="toggleNavSummary(true)" class="desktop">
+                            <a href="../guide/index.html" class="button">Table of contents</a>
+                            <div id="nav-summary-childs" style="display:none;">
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#introduction"><strong>1</strong><span>Introduction</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#whyCompiled"><strong>2</strong><span>Why Micronaut Jakarta EL?</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#releaseHistory"><strong>3</strong><span>Release History</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#quickStart"><strong>4</strong><span>Quick Start</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#declaringExpressions"><strong>5</strong><span>Declaring Expressions</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#declaringBeans"><strong>6</strong><span>Declaring Beans</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#examples"><strong>7</strong><span>Examples and Use Cases</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#runtimeParsing"><strong>8</strong><span>Parsing at Runtime</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#reflection"><strong>9</strong><span>When Reflection Is Used</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#repository"><strong>10</strong><span>Repository</span></a></div>
+                                
+                            </div>
+                        </div>
+                    </li>
+
+                <li id="table-of-content-nav-link-mobile" class="mobile">
+                    <a title="Scroll to Table of contents" href="javascript:scrollToTop();" class="button">Toc</a>
+                </li>
+                <li class="desktop">
+                    <a title="Go to API documentation" href="../api/index.html" class="button">API Reference</a>
+                </li>
+                <li class="mobile">
+                    <a title="Go to API documentation" href="../api/index.html" class="button">API</a>
+                </li>
+                <li class="desktop">
+                    <a title="Go to Configuration Reference documentation" href="../guide/configurationreference.html" class="button">Configuration Reference</a>
+                </li>
+                <li class="mobile">
+                    <a title="Go to Configuration Reference documentation" href="../guide/configurationreference.html" class="button">Conf</a>
+                </li>
+            </ul>
+
+        </div>
+    </div>
+    
+    <div id="table-of-content">
+        <div class="toc-content">
+
+        <h2>Table of Contents</h2>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-introduction"><a href="#introduction"><strong>1</strong><span>Introduction</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-whyCompiled"><a href="#whyCompiled"><strong>2</strong><span>Why Micronaut Jakarta EL?</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-releaseHistory"><a href="#releaseHistory"><strong>3</strong><span>Release History</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-quickStart"><a href="#quickStart"><strong>4</strong><span>Quick Start</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-declaringExpressions"><a href="#declaringExpressions"><strong>5</strong><span>Declaring Expressions</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-declaringBeans"><a href="#declaringBeans"><strong>6</strong><span>Declaring Beans</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-examples"><a href="#examples"><strong>7</strong><span>Examples and Use Cases</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-runtimeParsing"><a href="#runtimeParsing"><strong>8</strong><span>Parsing at Runtime</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-reflection"><a href="#reflection"><strong>9</strong><span>When Reflection Is Used</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-repository"><a href="#repository"><strong>10</strong><span>Repository</span></a></div>
+        
+        </div>
+    </div>
+    
+    <div class="docs-content">
+    <div class="project">
+        <h1>Micronaut Jakarta EL</h1>
+        <p></p>
+        <p>A Jakarta Expression Language implementation compiled at compilation time</p>
+        <p><strong>Version:</strong> 1.0.0-SNAPSHOT </p>
+    </div>
+    
+<h1 id="introduction"><a class="anchor" href="#introduction"></a>1 Introduction</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-jakarta-el/edit/1.0.x/src/main/docs/guide/introduction.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>Micronaut Jakarta EL is an implementation of the
+<a href="https://jakarta.ee/specifications/expression-language/6.0/jakarta-expression-language-spec-6.0">Jakarta Expression Language 6.0</a>
+specification whose expressions and bean resolution are prepared at <strong>compilation time</strong>, with
+<a href="https://micronaut-projects.github.io/micronaut-sourcegen/latest/guide/">Micronaut SourceGen</a> and an annotation
+processor.</p>
+</div>
+<div class="paragraph">
+<p>An interpreting implementation parses an expression string, builds an abstract syntax tree and walks it on every
+evaluation, resolving each property reflectively along the way. This module moves all of that to compilation time:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>every declared expression becomes a generated <code>jakarta.el.ValueExpression</code> or <code>jakarta.el.MethodExpression</code>
+whose body is the compiled form of the expression, so nothing is parsed and no tree is walked at evaluation time;</p>
+</li>
+<li>
+<p>every <code>@Introspected</code> type is resolved through the bean introspection Micronaut already generates for it, which
+replaces the reflective lookups of <code>jakarta.el.BeanELResolver</code>;</p>
+</li>
+<li>
+<p>every property access, method invocation, function call and static reference whose type is known at compilation
+time becomes a direct Java invocation.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The annotation processor runs for Java, Groovy and Kotlin and produces the same expression classes for all
+three; a Java build additionally gets them as readable generated sources.</p>
+</div>
+<div class="paragraph">
+<p>The implementation passes the Jakarta Expression Language 6.0 Technology Compatibility Kit — 360 tests, no
+failures, none skipped — on every build; the <code>tests/jakarta-el-tck</code> module of the repository runs it, and a
+workflow publishes the evidence of each run.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The public API, annotations included, is marked <code>@Experimental</code>: it can change between minor versions until the
+first stable release.
+</td>
+</tr>
+</table>
+</div>
+
+<h1 id="whyCompiled"><a class="anchor" href="#whyCompiled"></a>2 Why Micronaut Jakarta EL?</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-jakarta-el/edit/1.0.x/src/main/docs/guide/whyCompiled.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>The goal of this module is to be a complete build-time implementation of Jakarta Expression Language 6.0 that
+does not parse, walk trees or use reflection at runtime. The reasons to prefer it over an interpreting
+implementation are outlined below.</p>
+</div>
+<div class="sect3">
+<h4 id="_runtime_performance">Runtime Performance</h4>
+<div class="paragraph">
+<p>The <code>EvaluationBenchmark</code> JMH benchmark evaluates the same set of expressions — from a property read to a stream
+pipeline with two lambda expressions — with compiled Micronaut Jakarta EL, with its runtime interpreter, with
+Eclipse Expressly (the reference implementation) and with Apache Tomcat Jasper EL, each against the context it
+provides by default. The figure that sums a run up is the geometric mean of the average evaluation times over
+all the benchmarks; its ratio reads as "how many times slower than the compiled expressions, on average".</p>
+</div>
+<div class="paragraph">
+<p>OpenJDK 25.0.2 on Apple Silicon, JMH 1.37, 1 fork, 3 warmup and 5 measurement iterations of 1 s, average time:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 60%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Implementation</th>
+<th class="tableblock halign-left valign-top">Geometric mean of the average times</th>
+<th class="tableblock halign-left valign-top">Relative to the compiled stack</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Micronaut compiled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8.63 ns</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.0x</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Micronaut interpreted</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">82.9 ns</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">9.6x</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Eclipse Expressly</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">367 ns</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">42.5x</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Tomcat Jasper EL</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">449 ns</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">52.0x</p></td>
+</tr>
+</tbody>
+</table>
+<div class="imageblock">
+<div class="content">
+<a class="image" href="../img/evaluation-benchmark-results.svg"><img src="../img/evaluation-benchmark-aggregate.svg" alt="Geometric mean of the evaluation times per implementation"></a>
+</div>
+</div>
+<div class="paragraph">
+<p>In this run a compiled expression evaluated in 8.6 ns on average — about 43 times faster than the reference implementation and 52 times faster than Tomcat&#8217;s. The gap is narrowest, around 6x, where every implementation resolves at runtime (a bean not declared with a type), and widest — one hundred times and more — wherever the others fall back to reflection: a method call on a <code>List</code> or a <code>String</code>, a lambda expression coerced to a functional interface, a stream pipeline. The interpreter of this module, the fallback for expressions created at runtime, averaged 83 ns — itself over 4 times faster than the reference implementation — because it walks its trees against the same compiled runtime.</p>
+</div>
+<div class="paragraph">
+<p>Click the chart for the chart of every benchmark; the <code>benchmarks</code> module of the repository holds the harness,
+every figure with its error in its <code>README.md</code>, and runs with <code>./gradlew :micronaut-benchmarks:jmh</code>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_no_reflection">No Reflection</h4>
+<div class="paragraph">
+<p>A declared variable&#8217;s properties and methods compile to direct invocations, dynamic types resolve through the
+bean introspections Micronaut already generates, operators whose operand types are known compile to the Java
+operators, and a lambda expression passed to a method becomes a Java lambda implementing the parameter&#8217;s
+functional interface — no <code>LambdaExpression</code>, no argument maps, no <code>java.lang.reflect.Proxy</code>. The paths a
+typical expression takes use no reflection at all, which also means nothing to configure for a GraalVM native
+image; the few reflective paths that remain are the ones the specification defines in reflective terms, listed
+in <a href="#reflection">When Reflection Is Used</a>. This is verified continuously: the Java test suite and the complete
+TCK also run compiled into a native image, with <code>./gradlew nativeTest</code>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_type_safety">Type Safety</h4>
+<div class="paragraph">
+<p>The expressions are checked when the class compiles, not when a request arrives:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>a property or method a declared type does not have is a compilation error, and a member served by a custom
+resolver at runtime is a warning;</p>
+</li>
+<li>
+<p>an argument whose static type cannot be coerced to a function&#8217;s parameter is a compilation error;</p>
+</li>
+<li>
+<p>an omitted <code>expectedType</code> is inferred from the static type of the expression, and an expression whose type
+cannot be determined because an identifier is undeclared is a compilation error telling you what to declare;</p>
+</li>
+<li>
+<p>a syntax error reports the expression and the position, on the class that declares it.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_smaller_runtime">Smaller Runtime</h4>
+<div class="paragraph">
+<p>An application that declares its expressions in source ships no parser: the parser is a build-time module the
+runtime never sees. An expression is a generated class, and looking one up by its string through the standard
+<code>jakarta.el.ExpressionFactory</code> is a <code>switch</code>, not a parse.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_how_it_works">How It Works</h4>
+<div class="paragraph">
+<p>For the expression of the <a href="#quickStart">Quick Start</a> the annotation processor generates:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@ELEnvironment(variables = @ELVariable(name = "book", type = Book.class))
+@ELExpression("Book: ${book.title} costs ${book.unitPrice}")
+
+protected Object evaluate(ELContext context) {
+    Book shared0 = (Book) ELResolution.resolveVariable(context, "book");
+    return "Book: " + Objects.toString(shared0.getTitle(), "")
+        + " costs " + String.valueOf(shared0.getUnitPrice());
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The string was parsed once, by the processor. <code>book</code> is resolved once and its getters are called directly; the
+concatenation is Java&#8217;s own; the result is returned without a coercion because its type is already the expected
+one. What remains at runtime is one shared module — the coercions, the operators on values typed only at
+evaluation time, the resolution for what stays dynamic and the typed stream API — and the interpreter walks its
+trees against that same runtime, which is why it too stays well ahead of the other implementations.</p>
+</div>
+</div>
+
+<h1 id="releaseHistory"><a class="anchor" href="#releaseHistory"></a>3 Release History</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-jakarta-el/edit/1.0.x/src/main/docs/guide/releaseHistory.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>You can find a list of releases (with release notes) here:</p>
+</div>
+<div class="paragraph">
+<p><a href="https://github.com/micronaut-projects/micronaut-jakarta-el/releases">https://github.com/micronaut-projects/micronaut-jakarta-el/releases</a></p>
+</div>
+
+<h1 id="quickStart"><a class="anchor" href="#quickStart"></a>4 Quick Start</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-jakarta-el/edit/1.0.x/src/main/docs/guide/quickStart.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>Add the annotation processor and the runtime to your build:</p>
+</div>
+<div class="paragraph">
+<p>        <div class="listingblock multi-language-sample">
+<div class="title"></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">annotationProcessor(<span class="hljs-string">"io.micronaut.el:micronaut-jakarta-el-processor")</span></code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title"></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="maven">&lt;annotationProcessorPaths&gt;
+    &lt;path&gt;
+        &lt;groupId&gt;io.micronaut.el&lt;/groupId&gt;
+        &lt;artifactId&gt;micronaut-jakarta-el-processor&lt;/artifactId&gt;
+    &lt;/path&gt;
+&lt;/annotationProcessorPaths&gt;</code></pre>
+</div>
+</div>
+</p>
+</div>
+<div class="paragraph">
+<p>        <div class="listingblock multi-language-sample">
+<div class="title"></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">implementation(<span class="hljs-string">"io.micronaut.el:micronaut-jakarta-el")</span></code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="maven">&lt;dependency&gt;
+    &lt;groupId&gt;io.micronaut.el&lt;/groupId&gt;
+    &lt;artifactId&gt;micronaut-jakarta-el&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+</p>
+</div>
+<div class="paragraph">
+<p>Declare a bean with Micronaut&#8217;s <a href="../api/io/micronaut/core/annotation/Introspected.html">Introspected</a>:</p>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Book</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package example;
+
+import io.micronaut.context.annotation.Executable;
+import io.micronaut.core.annotation.Introspected;
+
+@Introspected // <b class="conum">(1)</b>
+public class Book {
+
+    private final String title;
+    private final String category;
+    private final double unitPrice;
+
+    public Book(String title, String category, double unitPrice) {
+        this.title = title;
+        this.category = category;
+        this.unitPrice = unitPrice;
+    }
+
+    public String getTitle() { // <b class="conum">(2)</b>
+        return title;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public double getUnitPrice() {
+        return unitPrice;
+    }
+
+    @Executable // <b class="conum">(3)</b>
+    public double discounted(double percent) {
+        return unitPrice * (100 - percent) / 100;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Book</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">package example
+
+import io.micronaut.context.annotation.Executable
+import io.micronaut.core.annotation.Introspected
+
+@Introspected // <b class="conum">(1)</b>
+class Book(val title: String, val category: String, val unitPrice: Double) { // <b class="conum">(2)</b>
+
+    @Executable // <b class="conum">(3)</b>
+    fun discounted(percent: Double): Double = unitPrice * (100 - percent) / 100
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Book</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">package example
+
+import io.micronaut.context.annotation.Executable
+import io.micronaut.core.annotation.Introspected
+
+@Introspected // <b class="conum">(1)</b>
+class Book {
+    final String title // <b class="conum">(2)</b>
+    final String category
+    final double unitPrice
+
+    Book(String title, String category, double unitPrice) {
+        this.title = title
+        this.category = category
+        this.unitPrice = unitPrice
+    }
+
+    @Executable // <b class="conum">(3)</b>
+    double discounted(double percent) {
+        unitPrice * (100 - percent) / 100
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The introspection generated for the type is what resolves its properties at runtime, without reflection.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>A property is read through its getter, which the introspection dispatches to directly.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td><a href="../api/io/micronaut/context/annotation/Executable.html">Executable</a> puts a method into the introspection, so that an expression can invoke it
+the same way.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Declare the expressions that use it:</p>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">BookExpressions</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package example;
+
+import io.micronaut.el.annotation.ELEnvironment;
+import io.micronaut.el.annotation.ELExpression;
+import io.micronaut.el.annotation.ELMethodExpression;
+import io.micronaut.el.annotation.ELVariable;
+
+@ELEnvironment(variables = @ELVariable(name = "book", type = Book.class)) // <b class="conum">(1)</b>
+@ELExpression(value = "${book.title}", expectedType = String.class, name = "TITLE") // <b class="conum">(2)</b>
+@ELExpression(value = "Book: ${book.title} at ${book.unitPrice}", expectedType = String.class, name = "SUMMARY") // <b class="conum">(3)</b>
+@ELExpression(value = "${book.unitPrice &gt; 15 ? 'expensive' : 'cheap'}", expectedType = String.class, name = "PRICE_BAND")
+@ELMethodExpression(value = "${book.discounted(10)}", expectedReturnType = double.class, name = "DISCOUNTED") // <b class="conum">(4)</b>
+public class BookExpressions {
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">BookExpressions</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">package example
+
+import io.micronaut.el.annotation.ELEnvironment
+import io.micronaut.el.annotation.ELExpression
+import io.micronaut.el.annotation.ELMethodExpression
+import io.micronaut.el.annotation.ELVariable
+
+@ELEnvironment(variables = [ELVariable(name = "book", type = Book::class)]) // <b class="conum">(1)</b>
+@ELExpression(value = "\${book.title}", expectedType = String::class, name = "TITLE") // <b class="conum">(2)</b>
+@ELExpression(value = "Book: \${book.title} at \${book.unitPrice}", expectedType = String::class, name = "SUMMARY") // <b class="conum">(3)</b>
+@ELExpression(value = "\${book.unitPrice &gt; 15 ? 'expensive' : 'cheap'}", expectedType = String::class, name = "PRICE_BAND")
+@ELMethodExpression(value = "\${book.discounted(10)}", expectedReturnType = Double::class, name = "DISCOUNTED") // <b class="conum">(4)</b>
+class BookExpressions</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">BookExpressions</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">package example
+
+import io.micronaut.el.annotation.ELEnvironment
+import io.micronaut.el.annotation.ELExpression
+import io.micronaut.el.annotation.ELMethodExpression
+import io.micronaut.el.annotation.ELVariable
+
+@ELEnvironment(variables = @ELVariable(name = "book", type = Book)) // <b class="conum">(1)</b>
+@ELExpression(value = '${book.title}', expectedType = String, name = "TITLE") // <b class="conum">(2)</b>
+@ELExpression(value = 'Book: ${book.title} at ${book.unitPrice}', expectedType = String, name = "SUMMARY") // <b class="conum">(3)</b>
+@ELExpression(value = "\${book.unitPrice &gt; 15 ? 'expensive' : 'cheap'}", expectedType = String, name = "PRICE_BAND")
+@ELMethodExpression(value = '${book.discounted(10)}', expectedReturnType = double, name = "DISCOUNTED") // <b class="conum">(4)</b>
+class BookExpressions {
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The environment gives <code>book</code> a static type, so <code>book.title</code> compiles to a direct invocation of <code>getTitle()</code>
+and a misspelt property is reported at compilation time.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>A value expression, the type its result is coerced to and the name of the constant holding it in the generated
+registry of the class.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>A composite expression: the literal text and the eval-expressions are concatenated, then coerced to the
+expected type.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>A method expression, which invokes the method rather than reading a value.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Evaluate them against any <code>jakarta.el.ELContext</code>:</p>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">BookExpressionsTest</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package example;
+
+import io.micronaut.el.CompiledELContext;
+import io.micronaut.el.runtime.CompiledExpression;
+import jakarta.el.ELContext;
+import jakarta.el.ExpressionFactory;
+import jakarta.el.ELManager;
+import jakarta.el.ValueExpression;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class BookExpressionsTest {
+
+    @Test
+    void evaluatesTheCompiledExpressions() {
+        ELContext context = new CompiledELContext() // <b class="conum">(1)</b>
+            .setBean("book", new Book("Jakarta EL", "reference", 20d));
+        ExpressionFactory factory = ELManager.getExpressionFactory();
+
+        ValueExpression title = factory.createValueExpression(context, "${book.title}", String.class); // <b class="conum">(2)</b>
+        assertTrue(title instanceof CompiledExpression); // <b class="conum">(3)</b>
+        assertEquals("Jakarta EL", title.getValue(context));
+        assertEquals("Book: Jakarta EL at 20.0",
+            factory.createValueExpression(context, "Book: ${book.title} at ${book.unitPrice}", String.class).getValue(context));
+        assertEquals(18d,
+            factory.createMethodExpression(context, "${book.discounted(10)}", double.class, new Class&lt;?&gt;[0]).invoke(context, null)); // <b class="conum">(4)</b>
+
+        assertEquals("expensive", BookExpressions$ELExpressions.PRICE_BAND.getValue(context)); // <b class="conum">(5)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">BookExpressionsTest</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">package example
+
+import io.micronaut.el.CompiledELContext
+import io.micronaut.el.runtime.CompiledExpression
+import jakarta.el.ELManager
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
+
+class BookExpressionsTest {
+
+    @Test
+    fun evaluatesTheCompiledExpressions() {
+        val context = CompiledELContext() // <b class="conum">(1)</b>
+            .setBean("book", Book("Jakarta EL", "reference", 20.0))
+        val factory = ELManager.getExpressionFactory()
+
+        val title = factory.createValueExpression(context, "\${book.title}", String::class.java) // <b class="conum">(2)</b>
+        assertTrue(title is CompiledExpression) // <b class="conum">(3)</b>
+        assertEquals("Jakarta EL", title.getValue(context))
+        assertEquals("Book: Jakarta EL at 20.0",
+            factory.createValueExpression(context, "Book: \${book.title} at \${book.unitPrice}", String::class.java).getValue(context))
+        assertEquals(18.0,
+            factory.createMethodExpression(context, "\${book.discounted(10)}", Double::class.java, arrayOf()).invoke(context, null)) // <b class="conum">(4)</b>
+
+        assertEquals("expensive", `BookExpressions$ELExpressions`.PRICE_BAND.getValue(context)) // <b class="conum">(5)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">BookExpressionsTest</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">package example
+
+import io.micronaut.el.CompiledELContext
+import io.micronaut.el.runtime.CompiledExpression
+import jakarta.el.ELContext
+import jakarta.el.ELManager
+import jakarta.el.ExpressionFactory
+import jakarta.el.ValueExpression
+import org.junit.jupiter.api.Test
+
+import static org.junit.jupiter.api.Assertions.assertEquals
+import static org.junit.jupiter.api.Assertions.assertTrue
+
+class BookExpressionsTest {
+
+    @Test
+    void evaluatesTheCompiledExpressions() {
+        ELContext context = new CompiledELContext() // <b class="conum">(1)</b>
+            .setBean("book", new Book("Jakarta EL", "reference", 20d))
+        ExpressionFactory factory = ELManager.expressionFactory
+
+        ValueExpression title = factory.createValueExpression(context, '${book.title}', String) // <b class="conum">(2)</b>
+        assertTrue(title instanceof CompiledExpression) // <b class="conum">(3)</b>
+        assertEquals("Jakarta EL", title.getValue(context))
+        assertEquals("Book: Jakarta EL at 20.0",
+            factory.createValueExpression(context, 'Book: ${book.title} at ${book.unitPrice}', String).getValue(context))
+        assertEquals(18d,
+            factory.createMethodExpression(context, '${book.discounted(10)}', double, new Class[0]).invoke(context, null)) // <b class="conum">(4)</b>
+
+        assertEquals("expensive",
+            factory.createValueExpression(context, "\${book.unitPrice &gt; 15 ? 'expensive' : 'cheap'}", String).getValue(context))
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>CompiledELContext</code> is the standard resolver chain of the specification with <code>IntrospectionELResolver</code> in
+front, and holds the beans the expressions refer to by name.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The expressions are returned by the <code>jakarta.el.ExpressionFactory</code> of the module, registered as a service, so
+code written against the standard API keeps working: <code>createValueExpression</code> is a lookup of the expression string
+in the registries, not a parse.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>What the factory returns is the class generated at compilation time.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>A method expression is invoked the same way; the parameters are the ones written in the expression.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>In Java and Kotlin the generated registry, <code>BookExpressions$ELExpressions</code>, also exposes each expression
+under the name it was declared with. The Groovy compiler resolves the names of a class before the registry is
+generated, so Groovy code reaches the expressions through the factory.</td>
+</tr>
+</table>
+</div>
+
+<h1 id="declaringExpressions"><a class="anchor" href="#declaringExpressions"></a>5 Declaring Expressions</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-jakarta-el/edit/1.0.x/src/main/docs/guide/declaringExpressions.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>The module ships one small set of annotations, all in <code>io.micronaut.el.annotation</code>:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Annotation</th>
+<th class="tableblock halign-left valign-top">Use it to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../api/io/micronaut/el/annotation/ELExpression.html">ELExpression</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Declare a value expression to compile — <code>${book.title}</code>, a composite, a literal. Repeatable; goes on a type,
+field, method or parameter.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../api/io/micronaut/el/annotation/ELMethodExpression.html">ELMethodExpression</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Declare a method expression — one that names a method to invoke, such as <code>${book.discounted(10)}</code> — when the
+caller needs a <code>jakarta.el.MethodExpression</code> rather than a value.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../api/io/micronaut/el/annotation/ELEnvironment.html">ELEnvironment</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Describe the world the expressions of a class or member live in: the typed variables, the imported classes and
+packages, the static imports and the function libraries.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../api/io/micronaut/el/annotation/ELVariable.html">ELVariable</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Give one variable a name and a static type inside an <code>@ELEnvironment</code>, so its properties and methods compile to
+direct calls and are checked at compilation time.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../api/io/micronaut/el/annotation/ELFunctions.html">ELFunctions</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Register a class of functions for the expressions, optionally under a namespace prefix — every public static
+method becomes a function.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="../api/io/micronaut/el/annotation/ELFunction.html">ELFunction</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Mark a single method as a function, with its own name and prefix, when the class should not export every
+static method — also works on instance methods of beans.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>An expression is declared with <code>@ELExpression</code>, which is repeatable, on a type, a field, a method or a parameter.
+The element is only a holder: the processor generates one class per expression, plus a registry per declaring
+class that maps each expression string to its implementation.</p>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">CatalogExpressions</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package example;
+
+import io.micronaut.el.annotation.ELEnvironment;
+import io.micronaut.el.annotation.ELExpression;
+import io.micronaut.el.annotation.ELFunctions;
+import io.micronaut.el.annotation.ELVariable;
+
+import java.util.List;
+
+@ELEnvironment(
+    variables = {
+        @ELVariable(name = "book", type = Book.class),
+        @ELVariable(name = "books", type = List.class) // <b class="conum">(1)</b>
+    },
+    imports = Math.class, // <b class="conum">(2)</b>
+    functions = @ELFunctions(value = TextFunctions.class, prefix = "text") // <b class="conum">(3)</b>
+)
+@ELExpression(value = "${text:shout(book.title)}", expectedType = String.class, name = "SHOUTED") // <b class="conum">(4)</b>
+@ELExpression(value = "${text:initials(book.title)}", expectedType = String.class, name = "INITIALS")
+@ELExpression(value = "${Math.max(book.unitPrice, 25)}", expectedType = double.class, name = "FLOOR_PRICE") // <b class="conum">(5)</b>
+@ELExpression(
+    value = "${books.stream().filter(b -&gt; b.unitPrice &gt; 10).map(b -&gt; b.title).toList()}", // <b class="conum">(6)</b>
+    expectedType = List.class,
+    name = "EXPENSIVE_TITLES"
+)
+@ELExpression(expression = "${(price -&gt; price * 2)(book.unitPrice)}", expectedType = double.class, name = "DOUBLED") // <b class="conum">(7)</b>
+@ELExpression(
+    expression = "${discount = (price, percent) -&gt; price * (100 - percent) / 100; discount(book.unitPrice, 25)}", // <b class="conum">(8)</b>
+    expectedType = double.class,
+    name = "DISCOUNTED"
+)
+@ELExpression(
+    expression = "${books.stream().sorted((a, b) -&gt; a.unitPrice - b.unitPrice).map(b -&gt; b.title).toList()}", // <b class="conum">(9)</b>
+    expectedType = List.class,
+    name = "BY_PRICE"
+)
+public class CatalogExpressions {
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">CatalogExpressions</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">package example
+
+import io.micronaut.el.annotation.ELEnvironment
+import io.micronaut.el.annotation.ELExpression
+import io.micronaut.el.annotation.ELFunctions
+import io.micronaut.el.annotation.ELVariable
+
+@ELEnvironment(
+    variables = [
+        ELVariable(name = "book", type = Book::class),
+        ELVariable(name = "books", type = List::class) // <b class="conum">(1)</b>
+    ],
+    imports = [Math::class], // <b class="conum">(2)</b>
+    functions = [ELFunctions(value = TextFunctions::class, prefix = "text")] // <b class="conum">(3)</b>
+)
+@ELExpression(value = "\${text:shout(book.title)}", expectedType = String::class, name = "SHOUTED") // <b class="conum">(4)</b>
+@ELExpression(value = "\${text:initials(book.title)}", expectedType = String::class, name = "INITIALS")
+@ELExpression(value = "\${Math.max(book.unitPrice, 25)}", expectedType = Double::class, name = "FLOOR_PRICE") // <b class="conum">(5)</b>
+@ELExpression(
+    value = "\${books.stream().filter(b -&gt; b.unitPrice &gt; 10).map(b -&gt; b.title).toList()}", // <b class="conum">(6)</b>
+    expectedType = List::class,
+    name = "EXPENSIVE_TITLES"
+)
+@ELExpression(expression = "\${(price -&gt; price * 2)(book.unitPrice)}", expectedType = Double::class, name = "DOUBLED") // <b class="conum">(7)</b>
+@ELExpression(
+    expression = "\${discount = (price, percent) -&gt; price * (100 - percent) / 100; discount(book.unitPrice, 25)}", // <b class="conum">(8)</b>
+    expectedType = Double::class,
+    name = "DISCOUNTED"
+)
+@ELExpression(
+    expression = "\${books.stream().sorted((a, b) -&gt; a.unitPrice - b.unitPrice).map(b -&gt; b.title).toList()}", // <b class="conum">(9)</b>
+    expectedType = List::class,
+    name = "BY_PRICE"
+)
+class CatalogExpressions</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">CatalogExpressions</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">package example
+
+import io.micronaut.el.annotation.ELEnvironment
+import io.micronaut.el.annotation.ELExpression
+import io.micronaut.el.annotation.ELFunctions
+import io.micronaut.el.annotation.ELVariable
+
+@ELEnvironment(
+    variables = [
+        @ELVariable(name = "book", type = Book),
+        @ELVariable(name = "books", type = List) // <b class="conum">(1)</b>
+    ],
+    imports = Math, // <b class="conum">(2)</b>
+    functions = @ELFunctions(value = TextFunctions, prefix = "text") // <b class="conum">(3)</b>
+)
+@ELExpression(value = '${text:shout(book.title)}', expectedType = String, name = "SHOUTED") // <b class="conum">(4)</b>
+@ELExpression(value = '${text:initials(book.title)}', expectedType = String, name = "INITIALS")
+@ELExpression(value = '${Math.max(book.unitPrice, 25)}', expectedType = double, name = "FLOOR_PRICE") // <b class="conum">(5)</b>
+@ELExpression(
+    value = '${books.stream().filter(b -&gt; b.unitPrice &gt; 10).map(b -&gt; b.title).toList()}', // <b class="conum">(6)</b>
+    expectedType = List,
+    name = "EXPENSIVE_TITLES"
+)
+@ELExpression(expression = '${(price -&gt; price * 2)(book.unitPrice)}', expectedType = double, name = "DOUBLED") // <b class="conum">(7)</b>
+@ELExpression(
+    expression = '${discount = (price, percent) -&gt; price * (100 - percent) / 100; discount(book.unitPrice, 25)}', // <b class="conum">(8)</b>
+    expectedType = double,
+    name = "DISCOUNTED"
+)
+@ELExpression(
+    expression = '${books.stream().sorted((a, b) -&gt; a.unitPrice - b.unitPrice).map(b -&gt; b.title).toList()}', // <b class="conum">(9)</b>
+    expectedType = List,
+    name = "BY_PRICE"
+)
+class CatalogExpressions {
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>variables</code> declares the name and the static type of the variables the expressions use. A variable declared
+this way is still looked up in the <code>ELContext</code> at evaluation time, but every property access, method invocation
+and coercion applied to it is resolved statically. A member the type does not declare is reported at compilation
+time.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>imports</code>, <code>importPackages</code> and <code>staticImports</code> make classes, packages and statically imported fields
+available to the expressions, the way the language defines static references. Among several overloads,
+<code>Math.max</code> here, the one whose parameters fit the static types of the arguments best is selected at compilation
+time.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td><code>functions</code> lists a class whose public static methods are functions without any annotation, optionally under
+a namespace prefix; <code>type</code> is an alias of <code>value</code>. A class declaring its functions with <code>@ELFunction</code> needs no
+listing in its own module, and keeps the names and prefixes it declares when listed from another.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>A function is called with its prefix.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>A static method of an imported class is called through the class name.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>The collection operations of the chapter 2 of the specification, lambdas included, compile like the rest.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>A lambda expression invoked immediately, and <code>expression</code> as an alias of <code>value</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="8"></i><b>8</b></td>
+<td>A lambda expression assigned to a variable and invoked by name; the semicolon operator evaluates the
+assignment, then the call.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="9"></i><b>9</b></td>
+<td>A lambda expression with two parameters, passed to the <code>sorted</code> operation as its comparator.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The functions are plain static methods:</p>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">TextFunctions</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package example;
+
+import io.micronaut.el.annotation.ELFunction;
+
+public final class TextFunctions {
+
+    private TextFunctions() {
+    }
+
+    @ELFunction // <b class="conum">(1)</b>
+    public static String shout(String text) {
+        return text.toUpperCase() + "!";
+    }
+
+    @ELFunction("initials") // <b class="conum">(2)</b>
+    public static String initialsOf(String text) {
+        StringBuilder initials = new StringBuilder();
+        for (String word : text.split(" ")) {
+            initials.append(word.charAt(0));
+        }
+        return initials.toString();
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">TextFunctions</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">package example
+
+import io.micronaut.el.annotation.ELFunction
+
+object TextFunctions {
+
+    @JvmStatic
+    @ELFunction // <b class="conum">(1)</b>
+    fun shout(text: String): String = text.uppercase() + "!"
+
+    @JvmStatic
+    @ELFunction("initials") // <b class="conum">(2)</b>
+    fun initialsOf(text: String): String = text.split(" ").joinToString("") { it.substring(0, 1) }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">TextFunctions</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">package example
+
+import io.micronaut.el.annotation.ELFunction
+
+final class TextFunctions {
+
+    private TextFunctions() {
+    }
+
+    @ELFunction // <b class="conum">(1)</b>
+    static String shout(String text) {
+        text.toUpperCase() + "!"
+    }
+
+    @ELFunction("initials") // <b class="conum">(2)</b>
+    static String initialsOf(String text) {
+        text.split(" ").collect { it.charAt(0) }.join()
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>@ELFunction</code> declares the method as a function, under its own name. Once a method of the class is
+annotated, only the annotated methods are functions; a class with no annotated method exposes all its public
+static methods, when listed with <code>@ELFunctions</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>@ELFunction</code> can give a function another name, with <code>name</code>, an alias of <code>value</code>, and a namespace prefix of
+its own.</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_functions_on_beans">Functions on beans</h3>
+<div class="paragraph">
+<p>A function does not have to be static. The public instance methods a class declares are functions too, invoked
+on the instance the <code>ELContext</code> provides at evaluation time, which is how a Micronaut bean offers functions:</p>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">PricingService</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package example;
+
+import io.micronaut.el.annotation.ELFunction;
+import jakarta.inject.Singleton;
+
+@Singleton // <b class="conum">(1)</b>
+public class PricingService {
+
+    private final double discount = 0.1;
+
+    @ELFunction(prefix = "pricing") // <b class="conum">(2)</b>
+    public double quote(Book book, int quantity) {
+        return book.getUnitPrice() * quantity * (1 - discount);
+    }
+
+    @ELFunction(prefix = "pricing", name = "currency") // <b class="conum">(3)</b>
+    public static String currencyCode() {
+        return "EUR";
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">PricingService</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">package example
+
+import io.micronaut.el.annotation.ELFunction
+import jakarta.inject.Singleton
+
+@Singleton // <b class="conum">(1)</b>
+class PricingService {
+
+    private val discount = 0.1
+
+    @ELFunction(prefix = "pricing") // <b class="conum">(2)</b>
+    fun quote(book: Book, quantity: Int): Double = book.unitPrice * quantity * (1 - discount)
+
+    companion object {
+        @JvmStatic
+        @ELFunction(prefix = "pricing", name = "currency") // <b class="conum">(3)</b>
+        fun currencyCode(): String = "EUR"
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">PricingService</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">package example
+
+import io.micronaut.el.annotation.ELFunction
+import jakarta.inject.Singleton
+
+@Singleton // <b class="conum">(1)</b>
+class PricingService {
+
+    private final double discount = 0.1
+
+    @ELFunction(prefix = "pricing") // <b class="conum">(2)</b>
+    double quote(Book book, int quantity) {
+        book.unitPrice * quantity * (1 - discount)
+    }
+
+    @ELFunction(prefix = "pricing", name = "currency") // <b class="conum">(3)</b>
+    static String currencyCode() {
+        "EUR"
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>An ordinary bean: nothing lists it. A function declared with <code>@ELFunction</code> is found by the expressions of
+the module declaring it, whatever the order of its classes; a function of another module is listed with
+<code>@ELFunctions(type = &#8230;&#8203;)</code>, and keeps the name and the prefix it declares.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>@ELFunction</code> declares the method as a function, here with its namespace prefix; an instance method is invoked
+on the instance. Once a method of the class is annotated, only the annotated methods are functions: a bean does
+not expose every public method it has.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>A static method is a function as well, invoked directly, here under another name.</td>
+</tr>
+</table>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">PricingExpressions</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package example;
+
+import io.micronaut.el.annotation.ELEnvironment;
+import io.micronaut.el.annotation.ELExpression;
+import io.micronaut.el.annotation.ELVariable;
+
+@ELEnvironment(variables = @ELVariable(name = "book", type = Book.class)) // <b class="conum">(1)</b>
+@ELExpression(value = "${pricing:quote(book, 3)}", expectedType = double.class, name = "QUOTE") // <b class="conum">(2)</b>
+@ELExpression(value = "${pricing:quote(book, 3) += ' ' += pricing:currency()}", expectedType = String.class, name = "PRICED") // <b class="conum">(3)</b>
+public class PricingExpressions {
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">PricingExpressions</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">package example
+
+import io.micronaut.el.annotation.ELEnvironment
+import io.micronaut.el.annotation.ELExpression
+import io.micronaut.el.annotation.ELVariable
+
+@ELEnvironment(variables = [ELVariable(name = "book", type = Book::class)]) // <b class="conum">(1)</b>
+@ELExpression(value = "\${pricing:quote(book, 3)}", expectedType = Double::class, name = "QUOTE") // <b class="conum">(2)</b>
+@ELExpression(value = "\${pricing:quote(book, 3) += ' ' += pricing:currency()}", expectedType = String::class, name = "PRICED") // <b class="conum">(3)</b>
+class PricingExpressions</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">PricingExpressions</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">package example
+
+import io.micronaut.el.annotation.ELEnvironment
+import io.micronaut.el.annotation.ELExpression
+import io.micronaut.el.annotation.ELVariable
+
+@ELEnvironment(variables = @ELVariable(name = "book", type = Book)) // <b class="conum">(1)</b>
+@ELExpression(value = '${pricing:quote(book, 3)}', expectedType = double, name = "QUOTE") // <b class="conum">(2)</b>
+@ELExpression(value = "\${pricing:quote(book, 3) += ' ' += pricing:currency()}", expectedType = String, name = "PRICED") // <b class="conum">(3)</b>
+class PricingExpressions {
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The environment declares the variable only: the functions need no declaration.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>A call of the instance function, with the parameters compiled against its signature: a call that does not
+match the function, in name or in number of arguments, fails the compilation.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Both kinds mix in one expression.</td>
+</tr>
+</table>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">PricingExpressionsTest</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package example;
+
+import io.micronaut.context.ApplicationContext;
+import io.micronaut.el.CompiledELContext;
+import io.micronaut.el.ELBeanProvider;
+import jakarta.el.ELContext;
+import jakarta.el.ELException;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class PricingExpressionsTest {
+
+    private final Book book = new Book("Jakarta EL", "reference", 20d);
+
+    @Test
+    void theFunctionIsInvokedOnTheBean() {
+        try (ApplicationContext applicationContext = ApplicationContext.run()) {
+            ELContext context = new CompiledELContext().setBean("book", book);
+            context.putContext(ELBeanProvider.class, (ELBeanProvider) applicationContext::getBean); // <b class="conum">(1)</b>
+
+            assertEquals(54d, PricingExpressions$ELExpressions.QUOTE.getValue(context)); // <b class="conum">(2)</b>
+            assertEquals("54.0 EUR", PricingExpressions$ELExpressions.PRICED.getValue(context));
+        }
+    }
+
+    @Test
+    void anInstanceCanBeRegisteredDirectly() {
+        ELContext context = new CompiledELContext().setBean("book", book);
+        context.putContext(PricingService.class, new PricingService()); // <b class="conum">(3)</b>
+
+        assertEquals(54d, PricingExpressions$ELExpressions.QUOTE.getValue(context));
+    }
+
+    @Test
+    void withoutAnInstanceTheEvaluationFails() {
+        ELContext context = new CompiledELContext().setBean("book", book);
+
+        ELException failure = assertThrows(ELException.class, () -&gt; PricingExpressions$ELExpressions.QUOTE.getValue(context)); // <b class="conum">(4)</b>
+        assertTrue(failure.getMessage().contains("No instance of example.PricingService"), failure.getMessage());
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">PricingExpressionsTest</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">package example
+
+import io.micronaut.context.ApplicationContext
+import io.micronaut.el.CompiledELContext
+import io.micronaut.el.ELBeanProvider
+import jakarta.el.ELException
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
+
+class PricingExpressionsTest {
+
+    private val book = Book("Jakarta EL", "reference", 20.0)
+
+    @Test
+    fun theFunctionIsInvokedOnTheBean() {
+        ApplicationContext.run().use { applicationContext -&gt;
+            val context = CompiledELContext().setBean("book", book)
+            context.putContext(ELBeanProvider::class.java, object : ELBeanProvider { // <b class="conum">(1)</b>
+                override fun &lt;T : Any&gt; get(type: Class&lt;T&gt;): T = applicationContext.getBean(type)
+            })
+
+            assertEquals(54.0, `PricingExpressions$ELExpressions`.QUOTE.getValue(context)) // <b class="conum">(2)</b>
+            assertEquals("54.0 EUR", `PricingExpressions$ELExpressions`.PRICED.getValue(context))
+        }
+    }
+
+    @Test
+    fun anInstanceCanBeRegisteredDirectly() {
+        val context = CompiledELContext().setBean("book", book)
+        context.putContext(PricingService::class.java, PricingService()) // <b class="conum">(3)</b>
+
+        assertEquals(54.0, `PricingExpressions$ELExpressions`.QUOTE.getValue(context))
+    }
+
+    @Test
+    fun withoutAnInstanceTheEvaluationFails() {
+        val context = CompiledELContext().setBean("book", book)
+
+        val failure = assertThrows(ELException::class.java) { `PricingExpressions$ELExpressions`.QUOTE.getValue&lt;Any&gt;(context) } // <b class="conum">(4)</b>
+        assertTrue(failure.message!!.contains("No instance of example.PricingService"), failure.message)
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">PricingExpressionsTest</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">package example
+
+import io.micronaut.context.ApplicationContext
+import io.micronaut.el.CompiledELContext
+import io.micronaut.el.ELBeanProvider
+import jakarta.el.ELContext
+import jakarta.el.ELException
+import jakarta.el.ELManager
+import org.junit.jupiter.api.Test
+
+import static org.junit.jupiter.api.Assertions.assertEquals
+import static org.junit.jupiter.api.Assertions.assertThrows
+import static org.junit.jupiter.api.Assertions.assertTrue
+
+class PricingExpressionsTest {
+
+    private final Book book = new Book("Jakarta EL", "reference", 20d)
+
+    @Test
+    void theFunctionIsInvokedOnTheBean() {
+        ApplicationContext.run().withCloseable { applicationContext -&gt;
+            ELContext context = new CompiledELContext().setBean("book", book)
+            context.putContext(ELBeanProvider, applicationContext.&amp;getBean as ELBeanProvider) // <b class="conum">(1)</b>
+
+            assertEquals(54d, ELManager.expressionFactory.createValueExpression(context, '${pricing:quote(book, 3)}', double).getValue(context)) // <b class="conum">(2)</b>
+            assertEquals("54.0 EUR", ELManager.expressionFactory
+                .createValueExpression(context, "\${pricing:quote(book, 3) += ' ' += pricing:currency()}", String).getValue(context))
+        }
+    }
+
+    @Test
+    void anInstanceCanBeRegisteredDirectly() {
+        ELContext context = new CompiledELContext().setBean("book", book)
+        context.putContext(PricingService, new PricingService()) // <b class="conum">(3)</b>
+
+        assertEquals(54d, ELManager.expressionFactory.createValueExpression(context, '${pricing:quote(book, 3)}', double).getValue(context))
+    }
+
+    @Test
+    void withoutAnInstanceTheEvaluationFails() {
+        ELContext context = new CompiledELContext().setBean("book", book)
+
+        ELException failure = assertThrows(ELException) {
+            ELManager.expressionFactory.createValueExpression(context, '${pricing:quote(book, 3)}', double).getValue(context) // <b class="conum">(4)</b>
+        }
+        assertTrue(failure.message.contains("No instance of example.PricingService"), failure.message)
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>A Micronaut application registers its bean context as the <a href="../api/io/micronaut/el/ELBeanProvider.html">ELBeanProvider</a> of the <code>ELContext</code>, once,
+and every bean can declare functions.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The function is invoked on the bean.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Without a container, the instance is registered under its type with the standard <code>putContext</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>With neither, the evaluation fails with an <code>ELException</code> saying so.</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+A function on a bean is a compiled construct: the interpreter resolves functions through the
+<code>jakarta.el.FunctionMapper</code> of the context, which the specification defines over static methods only.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>@ELEnvironment</code> is the compilation time counterpart of the <code>jakarta.el.ELContext</code>. It is declared on the class,
+or on the member holding the expressions, in which case it applies to those on top of the environment of the
+class. The expressions declared on a method, or on one of its parameters, additionally see the parameters of the
+method as variables, under their names and with their declared types.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The generated registry matches the expected type of a request: an expression declared with
+<code>expectedType = String.class</code> is only returned for a request with <code>String.class</code>. A primitive and its wrapper
+are the same expectation, so <code>double.class</code> and <code>Double.class</code> match each other. A request for the same string
+with another type, <code>Object.class</code> included, is treated as a different expression, and is rejected as not compiled
+unless the interpreter module is present.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+Any annotation string containing <code>#{...}</code> is treated by Micronaut as one of its own evaluated
+expressions. The processor reads the original text back out, so <code>#{...}</code> works in a plain holder class, but on a
+Micronaut bean Micronaut will also try to compile it with its own expression language. Prefer <code>${...}</code> for
+<code>@ELExpression</code>: the specification parses the two identically. An annotation of your own can use <code>#{...}</code> with
+the processor described in <a href="#examples">Examples and Use Cases</a>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_what_the_processor_generates">What the processor generates</h3>
+<div class="paragraph">
+<p>For <code>${book.title}</code> with <code>book</code> declared as a <code>Book</code>, the generated implementation contains the invocation
+itself:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public final class BookExpressions$Expression0 extends CompiledValueExpression {
+
+    public BookExpressions$Expression0() {
+        super("${book.title}", "${book[\"title\"]}", java.lang.String.class); <i class="conum" data-value="1"></i><b>(1)</b>
+    }
+
+    @Override
+    protected Object evaluate(ELContext context) {
+        return ((Book) ELResolution.resolveIdentifier(context, "book")).getTitle(); <i class="conum" data-value="2"></i><b>(2)</b>
+    }
+
+    @Override
+    public void setValue(ELContext context, Object value) {
+        ELResolution.setValue(context, (Book) ELResolution.resolveIdentifier(context, "book"), "title", value); <i class="conum" data-value="3"></i><b>(3)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The expression as written, its canonical form, which is what <code>equals</code> compares, and the expected type.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The identifier is resolved through the context once, then the property is read with a direct invocation.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td><code>setValue</code>, <code>getType</code>, <code>isReadOnly</code> and <code>getValueReference</code> are generated when the expression is an lvalue. An
+expression that is not an lvalue inherits the base class behaviour, which rejects assignment with a
+<code>PropertyNotWritableException</code> as the specification requires.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_errors_at_compilation_time">Errors at compilation time</h3>
+<div class="paragraph">
+<p>An expression that cannot be compiled fails the compilation of the class declaring it. The message carries the
+expression, the position of the error in it, and the class, so that the mistake never reaches a runtime:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-text hljs" data-lang="text">Expressions.java:7: error: Unexpected token RCURL('}') in the expression [${ book.title + }] at the position 16 <i class="conum" data-value="1"></i><b>(1)</b>
+public class Expressions {
+       ^</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The file and the line of the declaring class, the message of the parser, the expression and the position.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The same holds for a composite method expression, a function that is not declared, a static field the imported
+class does not have, an assignment to something that is not an lvalue, or a construction mixing set elements and
+map entries.</p>
+</div>
+<div class="paragraph">
+<p>A member that the static type of a variable does not declare is a warning rather than an error, because a custom
+<code>jakarta.el.ELResolver</code> may serve it at runtime, which is where the access is then left:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-text hljs" data-lang="text">warning: The type example.Book does not declare the property 'titel'; the access is left to the resolvers at runtime</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The types the standard resolvers read by key, index or name, maps, collections, arrays, resource bundles and
+optionals, are not reported.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_the_expected_type">The expected type</h3>
+<div class="paragraph">
+<p><code>expectedType</code> names the type the result of every evaluation is coerced to, with the standard coercion rules of
+the language. It can be omitted: the compiler then infers it from the static type of the expression —
+<code>${book.discounted(10)}</code> is a <code>Double</code> because <code>discounted</code> returns one, a comparison is a <code>Boolean</code>, a
+composite expression is a <code>String</code>, and an expression whose type the compiler does not know is an <code>Object</code>. The
+same applies to <code>expectedReturnType</code> of an <code>@ELMethodExpression</code>, inferred from the invocation. The generated
+<code>ExpressionFactory</code> serves an expression with an inferred type for that type, its primitive counterpart and
+<code>Object.class</code>.</p>
+</div>
+</div>
+
+<h1 id="declaringBeans"><a class="anchor" href="#declaringBeans"></a>6 Declaring Beans</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-jakarta-el/edit/1.0.x/src/main/docs/guide/declaringBeans.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>Beans are declared with Micronaut&#8217;s own <a href="../api/io/micronaut/core/annotation/Introspected.html">Introspected</a>, not with an annotation of this module:</p>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Book</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package example;
+
+import io.micronaut.context.annotation.Executable;
+import io.micronaut.core.annotation.Introspected;
+
+@Introspected // <b class="conum">(1)</b>
+public class Book {
+
+    private final String title;
+    private final String category;
+    private final double unitPrice;
+
+    public Book(String title, String category, double unitPrice) {
+        this.title = title;
+        this.category = category;
+        this.unitPrice = unitPrice;
+    }
+
+    public String getTitle() { // <b class="conum">(2)</b>
+        return title;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public double getUnitPrice() {
+        return unitPrice;
+    }
+
+    @Executable // <b class="conum">(3)</b>
+    public double discounted(double percent) {
+        return unitPrice * (100 - percent) / 100;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Book</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">package example
+
+import io.micronaut.context.annotation.Executable
+import io.micronaut.core.annotation.Introspected
+
+@Introspected // <b class="conum">(1)</b>
+class Book(val title: String, val category: String, val unitPrice: Double) { // <b class="conum">(2)</b>
+
+    @Executable // <b class="conum">(3)</b>
+    fun discounted(percent: Double): Double = unitPrice * (100 - percent) / 100
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Book</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">package example
+
+import io.micronaut.context.annotation.Executable
+import io.micronaut.core.annotation.Introspected
+
+@Introspected // <b class="conum">(1)</b>
+class Book {
+    final String title // <b class="conum">(2)</b>
+    final String category
+    final double unitPrice
+
+    Book(String title, String category, double unitPrice) {
+        this.title = title
+        this.category = category
+        this.unitPrice = unitPrice
+    }
+
+    @Executable // <b class="conum">(3)</b>
+    double discounted(double percent) {
+        unitPrice * (100 - percent) / 100
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Micronaut generates a <code>BeanIntrospection</code> for the type at compilation time, and <code>IntrospectionELResolver</code>
+reads and writes the properties through it. The introspection dispatches to a direct invocation, so no reflection
+is involved.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>A property is whatever the introspection exposes: a getter, a record component, a Kotlin property.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>A method reaches the same path once it is annotated with <a href="../api/io/micronaut/context/annotation/Executable.html">Executable</a>, which is what
+puts it into the introspection. A method that is not executable is resolved reflectively, as described in
+<a href="#reflection">When Reflection Is Used</a>.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>IntrospectionELResolver</code> is the first resolver of the chain built by <code>ELResolvers.standard()</code>. A type with no
+introspection is left unresolved, so the standard resolvers of the specification pick it up and a model that
+mixes introspected and plain types still resolves.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Any type that is already introspected for another reason is resolvable by expressions with no further
+annotation, including third party types brought in with <code>@Introspected(classes = &#8230;&#8203;)</code>.
+</td>
+</tr>
+</table>
+</div>
+
+<h1 id="examples"><a class="anchor" href="#examples"></a>7 Examples and Use Cases</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-jakarta-el/edit/1.0.x/src/main/docs/guide/examples.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>Jakarta Expression Language earns its place wherever your application wants a little logic as data: readable at
+the declaration, changeable without touching the surrounding Java, and — with this module — compiled and
+type-checked at build time, so a typo fails the build instead of a request, and evaluated in nanoseconds without
+parsing or reflection. Some places it fits:</p>
+</div>
+<div class="sect3">
+<h4 id="_business_rules_on_methods">Business rules on methods</h4>
+<div class="paragraph">
+<p>Guard an operation with the rule written right where the operation is declared: a customer must be an adult and
+live in Europe before registering, an order must stay under a credit limit, a discount only applies on weekdays.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Eligible(value = "#{ fn:adult(customer.age) &amp;&amp; fn:inEurope(customer.country) }",
+          otherwise = "#{ customer.name += ' must be an adult in Europe' }")
+public String register(Customer customer) { ... }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The parameters of the method are the variables of the expressions; the functions under <code>fn:</code> come from a shared
+library of the rules of the domain.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_validation_messages">Validation messages</h4>
+<div class="paragraph">
+<p>A constraint in the style of Jakarta Validation, whose message is a template over the attributes of the
+constraint and the validated value:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@MinAmount(value = 100)
+long amount
+// its default message: "Must be greater than ${inclusive == true ? 'or equal to ' : ''}{value}"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>{value}</code> attribute interpolates first, the expression sees <code>inclusive</code> and <code>validatedValue</code> as typed
+variables, and each segment of the template is compiled at build time.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_feature_flags_and_routing_conditions">Feature flags and routing conditions</h4>
+<div class="paragraph">
+<p>Any annotation that decides something can carry the decision as an expression — which customers see a feature,
+which handler takes a message, what gets audited:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@FeatureFlag("#{ customer.plan == 'PRO' or fn:betaTester(customer.id) }")
+public Dashboard newDashboard(Customer customer) { ... }</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_rules_that_only_exist_at_runtime">Rules that only exist at runtime</h4>
+<div class="paragraph">
+<p>When the expression itself is data — a discount rule from a database, a condition an operator edits — add the
+<a href="#runtimeParsing">interpreter module</a> and create the expression from its string with the standard
+<code>jakarta.el.ExpressionFactory</code>; everything an application declares in source stays compiled.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_building_your_own_annotation">Building your own annotation</h3>
+<div class="paragraph">
+<p><code>@Eligible</code> and <code>@MinAmount</code> above are not part of this module: they are ordinary user annotations, and the rest
+of this chapter walks through building them. Everything shown exists as working code — the
+<code>test-suite-custom-annotation</code> module of the repository is the library declaring them, and the <code>doc-examples</code>
+modules use it.</p>
+</div>
+<div class="sect3">
+<h4 id="_the_annotation">The annotation</h4>
+<div class="paragraph">
+<p>Declare the annotation as you would any other — here it also binds an AOP interceptor, so that the condition
+guards the method call. Its members are plain strings holding the expressions:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+@Around <i class="conum" data-value="1"></i><b>(1)</b>
+@InterceptorBinding
+public @interface Eligible {
+
+    /**
+     * @return The condition the parameters of the method must satisfy
+     */
+    String value() default ""; <i class="conum" data-value="2"></i><b>(2)</b>
+
+    /**
+     * @return The condition, an alias of {@link #value()}
+     */
+    @AliasFor(member = "value")
+    String condition() default "";
+
+    /**
+     * @return The message of the rejection, an expression evaluating to a string, or empty for a default one
+     */
+    String otherwise() default ""; <i class="conum" data-value="3"></i><b>(3)</b>
+
+    /**
+     * @return The name of the constant holding the compiled condition in the registry of the class, for the
+     * code that wants to reference it directly; derived from the condition when empty
+     */
+    String name() default ""; <i class="conum" data-value="4"></i><b>(4)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The annotation binds an interceptor, which is where the expressions are evaluated.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The condition the parameters of the method must satisfy.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>A second expression, the message of the rejection, evaluating to a string.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>An optional name for the constants holding the compiled expressions in the generated registry of the class;
+without it the names are derived from the declaration.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Using it looks like this. The parameters of the method are typed variables inside the expressions — <code>customer</code>
+is the <code>Customer</code> parameter, so <code>customer.age</code> compiles to a direct call of <code>getAge()</code> and a misspelt property
+is a compilation error. The functions of the library are available under their prefix, and imported classes by
+their simple name:</p>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">RegistrationService</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package example;
+
+import io.micronaut.el.example.eligible.Eligible;
+import io.micronaut.el.example.eligible.MinAmount;
+import jakarta.inject.Singleton;
+
+@Singleton
+public class RegistrationService {
+
+    @Eligible(value = "#{ fn:adult(customer.age) &amp;&amp; fn:inEurope(customer.country) }", // <b class="conum">(1)</b>
+              otherwise = "#{ customer.name += ' must be an adult in Europe' }", // <b class="conum">(2)</b>
+              name = "REGISTER") // <b class="conum">(3)</b>
+    public String register(Customer customer) {
+        return "registered " + customer.name();
+    }
+
+    @Eligible("${ customer.country == Locale.GERMANY.country }") // <b class="conum">(4)</b>
+    public String deposit(Customer customer,
+                          @MinAmount(value = 100, inclusive = true,
+                                     message = "Must be greater than ${inclusive == true ? 'or equal to ' : ''}{value}") // <b class="conum">(5)</b>
+                          long amount) {
+        return "deposited " + amount + " for " + customer.name();
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">RegistrationService</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">package example
+
+import io.micronaut.el.example.eligible.Eligible
+import io.micronaut.el.example.eligible.MinAmount
+import jakarta.inject.Singleton
+
+@Singleton
+open class RegistrationService {
+
+    @Eligible(value = "#{ fn:adult(customer.age) &amp;&amp; fn:inEurope(customer.country) }", // <b class="conum">(1)</b>
+              otherwise = "#{ customer.name += ' must be an adult in Europe' }", // <b class="conum">(2)</b>
+              name = "REGISTER") // <b class="conum">(3)</b>
+    open fun register(customer: Customer): String = "registered " + customer.name
+
+    @Eligible("\${ customer.country == Locale.GERMANY.country }") // <b class="conum">(4)</b>
+    open fun deposit(customer: Customer,
+                     @MinAmount(value = 100, inclusive = true,
+                                message = "Must be greater than \${inclusive == true ? 'or equal to ' : ''}{value}") // <b class="conum">(5)</b>
+                     amount: Long): String = "deposited $amount for " + customer.name
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">RegistrationService</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">package example
+
+import io.micronaut.el.example.eligible.Eligible
+import io.micronaut.el.example.eligible.MinAmount
+import jakarta.inject.Singleton
+
+@Singleton
+class RegistrationService {
+
+    @Eligible(value = '#{ fn:adult(customer.age) &amp;&amp; fn:inEurope(customer.country) }', // <b class="conum">(1)</b>
+              otherwise = "#{ customer.name += ' must be an adult in Europe' }", // <b class="conum">(2)</b>
+              name = "REGISTER") // <b class="conum">(3)</b>
+    String register(Customer customer) {
+        "registered " + customer.name
+    }
+
+    @Eligible('${ customer.country == Locale.GERMANY.country }') // <b class="conum">(4)</b>
+    String deposit(Customer customer,
+                   @MinAmount(value = 100L, inclusive = true,
+                              message = "Must be greater than \${inclusive == true ? 'or equal to ' : ''}{value}") // <b class="conum">(5)</b>
+                   long amount) {
+        "deposited " + amount + " for " + customer.name
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The condition over the parameters of the method, calling two functions of the library under their prefix.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The message of the rejection, another expression.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>The name of the generated constant.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>The <code>${...}</code> delimiters of the specification work too: the processor stores them as <code>#{...}</code>, which nothing in
+Micronaut resolves as a property placeholder.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>A constraint in the style of Jakarta Validation on a parameter: its message is a template over the
+attributes of the constraint, <code>{value}</code>, and the expressions of the specification, which see those attributes
+and the validated value as typed variables.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The constraint declares its message with a default in the style of the constraints of Jakarta Validation:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.PARAMETER)
+public @interface MinAmount {
+
+    /**
+     * @return The minimum
+     */
+    long value() default 0;
+
+    /**
+     * @return The minimum, an alias of {@link #value()}
+     */
+    @AliasFor(member = "value")
+    long minimum() default 0;
+
+    /**
+     * @return Whether the minimum itself is accepted
+     */
+    boolean inclusive() default false;
+
+    /**
+     * @return The message of the violation, a template over {@code {value}}, {@code {inclusive}} and the
+     * expressions of the specification
+     */
+    String message() default "Must be greater than ${inclusive == true ? 'or equal to ' : ''}{value}"; <i class="conum" data-value="1"></i><b>(1)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The template: literal text, the <code>{value}</code> attribute and an expression over the <code>inclusive</code> attribute.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_the_processor">The processor</h4>
+<div class="paragraph">
+<p>Micronaut treats any annotation string containing <code>#{...}</code> as one of its own evaluated expressions, and would
+fail to compile an expression of the Jakarta language. An <code>io.micronaut.inject.annotation.AnnotationRemapper</code>,
+which runs inside the annotation metadata builder before anything else sees the annotation, takes the text back
+and declares it:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public final class EligibleRemapper implements AnnotationRemapper {
+
+    @Override
+    public String getPackageName() {
+        return Eligible.class.getPackageName(); <i class="conum" data-value="1"></i><b>(1)</b>
+    }
+
+    @Override
+    public List&lt;AnnotationValue&lt;?&gt;&gt; remap(AnnotationValue&lt;?&gt; annotation, VisitorContext visitorContext) {
+        if (!annotation.getAnnotationName().equals(Eligible.class.getName())) {
+            return List.of(annotation);
+        }
+        String condition = textOf(annotation.getValues().get(AnnotationMetadata.VALUE_MEMBER)); <i class="conum" data-value="2"></i><b>(2)</b>
+        if (condition == null) {
+            return List.of(annotation);
+        }
+        String otherwise = textOf(annotation.getValues().get("otherwise"));
+        String name = annotation.stringValue("name").orElse("");
+
+        List&lt;AnnotationValue&lt;?&gt;&gt; remapped = new ArrayList&lt;&gt;();
+        AnnotationValueBuilder&lt;Eligible&gt; eligible = AnnotationValue.builder(Eligible.class)
+            .value(condition)
+            .member("name", name);
+        if (otherwise != null) {
+            eligible.member("otherwise", otherwise);
+        }
+        remapped.add(eligible.build()); <i class="conum" data-value="3"></i><b>(3)</b>
+        remapped.add(AnnotationValue.builder(ELExpression.class) <i class="conum" data-value="4"></i><b>(4)</b>
+            .value(condition)
+            .member("expectedType", new AnnotationClassValue&lt;&gt;(Boolean.class))
+            .member("name", name)
+            .build());
+        if (otherwise != null) {
+            remapped.add(AnnotationValue.builder(ELExpression.class)
+                .value(otherwise)
+                .member("expectedType", new AnnotationClassValue&lt;&gt;(String.class))
+                .member("name", name.isEmpty() ? "" : name + "_OTHERWISE")
+                .build());
+        }
+        remapped.add(AnnotationValue.builder(ELEnvironment.class) <i class="conum" data-value="5"></i><b>(5)</b>
+            .member("functions", AnnotationValue.builder(ELFunctions.class)
+                .value(EligibilityFunctions.class)
+                .build())
+            .member("imports", new AnnotationClassValue&lt;&gt;(Locale.class))
+            .build());
+        return remapped;
+    }
+
+    /**
+     * The expression as written, with {@code ${...}} stored as {@code #{...}}: the specification treats the two
+     * alike, while Micronaut resolves a {@code ${...}} in the metadata of a bean as a property placeholder.
+     */
+    private static String textOf(Object value) {
+        String text;
+        if (value instanceof EvaluatedExpressionReference reference) {
+            text = reference.annotationValue().toString(); <i class="conum" data-value="6"></i><b>(6)</b>
+        } else if (value instanceof String string) {
+            text = string;
+        } else {
+            return null;
+        }
+        text = text.trim();
+        if (text.isEmpty()) {
+            return null;
+        }
+        return text.startsWith("${") ? "#" + text.substring(1) : text; <i class="conum" data-value="7"></i><b>(7)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>A remapper is registered for the package of the annotations it handles, in
+<code>META-INF/services/io.micronaut.inject.annotation.AnnotationRemapper</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The text of the member as written, taken back from what Micronaut made of it.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>The same annotation, holding the text.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>An <code>@ELExpression</code> for every expression, with its expected type and its name, which is compiled into the
+registry of the class like any other declaration.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>An <code>@ELEnvironment</code> beside them, listing the functions of the library and importing a class; declared on the
+method, it applies to the expressions declared there. The parameters of the method are typed variables without
+any declaration. The functions declare their own names and prefix:</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public final class EligibilityFunctions {
+
+    private EligibilityFunctions() {
+    }
+
+    @ELFunction(prefix = "fn") <i class="conum" data-value="1"></i><b>(1)</b>
+    public static boolean adult(int age) {
+        return age &gt;= 18;
+    }
+
+    @ELFunction(prefix = "fn", name = "inEurope") <i class="conum" data-value="2"></i><b>(2)</b>
+    public static boolean isEuropean(String country) {
+        return country.equals("CZ") || country.equals("DE") || country.equals("FR");
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>A function under its own name, with its prefix.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>A function under another name.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Micronaut has already replaced a string containing <code>#{...}</code> by an evaluated expression reference when the
+remapper runs; the original text is inside it.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>A <code>${...}</code> is stored as <code>#{...}</code>: the specification treats the two alike, while Micronaut resolves a <code>${...}</code>
+in the metadata of a bean as a property placeholder.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The processor of the constraint declares every <code>${...}</code> segment of the message with the attributes of the
+constraint and the validated value as typed variables:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public final class MinAmountRemapper implements AnnotationRemapper {
+
+    @Override
+    public String getPackageName() {
+        return MinAmount.class.getPackageName();
+    }
+
+    @Override
+    public List&lt;AnnotationValue&lt;?&gt;&gt; remap(AnnotationValue&lt;?&gt; annotation, VisitorContext visitorContext) {
+        if (!annotation.getAnnotationName().equals(MinAmount.class.getName())) {
+            return List.of(annotation);
+        }
+        String message = textOf(annotation.getValues().get("message"));
+        if (message == null) {
+            return List.of(annotation);
+        }
+        Map&lt;CharSequence, Object&gt; values = new LinkedHashMap&lt;&gt;(annotation.getValues());
+        values.put("message", message);
+        List&lt;AnnotationValue&lt;?&gt;&gt; remapped = new ArrayList&lt;&gt;();
+        remapped.add(new AnnotationValue&lt;&gt;(MinAmount.class.getName(), values));
+        for (String segment : ConstraintMessages.segmentsOf(message)) { <i class="conum" data-value="1"></i><b>(1)</b>
+            remapped.add(AnnotationValue.builder(ELExpression.class)
+                .value(segment)
+                .member("expectedType", new AnnotationClassValue&lt;&gt;(String.class))
+                .build());
+        }
+        remapped.add(AnnotationValue.builder(ELEnvironment.class) <i class="conum" data-value="2"></i><b>(2)</b>
+            .member("variables",
+                AnnotationValue.builder(ELVariable.class).member("name", "value").member("type", new AnnotationClassValue&lt;&gt;(Long.class)).build(),
+                AnnotationValue.builder(ELVariable.class).member("name", "inclusive").member("type", new AnnotationClassValue&lt;&gt;(Boolean.class)).build(),
+                AnnotationValue.builder(ELVariable.class).member("name", "validatedValue").member("type", new AnnotationClassValue&lt;&gt;(Long.class)).build())
+            .build());
+        return remapped;
+    }
+
+    private static String textOf(Object value) {
+        if (value instanceof String text) {
+            // stored with ${...} as #{...}, which nothing in Micronaut resolves as a property placeholder;
+            // a message template uses ${...}, so, unlike a whole-expression member, it never reaches the
+            // metadata builder as an evaluated expression reference
+            return text.replace("${", "#{");
+        }
+        return null;
+    }
+
+
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Each segment is an expression of its own, keyed by its exact text, which is what the interpolation asks the
+factory for.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The attributes of the constraint, and the validated value, are the variables of the expressions.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_the_runtime">The runtime</h4>
+<div class="paragraph">
+<p>The text is read back from the annotation metadata and handed to <code>jakarta.el.ExpressionFactory</code>, which returns
+the compiled expression. The parameters of the invocation are bound by name:</p>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">EligibleInterceptor</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package example;
+
+import io.micronaut.aop.InterceptorBean;
+import io.micronaut.aop.MethodInterceptor;
+import io.micronaut.aop.MethodInvocationContext;
+import io.micronaut.el.CompiledELContext;
+import io.micronaut.core.annotation.AnnotationValue;
+import io.micronaut.core.type.Argument;
+import io.micronaut.el.example.eligible.ConstraintMessages;
+import io.micronaut.el.example.eligible.Eligible;
+import io.micronaut.el.example.eligible.MinAmount;
+import jakarta.el.ELManager;
+import jakarta.el.ValueExpression;
+import jakarta.inject.Singleton;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+@Singleton
+@InterceptorBean(Eligible.class) // <b class="conum">(1)</b>
+public class EligibleInterceptor implements MethodInterceptor&lt;Object, Object&gt; {
+
+    private final Map&lt;String, ValueExpression&gt; expressions = new ConcurrentHashMap&lt;&gt;();
+
+    @Override
+    public Object intercept(MethodInvocationContext&lt;Object, Object&gt; context) {
+        CompiledELContext elContext = new CompiledELContext();
+        context.getParameterValueMap().forEach(elContext::setBean); // <b class="conum">(2)</b>
+
+        for (Argument&lt;?&gt; argument : context.getArguments()) { // <b class="conum">(5)</b>
+            AnnotationValue&lt;MinAmount&gt; constraint = argument.getAnnotationMetadata().getAnnotation(MinAmount.class);
+            Object value = context.getParameterValueMap().get(argument.getName());
+            if (constraint != null &amp;&amp; value instanceof Number number &amp;&amp; !satisfies(constraint, number.longValue())) {
+                throw new NotEligibleException(ConstraintMessages.interpolate(constraint, value)); // <b class="conum">(6)</b>
+            }
+        }
+
+        String condition = context.stringValue(Eligible.class).orElseThrow(); // <b class="conum">(3)</b>
+        if (Boolean.TRUE.equals(expression(elContext, condition, Boolean.class).getValue(elContext))) {
+            return context.proceed();
+        }
+        String message = context.stringValue(Eligible.class, "otherwise")
+            .filter(otherwise -&gt; !otherwise.isEmpty())
+            .map(otherwise -&gt; expression(elContext, otherwise, String.class).&lt;String&gt;getValue(elContext))
+            .orElse(context.getMethodName() + " requires " + condition);
+        throw new NotEligibleException(message);
+    }
+
+    private static boolean satisfies(AnnotationValue&lt;MinAmount&gt; constraint, long amount) {
+        long minimum = constraint.longValue().orElseThrow();
+        return constraint.booleanValue("inclusive").orElse(false) ? amount &gt;= minimum : amount &gt; minimum;
+    }
+
+    private ValueExpression expression(CompiledELContext elContext, String text, Class&lt;?&gt; expectedType) {
+        return expressions.computeIfAbsent(text, key -&gt;
+            ELManager.getExpressionFactory().createValueExpression(elContext, key, expectedType)); // <b class="conum">(4)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">EligibleInterceptor</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">package example
+
+import io.micronaut.aop.InterceptorBean
+import io.micronaut.aop.MethodInterceptor
+import io.micronaut.aop.MethodInvocationContext
+import io.micronaut.el.CompiledELContext
+import io.micronaut.core.annotation.AnnotationValue
+import io.micronaut.el.example.eligible.ConstraintMessages
+import io.micronaut.el.example.eligible.Eligible
+import io.micronaut.el.example.eligible.MinAmount
+import jakarta.el.ELManager
+import jakarta.el.ValueExpression
+import jakarta.inject.Singleton
+import java.util.concurrent.ConcurrentHashMap
+
+@Singleton
+@InterceptorBean(Eligible::class) // <b class="conum">(1)</b>
+class EligibleInterceptor : MethodInterceptor&lt;Any, Any&gt; {
+
+    private val expressions = ConcurrentHashMap&lt;String, ValueExpression&gt;()
+
+    override fun intercept(context: MethodInvocationContext&lt;Any, Any&gt;): Any? {
+        val elContext = CompiledELContext()
+        context.parameterValueMap.forEach { (name, value) -&gt; elContext.setBean(name, value) } // <b class="conum">(2)</b>
+
+        for (argument in context.arguments) { // <b class="conum">(5)</b>
+            val constraint = argument.annotationMetadata.getAnnotation(MinAmount::class.java)
+            val value = context.parameterValueMap[argument.name]
+            if (constraint != null &amp;&amp; value is Number &amp;&amp; !satisfies(constraint, value.toLong())) {
+                throw NotEligibleException(ConstraintMessages.interpolate(constraint, value)) // <b class="conum">(6)</b>
+            }
+        }
+
+        val condition = context.stringValue(Eligible::class.java).orElseThrow() // <b class="conum">(3)</b>
+        if (expression(elContext, condition, Boolean::class.javaObjectType).getValue&lt;Boolean?&gt;(elContext) == true) {
+            return context.proceed()
+        }
+        val otherwise = context.stringValue(Eligible::class.java, "otherwise").orElse("")
+        val message = if (otherwise.isEmpty()) "${context.methodName} requires $condition"
+            else expression(elContext, otherwise, String::class.java).getValue&lt;String&gt;(elContext)
+        throw NotEligibleException(message)
+    }
+
+    private fun satisfies(constraint: AnnotationValue&lt;MinAmount&gt;, amount: Long): Boolean {
+        val minimum = constraint.longValue().orElseThrow()
+        return if (constraint.booleanValue("inclusive").orElse(false)) amount &gt;= minimum else amount &gt; minimum
+    }
+
+    private fun expression(elContext: CompiledELContext, text: String, expectedType: Class&lt;*&gt;): ValueExpression =
+        expressions.computeIfAbsent(text) { key -&gt;
+            ELManager.getExpressionFactory().createValueExpression(elContext, key, expectedType) // <b class="conum">(4)</b>
+        }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">EligibleInterceptor</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">package example
+
+import io.micronaut.aop.InterceptorBean
+import io.micronaut.aop.MethodInterceptor
+import io.micronaut.aop.MethodInvocationContext
+import io.micronaut.el.CompiledELContext
+import io.micronaut.core.annotation.AnnotationValue
+import io.micronaut.core.type.Argument
+import io.micronaut.el.example.eligible.ConstraintMessages
+import io.micronaut.el.example.eligible.Eligible
+import io.micronaut.el.example.eligible.MinAmount
+import jakarta.el.ELManager
+import jakarta.el.ValueExpression
+import jakarta.inject.Singleton
+
+import java.util.concurrent.ConcurrentHashMap
+
+@Singleton
+@InterceptorBean(Eligible) // <b class="conum">(1)</b>
+class EligibleInterceptor implements MethodInterceptor&lt;Object, Object&gt; {
+
+    private final Map&lt;String, ValueExpression&gt; expressions = new ConcurrentHashMap&lt;&gt;()
+
+    @Override
+    Object intercept(MethodInvocationContext&lt;Object, Object&gt; context) {
+        CompiledELContext elContext = new CompiledELContext()
+        context.parameterValueMap.each { name, value -&gt; elContext.setBean(name, value) } // <b class="conum">(2)</b>
+
+        for (Argument&lt;?&gt; argument : context.arguments) { // <b class="conum">(5)</b>
+            AnnotationValue&lt;MinAmount&gt; constraint = argument.annotationMetadata.getAnnotation(MinAmount)
+            Object value = context.parameterValueMap[argument.name]
+            if (constraint != null &amp;&amp; value instanceof Number &amp;&amp; !satisfies(constraint, ((Number) value).longValue())) {
+                throw new NotEligibleException(ConstraintMessages.interpolate(constraint, value)) // <b class="conum">(6)</b>
+            }
+        }
+
+        String condition = context.stringValue(Eligible).orElseThrow() // <b class="conum">(3)</b>
+        if (expression(elContext, condition, Boolean).getValue(elContext) == Boolean.TRUE) {
+            return context.proceed()
+        }
+        String otherwise = context.stringValue(Eligible, "otherwise").orElse("")
+        String message = otherwise.isEmpty()
+            ? "${context.methodName} requires ${condition}".toString()
+            : expression(elContext, otherwise, String).getValue(elContext)
+        throw new NotEligibleException(message)
+    }
+
+    private static boolean satisfies(AnnotationValue&lt;MinAmount&gt; constraint, long amount) {
+        long minimum = constraint.longValue().orElseThrow()
+        constraint.booleanValue("inclusive").orElse(false) ? amount &gt;= minimum : amount &gt; minimum
+    }
+
+    private ValueExpression expression(CompiledELContext elContext, String text, Class&lt;?&gt; expectedType) {
+        expressions.computeIfAbsent(text) { key -&gt;
+            ELManager.expressionFactory.createValueExpression(elContext, key, expectedType) // <b class="conum">(4)</b>
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The interceptor bound to the annotation.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The parameters of the invocation become the variables of the expressions, under their names.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>The condition, read back from the metadata exactly as written.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td><code>createValueExpression</code> is a lookup by text, not a parse, done once per expression.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>The constraints of the parameters are checked against the values of the invocation.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>A violated constraint reports its interpolated message.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The message is interpolated as the Bean Validation specification orders it:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public final class ConstraintMessages {
+
+    private static final Pattern ATTRIBUTE = Pattern.compile("(?&lt;![#$])\\{(\\w+)}");
+    // the expressions of a template, up to the first closing brace: good enough for messages
+    private static final Pattern EXPRESSION = Pattern.compile("[#$]\\{[^}]*}");
+
+    private ConstraintMessages() {
+    }
+
+    public static String interpolate(AnnotationValue&lt;?&gt; constraint, Object validatedValue) {
+        String template = constraint.stringValue("message").orElseThrow();
+        Matcher attributes = ATTRIBUTE.matcher(template); <i class="conum" data-value="1"></i><b>(1)</b>
+        StringBuilder withAttributes = new StringBuilder();
+        while (attributes.find()) {
+            Object attribute = constraint.getValues().get(attributes.group(1));
+            attributes.appendReplacement(withAttributes, Matcher.quoteReplacement(String.valueOf(attribute)));
+        }
+        attributes.appendTail(withAttributes);
+
+        CompiledELContext context = new CompiledELContext(); <i class="conum" data-value="2"></i><b>(2)</b>
+        constraint.getValues().forEach((name, value) -&gt; context.setBean(name.toString(), value));
+        context.setBean("validatedValue", validatedValue);
+        Matcher expressions = EXPRESSION.matcher(withAttributes);
+        StringBuilder message = new StringBuilder();
+        while (expressions.find()) { <i class="conum" data-value="3"></i><b>(3)</b>
+            String evaluated = ELManager.getExpressionFactory()
+                .&lt;String&gt;createValueExpression(context, stored(expressions.group()), String.class)
+                .getValue(context);
+            expressions.appendReplacement(message, Matcher.quoteReplacement(evaluated));
+        }
+        return expressions.appendTail(message).toString();
+    }
+
+    /**
+     * The distinct expressions of a template, as stored: {@code #{...}}, the key of the compiled registry.
+     */
+    public static List&lt;String&gt; segmentsOf(String template) {
+        return EXPRESSION.matcher(template).results()
+            .map(segment -&gt; stored(segment.group()))
+            .distinct()
+            .toList();
+    }
+
+    private static String stored(String segment) {
+        return "#" + segment.substring(1);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The attributes of the constraint first: <code>{value}</code> becomes <code>100</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The attributes and the validated value are the variables of the expressions.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Every expression of the template — written with either delimiter, looked up precompiled under its
+<code>#{...}</code> text — is evaluated into its place, with the same matcher idiom as the attributes.</td>
+</tr>
+</table>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">EligibleTest</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package example;
+
+import io.micronaut.context.ApplicationContext;
+import jakarta.el.ValueExpression;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+class EligibleTest {
+
+    @Test
+    void theConditionGuardsTheMethod() {
+        try (ApplicationContext context = ApplicationContext.run()) {
+            RegistrationService service = context.getBean(RegistrationService.class);
+
+            assertEquals("registered Ann", service.register(new Customer("Ann", 34, "CZ"))); // <b class="conum">(1)</b>
+            NotEligibleException rejected = assertThrows(NotEligibleException.class,
+                () -&gt; service.register(new Customer("Bob", 15, "CZ")));
+            assertEquals("Bob must be an adult in Europe", rejected.getMessage()); // <b class="conum">(2)</b>
+
+            assertEquals("deposited 100 for Ann", service.deposit(new Customer("Ann", 34, "DE"), 100));
+            NotEligibleException tooSmall = assertThrows(NotEligibleException.class,
+                () -&gt; service.deposit(new Customer("Ann", 34, "DE"), 99));
+            assertEquals("Must be greater than or equal to 100", tooSmall.getMessage()); // <b class="conum">(4)</b>
+        }
+    }
+
+    @Test
+    void theGeneratedConstantsCarryTheNameAndTheExpectedType() {
+        ValueExpression condition = RegistrationService$ELExpressions.REGISTER; // <b class="conum">(3)</b>
+        assertEquals(Boolean.class, condition.getExpectedType());
+        ValueExpression otherwise = RegistrationService$ELExpressions.REGISTER_OTHERWISE;
+        assertEquals(String.class, otherwise.getExpectedType());
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">EligibleTest</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">package example
+
+import io.micronaut.context.ApplicationContext
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Test
+
+class EligibleTest {
+
+    @Test
+    fun theConditionGuardsTheMethod() {
+        ApplicationContext.run().use { context -&gt;
+            val service = context.getBean(RegistrationService::class.java)
+
+            assertEquals("registered Ann", service.register(Customer("Ann", 34, "CZ"))) // <b class="conum">(1)</b>
+            val rejected = assertThrows(NotEligibleException::class.java) {
+                service.register(Customer("Bob", 15, "CZ"))
+            }
+            assertEquals("Bob must be an adult in Europe", rejected.message) // <b class="conum">(2)</b>
+
+            assertEquals("deposited 100 for Ann", service.deposit(Customer("Ann", 34, "DE"), 100))
+            val tooSmall = assertThrows(NotEligibleException::class.java) {
+                service.deposit(Customer("Ann", 34, "DE"), 99)
+            }
+            assertEquals("Must be greater than or equal to 100", tooSmall.message) // <b class="conum">(4)</b>
+        }
+    }
+
+    @Test
+    fun theGeneratedConstantsCarryTheNameAndTheExpectedType() {
+        val condition = `RegistrationService$ELExpressions`.REGISTER // <b class="conum">(3)</b>
+        assertEquals(Boolean::class.javaObjectType, condition.expectedType)
+        val otherwise = `RegistrationService$ELExpressions`.REGISTER_OTHERWISE
+        assertEquals(String::class.java, otherwise.expectedType)
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">EligibleTest</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">package example
+
+import io.micronaut.context.ApplicationContext
+import io.micronaut.el.CompiledELContext
+import jakarta.el.ELContext
+import jakarta.el.ELManager
+import jakarta.el.ValueExpression
+import org.junit.jupiter.api.Test
+
+import static org.junit.jupiter.api.Assertions.assertEquals
+import static org.junit.jupiter.api.Assertions.assertThrows
+
+class EligibleTest {
+
+    @Test
+    void theConditionGuardsTheMethod() {
+        ApplicationContext.run().withCloseable { context -&gt;
+            RegistrationService service = context.getBean(RegistrationService)
+
+            assertEquals("registered Ann", service.register(new Customer("Ann", 34, "CZ"))) // <b class="conum">(1)</b>
+            NotEligibleException rejected = assertThrows(NotEligibleException) {
+                service.register(new Customer("Bob", 15, "CZ"))
+            }
+            assertEquals("Bob must be an adult in Europe", rejected.message) // <b class="conum">(2)</b>
+
+            assertEquals("deposited 100 for Ann", service.deposit(new Customer("Ann", 34, "DE"), 100))
+            NotEligibleException tooSmall = assertThrows(NotEligibleException) {
+                service.deposit(new Customer("Ann", 34, "DE"), 99)
+            }
+            assertEquals("Must be greater than or equal to 100", tooSmall.message) // <b class="conum">(4)</b>
+        }
+    }
+
+    @Test
+    void theExpressionsCarryTheExpectedType() {
+        ELContext context = new CompiledELContext()
+        ValueExpression condition = ELManager.expressionFactory.createValueExpression(context,
+            '#{ fn:adult(customer.age) &amp;&amp; fn:inEurope(customer.country) }', Boolean) // <b class="conum">(3)</b>
+        assertEquals(Boolean, condition.expectedType)
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The condition holds and the method runs.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The condition does not hold and the message is the evaluation of the second expression.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>The constraint is violated and its message is interpolated: <code>Must be greater than or equal to 100</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>The compiled expressions carry the expected types the processor declared; in Java and Kotlin the registry of
+the class also exposes them under the names the annotation gave them.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+
+<h1 id="runtimeParsing"><a class="anchor" href="#runtimeParsing"></a>8 Parsing at Runtime</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-jakarta-el/edit/1.0.x/src/main/docs/guide/runtimeParsing.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>Compiling every expression is only possible when every expression is known at compilation time. When an
+expression string is built at runtime, add the interpreter module:</p>
+</div>
+<div class="paragraph">
+<p>        <div class="listingblock multi-language-sample">
+<div class="title"></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">runtimeOnly(<span class="hljs-string">"io.micronaut.el:micronaut-jakarta-el-interpreter")</span></code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="maven">&lt;dependency&gt;
+    &lt;groupId&gt;io.micronaut.el&lt;/groupId&gt;
+    &lt;artifactId&gt;micronaut-jakarta-el-interpreter&lt;/artifactId&gt;
+    &lt;scope&gt;runtime&lt;/scope&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+</p>
+</div>
+<div class="paragraph">
+<p>It registers an <code>ELExpressionParser</code> service, which <code>CompiledExpressionFactory</code> consults for the expressions that
+no generated source provides. Such an expression is parsed once, when it is created, and its tree is then
+evaluated by the interpreter.</p>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">RuntimeExpressionTest</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package example;
+
+import io.micronaut.el.CompiledELContext;
+import io.micronaut.el.runtime.CompiledExpression;
+import jakarta.el.ELContext;
+import jakarta.el.ELManager;
+import jakarta.el.ValueExpression;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
+class RuntimeExpressionTest {
+
+    @Test
+    void parsesAnExpressionBuiltAtRuntime() {
+        ELContext context = new CompiledELContext().setBean("book", new Book("Jakarta EL", "reference", 20d));
+        String property = "category"; // <b class="conum">(1)</b>
+
+        ValueExpression expression = ELManager.getExpressionFactory()
+            .createValueExpression(context, "${book." + property + "}", String.class); // <b class="conum">(2)</b>
+
+        assertFalse(expression instanceof CompiledExpression); // <b class="conum">(3)</b>
+        assertEquals("reference", expression.getValue(context));
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">RuntimeExpressionTest</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">package example
+
+import io.micronaut.el.CompiledELContext
+import io.micronaut.el.runtime.CompiledExpression
+import jakarta.el.ELManager
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Test
+
+class RuntimeExpressionTest {
+
+    @Test
+    fun parsesAnExpressionBuiltAtRuntime() {
+        val context = CompiledELContext().setBean("book", Book("Jakarta EL", "reference", 20.0))
+        val property = "category" // <b class="conum">(1)</b>
+
+        val expression = ELManager.getExpressionFactory()
+            .createValueExpression(context, "\${book.$property}", String::class.java) // <b class="conum">(2)</b>
+
+        assertFalse(expression is CompiledExpression) // <b class="conum">(3)</b>
+        assertEquals("reference", expression.getValue(context))
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">RuntimeExpressionTest</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">package example
+
+import io.micronaut.el.CompiledELContext
+import io.micronaut.el.runtime.CompiledExpression
+import jakarta.el.ELContext
+import jakarta.el.ELManager
+import jakarta.el.ValueExpression
+import org.junit.jupiter.api.Test
+
+import static org.junit.jupiter.api.Assertions.assertEquals
+import static org.junit.jupiter.api.Assertions.assertFalse
+
+class RuntimeExpressionTest {
+
+    @Test
+    void parsesAnExpressionBuiltAtRuntime() {
+        ELContext context = new CompiledELContext().setBean("book", new Book("Jakarta EL", "reference", 20d))
+        String property = "category" // <b class="conum">(1)</b>
+
+        ValueExpression expression = ELManager.expressionFactory
+            .createValueExpression(context, '${book.' + property + '}', String) // <b class="conum">(2)</b>
+
+        assertFalse(expression instanceof CompiledExpression) // <b class="conum">(3)</b>
+        assertEquals("reference", expression.getValue(context))
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The property is only known at runtime, so no declaration can have compiled the expression.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The factory finds no generated source for the string and hands it to the interpreter.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>What comes back is an interpreted expression, not a compiled one; it evaluates to the same result.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Without the module, an expression that was neither compiled nor a literal-expression is rejected:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">jakarta.el.ELException: The expression '${book.title}' was not compiled. Declare it with @ELExpression so that it
+is compiled at compilation time, or add the micronaut-jakarta-el-interpreter module to parse it at runtime.</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The interpreter is not a second implementation of the language. It walks the same abstract syntax tree the
+compiler consumes, produced by the same <code>micronaut-jakarta-el-parser</code> module, and calls the same runtime
+as the generated code, so both share one definition of the semantics of the specification. The compiled path
+remains the fast one and the interpreted path is the fallback.</p>
+</div>
+<div class="paragraph">
+<p>The parser is a module of its own for the same reason: the compiler is not its only consumer, and any code that
+needs to inspect an expression without generating one can depend on it alone.</p>
+</div>
+
+<h1 id="reflection"><a class="anchor" href="#reflection"></a>9 When Reflection Is Used</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-jakarta-el/edit/1.0.x/src/main/docs/guide/reflection.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>The paths a typical expression takes — declared variables, introspected beans, operators, lambda expressions,
+streams, the expression lookup itself — use no reflection at all, which is what the <a href="#whyCompiled">benchmarks</a>
+measure and what makes the module work in a GraalVM native image without configuration.</p>
+</div>
+<div class="paragraph">
+<p>Reflection remains only where the specification itself defines a behaviour in reflective terms:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>invoking a method of a type that has no bean introspection, or reading its properties, through the standard
+resolvers — annotate the type with <code>@Introspected</code> (and methods with <code>@Executable</code>) to move it to the generated
+dispatch instead;</p>
+</li>
+<li>
+<p>a <code>jakarta.el.FunctionMapper</code>, <code>MethodExpression.getMethodInfo</code> and <code>getMethodReference</code>, whose contracts are
+<code>java.lang.reflect</code> types;</p>
+</li>
+<li>
+<p>coercing a <code>LambdaExpression</code> held in a variable to a functional interface (a lambda written in place is
+compiled to the interface directly), and coercing a string through a <code>PropertyEditor</code>;</p>
+</li>
+<li>
+<p>array access, which the JDK only exposes reflectively.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Even these are served through a per-class method cache, so they stay fast — the <code>staticMethod</code> and
+<code>stringMethods</code> benchmarks run them — but a native image needs the involved types registered for reflection.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+To keep a method invocation off the reflective path, annotate the method with <code>@Executable</code> so that it
+enters the bean introspection of its type.
+</td>
+</tr>
+</table>
+</div>
+
+<h1 id="repository"><a class="anchor" href="#repository"></a>10 Repository</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-jakarta-el/edit/1.0.x/src/main/docs/guide/repository.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>You can find the source code of this project in this repository:</p>
+</div>
+<div class="paragraph">
+<p><a href="https://github.com/micronaut-projects/micronaut-jakarta-el">https://github.com/micronaut-projects/micronaut-jakarta-el</a></p>
+</div>
+
+    </div>
+</div>
+
+<script type="text/javascript">
+
+</script>
+</body>
+</html>
