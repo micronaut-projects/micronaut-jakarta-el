@@ -48,6 +48,11 @@ class IntrospectionInvocationTest {
     }
 
     @Test
+    void equallyCoercibleOverloadsAreAmbiguous() {
+        assertThrows(MethodNotFoundException.class, () -> invoke("ambiguousCoercion", "1"));
+    }
+
+    @Test
     void anArrayGivenDirectlyIsPassedThroughNotWrapped() {
         assertEquals("a-b", invoke("join", "-", new Object[]{"a", "b"}));
         assertEquals(3, invoke("size", new Object[]{new Object[]{1, 2, 3}}));

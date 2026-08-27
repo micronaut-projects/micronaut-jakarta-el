@@ -170,7 +170,7 @@ final class InterpretedMethodExpression extends MethodExpression {
             return ELResolution.invokeWithParamTypes(context, base, target.property(), expectedParamTypes, params);
         } catch (MethodNotFoundException ignored) {
             // Some ELContext implementations provide a resolver for the base's properties but not its methods.
-            return ELResolution.invokeMethod(context, base, findMethod(base, target.property(), null), params);
+            return ELResolution.invokeMethod(context, base, findMethod(base, target.property(), params), params);
         }
     }
 

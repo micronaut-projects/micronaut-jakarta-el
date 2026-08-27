@@ -19,10 +19,13 @@ import io.micronaut.el.CompiledExpressionFactory;
 import jakarta.el.ELContext;
 import jakarta.el.ELException;
 import jakarta.el.ELProcessor;
+import jakarta.el.ELResolver;
 import jakarta.el.ExpressionFactory;
+import jakarta.el.FunctionMapper;
 import jakarta.el.MethodExpression;
 import jakarta.el.StandardELContext;
 import jakarta.el.ValueExpression;
+import jakarta.el.VariableMapper;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -228,6 +231,15 @@ class ELInterpreterTest {
     }
 
     @Test
+    void propertyMethodExpressionsPackVarargsInTheReflectiveFallback() {
+        ELContext context = new PropertyOnlyContext();
+        MethodExpression join = ExpressionFactory.newInstance().createMethodExpression(context, "#{bean.join}",
+            String.class, new Class<?>[]{String.class, String.class});
+
+        assertEquals("a,b", join.invoke(context, new Object[]{"a", "b"}));
+    }
+
+    @Test
     void anIdentifierThatIsNotInvocableDefersToTheFunctionMapper() throws NoSuchMethodException {
         processor.defineBean("twice", 42L);
         processor.defineFunction("", "twice", ELInterpreterTest.class.getMethod("twice", long.class));
@@ -252,6 +264,59 @@ class ELInterpreterTest {
 
         public void setName(String name) {
             this.name = name;
+        }
+    }
+
+    public static final class Varargs {
+        public String join(String... values) {
+            return String.join(",", values);
+        }
+    }
+
+    private static final class PropertyOnlyContext extends ELContext {
+        private final ELResolver resolver = new ELResolver() {
+            @Override
+            public Object getValue(ELContext context, Object base, Object property) {
+                if (base == null && "bean".equals(property)) {
+                    context.setPropertyResolved(true);
+                    return new Varargs();
+                }
+                return null;
+            }
+
+            @Override
+            public Class<?> getType(ELContext context, Object base, Object property) {
+                return null;
+            }
+
+            @Override
+            public void setValue(ELContext context, Object base, Object property, Object value) {
+            }
+
+            @Override
+            public boolean isReadOnly(ELContext context, Object base, Object property) {
+                return true;
+            }
+
+            @Override
+            public Class<?> getCommonPropertyType(ELContext context, Object base) {
+                return null;
+            }
+        };
+
+        @Override
+        public ELResolver getELResolver() {
+            return resolver;
+        }
+
+        @Override
+        public FunctionMapper getFunctionMapper() {
+            return null;
+        }
+
+        @Override
+        public VariableMapper getVariableMapper() {
+            return null;
         }
     }
 }

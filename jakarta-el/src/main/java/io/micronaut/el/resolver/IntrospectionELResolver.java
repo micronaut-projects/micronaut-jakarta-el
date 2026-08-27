@@ -158,12 +158,28 @@ public final class IntrospectionELResolver extends ELResolver {
         // Coercing the arguments is part of selecting the overload, so it happens before the resolver commits:
         // an overload the arguments do not fit is skipped, and when none fits the resolver declines and the
         // standard resolvers get their chance.
+        BeanMethod<Object, Object> selected = null;
+        Object[] selectedArguments = arguments;
+        boolean selectedVariableArity = false;
         for (BeanMethod<Object, Object> candidate : named.length == 1 ? List.of(named[0]) : candidates(named, arguments)) {
             Object[] coerced = coerce(context, candidate.getArguments(), arguments);
-            if (coerced != null) {
-                context.setPropertyResolved(base, method);
-                return candidate.invoke(base, coerced);
+            if (coerced == null) {
+                continue;
             }
+            boolean variableArity = isVariableArity(candidate.getArguments());
+            if (selected == null || (selectedVariableArity && !variableArity)) {
+                selected = candidate;
+                selectedArguments = coerced;
+                selectedVariableArity = variableArity;
+            } else if (!selectedVariableArity || variableArity) {
+                // The candidates have equal method-selection priority. Let the reflective resolver report
+                // the ambiguity instead of depending on the order of the generated introspection methods.
+                return null;
+            }
+        }
+        if (selected != null) {
+            context.setPropertyResolved(base, method);
+            return selected.invoke(base, selectedArguments);
         }
         return null;
     }
