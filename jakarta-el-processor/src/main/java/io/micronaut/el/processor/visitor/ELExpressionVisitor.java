@@ -346,14 +346,15 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
                 variables.put(parameter.getName(), parameter.getGenericType());
             }
         }
-        declare(element.getAnnotation(ELEnvironment.class), context, variables, importedClasses, importedPackages, staticImports, functions);
+        declare(element.getAnnotation(ELEnvironment.class), element, context, variables, importedClasses, importedPackages, staticImports, functions);
         if (owner != element) {
-            declare(owner.getAnnotation(ELEnvironment.class), context, variables, importedClasses, importedPackages, staticImports, functions);
+            declare(owner.getAnnotation(ELEnvironment.class), owner, context, variables, importedClasses, importedPackages, staticImports, functions);
         }
         return new CompilationContext(context, owner, ELFunctionDiscovery.current(), variables, importedClasses, importedPackages, staticImports, functions);
     }
 
     private void declare(@Nullable AnnotationValue<ELEnvironment> environment,
+                         Element owner,
                          VisitorContext context,
                          Map<String, ClassElement> variables,
                          Map<String, ClassElement> importedClasses,
@@ -363,10 +364,16 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
         if (environment == null) {
             return;
         }
-        for (AnnotationValue<ELVariable> variable : ELTypes.nested(environment, "variables", ELVariable.class)) {
+        List<AnnotationValue<ELVariable>> declaredVariables = ELTypes.nested(environment, "variables", ELVariable.class);
+        for (int i = 0; i < declaredVariables.size(); i++) {
+            int variableIndex = i;
+            AnnotationValue<ELVariable> variable = declaredVariables.get(i);
             String name = variable.stringValue("name").orElseThrow(() ->
                 new ELCompilationException("The name of @ELVariable is required"));
-            ClassElement type = ELTypes.resolveMember(variable, "type", context).orElseThrow(() ->
+            ClassElement type = ELTypes.resolveMember(variable, "type", context)
+                .or(() -> JavaAnnotationTypes.resolveNestedMember(owner.getNativeType(), ELEnvironment.class.getName(),
+                    "variables", variableIndex, "type", context))
+                .orElseThrow(() ->
                 new ELCompilationException("The type of the variable '" + name + "' is required"));
             variables.put(name, type);
         }

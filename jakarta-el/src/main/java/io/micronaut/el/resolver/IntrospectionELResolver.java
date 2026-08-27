@@ -29,7 +29,6 @@ import jakarta.el.ELResolver;
 import jakarta.el.PropertyNotWritableException;
 import org.jspecify.annotations.Nullable;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -149,8 +148,12 @@ public final class IntrospectionELResolver extends ELResolver {
         if (paramTypes != null) {
             for (BeanMethod<Object, Object> candidate : named) {
                 if (sameTypes(candidate.getArguments(), paramTypes)) {
-                    context.setPropertyResolved(base, method);
-                    return candidate.invoke(base, coerceRequired(context, candidate.getArguments(), arguments));
+                    Object[] coerced = coerce(context, candidate.getArguments(), arguments);
+                    if (coerced != null) {
+                        context.setPropertyResolved(base, method);
+                        return candidate.invoke(base, coerced);
+                    }
+                    return null;
                 }
             }
             return null;
@@ -160,18 +163,15 @@ public final class IntrospectionELResolver extends ELResolver {
         // standard resolvers get their chance.
         BeanMethod<Object, Object> selected = null;
         Object[] selectedArguments = arguments;
-        boolean selectedVariableArity = false;
         for (BeanMethod<Object, Object> candidate : named.length == 1 ? List.of(named[0]) : candidates(named, arguments)) {
             Object[] coerced = coerce(context, candidate.getArguments(), arguments);
             if (coerced == null) {
                 continue;
             }
-            boolean variableArity = isVariableArity(candidate.getArguments());
-            if (selected == null || (selectedVariableArity && !variableArity)) {
+            if (selected == null) {
                 selected = candidate;
                 selectedArguments = coerced;
-                selectedVariableArity = variableArity;
-            } else if (!selectedVariableArity || variableArity) {
+            } else {
                 // The candidates have equal method-selection priority. Let the reflective resolver report
                 // the ambiguity instead of depending on the order of the generated introspection methods.
                 return null;
@@ -192,25 +192,22 @@ public final class IntrospectionELResolver extends ELResolver {
 
     /**
      * The overloads of the given name that can take the arguments, in the order the section 1.6 of the
-     * specification prefers them: a fixed arity overload whose parameters accept the arguments as they are,
-     * then the other fixed arity overloads of the same arity, then the variable arity ones.
+     * specification prefers them: an overload whose parameters accept the arguments as they are, then the
+     * other overloads of the same arity. Expanded variable arity calls are left to the reflective resolver,
+     * because {@link BeanMethod} does not carry the variable arity flag.
      */
     private static List<BeanMethod<Object, Object>> candidates(BeanMethod<Object, Object>[] named, Object[] arguments) {
         List<BeanMethod<Object, Object>> exact = new ArrayList<>(2);
         List<BeanMethod<Object, Object>> fixedArity = new ArrayList<>(2);
-        List<BeanMethod<Object, Object>> variableArity = new ArrayList<>(2);
         for (BeanMethod<Object, Object> beanMethod : named) {
             Argument<?>[] parameters = beanMethod.getArguments();
             if (parameters.length == arguments.length) {
                 (accepts(parameters, arguments) ? exact : fixedArity).add(beanMethod);
-            } else if (isVariableArity(parameters) && arguments.length >= parameters.length - 1) {
-                variableArity.add(beanMethod);
             }
         }
         if (!exact.isEmpty()) {
             return mostSpecific(exact);
         }
-        fixedArity.addAll(variableArity);
         return fixedArity;
     }
 
@@ -273,57 +270,24 @@ public final class IntrospectionELResolver extends ELResolver {
         return true;
     }
 
-    private static Object[] coerceRequired(ELContext context, Argument<?>[] parameters, Object[] arguments) {
-        Object[] coerced = coerce(context, parameters, arguments);
-        if (coerced == null) {
-            throw new ELException("The method expects " + parameters.length + " argument(s) but "
-                + arguments.length + " were provided");
-        }
-        return coerced;
-    }
-
     /**
-     * A {@link BeanMethod} does not carry the variable arity flag of the method it dispatches to, so a trailing
-     * array parameter is treated as variable arity. A fixed arity array parameter is still served: an array
-     * given directly is passed through rather than wrapped.
-     */
-    private static boolean isVariableArity(Argument<?>[] parameters) {
-        return parameters.length > 0 && parameters[parameters.length - 1].getType().isArray();
-    }
-
-    /**
-     * Coerces the arguments to the parameters, packing the trailing ones into the array of a variable arity
-     * method.
+     * Coerces arguments of the same arity to the declared parameters.
+     *
+     * <p>{@link BeanMethod} does not expose whether a trailing array parameter was declared with varargs.
+     * Expanded calls are therefore left to the reflective resolver later in the chain, which has that flag;
+     * otherwise a fixed array parameter would incorrectly accept a scalar.</p>
      *
      * @return The coerced arguments, or {@code null} when the arguments do not fit the parameters, so that the
      * overload is not selected
      */
     private static Object @Nullable [] coerce(ELContext context, Argument<?>[] parameters, Object[] arguments) {
-        int fixed = parameters.length;
-        Class<?> componentType = null;
-        if (isVariableArity(parameters)) {
-            Class<?> last = parameters[parameters.length - 1].getType();
-            boolean arrayGivenDirectly = arguments.length == parameters.length
-                && last.isInstance(arguments[arguments.length - 1]);
-            if (!arrayGivenDirectly) {
-                componentType = last.getComponentType();
-                fixed = parameters.length - 1;
-            }
-        }
-        if (componentType == null ? arguments.length != parameters.length : arguments.length < fixed) {
+        if (arguments.length != parameters.length) {
             return null;
         }
         try {
             Object[] coerced = new Object[parameters.length];
-            for (int i = 0; i < fixed; i++) {
+            for (int i = 0; i < parameters.length; i++) {
                 coerced[i] = ELSupport.coerceToType(context, arguments[i], parameters[i].getType());
-            }
-            if (componentType != null) {
-                Object variadic = Array.newInstance(componentType, arguments.length - fixed);
-                for (int i = fixed; i < arguments.length; i++) {
-                    Array.set(variadic, i - fixed, ELSupport.coerceToType(context, arguments[i], componentType));
-                }
-                coerced[parameters.length - 1] = variadic;
             }
             return coerced;
         } catch (ELException e) {
