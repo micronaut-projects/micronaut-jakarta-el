@@ -32,7 +32,7 @@ class ELSupportTest {
     }
 
     static final class Varargs {
-        String join(Object... values) {
+        public String join(String... values) {
             return String.join(",", java.util.Arrays.stream(values).map(String::valueOf).toList());
         }
     }
@@ -149,9 +149,10 @@ class ELSupportTest {
 
     @Test
     void aSubtypeArrayIsPassedDirectlyToAVariableArityMethod() throws NoSuchMethodException {
-        Method join = Varargs.class.getDeclaredMethod("join", Object[].class);
+        String[] values = {"a", "b"};
+        Method join = ELMethods.findMethod(Varargs.class, "join", null, new Object[]{values});
 
         assertEquals("a,b", ELMethods.invoke(new CompiledELContext(), join, new Varargs(),
-            new Object[]{new String[]{"a", "b"}}));
+            new Object[]{values}));
     }
 }

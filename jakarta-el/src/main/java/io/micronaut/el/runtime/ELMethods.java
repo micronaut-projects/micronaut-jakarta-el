@@ -162,6 +162,26 @@ public final class ELMethods {
         return select(type, name, candidates, paramTypes, arguments, false);
     }
 
+    /**
+     * Finds the static method a method expression refers to.
+     *
+     * @param type       The type declaring the method
+     * @param name       The name of the method
+     * @param paramTypes The parameter types provided at parse time, can be {@code null}
+     * @param arguments  The evaluated arguments, can be {@code null}
+     * @return The method
+     */
+    public static Method findStaticMethod(Class<?> type,
+                                          String name,
+                                          Class<?> @Nullable [] paramTypes,
+                                          Object @Nullable [] arguments) {
+        List<Candidate> candidates = METHODS.get(type).get(name);
+        if (candidates == null) {
+            throw notFound(type, name, paramTypes != null ? paramTypes.length : arguments == null ? 0 : arguments.length);
+        }
+        return select(type, name, candidates, paramTypes, arguments, true);
+    }
+
     private static Method select(Class<?> type,
                                  String name,
                                  List<Candidate> candidates,
@@ -297,7 +317,11 @@ public final class ELMethods {
             score += argument;
         }
         if (varArgs) {
-            Class<?> componentType = parameterTypes[parameterTypes.length - 1].getComponentType();
+            Class<?> arrayType = parameterTypes[parameterTypes.length - 1];
+            if (arguments.length == parameterTypes.length && arrayType.isInstance(arguments[fixed])) {
+                return score + score(arrayType, arguments[fixed]);
+            }
+            Class<?> componentType = arrayType.getComponentType();
             for (int i = fixed; i < arguments.length; i++) {
                 int argument = score(componentType, arguments[i]);
                 if (argument == NO_MATCH) {
