@@ -7,7 +7,8 @@ import io.micronaut.el.annotation.ELVariable;
 
 @ELEnvironment(variables = {
     @ELVariable(name = "book", type = Book.class),
-    @ELVariable(name = "author", type = Author.class)
+    @ELVariable(name = "author", type = Author.class),
+    @ELVariable(name = "formatting", type = Formatting.class)
 })
 @ELExpression(value = "${book.title}", expectedType = String.class, name = "title")
 @ELExpression(value = "${book.category}", expectedType = String.class, name = "category")
@@ -20,6 +21,12 @@ import io.micronaut.el.annotation.ELVariable;
     expectedReturnType = String.class,
     expectedParamTypes = String.class,
     name = "greet"
+)
+@ELMethodExpression(
+    value = "${formatting.select}",
+    expectedReturnType = String.class,
+    expectedParamTypes = Integer.class,
+    name = "selectInteger"
 )
 public final class LValueExpressions {
 

@@ -33,4 +33,14 @@ public class Formatting {
     public String format(String format, Object... args) {
         return String.format(format, args);
     }
+
+    @Executable
+    public String select(Integer value) {
+        return "integer";
+    }
+
+    @Executable
+    public String select(String value) {
+        return "string";
+    }
 }

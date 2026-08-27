@@ -20,6 +20,7 @@ import io.micronaut.core.beans.BeanIntrospection;
 import io.micronaut.core.beans.BeanIntrospector;
 import io.micronaut.core.beans.BeanMethod;
 import io.micronaut.core.beans.BeanProperty;
+import io.micronaut.core.reflect.ReflectionUtils;
 import io.micronaut.core.type.Argument;
 import io.micronaut.el.runtime.ELSupport;
 import jakarta.el.ELContext;
@@ -145,6 +146,15 @@ public final class IntrospectionELResolver extends ELResolver {
             return null;
         }
         Object[] arguments = params == null ? new Object[0] : params;
+        if (paramTypes != null) {
+            for (BeanMethod<Object, Object> candidate : named) {
+                if (sameTypes(candidate.getArguments(), paramTypes)) {
+                    context.setPropertyResolved(base, method);
+                    return candidate.invoke(base, coerceRequired(context, candidate.getArguments(), arguments));
+                }
+            }
+            return null;
+        }
         // Coercing the arguments is part of selecting the overload, so it happens before the resolver commits:
         // an overload the arguments do not fit is skipped, and when none fits the resolver declines and the
         // standard resolvers get their chance.
@@ -195,6 +205,27 @@ public final class IntrospectionELResolver extends ELResolver {
             }
         }
         return true;
+    }
+
+    private static boolean sameTypes(Argument<?>[] parameters, Class<?>[] paramTypes) {
+        if (parameters.length != paramTypes.length) {
+            return false;
+        }
+        for (int i = 0; i < parameters.length; i++) {
+            if (parameters[i].getWrapperType() != ReflectionUtils.getWrapperType(paramTypes[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static Object[] coerceRequired(ELContext context, Argument<?>[] parameters, Object[] arguments) {
+        Object[] coerced = coerce(context, parameters, arguments);
+        if (coerced == null) {
+            throw new ELException("The method expects " + parameters.length + " argument(s) but "
+                + arguments.length + " were provided");
+        }
+        return coerced;
     }
 
     /**

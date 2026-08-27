@@ -81,7 +81,7 @@ public final class MethodExpressionWriter {
             .addMethod(constructor(definition, node))
             .addMethod(evaluateBase(node, compiler))
             .addMethod(evaluateProperty(node, compiler))
-            .addMethod(doInvoke(node, compiler));
+            .addMethod(doInvoke(node, definition, compiler));
         if (node instanceof ELNode.Method method) {
             builder.addMethod(evaluateArguments(method, compiler));
         }
@@ -121,7 +121,9 @@ public final class MethodExpressionWriter {
             .build((aThis, parameters) -> property(node, compiler, parameters.get(0)).returning());
     }
 
-    private static MethodDef doInvoke(ELNode node, ELCompiler compiler) {
+    private static MethodDef doInvoke(ELNode node,
+                                      ELMethodExpressionDefinition definition,
+                                      ELCompiler compiler) {
         return MethodDef.builder("doInvoke")
             .addModifiers(Modifier.PROTECTED)
             .overrides()
@@ -135,10 +137,13 @@ public final class MethodExpressionWriter {
                     case ELNode.Method method -> compiler.compileEvaluation(method, context,
                         ctx -> new ELCompiler.Typed(compiler.invokeRuntime(EL_RESOLUTION, "invoke", TypeDef.OBJECT,
                             invocation(compiler, ctx, method).toArray(ExpressionDef[]::new)), null));
-                    case ELNode.Property property -> compiler.invokeRuntime(EL_RESOLUTION, "invokeWithParams", TypeDef.OBJECT,
+                    case ELNode.Property property -> compiler.invokeRuntime(EL_RESOLUTION, "invokeWithParamTypes", TypeDef.OBJECT,
                         context,
                         compiler.compile(property.base(), context),
                         compiler.compile(property.property(), context),
+                        CLASS_ARRAY.instantiate(definition.parameterTypes().stream()
+                            .map(type -> (ExpressionDef) ExpressionDef.constant(TypeDef.erasure(type)))
+                            .toList()),
                         arguments).returning();
                     default -> compiler.invokeRuntime(EL_RESOLUTION, "invokeMethodExpression", TypeDef.OBJECT,
                         context, compiler.compile(node, context), arguments).returning();
