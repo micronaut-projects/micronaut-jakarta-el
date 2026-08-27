@@ -52,6 +52,32 @@ public final class ELTypes {
      * @return The resolved type
      */
     static ClassElement resolve(String name, VisitorContext context) {
+        if (name.startsWith("[")) {
+            int dimensions = 0;
+            while (name.charAt(dimensions) == '[') {
+                dimensions++;
+            }
+            String component = switch (name.charAt(dimensions)) {
+                case 'Z' -> "boolean";
+                case 'B' -> "byte";
+                case 'S' -> "short";
+                case 'I' -> "int";
+                case 'J' -> "long";
+                case 'C' -> "char";
+                case 'F' -> "float";
+                case 'D' -> "double";
+                case 'L' -> name.substring(dimensions + 1, name.length() - 1).replace('/', '.');
+                default -> throw new IllegalStateException("Cannot resolve the type " + name);
+            };
+            ClassElement type = resolve(component, context);
+            for (int i = 0; i < dimensions; i++) {
+                type = type.toArray();
+            }
+            return type;
+        }
+        if (name.endsWith("[]")) {
+            return resolve(name.substring(0, name.length() - 2), context).toArray();
+        }
         return switch (name) {
             case "void" -> PrimitiveElement.VOID;
             case "boolean" -> PrimitiveElement.BOOLEAN;

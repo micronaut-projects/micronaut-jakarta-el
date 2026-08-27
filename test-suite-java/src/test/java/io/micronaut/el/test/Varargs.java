@@ -11,4 +11,16 @@ public final class Varargs {
     public String getValue() {
         return value;
     }
+
+    public String join(String... values) {
+        return String.join(",", values);
+    }
+
+    public String argumentType(Object... values) {
+        return values.length + ":" + values[0].getClass().getTypeName();
+    }
+
+    public int[] getNumbers() {
+        return new int[]{1, 2};
+    }
 }

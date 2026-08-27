@@ -97,6 +97,7 @@ public final class ELCompiler {
     private static final int EXACT = 0;
     private static final int WIDENING = 1;
     private static final int COERCIBLE = 3;
+    private static final int STRING_COERCIBLE = 4;
 
     private final CompilationContext context;
     /**
@@ -788,9 +789,12 @@ public final class ELCompiler {
         if (declared != null) {
             if ((!declared.isVarArgs() && declared.getParameters().length != arguments.size())
                 || (declared.isVarArgs() && arguments.size() < declared.getParameters().length - 1)) {
+                String expected = declared.isVarArgs()
+                    ? "at least " + (declared.getParameters().length - 1)
+                    : Integer.toString(declared.getParameters().length);
                 throw new ELCompilationException("The function '"
                     + CompilationContext.qualifiedFunctionName(function.prefix(), function.localName())
-                    + "' expects " + declared.getParameters().length + " argument(s) but "
+                    + "' expects " + expected + " argument(s) but "
                     + arguments.size() + " were given");
             }
             if (!ELTypes.isStatic(declared)) {
@@ -844,7 +848,7 @@ public final class ELCompiler {
                 }
             }
         }
-        ExpressionDef target = runtime(EL_RESOLUTION, "resolveIdentifier", TypeDef.OBJECT,
+        ExpressionDef target = runtime(EL_RESOLUTION, "resolveCallableIdentifier", TypeDef.OBJECT,
             ctx, ExpressionDef.constant(name));
         return dynamic(runtime(EL_RESOLUTION, "invokeCallable", TypeDef.OBJECT,
             arguments(ctx, target, arguments)));
@@ -1724,8 +1728,12 @@ public final class ELCompiler {
             int argumentRank = numericRank(argument);
             if (parameterRank >= 0 && argumentRank >= 0) {
                 total += parameterRank == argumentRank ? EXACT : parameterRank > argumentRank ? WIDENING : COERCIBLE;
+            } else if (argument.getName().equals(parameter.getName())) {
+                total += EXACT;
             } else if (argument.isAssignable(parameter) || parameter.getName().equals(Object.class.getName())) {
                 total += WIDENING;
+            } else if (parameter.getName().equals(String.class.getName())) {
+                total += STRING_COERCIBLE;
             } else if (argument.isAssignable(String.class) || parameterRank >= 0 || parameter.isAssignable(String.class)) {
                 total += COERCIBLE;
             } else {
