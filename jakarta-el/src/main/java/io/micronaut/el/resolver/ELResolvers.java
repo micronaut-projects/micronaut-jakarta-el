@@ -55,13 +55,6 @@ public final class ELResolvers {
         new BeanELResolver()
     );
 
-    private static final IntrospectionELResolver INTROSPECTIONS = new IntrospectionELResolver();
-
-    /**
-     * The standard chain itself, shared: it holds no state.
-     */
-    private static final ELResolverChain STANDARD = new ELResolverChain(standardResolvers(INTROSPECTIONS));
-
     private ELResolvers() {
     }
 
@@ -72,7 +65,7 @@ public final class ELResolvers {
      * @return The resolver chain
      */
     public static ELResolver standard() {
-        return STANDARD;
+        return new ELResolverChain(standardResolvers());
     }
 
     /**
@@ -92,8 +85,9 @@ public final class ELResolvers {
      * @return The resolvers
      */
     public static List<ELResolver> standardResolvers(ELResolver... first) {
-        List<ELResolver> resolvers = new ArrayList<>(first.length + SPECIFICATION.size());
+        List<ELResolver> resolvers = new ArrayList<>(first.length + SPECIFICATION.size() + 1);
         resolvers.addAll(List.of(first));
+        resolvers.add(new IntrospectionELResolver());
         resolvers.addAll(SPECIFICATION);
         return resolvers;
     }

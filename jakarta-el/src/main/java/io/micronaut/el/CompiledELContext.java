@@ -63,7 +63,7 @@ public class CompiledELContext extends ELContext {
      * @param first The resolvers consulted before the standard ones
      */
     public CompiledELContext(ELResolver... first) {
-        // the standard chain is shared, a chain nested in a chain is flattened for the coercions
+        // a chain nested in a chain is flattened for the coercions
         this.resolver = new ELResolverChain(new BeanNameELResolver(new LocalBeanNameResolver()),
             first.length == 0 ? ELResolvers.standard() : ELResolvers.standard(first));
     }

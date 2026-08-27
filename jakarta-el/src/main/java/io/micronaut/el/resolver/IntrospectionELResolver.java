@@ -33,7 +33,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The {@link ELResolver} resolving the types annotated with {@link io.micronaut.core.annotation.Introspected}
@@ -58,7 +57,12 @@ public final class IntrospectionELResolver extends ELResolver {
      * by name. {@code BeanIntrospector.findIntrospection} loads the introspection through an {@code Optional}
      * on every call, and the methods of a name are otherwise filtered from all the methods on every invocation.
      */
-    private final Map<Class<?>, Introspected> introspected = new ConcurrentHashMap<>();
+    private final ClassValue<Introspected> introspected = new ClassValue<>() {
+        @Override
+        protected Introspected computeValue(Class<?> type) {
+            return Introspected.of(findIntrospection(type));
+        }
+    };
 
     /**
      * Creates a resolver using the shared introspector.
@@ -305,12 +309,7 @@ public final class IntrospectionELResolver extends ELResolver {
     }
 
     private Introspected introspected(Class<?> type) {
-        Introspected entry = introspected.get(type);
-        if (entry == null) {
-            entry = Introspected.of(findIntrospection(type));
-            introspected.put(type, entry);
-        }
-        return entry;
+        return introspected.get(type);
     }
 
     @Nullable

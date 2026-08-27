@@ -192,6 +192,18 @@ class ELParserTest {
         assertInstanceOf(ELNode.MapData.class, map.entries().get(0).value());
     }
 
+    @Test
+    void expressionSizeIsBounded() {
+        ELParsingException tooLong = assertThrows(ELParsingException.class,
+            () -> ELParser.parse("x".repeat(ELParser.MAX_EXPRESSION_LENGTH + 1)));
+        assertTrue(tooLong.getMessage().contains("cannot exceed " + ELParser.MAX_EXPRESSION_LENGTH + " characters"));
+
+        String tooManyTokens = "${" + "1+".repeat(ELParser.MAX_TOKENS / 2) + "1}";
+        ELParsingException tokenFailure = assertThrows(ELParsingException.class,
+            () -> ELParser.parse(tooManyTokens));
+        assertTrue(tokenFailure.getMessage().contains("cannot exceed " + ELParser.MAX_TOKENS + " tokens"));
+    }
+
     private static ELNode eval(String expression) {
         return assertInstanceOf(ELNode.Eval.class, ELParser.parse(expression)).expression();
     }

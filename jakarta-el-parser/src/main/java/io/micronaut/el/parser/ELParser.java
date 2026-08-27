@@ -37,6 +37,9 @@ import java.util.List;
 @Experimental
 public final class ELParser {
 
+    static final int MAX_EXPRESSION_LENGTH = 16_384;
+    static final int MAX_TOKENS = 1_024;
+
     /**
      * The nesting depth an expression may reach by default.
      *
@@ -59,8 +62,14 @@ public final class ELParser {
     private int depth;
 
     private ELParser(String expression, int maxDepth) {
+        if (expression.length() > MAX_EXPRESSION_LENGTH) {
+            throw new ELParsingException("An expression cannot exceed " + MAX_EXPRESSION_LENGTH + " characters");
+        }
         this.expression = expression;
         this.tokens = ELTokenizer.tokenize(expression);
+        if (tokens.size() > MAX_TOKENS) {
+            throw new ELParsingException("An expression cannot exceed " + MAX_TOKENS + " tokens");
+        }
         this.maxDepth = maxDepth;
     }
 
