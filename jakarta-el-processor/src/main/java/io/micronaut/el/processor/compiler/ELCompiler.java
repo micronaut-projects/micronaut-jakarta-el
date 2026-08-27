@@ -93,11 +93,9 @@ public final class ELCompiler {
     /**
      * The methods of {@link Object} an interface may redeclare abstract, which do not make it functional.
      */
-    private static final Set<String> OBJECT_METHODS = Set.of("equals/1", "hashCode/0", "toString/0");
-    private static final int EXACT = 0;
-    private static final int WIDENING = 1;
-    private static final int COERCIBLE = 3;
-    private static final int STRING_COERCIBLE = 4;
+    private static final Set<String> OBJECT_METHODS = Set.of(
+        "equals(java.lang.Object)", "hashCode()", "toString()"
+    );
 
     private final CompilationContext context;
     /**
@@ -1297,8 +1295,8 @@ public final class ELCompiler {
         MethodElement found = null;
         Set<String> seen = new java.util.HashSet<>();
         for (MethodElement method : type.getEnclosedElements(ElementQuery.ALL_METHODS.onlyAbstract())) {
-            if (OBJECT_METHODS.contains(method.getName() + "/" + method.getParameters().length)
-                || !seen.add(method.getName() + "/" + method.getParameters().length)) {
+            String signature = methodSignature(method);
+            if (OBJECT_METHODS.contains(signature) || !seen.add(signature)) {
                 continue;
             }
             if (found != null) {
@@ -1307,6 +1305,12 @@ public final class ELCompiler {
             found = method;
         }
         return found;
+    }
+
+    private static String methodSignature(MethodElement method) {
+        return method.getName() + "(" + Stream.of(method.getParameters())
+            .map(parameter -> parameter.getType().getName())
+            .collect(java.util.stream.Collectors.joining(",")) + ")";
     }
 
     private ClassElement elementOf(Class<?> type) {
@@ -1644,9 +1648,9 @@ public final class ELCompiler {
 
     /**
      * The method of the given name taking the arguments. Among several overloads of the right arity the one
-     * whose parameters fit the static types of the arguments best is selected, exact over widening over
-     * coercible; when two fit equally well, or an argument has no static type to decide by, the resolution
-     * is left to the resolvers at runtime.
+     * whose parameters fit the static types of the arguments best is selected, exact over assignable over
+     * coercible and fixed arity over variable arity. Ties are resolved by parameter specificity. When the
+     * static argument types cannot decide, resolution is left to the resolvers at runtime.
      */
     @Nullable
     private MethodElement selectMethod(ClassElement type, String name, List<ELNode> arguments, boolean onlyStatic, ExpressionDef ctx) {
@@ -1669,78 +1673,213 @@ public final class ELCompiler {
     }
 
     private MethodSelection selectMethods(List<MethodElement> candidates, List<ELNode> arguments, ExpressionDef ctx) {
-        if (candidates.size() <= 1) {
-            return new MethodSelection(candidates.isEmpty() ? null : candidates.get(0), false);
+        if (candidates.isEmpty()) {
+            return new MethodSelection(null, false);
         }
         List<ClassElement> argumentTypes = arguments.stream()
             .map(argument -> argument instanceof ELNode.Lambda ? null : compileTyped(argument, ctx).type())
             .toList();
-        MethodElement best = null;
-        int bestScore = Integer.MAX_VALUE;
-        boolean ambiguous = false;
+        List<MethodElement> assignable = new ArrayList<>();
+        List<MethodElement> coercible = new ArrayList<>();
+        List<MethodElement> varArgs = new ArrayList<>();
         for (MethodElement candidate : candidates) {
-            int score = score(candidate, arguments, argumentTypes);
-            if (score < 0) {
-                continue;
-            }
-            if (score < bestScore) {
-                best = candidate;
-                bestScore = score;
-                ambiguous = false;
-            } else if (score == bestScore) {
-                ambiguous = true;
+            MethodMatch match = match(candidate, arguments, argumentTypes);
+            switch (match) {
+                case EXACT -> {
+                    return new MethodSelection(candidate, false);
+                }
+                case ASSIGNABLE -> assignable.add(candidate);
+                case COERCIBLE -> coercible.add(candidate);
+                case VARARGS -> varArgs.add(candidate);
+                case NONE -> {
+                    // not a candidate
+                }
+                default -> throw new IllegalStateException("Unexpected method match " + match);
             }
         }
-        return new MethodSelection(ambiguous ? null : best, ambiguous);
+        boolean elSpecific = assignable.isEmpty();
+        List<MethodElement> best = !assignable.isEmpty() ? assignable
+            : !coercible.isEmpty() ? coercible : varArgs;
+        return mostSpecific(best, argumentTypes, elSpecific);
     }
 
-    private static int score(MethodElement method, List<ELNode> arguments, List<ClassElement> argumentTypes) {
+    private MethodMatch match(MethodElement method,
+                              List<ELNode> arguments,
+                              List<ClassElement> argumentTypes) {
         ParameterElement[] parameters = method.getParameters();
         int fixed = method.isVarArgs() ? parameters.length - 1 : parameters.length;
         if (method.isVarArgs() ? arguments.size() < fixed : arguments.size() != fixed) {
-            return -1;
+            return MethodMatch.NONE;
         }
         boolean directVarargsArray = method.isVarArgs() && arguments.size() == parameters.length
             && argumentTypes.get(parameters.length - 1) != null
             && argumentTypes.get(parameters.length - 1).getName().equals(parameters[parameters.length - 1].getType().getName());
-        int total = method.isVarArgs() && !directVarargsArray ? 1 << 20 : 0;
+        MethodMatch result = MethodMatch.EXACT;
         for (int i = 0; i < arguments.size(); i++) {
             ClassElement argument = argumentTypes.get(i);
             boolean directArray = directVarargsArray && i == fixed;
             ClassElement parameter = directArray ? parameters[parameters.length - 1].getType()
                 : method.isVarArgs() && i >= fixed ? parameters[parameters.length - 1].getType().fromArray() : parameters[i].getType();
+            MethodMatch argumentMatch;
             if (arguments.get(i) instanceof ELNode.Lambda) {
                 // a lambda expression is compiled to a functional interface, section 1.25.8, and is itself a
                 // LambdaExpression, the former being the direct form
                 if (functionalMethod(parameter) != null) {
-                    total += EXACT;
+                    argumentMatch = MethodMatch.EXACT;
                 } else if (parameter.isAssignable(LambdaExpression.class) || parameter.getName().equals(Object.class.getName())) {
-                    total += WIDENING;
+                    argumentMatch = MethodMatch.ASSIGNABLE;
                 } else {
-                    return -1;
+                    return MethodMatch.NONE;
                 }
-                continue;
-            }
-            if (argument == null) {
-                return -1;
-            }
-            int parameterRank = numericRank(parameter);
-            int argumentRank = numericRank(argument);
-            if (parameterRank >= 0 && argumentRank >= 0) {
-                total += parameterRank == argumentRank ? EXACT : parameterRank > argumentRank ? WIDENING : COERCIBLE;
-            } else if (argument.getName().equals(parameter.getName())) {
-                total += EXACT;
-            } else if (argument.isAssignable(parameter) || parameter.getName().equals(Object.class.getName())) {
-                total += WIDENING;
-            } else if (parameter.getName().equals(String.class.getName())) {
-                total += STRING_COERCIBLE;
-            } else if (argument.isAssignable(String.class) || parameterRank >= 0 || parameter.isAssignable(String.class)) {
-                total += COERCIBLE;
             } else {
-                return -1;
+                if (argument == null) {
+                    return MethodMatch.NONE;
+                }
+                argumentMatch = sameBoxedType(argument, parameter) ? MethodMatch.EXACT
+                    : isAssignable(argument, parameter)
+                        ? MethodMatch.ASSIGNABLE
+                        : isCoercible(argument, parameter) ? MethodMatch.COERCIBLE : MethodMatch.NONE;
+            }
+            if (argumentMatch == MethodMatch.NONE) {
+                return MethodMatch.NONE;
+            }
+            if (argumentMatch == MethodMatch.COERCIBLE
+                || (argumentMatch == MethodMatch.ASSIGNABLE && result == MethodMatch.EXACT)) {
+                result = argumentMatch;
             }
         }
-        return total;
+        return method.isVarArgs() ? MethodMatch.VARARGS : result;
+    }
+
+    private static boolean isAssignable(ClassElement argument, ClassElement parameter) {
+        return argument.isAssignable(parameter)
+            || parameter.getName().equals(Object.class.getName())
+            || (numericRank(argument) >= 0 && parameter.getName().equals(Number.class.getName()));
+    }
+
+    private static MethodSelection mostSpecific(List<MethodElement> candidates,
+                                                List<ClassElement> argumentTypes,
+                                                boolean elSpecific) {
+        if (candidates.isEmpty()) {
+            return new MethodSelection(null, false);
+        }
+        List<MethodElement> best = new ArrayList<>(1);
+        for (MethodElement candidate : candidates) {
+            boolean lessSpecific = false;
+            for (int i = best.size() - 1; i >= 0; i--) {
+                int comparison = compareSpecificity(candidate, best.get(i), argumentTypes, elSpecific);
+                if (comparison > 0) {
+                    best.remove(i);
+                } else if (comparison < 0) {
+                    lessSpecific = true;
+                }
+            }
+            if (!lessSpecific && best.stream().noneMatch(method -> sameSignature(method, candidate))) {
+                best.add(candidate);
+            }
+        }
+        if (best.size() == 1) {
+            return new MethodSelection(best.get(0), false);
+        }
+        MethodElement numeric = mostSpecificNumeric(best, argumentTypes);
+        return new MethodSelection(numeric, numeric == null);
+    }
+
+    /**
+     * Resolves a tie consisting entirely of numeric parameters from statically known numeric arguments. The
+     * runtime sees boxed values and cannot distinguish two mixed widening/coercion candidates, while generated
+     * code can preserve Java's numeric widening preference without weakening the EL match category ordering.
+     */
+    @Nullable
+    private static MethodElement mostSpecificNumeric(List<MethodElement> candidates,
+                                                     List<ClassElement> argumentTypes) {
+        MethodElement best = null;
+        int bestCost = Integer.MAX_VALUE;
+        boolean ambiguous = false;
+        for (MethodElement candidate : candidates) {
+            int cost = 0;
+            for (int i = 0; i < argumentTypes.size(); i++) {
+                ClassElement argument = argumentTypes.get(i);
+                ClassElement parameter = comparisonType(candidate, i);
+                int argumentRank = argument == null ? -1 : numericRank(argument);
+                int parameterRank = numericRank(parameter);
+                if (argumentRank < 0 || parameterRank < 0) {
+                    return null;
+                }
+                cost += parameterRank == argumentRank ? 0 : parameterRank > argumentRank ? 1 : 3;
+            }
+            if (cost < bestCost) {
+                best = candidate;
+                bestCost = cost;
+                ambiguous = false;
+            } else if (cost == bestCost) {
+                ambiguous = true;
+            }
+        }
+        return ambiguous ? null : best;
+    }
+
+    private static int compareSpecificity(MethodElement first,
+                                          MethodElement second,
+                                          List<ClassElement> argumentTypes,
+                                          boolean elSpecific) {
+        int length = Math.max(Math.max(first.getParameters().length, second.getParameters().length), argumentTypes.size());
+        int result = 0;
+        for (int i = 0; i < length; i++) {
+            ClassElement firstType = comparisonType(first, i);
+            ClassElement secondType = comparisonType(second, i);
+            if (sameBoxedType(firstType, secondType)) {
+                continue;
+            }
+            int comparison = firstType.isAssignable(secondType) ? 1
+                : secondType.isAssignable(firstType) ? -1
+                : numericSpecificity(firstType, secondType, argumentTypes.get(i), elSpecific);
+            if (comparison == 0 || (result != 0 && result != comparison)) {
+                return 0;
+            }
+            result = comparison;
+        }
+        return result;
+    }
+
+    private static ClassElement comparisonType(MethodElement method, int index) {
+        ParameterElement[] parameters = method.getParameters();
+        if (method.isVarArgs() && index >= parameters.length - 1) {
+            return parameters[parameters.length - 1].getType().fromArray();
+        }
+        return parameters[index].getType();
+    }
+
+    private static int numericSpecificity(ClassElement first,
+                                          ClassElement second,
+                                          @Nullable ClassElement argument,
+                                          boolean elSpecific) {
+        if (!elSpecific || argument == null || numericRank(argument) < 0) {
+            return 0;
+        }
+        boolean firstNumeric = numericRank(first) >= 0 || first.isAssignable(Number.class);
+        boolean secondNumeric = numericRank(second) >= 0 || second.isAssignable(Number.class);
+        return firstNumeric == secondNumeric ? 0 : firstNumeric ? 1 : -1;
+    }
+
+    private static boolean sameBoxedType(ClassElement first, ClassElement second) {
+        return first.getName().equals(second.getName())
+            || first.getName().equals(wrapper(second.getName()))
+            || wrapper(first.getName()).equals(second.getName());
+    }
+
+    private static boolean sameSignature(MethodElement first, MethodElement second) {
+        ParameterElement[] firstParameters = first.getParameters();
+        ParameterElement[] secondParameters = second.getParameters();
+        if (firstParameters.length != secondParameters.length) {
+            return false;
+        }
+        for (int i = 0; i < firstParameters.length; i++) {
+            if (!firstParameters[i].getType().getName().equals(secondParameters[i].getType().getName())) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -1780,22 +1919,7 @@ public final class ELCompiler {
                 candidates.add(constructor);
             }
         }
-        if (candidates.size() <= 1) {
-            return candidates.isEmpty() ? null : candidates.get(0);
-        }
-        List<ClassElement> types = arguments.stream().map(argument -> argument instanceof ELNode.Lambda ? null : compileTyped(argument, ctx).type()).toList();
-        MethodElement best = null;
-        int bestScore = Integer.MAX_VALUE;
-        for (MethodElement candidate : candidates) {
-            int score = score(candidate, arguments, types);
-            if (score >= 0 && score < bestScore) {
-                best = candidate;
-                bestScore = score;
-            } else if (score == bestScore) {
-                best = null;
-            }
-        }
-        return best;
+        return selectMethods(candidates, arguments, ctx).method();
     }
 
     private static ExpressionDef integerLiteral(String image) {
@@ -1825,6 +1949,14 @@ public final class ELCompiler {
      * @param ambiguous Whether multiple methods matched with the same score
      */
     private record MethodSelection(@Nullable MethodElement method, boolean ambiguous) {
+    }
+
+    private enum MethodMatch {
+        EXACT,
+        ASSIGNABLE,
+        COERCIBLE,
+        VARARGS,
+        NONE
     }
 
     /**

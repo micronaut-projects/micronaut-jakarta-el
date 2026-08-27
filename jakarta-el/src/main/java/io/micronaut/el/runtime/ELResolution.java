@@ -381,7 +381,7 @@ public final class ELResolution {
     @Nullable
     public static Object invokeMethodExpression(ELContext context,
                                                 @Nullable Object target,
-                                                @Nullable Object[] arguments) {
+                                                Object @Nullable [] arguments) {
         if (target instanceof MethodExpression methodExpression) {
             return methodExpression.invoke(context, arguments);
         }
@@ -436,7 +436,7 @@ public final class ELResolution {
     public static Object invokeWithParams(ELContext context,
                                           @Nullable Object base,
                                           @Nullable Object method,
-                                          @Nullable Object[] params) {
+                                          Object @Nullable [] params) {
         return invoke(context, base, method, params == null ? new Object[0] : params);
     }
 
@@ -456,7 +456,7 @@ public final class ELResolution {
                                               @Nullable Object base,
                                               @Nullable Object method,
                                               Class<?> @Nullable [] paramTypes,
-                                              @Nullable Object[] params) {
+                                              Object @Nullable [] params) {
         if (base == null || method == null) {
             throw propertyNotFound(base, method);
         }

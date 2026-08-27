@@ -21,6 +21,7 @@ import io.micronaut.el.ELExpressionSource;
 import io.micronaut.el.processor.compiler.ELExpressionDefinition;
 import io.micronaut.el.processor.compiler.ELMethodExpressionDefinition;
 import io.micronaut.el.parser.ast.ELNode;
+import io.micronaut.el.runtime.CompiledMethodExpression;
 import io.micronaut.el.runtime.ELMethods;
 import io.micronaut.core.reflect.ClassUtils;
 import io.micronaut.core.reflect.ReflectionUtils;
@@ -196,10 +197,17 @@ public final class ExpressionSourceWriter {
                                     List.of(CLASS_ARRAY.instantiate(parameterTypes), parameters.get(2))).isTrue()
                             ));
                         }
+                        ExpressionDef compiled = ClassTypeDef.of(className)
+                            .getStaticField(method.definition().constantName(), METHOD_EXPRESSION);
+                        ExpressionDef selected = new ExpressionDef.IfElse(
+                            parameters.get(1).isNull(),
+                            compiled.cast(ClassTypeDef.of(CompiledMethodExpression.class))
+                                .invoke("withoutExpectedReturnType", METHOD_EXPRESSION),
+                            compiled
+                        );
                         result = new ExpressionDef.IfElse(
                             matches,
-                            ClassTypeDef.of(className)
-                                .getStaticField(method.definition().constantName(), METHOD_EXPRESSION),
+                            selected,
                             result
                         );
                     }

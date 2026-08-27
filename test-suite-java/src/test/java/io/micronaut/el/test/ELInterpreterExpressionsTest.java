@@ -1,7 +1,11 @@
 package io.micronaut.el.test;
 
 import io.micronaut.el.CompiledELContext;
+import io.micronaut.el.CompiledExpressionFactory;
 import jakarta.el.ELContext;
+import jakarta.el.ELException;
+import jakarta.el.ELResolver;
+import jakarta.el.EvaluationListener;
 import jakarta.el.MethodExpression;
 import jakarta.el.MethodNotFoundException;
 import jakarta.el.ValueExpression;
@@ -15,6 +19,7 @@ import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -30,7 +35,8 @@ class ELInterpreterExpressionsTest {
         .setBean("varargs", new Varargs())
         .setBean("strings", new String[]{"a", "b"})
         .setBean("functions", new Formatting())
-        .setBean("twice", 42L);
+        .setBean("twice", 42L)
+        .setBean("target", ELInterpreterExpressions$ELExpressions.LIST_SIZE_METHOD);
 
     @Test
     void literalsAndOperators() {
@@ -91,6 +97,10 @@ class ELInterpreterExpressionsTest {
         assertEquals(6L, value(ELInterpreterExpressions$ELExpressions.MAPPED_FUNCTION_FALLBACK));
         assertThrows(MethodNotFoundException.class,
             () -> value(ELInterpreterExpressions$ELExpressions.MISSING_FUNCTION));
+        assertEquals("assignable", value(ELInterpreterExpressions$ELExpressions.ASSIGNABLE_OVER_COERCIBLE));
+        assertEquals("number", value(ELInterpreterExpressions$ELExpressions.MOST_SPECIFIC_OVERLOAD));
+        assertThrows(MethodNotFoundException.class,
+            () -> value(ELInterpreterExpressions$ELExpressions.NON_FUNCTIONAL_INTERFACE));
     }
 
     @Test
@@ -102,10 +112,48 @@ class ELInterpreterExpressionsTest {
             new Object[]{"a", "b"}));
         assertEquals("1:java.lang.String[]", ELInterpreterExpressions$ELExpressions.OBJECT_VARARGS_METHOD.invoke(context,
             new Object[]{new String[]{"a", "b"}}));
+        assertEquals("number", ELInterpreterExpressions$ELExpressions.SPECIFIC_METHOD.invoke(context,
+            new Object[]{1L}));
+
+        MethodExpression identifier = ELInterpreterExpressions$ELExpressions.IDENTIFIER_METHOD;
+        assertEquals(3, identifier.invoke(context, null));
+        assertEquals("size", identifier.getMethodInfo(context).getName());
+        assertEquals("size", identifier.getMethodReference(context).getMethodInfo().getName());
 
         MethodExpression provided = roundTrip(ELInterpreterExpressions$ELExpressions.PROVIDED_VARARGS_METHOD);
         assertTrue(provided.isParametersProvided());
         assertEquals("a,b", provided.invoke(context, null));
+    }
+
+    @Test
+    void listenersObserveMethodReferencesAndCompletedCoercions() {
+        List<String> events = new ArrayList<>();
+        CompiledELContext listeningContext = new CompiledELContext(new FailingIntegerConversionResolver(events))
+            .setBean("varargs", new Varargs());
+        listeningContext.addEvaluationListener(new RecordingListener(events));
+
+        ELInterpreterExpressions$ELExpressions.COERCION_LISTENER_METHOD.getMethodReference(listeningContext);
+        assertEquals(List.of("before:#{varargs.numberText}", "after:#{varargs.numberText}"), events);
+
+        events.clear();
+        assertThrows(ELException.class,
+            () -> ELInterpreterExpressions$ELExpressions.COERCION_LISTENER_VALUE.getValue(listeningContext));
+        assertEquals(List.of("before:${'1'}", "coerce"), events);
+
+        events.clear();
+        assertThrows(ELException.class,
+            () -> ELInterpreterExpressions$ELExpressions.COERCION_LISTENER_METHOD.invoke(listeningContext, null));
+        assertEquals(List.of("before:#{varargs.numberText}", "coerce"), events);
+    }
+
+    @Test
+    void nullableExpectedReturnTypeReturnsTheUncoercedCompiledResult() {
+        CompiledExpressionFactory factory = new CompiledExpressionFactory(
+            List.of(new ELInterpreterExpressions$ELExpressions()));
+
+        assertEquals(1, ELInterpreterExpressions$ELExpressions.COERCION_LISTENER_METHOD.invoke(context, null));
+        assertEquals("1", factory.createMethodExpression(context, "#{varargs.numberText}", null,
+            new Class<?>[0]).invoke(context, null));
     }
 
     private Object value(ValueExpression expression) {
@@ -119,6 +167,66 @@ class ELInterpreterExpressionsTest {
         }
         try (ObjectInputStream input = new ObjectInputStream(new ByteArrayInputStream(bytes.toByteArray()))) {
             return (MethodExpression) input.readObject();
+        }
+    }
+
+    private static final class RecordingListener extends EvaluationListener {
+        private final List<String> events;
+
+        private RecordingListener(List<String> events) {
+            this.events = events;
+        }
+
+        @Override
+        public void beforeEvaluation(ELContext context, String expression) {
+            events.add("before:" + expression);
+        }
+
+        @Override
+        public void afterEvaluation(ELContext context, String expression) {
+            events.add("after:" + expression);
+        }
+    }
+
+    private static final class FailingIntegerConversionResolver extends ELResolver {
+        private final List<String> events;
+
+        private FailingIntegerConversionResolver(List<String> events) {
+            this.events = events;
+        }
+
+        @Override
+        public <T> T convertToType(ELContext context, Object value, Class<T> type) {
+            if (type == Integer.class) {
+                context.setPropertyResolved(true);
+                events.add("coerce");
+                throw new ELException("conversion failed");
+            }
+            return null;
+        }
+
+        @Override
+        public Object getValue(ELContext context, Object base, Object property) {
+            return null;
+        }
+
+        @Override
+        public Class<?> getType(ELContext context, Object base, Object property) {
+            return null;
+        }
+
+        @Override
+        public void setValue(ELContext context, Object base, Object property, Object value) {
+        }
+
+        @Override
+        public boolean isReadOnly(ELContext context, Object base, Object property) {
+            return true;
+        }
+
+        @Override
+        public Class<?> getCommonPropertyType(ELContext context, Object base) {
+            return null;
         }
     }
 }
