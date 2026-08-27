@@ -16,4 +16,9 @@ public final class TextFunctions {
     public static String toUpperCase(String value) {
         return value == null ? null : value.toUpperCase();
     }
+
+    @ELFunction
+    public static String join(String... values) {
+        return String.join(",", values);
+    }
 }

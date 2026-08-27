@@ -34,6 +34,7 @@ import jakarta.el.PropertyNotWritableException;
 import jakarta.el.ValueReference;
 import org.jspecify.annotations.Nullable;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -732,15 +733,21 @@ final class ELInterpreter {
     private Object invokeStatic(ELContext context, Method method, Object[] arguments) {
         Class<?>[] parameterTypes = method.getParameterTypes();
         Object[] coerced = new Object[parameterTypes.length];
-        if (method.isVarArgs()) {
-            throw new ELException("Variable arity functions are not supported: " + method);
-        }
-        if (arguments.length != parameterTypes.length) {
+        if (!method.isVarArgs() && arguments.length != parameterTypes.length) {
             throw new IllegalArgumentException("The function '" + method.getName() + "' expects "
                 + parameterTypes.length + " argument(s) but " + arguments.length + " were provided");
         }
-        for (int i = 0; i < parameterTypes.length; i++) {
+        int fixed = method.isVarArgs() ? parameterTypes.length - 1 : parameterTypes.length;
+        for (int i = 0; i < fixed; i++) {
             coerced[i] = ELSupport.coerceToType(context, arguments[i], parameterTypes[i]);
+        }
+        if (method.isVarArgs()) {
+            Class<?> component = parameterTypes[fixed].getComponentType();
+            Object varargs = Array.newInstance(component, Math.max(0, arguments.length - fixed));
+            for (int i = fixed; i < arguments.length; i++) {
+                Array.set(varargs, i - fixed, ELSupport.coerceToType(context, arguments[i], component));
+            }
+            coerced[fixed] = varargs;
         }
         try {
             return method.invoke(null, coerced);

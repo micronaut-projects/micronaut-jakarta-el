@@ -126,7 +126,7 @@ class ELInterpreterTest {
     void propertyMethodExpressionsPackVarargsInTheReflectiveFallback() {
         ELContext context = new PropertyOnlyContext();
         MethodExpression join = ExpressionFactory.newInstance().createMethodExpression(context, "#{bean.join}",
-            String.class, new Class<?>[]{String.class, String.class});
+            String.class, new Class<?>[]{String[].class});
 
         assertEquals("a,b", join.invoke(context, new Object[]{"a", "b"}));
     }
