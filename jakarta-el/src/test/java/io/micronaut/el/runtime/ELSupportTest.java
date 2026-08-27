@@ -5,6 +5,7 @@ import jakarta.el.ELException;
 import jakarta.el.LambdaExpression;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
@@ -28,6 +29,12 @@ class ELSupportTest {
     enum Suit {
         HEART,
         SPADE
+    }
+
+    static final class Varargs {
+        String join(Object... values) {
+            return String.join(",", java.util.Arrays.stream(values).map(String::valueOf).toList());
+        }
     }
 
     @Test
@@ -138,5 +145,13 @@ class ELSupportTest {
         assertEquals("lambda", function.apply("lambda"));
         assertEquals(function, function);
         assertFalse(function.equals(new Object()));
+    }
+
+    @Test
+    void aSubtypeArrayIsPassedDirectlyToAVariableArityMethod() throws NoSuchMethodException {
+        Method join = Varargs.class.getDeclaredMethod("join", Object[].class);
+
+        assertEquals("a,b", ELMethods.invoke(new CompiledELContext(), join, new Varargs(),
+            new Object[]{new String[]{"a", "b"}}));
     }
 }
