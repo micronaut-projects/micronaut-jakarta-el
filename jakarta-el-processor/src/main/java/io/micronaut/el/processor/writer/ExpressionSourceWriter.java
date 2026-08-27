@@ -20,6 +20,7 @@ import io.micronaut.core.annotation.Internal;
 import io.micronaut.el.ELExpressionSource;
 import io.micronaut.el.processor.compiler.ELExpressionDefinition;
 import io.micronaut.el.processor.compiler.ELMethodExpressionDefinition;
+import io.micronaut.el.runtime.ELMethods;
 import io.micronaut.core.reflect.ClassUtils;
 import io.micronaut.core.reflect.ReflectionUtils;
 import io.micronaut.inject.ast.ClassElement;
@@ -35,7 +36,6 @@ import jakarta.el.ValueExpression;
 
 import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -186,9 +186,7 @@ public final class ExpressionSourceWriter {
                             .toList();
                         ExpressionDef.ConditionExpressionDef matches = new ExpressionDef.And(
                             requestedType(method.definition().requireReturnType(), method.definition().inferred(), parameters.get(1)),
-                            // the declared parameters are Object[]: the descriptor must not be inferred from
-                            // the arguments, which the bytecode writer would emit as it is
-                            ClassTypeDef.of(Arrays.class).invokeStatic("equals", List.of(OBJECT_ARRAY, OBJECT_ARRAY),
+                            ClassTypeDef.of(ELMethods.class).invokeStatic("sameTypes", List.of(CLASS_ARRAY, CLASS_ARRAY),
                                 TypeDef.Primitive.BOOLEAN,
                                 List.of(CLASS_ARRAY.instantiate(parameterTypes), parameters.get(2))).isTrue()
                         );

@@ -1,6 +1,7 @@
 package io.micronaut.el.test;
 
 import io.micronaut.el.CompiledELContext;
+import jakarta.el.ExpressionFactory;
 import jakarta.el.PropertyNotWritableException;
 import jakarta.el.ValueReference;
 import org.junit.jupiter.api.Test;
@@ -70,6 +71,14 @@ class LValueExpressionsTest {
             LValueExpressions$ELExpressions.GREET.invoke(context, new Object[]{"Hi"}));
         assertEquals("integer",
             LValueExpressions$ELExpressions.SELECT_INTEGER.invoke(context, new Object[]{"1"}));
+        assertEquals("string",
+            LValueExpressions$ELExpressions.SELECT_STRING.invoke(context, new Object[]{"1"}));
+
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        assertEquals("integer", factory.createMethodExpression(context, "${formatting.select}", String.class,
+            new Class<?>[]{int.class}).invoke(context, new Object[]{"1"}));
+        assertEquals("string", factory.createMethodExpression(context, "${formatting.select}", String.class,
+            new Class<?>[]{String.class}).invoke(context, new Object[]{"1"}));
     }
 
     @Test

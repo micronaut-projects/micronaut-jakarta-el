@@ -210,7 +210,14 @@ public final class ELMethods {
      * wrapper as the same type: a class literal such as {@code double.class} cannot reach an annotation member
      * of a Micronaut annotation, so the wrapper is what a declaration can provide.
      */
-    private static boolean sameTypes(Class<?>[] declared, Class<?>[] provided) {
+    /**
+     * Compares parameter types, treating a primitive and its wrapper as the same type.
+     *
+     * @param declared The declared parameter types
+     * @param provided The parameter types to match
+     * @return Whether every declared type matches its provided counterpart
+     */
+    public static boolean sameTypes(Class<?>[] declared, Class<?>[] provided) {
         if (declared.length != provided.length) {
             return false;
         }

@@ -61,6 +61,7 @@ import io.micronaut.sourcegen.model.ClassDef;
 import java.lang.annotation.Annotation;
 import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -283,7 +284,10 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
         for (Declared<A> value : declared) {
             String key = expressionOf(value.annotation()).orElse("") + "|"
                 + value.annotation().annotationClassValue("expectedType").map(AnnotationClassValue::getName).orElse("")
-                + "|" + value.annotation().annotationClassValue("expectedReturnType").map(AnnotationClassValue::getName).orElse("");
+                + "|" + value.annotation().annotationClassValue("expectedReturnType").map(AnnotationClassValue::getName).orElse("")
+                + "|" + Arrays.stream(value.annotation().annotationClassValues("expectedParamTypes"))
+                    .map(AnnotationClassValue::getName)
+                    .collect(java.util.stream.Collectors.joining(","));
             distinct.putIfAbsent(key, value);
         }
         return new ArrayList<>(distinct.values());
