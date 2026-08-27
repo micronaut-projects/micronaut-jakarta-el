@@ -213,7 +213,8 @@ public final class CompilationContext {
         for (ClassElement staticImport : staticImports) {
             for (MethodElement method : staticImport
                 .getEnclosedElements(ElementQuery.ALL_METHODS.onlyAccessible().named(name))) {
-                if (method.getParameters().length == arguments && ELTypes.isStatic(method)) {
+                if ((method.getParameters().length == arguments
+                    || method.isVarArgs() && arguments >= method.getParameters().length - 1) && ELTypes.isStatic(method)) {
                     return method;
                 }
             }

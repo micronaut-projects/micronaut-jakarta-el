@@ -470,8 +470,10 @@ public final class ELResolution {
         if (context.isPropertyResolved()) {
             return result;
         }
-        throw new MethodNotFoundException("Cannot find the method '" + method + "' of "
-            + base.getClass().getName());
+        Method fallback = base instanceof ELClass elClass
+            ? ELMethods.findStaticMethod(elClass.getKlass(), method.toString(), paramTypes, null)
+            : ELMethods.findMethod(base.getClass(), method.toString(), paramTypes, null);
+        return ELMethods.invoke(context, fallback, base instanceof ELClass ? null : base, arguments);
     }
 
     /**

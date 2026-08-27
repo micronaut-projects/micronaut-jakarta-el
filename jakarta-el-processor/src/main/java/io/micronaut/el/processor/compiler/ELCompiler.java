@@ -786,7 +786,8 @@ public final class ELCompiler {
     private Typed compileFirstInvocation(ELNode.Function function, List<ELNode> arguments, ExpressionDef ctx) {
         MethodElement declared = context.resolveFunction(function.prefix(), function.localName());
         if (declared != null) {
-            if (declared.getParameters().length != arguments.size()) {
+            if ((!declared.isVarArgs() && declared.getParameters().length != arguments.size())
+                || (declared.isVarArgs() && arguments.size() < declared.getParameters().length - 1)) {
                 throw new ELCompilationException("The function '"
                     + CompilationContext.qualifiedFunctionName(function.prefix(), function.localName())
                     + "' expects " + declared.getParameters().length + " argument(s) but "
@@ -1353,6 +1354,9 @@ public final class ELCompiler {
         for (int i = 0; i < arguments.size(); i++) {
             ELNode argument = arguments.get(i);
             ClassElement parameter = i < parameters.length ? parameters[i].getType() : null;
+            if (method.isVarArgs() && i >= parameters.length - 1) {
+                parameter = parameters[parameters.length - 1].getType().fromArray();
+            }
             if (argument instanceof ELNode.Lambda lambda && parameter != null) {
                 MethodElement functionalMethod = functionalMethod(parameter);
                 if (functionalMethod != null) {
@@ -1372,7 +1376,15 @@ public final class ELCompiler {
             }
             values.add(parameter == null ? value.expression() : coerce(value.expression(), parameter, ctx));
         }
-        return values;
+        if (!method.isVarArgs()) {
+            return values;
+        }
+        int fixed = parameters.length - 1;
+        List<ExpressionDef> packed = new ArrayList<>(parameters.length);
+        packed.addAll(values.subList(0, fixed));
+        ClassElement component = parameters[fixed].getType().fromArray();
+        packed.add(erasure(component).array().instantiate(values.subList(fixed, values.size())));
+        return packed;
     }
 
     /**
@@ -1617,7 +1629,8 @@ public final class ELCompiler {
     private MethodElement selectMethod(ClassElement type, String name, List<ELNode> arguments, boolean onlyStatic, ExpressionDef ctx) {
         List<MethodElement> candidates = new ArrayList<>();
         for (MethodElement method : type.getEnclosedElements(ElementQuery.ALL_METHODS.onlyAccessible().named(name))) {
-            if (method.getParameters().length == arguments.size() && method.isPublic()
+            if ((method.getParameters().length == arguments.size()
+                || method.isVarArgs() && arguments.size() >= method.getParameters().length - 1) && method.isPublic()
                 && (!onlyStatic || ELTypes.isStatic(method))) {
                 candidates.add(method);
             }
@@ -1714,7 +1727,8 @@ public final class ELCompiler {
     @Nullable
     private static MethodElement findConstructor(ClassElement type, int arguments) {
         for (MethodElement constructor : type.getEnclosedElements(ElementQuery.CONSTRUCTORS)) {
-            if (constructor.isPublic() && constructor.getParameters().length == arguments) {
+            if (constructor.isPublic() && (constructor.getParameters().length == arguments
+                || constructor.isVarArgs() && arguments >= constructor.getParameters().length - 1)) {
                 return constructor;
             }
         }
