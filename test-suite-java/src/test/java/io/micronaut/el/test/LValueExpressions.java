@@ -28,6 +28,12 @@ import io.micronaut.el.annotation.ELVariable;
     expectedParamTypes = Integer.class,
     name = "selectInteger"
 )
+@ELMethodExpression(
+    value = "${formatting.select}",
+    expectedReturnType = String.class,
+    expectedParamTypes = String.class,
+    name = "selectString"
+)
 public final class LValueExpressions {
 
     private LValueExpressions() {
