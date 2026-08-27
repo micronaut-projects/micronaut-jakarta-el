@@ -117,6 +117,10 @@ public final class ELMethods {
         Object[] arguments = values == null ? new Object[0] : values;
         int count = arguments.length;
         int fixed = method.isVarArgs() ? parameterTypes.length - 1 : parameterTypes.length;
+        if (method.isVarArgs() ? count < fixed : count != fixed) {
+            throw new IllegalArgumentException("The method '" + method.getName() + "' expects "
+                + (method.isVarArgs() ? "at least " + fixed : fixed) + " argument(s) but " + count + " were provided");
+        }
         for (int i = 0; i < fixed && i < count; i++) {
             parameters[i] = ELSupport.coerceToType(context, arguments[i], parameterTypes[i]);
         }

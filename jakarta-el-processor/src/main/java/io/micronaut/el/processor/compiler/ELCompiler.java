@@ -815,7 +815,7 @@ public final class ELCompiler {
         if (!context.isLambdaParameter(name) && context.variableType(name) == null) {
             ClassElement importedClass = context.resolveClass(name);
             if (importedClass != null) {
-                MethodElement constructor = findConstructor(importedClass, arguments.size());
+                MethodElement constructor = selectConstructor(importedClass, arguments, ctx);
                 if (constructor == null) {
                     throw new ELCompilationException("The class " + importedClass.getName()
                         + " does not declare a public constructor accepting " + arguments.size()
@@ -827,13 +827,15 @@ public final class ELCompiler {
                     importedClass
                 );
             }
-            MethodElement staticMethod = context.resolveStaticMethod(name, arguments.size());
-            if (staticMethod != null) {
-                return new Typed(
-                    ClassTypeDef.of(staticMethod.getDeclaringType()).invokeStatic(staticMethod,
-                        coercedArguments(staticMethod, arguments, ctx)),
-                    staticMethod.getReturnType()
-                );
+            for (ClassElement staticImport : context.staticImports()) {
+                MethodElement staticMethod = selectMethod(staticImport, name, arguments, true, ctx);
+                if (staticMethod != null) {
+                    return new Typed(
+                        ClassTypeDef.of(staticMethod.getDeclaringType()).invokeStatic(staticMethod,
+                            coercedArguments(staticMethod, arguments, ctx)),
+                        staticMethod.getReturnType()
+                    );
+                }
             }
         }
         ExpressionDef target = runtime(EL_RESOLUTION, "resolveIdentifier", TypeDef.OBJECT,
@@ -1351,10 +1353,20 @@ public final class ELCompiler {
     private List<ExpressionDef> coercedArguments(@Nullable ClassElement receiver, MethodElement method, List<ELNode> arguments, ExpressionDef ctx) {
         ParameterElement[] parameters = method.getParameters();
         List<ExpressionDef> values = new ArrayList<>(arguments.size());
+        boolean directVarargsArray = false;
         for (int i = 0; i < arguments.size(); i++) {
             ELNode argument = arguments.get(i);
             ClassElement parameter = i < parameters.length ? parameters[i].getType() : null;
-            if (method.isVarArgs() && i >= parameters.length - 1) {
+            Typed directValue = null;
+            if (method.isVarArgs() && i == parameters.length - 1 && arguments.size() == parameters.length
+                && !(argument instanceof ELNode.Lambda)) {
+                directValue = compileTyped(argument, ctx);
+                if (directValue.type() != null && directValue.type().isArray()) {
+                    directVarargsArray = true;
+                } else {
+                    parameter = parameters[parameters.length - 1].getType().fromArray();
+                }
+            } else if (method.isVarArgs() && i >= parameters.length - 1) {
                 parameter = parameters[parameters.length - 1].getType().fromArray();
             }
             if (argument instanceof ELNode.Lambda lambda && parameter != null) {
@@ -1370,13 +1382,13 @@ public final class ELCompiler {
                     continue;
                 }
             }
-            Typed value = compileTyped(argument, ctx);
+            Typed value = directValue == null ? compileTyped(argument, ctx) : directValue;
             if (parameter != null) {
                 requireCoercible(value.type(), parameter, method, i);
             }
             values.add(parameter == null ? value.expression() : coerce(value.expression(), parameter, ctx));
         }
-        if (!method.isVarArgs()) {
+        if (!method.isVarArgs() || directVarargsArray) {
             return values;
         }
         int fixed = parameters.length - 1;
@@ -1662,9 +1674,14 @@ public final class ELCompiler {
 
     private static int score(MethodElement method, List<ELNode> arguments, List<ClassElement> argumentTypes) {
         ParameterElement[] parameters = method.getParameters();
-        int total = 0;
-        for (int i = 0; i < parameters.length; i++) {
-            ClassElement parameter = parameters[i].getType();
+        int fixed = method.isVarArgs() ? parameters.length - 1 : parameters.length;
+        if (method.isVarArgs() ? arguments.size() < fixed : arguments.size() != fixed) {
+            return -1;
+        }
+        int total = method.isVarArgs() ? 1 << 20 : 0;
+        for (int i = 0; i < arguments.size(); i++) {
+            ClassElement parameter = method.isVarArgs() && i >= fixed
+                ? parameters[parameters.length - 1].getType().fromArray() : parameters[i].getType();
             if (arguments.get(i) instanceof ELNode.Lambda) {
                 // a lambda expression is compiled to a functional interface, section 1.25.8, and is itself a
                 // LambdaExpression, the former being the direct form
@@ -1725,14 +1742,30 @@ public final class ELCompiler {
     }
 
     @Nullable
-    private static MethodElement findConstructor(ClassElement type, int arguments) {
+    private MethodElement selectConstructor(ClassElement type, List<ELNode> arguments, ExpressionDef ctx) {
+        List<MethodElement> candidates = new ArrayList<>();
         for (MethodElement constructor : type.getEnclosedElements(ElementQuery.CONSTRUCTORS)) {
-            if (constructor.isPublic() && (constructor.getParameters().length == arguments
-                || constructor.isVarArgs() && arguments >= constructor.getParameters().length - 1)) {
-                return constructor;
+            if (constructor.isPublic() && (constructor.getParameters().length == arguments.size()
+                || constructor.isVarArgs() && arguments.size() >= constructor.getParameters().length - 1)) {
+                candidates.add(constructor);
             }
         }
-        return null;
+        if (candidates.size() <= 1) {
+            return candidates.isEmpty() ? null : candidates.get(0);
+        }
+        List<ClassElement> types = arguments.stream().map(argument -> argument instanceof ELNode.Lambda ? null : compileTyped(argument, ctx).type()).toList();
+        MethodElement best = null;
+        int bestScore = Integer.MAX_VALUE;
+        for (MethodElement candidate : candidates) {
+            int score = score(candidate, arguments, types);
+            if (score >= 0 && score < bestScore) {
+                best = candidate;
+                bestScore = score;
+            } else if (score == bestScore) {
+                best = null;
+            }
+        }
+        return best;
     }
 
     private static ExpressionDef integerLiteral(String image) {

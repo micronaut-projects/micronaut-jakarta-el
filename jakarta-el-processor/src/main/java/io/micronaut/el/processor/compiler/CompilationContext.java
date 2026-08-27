@@ -222,6 +222,10 @@ public final class CompilationContext {
         return null;
     }
 
+    public List<ClassElement> staticImports() {
+        return staticImports;
+    }
+
     /**
      * @param prefix    The namespace prefix
      * @param localName The local name
