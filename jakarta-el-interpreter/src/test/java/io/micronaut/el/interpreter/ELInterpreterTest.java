@@ -241,9 +241,17 @@ class ELInterpreterTest {
 
     @Test
     void functionsPackVariableArityArguments() throws NoSuchMethodException {
-        processor.defineFunction("fn", "join", ELInterpreterTest.class.getMethod("join", String[].class));
+        processor.defineFunction("fn", "join", Varargs.class.getMethod("join", CharSequence[].class));
 
         assertEquals("a,b", processor.eval("fn:join('a', 'b')"));
+    }
+
+    @Test
+    void constructorsPackVariableArityArguments() {
+        ELContext context = processor.getELManager().getELContext();
+        context.getImportHandler().importClass(Varargs.class.getName());
+
+        assertEquals("a,b", processor.eval("Varargs('a', 'b').value"));
     }
 
     @Test
@@ -271,16 +279,6 @@ class ELInterpreterTest {
 
         public void setName(String name) {
             this.name = name;
-        }
-    }
-
-    public static String join(String... values) {
-        return String.join(",", values);
-    }
-
-    public static final class Varargs {
-        public String join(String... values) {
-            return String.join(",", values);
         }
     }
 
