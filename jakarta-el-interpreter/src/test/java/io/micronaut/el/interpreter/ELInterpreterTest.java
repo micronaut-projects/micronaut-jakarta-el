@@ -147,6 +147,13 @@ class ELInterpreterTest {
     }
 
     @Test
+    void lambdasCoerceToUnannotatedFunctionalInterfaces() {
+        processor.defineBean("functions", new InterpreterFunctions());
+
+        assertEquals("EL", processor.eval("functions.map(value -> value.toUpperCase(), 'el')"));
+    }
+
+    @Test
     void anIdentifierThatIsNotInvocableDefersToTheFunctionMapper() throws NoSuchMethodException {
         processor.defineBean("twice", 42L);
         processor.defineFunction("", "twice", ELInterpreterTest.class.getMethod("twice", long.class));
