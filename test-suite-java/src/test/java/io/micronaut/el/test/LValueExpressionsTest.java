@@ -21,7 +21,8 @@ class LValueExpressionsTest {
     private final CompiledELContext context = new CompiledELContext()
         .setBean("book", book)
         .setBean("author", author)
-        .setBean("formatting", new Formatting());
+        .setBean("formatting", new Formatting())
+        .setBean("xs", List.of(1, 2, 3));
 
     @Test
     void assignAProperty() {
@@ -79,6 +80,8 @@ class LValueExpressionsTest {
             new Class<?>[]{int.class}).invoke(context, new Object[]{"1"}));
         assertEquals("string", factory.createMethodExpression(context, "${formatting.select}", String.class,
             new Class<?>[]{String.class}).invoke(context, new Object[]{"1"}));
+        assertEquals(42, LValueExpressions$ELExpressions.INTEGER_VALUE_OF.invoke(context, new Object[]{"42"}));
+        assertEquals(3, LValueExpressions$ELExpressions.LIST_SIZE.invoke(context, null));
     }
 
     @Test

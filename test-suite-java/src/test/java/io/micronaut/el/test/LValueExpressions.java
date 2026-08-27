@@ -5,10 +5,13 @@ import io.micronaut.el.annotation.ELExpression;
 import io.micronaut.el.annotation.ELMethodExpression;
 import io.micronaut.el.annotation.ELVariable;
 
+import java.util.List;
+
 @ELEnvironment(variables = {
     @ELVariable(name = "book", type = Book.class),
     @ELVariable(name = "author", type = Author.class),
-    @ELVariable(name = "formatting", type = Formatting.class)
+    @ELVariable(name = "formatting", type = Formatting.class),
+    @ELVariable(name = "xs", type = List.class)
 })
 @ELExpression(value = "${book.title}", expectedType = String.class, name = "title")
 @ELExpression(value = "${book.category}", expectedType = String.class, name = "category")
@@ -34,6 +37,10 @@ import io.micronaut.el.annotation.ELVariable;
     expectedParamTypes = String.class,
     name = "selectString"
 )
+@ELMethodExpression(value = "${Integer.valueOf}", expectedReturnType = Integer.class,
+    expectedParamTypes = String.class, name = "integerValueOf")
+@ELMethodExpression(value = "${xs.size}", expectedReturnType = Integer.class,
+    name = "listSize")
 public final class LValueExpressions {
 
     private LValueExpressions() {
