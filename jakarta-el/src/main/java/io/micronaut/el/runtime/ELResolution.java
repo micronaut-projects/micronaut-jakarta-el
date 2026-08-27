@@ -518,6 +518,22 @@ public final class ELResolution {
     }
 
     /**
+     * Resolves an identifier used as a function, reporting a missing identifier as a missing function.
+     *
+     * @param context The context
+     * @param name    The identifier
+     * @return The callable value
+     */
+    @Nullable
+    public static Object resolveCallableIdentifier(ELContext context, String name) {
+        try {
+            return resolveIdentifier(context, name);
+        } catch (PropertyNotFoundException e) {
+            throw new MethodNotFoundException("Cannot resolve the function '" + name + "'", e);
+        }
+    }
+
+    /**
      * Invokes the constructor of an imported class as described in the section 1.24.3 of the specification.
      *
      * @param context   The context
