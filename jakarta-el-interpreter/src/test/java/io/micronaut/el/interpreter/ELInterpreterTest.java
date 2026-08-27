@@ -132,6 +132,13 @@ class ELInterpreterTest {
     }
 
     @Test
+    void functionsPackVariableArityArguments() throws NoSuchMethodException {
+        processor.defineFunction("fn", "join", ELInterpreterTest.class.getMethod("join", String[].class));
+
+        assertEquals("a,b", processor.eval("fn:join('a', 'b')"));
+    }
+
+    @Test
     void anIdentifierThatIsNotInvocableDefersToTheFunctionMapper() throws NoSuchMethodException {
         processor.defineBean("twice", 42L);
         processor.defineFunction("", "twice", ELInterpreterTest.class.getMethod("twice", long.class));
@@ -141,6 +148,10 @@ class ELInterpreterTest {
 
     public static long twice(long value) {
         return value * 2;
+    }
+
+    public static String join(String... values) {
+        return String.join(",", values);
     }
 
     public static final class Varargs {
