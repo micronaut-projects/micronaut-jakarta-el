@@ -223,6 +223,8 @@ class ELInterpreterTest {
             new Class<?>[]{String.class});
 
         assertEquals(42, valueOf.invoke(context, new Object[]{"42"}));
+        assertEquals("valueOf", valueOf.getMethodInfo(context).getName());
+        assertEquals("valueOf", valueOf.getMethodReference(context).getMethodInfo().getName());
     }
 
     @Test

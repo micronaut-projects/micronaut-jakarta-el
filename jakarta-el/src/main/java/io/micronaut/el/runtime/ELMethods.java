@@ -169,6 +169,26 @@ public final class ELMethods {
         return select(type, name, candidates, paramTypes, arguments, false);
     }
 
+    /**
+     * Finds the static method a method expression refers to.
+     *
+     * @param type       The type declaring the method
+     * @param name       The name of the method
+     * @param paramTypes The parameter types provided at parse time, can be {@code null}
+     * @param arguments  The evaluated arguments, can be {@code null}
+     * @return The method
+     */
+    public static Method findStaticMethod(Class<?> type,
+                                          String name,
+                                          Class<?> @Nullable [] paramTypes,
+                                          Object @Nullable [] arguments) {
+        List<Candidate> candidates = METHODS.get(type).get(name);
+        if (candidates == null) {
+            throw notFound(type, name, paramTypes != null ? paramTypes.length : arguments == null ? 0 : arguments.length);
+        }
+        return select(type, name, candidates, paramTypes, arguments, true);
+    }
+
     private static Method select(Class<?> type,
                                  String name,
                                  List<Candidate> candidates,

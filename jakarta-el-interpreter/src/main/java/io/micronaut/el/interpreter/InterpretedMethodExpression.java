@@ -22,6 +22,7 @@ import io.micronaut.el.parser.ast.ELNode;
 import io.micronaut.el.runtime.ELMethods;
 import io.micronaut.el.runtime.ELResolution;
 import io.micronaut.el.runtime.ELSupport;
+import jakarta.el.ELClass;
 import jakarta.el.ELContext;
 import jakarta.el.MethodExpression;
 import jakarta.el.MethodInfo;
@@ -206,7 +207,9 @@ final class InterpretedMethodExpression extends MethodExpression {
         }
         String name = ELSupport.coerceToString(property);
         Class<?>[] paramTypes = arguments == null ? expectedParamTypes : null;
-        return ELMethods.findMethod(base.getClass(), name, paramTypes, arguments);
+        return base instanceof ELClass elClass
+            ? ELMethods.findStaticMethod(elClass.getKlass(), name, paramTypes, arguments)
+            : ELMethods.findMethod(base.getClass(), name, paramTypes, arguments);
     }
 
     private static ELNode unwrap(ELNode node) {

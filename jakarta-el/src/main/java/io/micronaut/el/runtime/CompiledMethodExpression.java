@@ -17,6 +17,7 @@ package io.micronaut.el.runtime;
 
 import io.micronaut.core.annotation.Experimental;
 import org.jspecify.annotations.Nullable;
+import jakarta.el.ELClass;
 import jakarta.el.ELContext;
 import jakarta.el.MethodExpression;
 import jakarta.el.MethodInfo;
@@ -196,6 +197,9 @@ public abstract class CompiledMethodExpression extends MethodExpression implemen
         }
         // the parameters provided by the expression select the method, the declared types otherwise
         Class<?>[] paramTypes = arguments == null ? getExpectedParamTypes() : null;
-        return ELMethods.findMethod(base.getClass(), ELSupport.coerceToString(property), paramTypes, arguments);
+        String name = ELSupport.coerceToString(property);
+        return base instanceof ELClass elClass
+            ? ELMethods.findStaticMethod(elClass.getKlass(), name, paramTypes, arguments)
+            : ELMethods.findMethod(base.getClass(), name, paramTypes, arguments);
     }
 }
