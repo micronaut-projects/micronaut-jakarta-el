@@ -19,7 +19,8 @@ class LValueExpressionsTest {
     private final Author author = new Author("Denis", List.of(book));
     private final CompiledELContext context = new CompiledELContext()
         .setBean("book", book)
-        .setBean("author", author);
+        .setBean("author", author)
+        .setBean("formatting", new Formatting());
 
     @Test
     void assignAProperty() {
@@ -67,6 +68,8 @@ class LValueExpressionsTest {
         assertFalse(LValueExpressions$ELExpressions.DESCRIBE.isParametersProvided());
         assertEquals("Hi, Denis",
             LValueExpressions$ELExpressions.GREET.invoke(context, new Object[]{"Hi"}));
+        assertEquals("integer",
+            LValueExpressions$ELExpressions.SELECT_INTEGER.invoke(context, new Object[]{"1"}));
     }
 
     @Test
