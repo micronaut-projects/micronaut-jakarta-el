@@ -50,7 +50,7 @@ final class InterpretedMethodExpression extends MethodExpression {
     private final Class<?> expectedReturnType;
     private final Class<?> @Nullable [] expectedParamTypes;
     private transient @Nullable ELNode node;
-    private final transient ELNode.@Nullable Method invocation;
+    private transient ELNode.@Nullable Method invocation;
     private transient @Nullable ELInterpreter interpreter;
 
     InterpretedMethodExpression(String expressionString,
@@ -87,7 +87,7 @@ final class InterpretedMethodExpression extends MethodExpression {
 
     @Override
     public MethodReference getMethodReference(ELContext context) {
-        ELNode.Method providedInvocation = invocation;
+        ELNode.Method providedInvocation = invocation();
         ELInterpreter.Target target = interpreter().resolveTarget(context,
             providedInvocation == null ? node() : methodTargetNode());
         Object base = target == null ? null : target.base();
@@ -101,7 +101,7 @@ final class InterpretedMethodExpression extends MethodExpression {
 
     @Override
     public boolean isParametersProvided() {
-        return invocation != null;
+        return invocation() != null;
     }
 
     @Override
@@ -152,7 +152,7 @@ final class InterpretedMethodExpression extends MethodExpression {
 
     @Nullable
     private Object doInvoke(ELContext context, @Nullable Object[] params) {
-        if (invocation != null) {
+        if (invocation() != null) {
             // the expression provides its own parameters, the ones passed to invoke are ignored
             return interpreter().evaluate(context, node());
         }
@@ -170,14 +170,14 @@ final class InterpretedMethodExpression extends MethodExpression {
     }
 
     private ELNode methodTargetNode() {
-        ELNode.Method providedInvocation = invocation;
+        ELNode.Method providedInvocation = invocation();
         return providedInvocation == null
             ? node()
             : new ELNode.Property(providedInvocation.base(), providedInvocation.property());
     }
 
     private Method findMethod(ELContext context) {
-        ELNode.Method providedInvocation = invocation;
+        ELNode.Method providedInvocation = invocation();
         if (providedInvocation == null) {
             ELInterpreter.Target target = interpreter().resolveTarget(context, node());
             return findMethod(target == null ? null : target.base(),
@@ -205,6 +205,15 @@ final class InterpretedMethodExpression extends MethodExpression {
         return base instanceof ELClass elClass
             ? ELMethods.findStaticMethod(elClass.getKlass(), name, paramTypes, arguments)
             : ELMethods.findMethod(base.getClass(), name, paramTypes, arguments);
+    }
+
+    private ELNode.@Nullable Method invocation() {
+        ELNode.Method resolved = invocation;
+        if (resolved == null && unwrap(node()) instanceof ELNode.Method method) {
+            resolved = method;
+            invocation = resolved;
+        }
+        return resolved;
     }
 
     private static ELNode unwrap(ELNode node) {

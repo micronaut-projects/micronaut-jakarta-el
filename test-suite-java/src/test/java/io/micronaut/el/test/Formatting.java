@@ -10,8 +10,12 @@ import java.util.stream.Collectors;
 @Introspected
 public class Formatting {
 
-    interface TextMapper {
+    public interface TextMapper {
         String apply(String value);
+
+        default String decorate(String value) {
+            return "default:" + apply(value);
+        }
     }
 
     @Executable
@@ -50,7 +54,7 @@ public class Formatting {
 
     @Executable
     public String map(TextMapper mapper, String value) {
-        return mapper.apply(value);
+        return mapper.decorate(value);
     }
 
     @Executable

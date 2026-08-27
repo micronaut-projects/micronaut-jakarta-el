@@ -738,21 +738,27 @@ final class ELInterpreter {
     private Object invokeStatic(ELContext context, Method method, Object[] arguments) {
         Class<?>[] parameterTypes = method.getParameterTypes();
         Object[] coerced = new Object[parameterTypes.length];
-        if (!method.isVarArgs() && arguments.length != parameterTypes.length) {
-            throw new IllegalArgumentException("The function '" + method.getName() + "' expects "
-                + parameterTypes.length + " argument(s) but " + arguments.length + " were provided");
-        }
         int fixed = method.isVarArgs() ? parameterTypes.length - 1 : parameterTypes.length;
+        if (method.isVarArgs() ? arguments.length < fixed : arguments.length != fixed) {
+            throw new IllegalArgumentException("The function '" + method.getName() + "' expects "
+                + (method.isVarArgs() ? "at least " + fixed : fixed) + " argument(s) but "
+                + arguments.length + " were provided");
+        }
         for (int i = 0; i < fixed; i++) {
             coerced[i] = ELSupport.coerceToType(context, arguments[i], parameterTypes[i]);
         }
         if (method.isVarArgs()) {
-            Class<?> component = parameterTypes[fixed].getComponentType();
-            Object varargs = Array.newInstance(component, Math.max(0, arguments.length - fixed));
-            for (int i = fixed; i < arguments.length; i++) {
-                Array.set(varargs, i - fixed, ELSupport.coerceToType(context, arguments[i], component));
+            if (arguments.length == parameterTypes.length && arguments[fixed] != null
+                && arguments[fixed].getClass() == parameterTypes[fixed]) {
+                coerced[fixed] = arguments[fixed];
+            } else {
+                Class<?> component = parameterTypes[fixed].getComponentType();
+                Object varargs = Array.newInstance(component, arguments.length - fixed);
+                for (int i = fixed; i < arguments.length; i++) {
+                    Array.set(varargs, i - fixed, ELSupport.coerceToType(context, arguments[i], component));
+                }
+                coerced[fixed] = varargs;
             }
-            coerced[fixed] = varargs;
         }
         try {
             return method.invoke(null, coerced);

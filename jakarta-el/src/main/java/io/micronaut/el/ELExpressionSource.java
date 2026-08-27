@@ -61,14 +61,14 @@ public interface ELExpressionSource {
 
     /**
      * @param expression         The expression string
-     * @param expectedReturnType The expected return type
-     * @param expectedParamTypes The expected parameter types
+     * @param expectedReturnType The expected return type, or {@code null} when the caller does not care
+     * @param expectedParamTypes The expected parameter types, or {@code null} when the expression provides them
      * @return The compiled method expression or {@code null} when this source does not declare it
      */
     @Nullable
     default MethodExpression createMethodExpression(String expression,
-                                                    Class<?> expectedReturnType,
-                                                    Class<?>[] expectedParamTypes) {
+                                                    @Nullable Class<?> expectedReturnType,
+                                                    Class<?> @Nullable [] expectedParamTypes) {
         return null;
     }
 }

@@ -828,7 +828,13 @@ public final class ELCompiler {
                 );
             }
             for (ClassElement staticImport : context.staticImports()) {
-                MethodElement staticMethod = selectMethod(staticImport, name, arguments, true, ctx);
+                MethodSelection imported = selectMethods(methodCandidates(staticImport, name, arguments, true),
+                    arguments, ctx);
+                if (imported.ambiguous()) {
+                    throw new ELCompilationException("The reference to the imported static method '" + name
+                        + "' is ambiguous");
+                }
+                MethodElement staticMethod = imported.method();
                 if (staticMethod != null) {
                     return new Typed(
                         ClassTypeDef.of(staticMethod.getDeclaringType()).invokeStatic(staticMethod,
@@ -1640,6 +1646,13 @@ public final class ELCompiler {
      */
     @Nullable
     private MethodElement selectMethod(ClassElement type, String name, List<ELNode> arguments, boolean onlyStatic, ExpressionDef ctx) {
+        return selectMethods(methodCandidates(type, name, arguments, onlyStatic), arguments, ctx).method();
+    }
+
+    private static List<MethodElement> methodCandidates(ClassElement type,
+                                                        String name,
+                                                        List<ELNode> arguments,
+                                                        boolean onlyStatic) {
         List<MethodElement> candidates = new ArrayList<>();
         for (MethodElement method : type.getEnclosedElements(ElementQuery.ALL_METHODS.onlyAccessible().named(name))) {
             if ((method.getParameters().length == arguments.size()
@@ -1648,8 +1661,12 @@ public final class ELCompiler {
                 candidates.add(method);
             }
         }
+        return candidates;
+    }
+
+    private MethodSelection selectMethods(List<MethodElement> candidates, List<ELNode> arguments, ExpressionDef ctx) {
         if (candidates.size() <= 1) {
-            return candidates.isEmpty() ? null : candidates.get(0);
+            return new MethodSelection(candidates.isEmpty() ? null : candidates.get(0), false);
         }
         List<ClassElement> argumentTypes = arguments.stream()
             .map(argument -> argument instanceof ELNode.Lambda ? null : compileTyped(argument, ctx).type())
@@ -1670,7 +1687,7 @@ public final class ELCompiler {
                 ambiguous = true;
             }
         }
-        return ambiguous ? null : best;
+        return new MethodSelection(ambiguous ? null : best, ambiguous);
     }
 
     private static int score(MethodElement method, List<ELNode> arguments, List<ClassElement> argumentTypes) {
@@ -1791,6 +1808,15 @@ public final class ELCompiler {
 
     private static Typed dynamic(ExpressionDef expression) {
         return new Typed(expression, null);
+    }
+
+    /**
+     * The result of selecting an overload, distinguishing no match from an ambiguous match.
+     *
+     * @param method    The uniquely selected method, or {@code null}
+     * @param ambiguous Whether multiple methods matched with the same score
+     */
+    private record MethodSelection(@Nullable MethodElement method, boolean ambiguous) {
     }
 
     /**

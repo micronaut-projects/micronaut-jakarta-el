@@ -28,6 +28,11 @@ import jakarta.el.ValueExpression;
 import jakarta.el.VariableMapper;
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -235,15 +240,30 @@ class ELInterpreterTest {
         ELContext context = new PropertyOnlyContext();
         MethodExpression join = ExpressionFactory.newInstance().createMethodExpression(context, "#{bean.join}",
             String.class, new Class<?>[]{String[].class});
+        MethodExpression argumentType = ExpressionFactory.newInstance().createMethodExpression(context,
+            "#{bean.argumentType}", String.class, new Class<?>[]{Object[].class});
 
         assertEquals("a,b", join.invoke(context, new Object[]{"a", "b"}));
+        assertEquals("1:java.lang.String[]",
+            argumentType.invoke(context, new Object[]{new String[]{"a", "b"}}));
     }
 
     @Test
     void functionsPackVariableArityArguments() throws NoSuchMethodException {
         processor.defineFunction("fn", "join", Varargs.class.getMethod("join", CharSequence[].class));
+        processor.defineBean("sequences", new CharSequence[]{"a", "b"});
 
         assertEquals("a,b", processor.eval("fn:join('a', 'b')"));
+        assertEquals("a,b", processor.eval("fn:join(sequences)"));
+    }
+
+    @Test
+    void functionsRejectTooFewFixedArguments() throws NoSuchMethodException {
+        processor.defineFunction("fn", "combine", Varargs.class.getMethod("combine", String.class, String[].class));
+
+        IllegalArgumentException failure = assertThrows(IllegalArgumentException.class,
+            () -> processor.eval("fn:combine()"));
+        assertTrue(failure.getMessage().contains("at least 1 argument"), failure.getMessage());
     }
 
     @Test
@@ -261,13 +281,26 @@ class ELInterpreterTest {
 
         assertEquals("1:int[]", processor.eval("varargs.argumentType(varargs.numbers)"));
         assertEquals("a,b", processor.eval("varargs.join(strings)"));
+        assertEquals("a", processor.eval("strings[0]"));
     }
 
     @Test
     void lambdasCoerceToUnannotatedFunctionalInterfaces() {
         processor.defineBean("functions", new InterpreterFunctions());
 
-        assertEquals("EL", processor.eval("functions.map(value -> value.toUpperCase(), 'el')"));
+        assertEquals("default:EL", processor.eval("functions.map(value -> value.toUpperCase(), 'el')"));
+    }
+
+    @Test
+    void methodExpressionsWithProvidedParametersSurviveSerialization() throws Exception {
+        ELContext context = processor.getELManager().getELContext();
+        processor.defineBean("varargs", new Varargs());
+        MethodExpression expression = ExpressionFactory.newInstance().createMethodExpression(context,
+            "#{varargs.join('a', 'b')}", String.class, null);
+
+        MethodExpression copy = roundTrip(expression);
+        assertTrue(copy.isParametersProvided());
+        assertEquals("a,b", copy.invoke(context, null));
     }
 
     @Test
@@ -280,6 +313,16 @@ class ELInterpreterTest {
 
     public static long twice(long value) {
         return value * 2;
+    }
+
+    private static MethodExpression roundTrip(MethodExpression expression) throws IOException, ClassNotFoundException {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        try (ObjectOutputStream output = new ObjectOutputStream(bytes)) {
+            output.writeObject(expression);
+        }
+        try (ObjectInputStream input = new ObjectInputStream(new ByteArrayInputStream(bytes.toByteArray()))) {
+            return (MethodExpression) input.readObject();
+        }
     }
 
     /**

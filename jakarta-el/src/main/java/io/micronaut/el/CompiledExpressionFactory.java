@@ -166,14 +166,14 @@ public class CompiledExpressionFactory extends ExpressionFactory {
                                                    String expression,
                                                    Class<?> expectedReturnType,
                                                    Class<?>[] expectedParamTypes) {
-        Class<?> returnType = expectedReturnType == null ? Object.class : expectedReturnType;
         Class<?>[] paramTypes = expectedParamTypes;
         for (ELExpressionSource source : sourcesOf(expression)) {
-            MethodExpression methodExpression = source.createMethodExpression(expression, returnType, paramTypes);
+            MethodExpression methodExpression = source.createMethodExpression(expression, expectedReturnType, paramTypes);
             if (methodExpression != null) {
                 return requireParamTypes(methodExpression, paramTypes);
             }
         }
+        Class<?> returnType = expectedReturnType == null ? Object.class : expectedReturnType;
         String literalText = expression == null ? null : ELLiterals.literalTextOrNull(expression);
         if (literalText != null) {
             return requireParamTypes(new LiteralMethodExpression(literalText, returnType, paramTypes), paramTypes);

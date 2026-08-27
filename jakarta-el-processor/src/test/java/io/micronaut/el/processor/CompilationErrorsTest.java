@@ -101,6 +101,36 @@ class CompilationErrorsTest {
     }
 
     @Test
+    void ambiguousOverloadsOfAStaticImportAreNotDiscarded() {
+        String source = """
+            package io.micronaut.el.test.errors;
+
+            import io.micronaut.el.annotation.*;
+            import java.io.Serializable;
+
+            @ELEnvironment(staticImports = {First.class, Second.class})
+            @ELExpression(value = "${ambiguous('x')}", expectedType = String.class)
+            public class Expressions {
+            }
+
+            class First {
+                public static String ambiguous(Comparable<?> value) { return "comparable"; }
+                public static String ambiguous(Serializable value) { return "serializable"; }
+            }
+
+            class Second {
+                public static String ambiguous(Object value) { return "object"; }
+            }
+            """;
+        try (JavaParser parser = new JavaParser()) {
+            RuntimeException failure = assertThrows(RuntimeException.class,
+                () -> parser.generate(PACKAGE + ".Expressions", source));
+            assertTrue(failure.getMessage().contains("imported static method 'ambiguous' is ambiguous"),
+                failure.getMessage());
+        }
+    }
+
+    @Test
     void aMemberTheTypedVariableDoesNotDeclareIsAWarning() {
         try (JavaParser parser = new JavaParser()) {
             Iterable<? extends JavaFileObject> generated = parser.generate(PACKAGE + ".Expressions",

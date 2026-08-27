@@ -11,7 +11,8 @@ import java.util.List;
     @ELVariable(name = "book", type = Book.class),
     @ELVariable(name = "author", type = Author.class),
     @ELVariable(name = "formatting", type = Formatting.class),
-    @ELVariable(name = "xs", type = List.class)
+    @ELVariable(name = "xs", type = List.class),
+    @ELVariable(name = "strings", type = String[].class)
 })
 @ELExpression(value = "${book.title}", expectedType = String.class, name = "title")
 @ELExpression(value = "${book.category}", expectedType = String.class, name = "category")
@@ -42,6 +43,8 @@ import java.util.List;
 @ELMethodExpression(value = "${xs.size}", expectedReturnType = Integer.class,
     name = "listSize")
 @ELExpression(value = "${formatting.argumentType(formatting.numbers)}", expectedType = String.class, name = "packedPrimitiveArray")
+@ELExpression(value = "${formatting.argumentType(strings)}", expectedType = String.class, name = "packedReferenceArray")
+@ELExpression(value = "${strings[0]}", expectedType = String.class, name = "firstString")
 public final class LValueExpressions {
 
     private LValueExpressions() {

@@ -20,6 +20,7 @@ import io.micronaut.core.annotation.Internal;
 import io.micronaut.el.ELExpressionSource;
 import io.micronaut.el.processor.compiler.ELExpressionDefinition;
 import io.micronaut.el.processor.compiler.ELMethodExpressionDefinition;
+import io.micronaut.el.parser.ast.ELNode;
 import io.micronaut.el.runtime.ELMethods;
 import io.micronaut.core.reflect.ClassUtils;
 import io.micronaut.core.reflect.ReflectionUtils;
@@ -184,12 +185,17 @@ public final class ExpressionSourceWriter {
                         List<ExpressionDef> parameterTypes = method.definition().parameterTypes().stream()
                             .map(type -> (ExpressionDef) ExpressionDef.constant(TypeDef.erasure(type)))
                             .toList();
-                        ExpressionDef.ConditionExpressionDef matches = new ExpressionDef.And(
-                            requestedType(method.definition().requireReturnType(), method.definition().inferred(), parameters.get(1)),
-                            ClassTypeDef.of(ELMethods.class).invokeStatic("sameTypes", List.of(CLASS_ARRAY, CLASS_ARRAY),
-                                TypeDef.Primitive.BOOLEAN,
-                                List.of(CLASS_ARRAY.instantiate(parameterTypes), parameters.get(2))).isTrue()
+                        ExpressionDef.ConditionExpressionDef returnTypeMatches = parameters.get(1).isNull().or(
+                            requestedType(method.definition().requireReturnType(), method.definition().inferred(), parameters.get(1))
                         );
+                        ExpressionDef.ConditionExpressionDef matches = returnTypeMatches;
+                        if (!providesParameters(method.definition().node())) {
+                            matches = matches.and(parameters.get(2).isNull().or(
+                                ClassTypeDef.of(ELMethods.class).invokeStatic("sameTypes", List.of(CLASS_ARRAY, CLASS_ARRAY),
+                                    TypeDef.Primitive.BOOLEAN,
+                                    List.of(CLASS_ARRAY.instantiate(parameterTypes), parameters.get(2))).isTrue()
+                            ));
+                        }
                         result = new ExpressionDef.IfElse(
                             matches,
                             ClassTypeDef.of(className)
@@ -205,17 +211,10 @@ public final class ExpressionSourceWriter {
             });
     }
 
-    /**
-     * A compiled value expression and the class generated for it.
-     *
-     * @param definition The declared expression
-     * @param className  The name of the generated class
-     */
-    /**
-     * Whether the requested type is the declared one, a primitive and its wrapper being the same expectation:
-     * the coercion rules treat them alike, and the languages do not agree on which one an annotation names,
-     * KSP reads a Kotlin {@code Double::class} as the wrapper while {@code Double::class.java} is the primitive.
-     */
+    private static boolean providesParameters(ELNode node) {
+        return node instanceof ELNode.Eval eval ? providesParameters(eval.expression()) : node instanceof ELNode.Method;
+    }
+
     /**
      * Whether the requested type selects the expression: its declared type, or, for a declaration whose type
      * was inferred rather than written, also {@link Object}, the type a caller passes when it does not care.
@@ -256,6 +255,12 @@ public final class ExpressionSourceWriter {
             .orElse(null);
     }
 
+    /**
+     * A compiled value expression and the class generated for it.
+     *
+     * @param definition The declared expression
+     * @param className  The name of the generated class
+     */
     public record CompiledValue(ELExpressionDefinition definition, String className) {
     }
 

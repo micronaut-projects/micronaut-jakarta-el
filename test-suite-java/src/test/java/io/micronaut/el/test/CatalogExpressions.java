@@ -10,7 +10,8 @@ import java.util.List;
 @ELEnvironment(
     variables = {
         @ELVariable(name = "author", type = Author.class),
-        @ELVariable(name = "books", type = List.class)
+        @ELVariable(name = "books", type = List.class),
+        @ELVariable(name = "strings", type = String[].class)
     },
     imports = {Suit.class, Book.class, VarargsConstructor.class, Varargs.class},
     staticImports = {Suit.class, TextFunctions.class},
@@ -24,6 +25,7 @@ import java.util.List;
 @ELExpression(value = "${fn:length(author.name)}", name = "nameLength")
 @ELExpression(value = "${fn:upper(author.name)}", name = "upperName")
 @ELExpression(value = "${fn:join('a', 'b')}", name = "functionJoin")
+@ELExpression(value = "${fn:join(strings)}", name = "functionArrayJoin")
 @ELExpression(value = "${join('a', 'b')}", name = "staticJoin")
 @ELExpression(value = "${Suit.SPADE}", name = "suit")
 @ELExpression(value = "${SPADE}", name = "importedSuit")

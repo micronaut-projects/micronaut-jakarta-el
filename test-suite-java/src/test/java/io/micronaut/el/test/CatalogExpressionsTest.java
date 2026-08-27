@@ -19,6 +19,7 @@ class CatalogExpressionsTest {
     private final CompiledELContext context = new CompiledELContext()
         .setBean("author", author)
         .setBean("books", books)
+        .setBean("strings", new String[]{"a", "b"})
         .setBean("customer", author);
 
     @Test
@@ -39,6 +40,7 @@ class CatalogExpressionsTest {
         assertEquals(5, value(CatalogExpressions$ELExpressions.NAME_LENGTH));
         assertEquals("DENIS", value(CatalogExpressions$ELExpressions.UPPER_NAME));
         assertEquals("a,b", value(CatalogExpressions$ELExpressions.FUNCTION_JOIN));
+        assertEquals("a,b", value(CatalogExpressions$ELExpressions.FUNCTION_ARRAY_JOIN));
         assertEquals("a,b", value(CatalogExpressions$ELExpressions.STATIC_JOIN));
     }
 

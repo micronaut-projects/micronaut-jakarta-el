@@ -26,6 +26,7 @@ import jakarta.el.LambdaExpression;
 import java.beans.PropertyEditor;
 import java.beans.PropertyEditorManager;
 import java.lang.reflect.Array;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
@@ -186,6 +187,9 @@ public final class ELSupport {
                             case "toString" -> lambda.toString();
                             default -> throw new IllegalStateException("Unexpected Object method: " + method);
                         };
+                    }
+                    if (method.isDefault()) {
+                        return InvocationHandler.invokeDefault(proxy, method, args == null ? new Object[0] : args);
                     }
                     Object result = lambda.invoke(args == null ? new Object[0] : args);
                     Class<?> returnType = method.getReturnType();

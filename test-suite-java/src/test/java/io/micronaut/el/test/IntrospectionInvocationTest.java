@@ -59,10 +59,8 @@ class IntrospectionInvocationTest {
     }
 
     @Test
-    void aScalarIsPackedIntoATrailingArrayParameter() {
-        // a BeanMethod does not say whether the array is variadic, so a trailing array parameter is treated as
-        // one: a scalar that would otherwise fail to coerce to the array is packed into it
-        assertEquals(1, invoke("size", "x"));
+    void aFixedArityArrayParameterRejectsAScalar() {
+        assertThrows(ELException.class, () -> invoke("size", "x"));
     }
 
     @Test
@@ -81,6 +79,6 @@ class IntrospectionInvocationTest {
         assertEquals("0.50", FormattingExpressions$ELExpressions.FORMATTED.getValue(context));
         assertEquals("a-b-c", FormattingExpressions$ELExpressions.JOINED.getValue(context));
         assertEquals("only:-", FormattingExpressions$ELExpressions.JOINED_ALONE.getValue(context));
-        assertEquals("EL", FormattingExpressions$ELExpressions.MAPPED.getValue(context));
+        assertEquals("default:EL", FormattingExpressions$ELExpressions.MAPPED.getValue(context));
     }
 }
