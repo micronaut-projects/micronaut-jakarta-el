@@ -41,6 +41,7 @@ import java.util.List;
     expectedParamTypes = String.class, name = "integerValueOf")
 @ELMethodExpression(value = "${xs.size}", expectedReturnType = Integer.class,
     name = "listSize")
+@ELExpression(value = "${formatting.argumentType(formatting.numbers)}", expectedType = String.class, name = "packedPrimitiveArray")
 public final class LValueExpressions {
 
     private LValueExpressions() {

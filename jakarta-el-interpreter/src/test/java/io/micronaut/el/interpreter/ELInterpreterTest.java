@@ -255,6 +255,15 @@ class ELInterpreterTest {
     }
 
     @Test
+    void variableArityMethodsHandleDirectArrays() {
+        processor.defineBean("varargs", new Varargs());
+        processor.defineBean("strings", new String[]{"a", "b"});
+
+        assertEquals("1:int[]", processor.eval("varargs.argumentType(varargs.numbers)"));
+        assertEquals("a,b", processor.eval("varargs.join(strings)"));
+    }
+
+    @Test
     void lambdasCoerceToUnannotatedFunctionalInterfaces() {
         processor.defineBean("functions", new InterpreterFunctions());
 

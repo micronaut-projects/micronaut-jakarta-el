@@ -88,4 +88,9 @@ class LValueExpressionsTest {
     void methodInfo() {
         assertEquals("describe", LValueExpressions$ELExpressions.DESCRIBE.getMethodInfo(context).getName());
     }
+
+    @Test
+    void variableArityMethodsHandleDirectArrays() {
+        assertEquals("1:int[]", LValueExpressions$ELExpressions.PACKED_PRIMITIVE_ARRAY.getValue(context));
+    }
 }
