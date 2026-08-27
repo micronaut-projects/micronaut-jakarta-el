@@ -20,6 +20,7 @@ import jakarta.el.ELContext;
 import jakarta.el.ELException;
 import jakarta.el.ELProcessor;
 import jakarta.el.ExpressionFactory;
+import jakarta.el.MethodExpression;
 import jakarta.el.StandardELContext;
 import jakarta.el.ValueExpression;
 import org.junit.jupiter.api.Test;
@@ -212,6 +213,16 @@ class ELInterpreterTest {
         jakarta.el.MethodExpression size = factory.createMethodExpression(context, "#{xs.size}", Object.class, new Class<?>[0]);
         assertEquals((Object) 3, size.invoke(context, null));
         assertEquals("size", size.getMethodInfo(context).getName());
+    }
+
+    @Test
+    void propertyMethodExpressionsUseTheResolverChain() {
+        jakarta.el.ELContext context = processor.getELManager().getELContext();
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        MethodExpression valueOf = factory.createMethodExpression(context, "#{Integer.valueOf}", Integer.class,
+            new Class<?>[]{String.class});
+
+        assertEquals(42, valueOf.invoke(context, new Object[]{"42"}));
     }
 
     @Test

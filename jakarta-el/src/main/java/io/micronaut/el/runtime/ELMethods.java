@@ -129,7 +129,7 @@ public final class ELMethods {
         }
         if (method.isVarArgs()) {
             Class<?> componentType = parameterTypes[fixed].getComponentType();
-            if (count == parameterTypes.length && arguments[fixed] != null && parameterTypes[fixed] == arguments[fixed].getClass()) {
+            if (count == parameterTypes.length && parameterTypes[fixed].isInstance(arguments[fixed])) {
                 parameters[fixed] = arguments[fixed];
             } else {
                 Object varargs = Array.newInstance(componentType, Math.max(0, count - fixed));

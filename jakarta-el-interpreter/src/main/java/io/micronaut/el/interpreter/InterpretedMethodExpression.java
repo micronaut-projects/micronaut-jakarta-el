@@ -93,7 +93,7 @@ final class InterpretedMethodExpression extends MethodExpression {
         Object[] arguments = providedInvocation == null
             ? null
             : interpreter().evaluateArguments(context, providedInvocation.arguments());
-        Method method = findMethod(context, base, target == null ? null : target.property(), arguments);
+        Method method = findMethod(base, target == null ? null : target.property(), arguments);
         MethodInfo methodInfo = new MethodInfo(method.getName(), method.getReturnType(), method.getParameterTypes());
         return new MethodReference(base, methodInfo, method.getAnnotations(), arguments);
     }
@@ -164,9 +164,13 @@ final class InterpretedMethodExpression extends MethodExpression {
             return ELResolution.invokeMethodExpression(context, identifier, params);
         }
         Object base = target.base();
-        Method method = ELSandboxGuard.findMethod(context, base, target.property(),
-            () -> findMethod(context, base, target.property(), null));
-        return ELResolution.invokeMethod(context, base, method, params);
+        ELSandboxGuard.check(context, base, target.property());
+        try {
+            return ELResolution.invokeWithParamTypes(context, base, target.property(), expectedParamTypes, params);
+        } catch (MethodNotFoundException ignored) {
+            // Some ELContext implementations provide a resolver for the base's properties but not its methods.
+            return ELResolution.invokeMethod(context, base, findMethod(base, target.property(), null), params);
+        }
     }
 
     private ELNode methodTargetNode() {
@@ -180,17 +184,16 @@ final class InterpretedMethodExpression extends MethodExpression {
         ELNode.Method providedInvocation = invocation;
         if (providedInvocation == null) {
             ELInterpreter.Target target = interpreter().resolveTarget(context, node());
-            return findMethod(context, target == null ? null : target.base(),
+            return findMethod(target == null ? null : target.base(),
                 target == null ? null : target.property(), null);
         }
         ELInterpreter.Target target = interpreter().resolveTarget(context, methodTargetNode());
         Object[] arguments = interpreter().evaluateArguments(context, providedInvocation.arguments());
-        return findMethod(context, target == null ? null : target.base(),
+        return findMethod(target == null ? null : target.base(),
             target == null ? null : target.property(), arguments);
     }
 
-    private Method findMethod(ELContext context,
-                              @Nullable Object base,
+    private Method findMethod(@Nullable Object base,
                               @Nullable Object property,
                               Object @Nullable [] arguments) {
         if (base == null) {
