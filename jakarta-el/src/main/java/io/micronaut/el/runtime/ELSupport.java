@@ -179,8 +179,13 @@ public final class ELSupport {
                 type.getClassLoader(),
                 new Class<?>[]{type},
                 (proxy, method, args) -> {
-                    if (method.getDeclaringClass() == Object.class) {
-                        return method.invoke(lambda, args);
+                    if (isObjectMethod(method)) {
+                        return switch (method.getName()) {
+                            case "equals" -> proxy == args[0];
+                            case "hashCode" -> System.identityHashCode(proxy);
+                            case "toString" -> lambda.toString();
+                            default -> throw new IllegalStateException("Unexpected Object method: " + method);
+                        };
                     }
                     Object result = lambda.invoke(args == null ? new Object[0] : args);
                     Class<?> returnType = method.getReturnType();

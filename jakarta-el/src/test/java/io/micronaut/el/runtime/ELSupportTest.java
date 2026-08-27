@@ -136,5 +136,7 @@ class ELSupportTest {
         UnannotatedFunction function = ELSupport.coerceToType(context, lambda, UnannotatedFunction.class);
 
         assertEquals("lambda", function.apply("lambda"));
+        assertEquals(function, function);
+        assertFalse(function.equals(new Object()));
     }
 }
