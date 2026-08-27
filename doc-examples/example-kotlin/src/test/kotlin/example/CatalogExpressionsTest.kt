@@ -16,7 +16,7 @@ class CatalogExpressionsTest {
 
         assertEquals("JAKARTA EL!", factory.createValueExpression(context, "\${text:shout(book.title)}", String::class.java).getValue(context))
         assertEquals("JE", factory.createValueExpression(context, "\${text:initials(book.title)}", String::class.java).getValue(context))
-        assertEquals(25.0, factory.createValueExpression(context, "\${Math.max(book.unitPrice, 25)}", Double::class.java).getValue(context))
+        assertEquals(25.0, factory.createValueExpression(context, "\${Math.max(book.unitPrice, 25.0)}", Double::class.java).getValue(context))
         assertEquals(listOf("Jakarta EL"), factory.createValueExpression(context,
             "\${books.stream().filter(b -> b.unitPrice > 10).map(b -> b.title).toList()}", List::class.java).getValue(context))
         assertEquals(40.0, factory.createValueExpression(context, "\${(price -> price * 2)(book.unitPrice)}", Double::class.java).getValue(context))

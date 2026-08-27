@@ -371,8 +371,10 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
             String name = variable.stringValue("name").orElseThrow(() ->
                 new ELCompilationException("The name of @ELVariable is required"));
             ClassElement type = ELTypes.resolveMember(variable, "type", context)
-                .or(() -> JavaAnnotationTypes.resolveNestedMember(owner.getNativeType(), ELEnvironment.class.getName(),
-                    "variables", variableIndex, "type", context))
+                .or(() -> context.getLanguage() == VisitorContext.Language.JAVA
+                    ? JavaAnnotationTypes.resolveNestedMember(owner.getNativeType(), ELEnvironment.class.getName(),
+                        "variables", variableIndex, "type", context)
+                    : Optional.empty())
                 .orElseThrow(() ->
                 new ELCompilationException("The type of the variable '" + name + "' is required"));
             variables.put(name, type);

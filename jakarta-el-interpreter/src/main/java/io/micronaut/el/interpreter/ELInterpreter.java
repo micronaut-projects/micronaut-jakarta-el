@@ -749,7 +749,7 @@ final class ELInterpreter {
         }
         if (method.isVarArgs()) {
             if (arguments.length == parameterTypes.length && arguments[fixed] != null
-                && arguments[fixed].getClass() == parameterTypes[fixed]) {
+                && parameterTypes[fixed].isInstance(arguments[fixed])) {
                 coerced[fixed] = arguments[fixed];
             } else {
                 Class<?> component = parameterTypes[fixed].getComponentType();

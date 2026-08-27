@@ -1288,8 +1288,9 @@ public final class ELCompiler {
      * @return The single abstract method of a functional interface, or {@code null} when the type is not one
      */
     @Nullable
-    private static MethodElement functionalMethod(ClassElement type) {
-        if (!type.isInterface() || type.isAssignable(LambdaExpression.class)) {
+    private MethodElement functionalMethod(ClassElement type) {
+        if (!ELTypes.isFunctionalInterfaceCandidate(type, context.getVisitorContext())
+            || type.isAssignable(LambdaExpression.class)) {
             return null;
         }
         MethodElement found = null;
@@ -1735,8 +1736,8 @@ public final class ELCompiler {
                 if (argument == null) {
                     return MethodMatch.NONE;
                 }
-                argumentMatch = sameBoxedType(argument, parameter) ? MethodMatch.EXACT
-                    : isAssignable(argument, parameter)
+                argumentMatch = argument.getName().equals(parameter.getName()) ? MethodMatch.EXACT
+                    : sameBoxedType(argument, parameter) || isAssignable(argument, parameter)
                         ? MethodMatch.ASSIGNABLE
                         : isCoercible(argument, parameter) ? MethodMatch.COERCIBLE : MethodMatch.NONE;
             }
@@ -1781,42 +1782,7 @@ public final class ELCompiler {
         if (best.size() == 1) {
             return new MethodSelection(best.get(0), false);
         }
-        MethodElement numeric = mostSpecificNumeric(best, argumentTypes);
-        return new MethodSelection(numeric, numeric == null);
-    }
-
-    /**
-     * Resolves a tie consisting entirely of numeric parameters from statically known numeric arguments. The
-     * runtime sees boxed values and cannot distinguish two mixed widening/coercion candidates, while generated
-     * code can preserve Java's numeric widening preference without weakening the EL match category ordering.
-     */
-    @Nullable
-    private static MethodElement mostSpecificNumeric(List<MethodElement> candidates,
-                                                     List<ClassElement> argumentTypes) {
-        MethodElement best = null;
-        int bestCost = Integer.MAX_VALUE;
-        boolean ambiguous = false;
-        for (MethodElement candidate : candidates) {
-            int cost = 0;
-            for (int i = 0; i < argumentTypes.size(); i++) {
-                ClassElement argument = argumentTypes.get(i);
-                ClassElement parameter = comparisonType(candidate, i);
-                int argumentRank = argument == null ? -1 : numericRank(argument);
-                int parameterRank = numericRank(parameter);
-                if (argumentRank < 0 || parameterRank < 0) {
-                    return null;
-                }
-                cost += parameterRank == argumentRank ? 0 : parameterRank > argumentRank ? 1 : 3;
-            }
-            if (cost < bestCost) {
-                best = candidate;
-                bestCost = cost;
-                ambiguous = false;
-            } else if (cost == bestCost) {
-                ambiguous = true;
-            }
-        }
-        return ambiguous ? null : best;
+        return new MethodSelection(null, true);
     }
 
     private static int compareSpecificity(MethodElement first,
@@ -1833,7 +1799,8 @@ public final class ELCompiler {
             }
             int comparison = firstType.isAssignable(secondType) ? 1
                 : secondType.isAssignable(firstType) ? -1
-                : numericSpecificity(firstType, secondType, argumentTypes.get(i), elSpecific);
+                : numericSpecificity(firstType, secondType,
+                    i < argumentTypes.size() ? argumentTypes.get(i) : null, elSpecific);
             if (comparison == 0 || (result != 0 && result != comparison)) {
                 return 0;
             }

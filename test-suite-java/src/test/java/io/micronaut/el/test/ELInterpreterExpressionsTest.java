@@ -35,6 +35,7 @@ class ELInterpreterExpressionsTest {
         .setBean("varargs", new Varargs())
         .setBean("strings", new String[]{"a", "b"})
         .setBean("functions", new Formatting())
+        .setBean("integer", 1)
         .setBean("twice", 42L)
         .setBean("target", ELInterpreterExpressions$ELExpressions.LIST_SIZE_METHOD);
 
@@ -99,8 +100,15 @@ class ELInterpreterExpressionsTest {
             () -> value(ELInterpreterExpressions$ELExpressions.MISSING_FUNCTION));
         assertEquals("assignable", value(ELInterpreterExpressions$ELExpressions.ASSIGNABLE_OVER_COERCIBLE));
         assertEquals("number", value(ELInterpreterExpressions$ELExpressions.MOST_SPECIFIC_OVERLOAD));
+        assertEquals("wrapper", value(ELInterpreterExpressions$ELExpressions.BOXED_OVERLOAD));
+        assertThrows(MethodNotFoundException.class,
+            () -> value(ELInterpreterExpressions$ELExpressions.EMPTY_VARARGS_AMBIGUITY));
+        assertThrows(MethodNotFoundException.class,
+            () -> value(ELInterpreterExpressions$ELExpressions.NUMERIC_AMBIGUITY));
         assertThrows(MethodNotFoundException.class,
             () -> value(ELInterpreterExpressions$ELExpressions.NON_FUNCTIONAL_INTERFACE));
+        assertThrows(MethodNotFoundException.class,
+            () -> value(ELInterpreterExpressions$ELExpressions.SEALED_INTERFACE));
     }
 
     @Test
@@ -114,6 +122,10 @@ class ELInterpreterExpressionsTest {
             new Object[]{new String[]{"a", "b"}}));
         assertEquals("number", ELInterpreterExpressions$ELExpressions.SPECIFIC_METHOD.invoke(context,
             new Object[]{1L}));
+        assertEquals("String", ELInterpreterExpressions$ELExpressions.COMPATIBLE_METHOD.invoke(context,
+            new Object[]{"value"}));
+        assertEquals("a,b", ELInterpreterExpressions$ELExpressions.EXPANDED_VARARGS_METHOD.invoke(context,
+            new Object[]{"a", "b"}));
 
         MethodExpression identifier = ELInterpreterExpressions$ELExpressions.IDENTIFIER_METHOD;
         assertEquals(3, identifier.invoke(context, null));

@@ -172,6 +172,19 @@ public final class ELTypes {
     }
 
     /**
+     * Whether an interface can be the target of a generated Java lambda. Sealed Java interfaces cannot be
+     * implemented by the synthetic lambda class, even when they declare a single abstract method.
+     *
+     * @param type The interface
+     * @param context The visitor context
+     * @return True when generated code may use the interface as a lambda target
+     */
+    public static boolean isFunctionalInterfaceCandidate(ClassElement type, VisitorContext context) {
+        return type.isInterface() && (context.getLanguage() != VisitorContext.Language.JAVA
+            || JavaAnnotationTypes.isFunctionalInterfaceCandidate(type.getNativeType()));
+    }
+
+    /**
      * Whether the field is a public static field of the class. The visibility is read from the modifiers: KSP
      * reports a public field of a Java library class as private through {@code isPublic()} and
      * {@code isPrivate()}, while its modifiers are right.

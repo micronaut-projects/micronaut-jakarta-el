@@ -166,6 +166,7 @@ public abstract class CompiledMethodExpression extends MethodExpression implemen
      * registries use this when a caller supplies no expected return type.
      *
      * @return This expression when it is already uncoerced, or an uncoerced view
+     * @since 1.0.1
      */
     public final MethodExpression withoutExpectedReturnType() {
         return expectedReturnType == null ? this : new UncoercedMethodExpression(this);

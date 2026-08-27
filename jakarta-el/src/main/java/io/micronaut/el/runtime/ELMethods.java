@@ -200,16 +200,8 @@ public final class ELMethods {
                                  Class<?> @Nullable [] paramTypes,
                                  Object @Nullable [] arguments,
                                  boolean isStatic) {
-        if (paramTypes != null) {
-            for (Candidate candidate : candidates) {
-                if ((!isStatic || candidate.isStatic()) && sameTypes(candidate.parameterTypes(), paramTypes)) {
-                    return candidate.method();
-                }
-            }
-            throw notFound(type, name, paramTypes.length);
-        }
         Object[] values = arguments == null ? new Object[0] : arguments;
-        Class<?>[] argumentTypes = typesOf(values);
+        Class<?>[] matchingTypes = paramTypes == null ? typesOf(values) : paramTypes;
         List<Candidate> assignable = new ArrayList<>(1);
         List<Candidate> coercible = new ArrayList<>(1);
         List<Candidate> variableArity = new ArrayList<>(1);
@@ -217,7 +209,7 @@ public final class ELMethods {
             if (isStatic && !candidate.isStatic()) {
                 continue;
             }
-            switch (match(candidate, argumentTypes, values)) {
+            switch (match(candidate, matchingTypes, values)) {
                 // a method whose every parameter matches exactly is the method, section 1.6
                 case EXACT -> {
                     return candidate.method();
@@ -231,15 +223,15 @@ public final class ELMethods {
             }
         }
         if (!assignable.isEmpty()) {
-            return mostSpecific(type, name, assignable, argumentTypes, false);
+            return mostSpecific(type, name, assignable, matchingTypes, false);
         }
         if (!coercible.isEmpty()) {
-            return mostSpecific(type, name, coercible, argumentTypes, true);
+            return mostSpecific(type, name, coercible, matchingTypes, true);
         }
         if (!variableArity.isEmpty()) {
-            return mostSpecific(type, name, variableArity, argumentTypes, true);
+            return mostSpecific(type, name, variableArity, matchingTypes, true);
         }
-        throw notFound(type, name, values.length);
+        throw notFound(type, name, matchingTypes.length);
     }
 
     /**
@@ -265,7 +257,8 @@ public final class ELMethods {
                 }
                 Class<?> componentType = parameterTypes[i].getComponentType();
                 for (int j = i; j < argumentCount; j++) {
-                    if (!isAssignable(argumentTypes[j], componentType) && !isCoercible(values[j], componentType)) {
+                    if (!isAssignable(argumentTypes[j], componentType)
+                        && !isCoercible(argumentTypes[j], argument(values, j), componentType)) {
                         return NO_MATCH;
                     }
                 }
@@ -273,7 +266,7 @@ public final class ELMethods {
                 continue;
             } else if (isAssignable(argumentTypes[i], parameterTypes[i])) {
                 assignable = true;
-            } else if (isCoercible(values[i], parameterTypes[i])) {
+            } else if (isCoercible(argumentTypes[i], argument(values, i), parameterTypes[i])) {
                 coercible = true;
             } else {
                 return NO_MATCH;
@@ -407,6 +400,11 @@ public final class ELMethods {
         return types;
     }
 
+    @Nullable
+    private static Object argument(Object[] arguments, int index) {
+        return index < arguments.length ? arguments[index] : null;
+    }
+
     /**
      * Whether an argument of the given type can be passed as is, a null argument being assignable to
      * anything: the section 1.25 coerces it to the default value of a primitive.
@@ -414,6 +412,12 @@ public final class ELMethods {
     private static boolean isAssignable(@Nullable Class<?> argumentType, Class<?> parameterType) {
         return argumentType == null
             || ReflectionUtils.getWrapperType(parameterType).isAssignableFrom(argumentType);
+    }
+
+    private static boolean isCoercible(@Nullable Class<?> argumentType,
+                                       @Nullable Object argument,
+                                       Class<?> parameterType) {
+        return argumentType == null || argument != null && isCoercible(argument, parameterType);
     }
 
     /**
