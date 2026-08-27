@@ -191,9 +191,47 @@ public final class IntrospectionELResolver extends ELResolver {
                 variableArity.add(beanMethod);
             }
         }
-        exact.addAll(fixedArity);
-        exact.addAll(variableArity);
-        return exact;
+        if (!exact.isEmpty()) {
+            return mostSpecific(exact);
+        }
+        fixedArity.addAll(variableArity);
+        return fixedArity;
+    }
+
+    /**
+     * Returns the uniquely most specific method from the candidates that already accept every argument, or no
+     * method when the candidates are ambiguous. Returning no method lets the reflective resolver report the
+     * ambiguity according to the EL method-selection rules.
+     */
+    private static List<BeanMethod<Object, Object>> mostSpecific(List<BeanMethod<Object, Object>> candidates) {
+        BeanMethod<Object, Object> result = null;
+        for (int candidateIndex = 0; candidateIndex < candidates.size(); candidateIndex++) {
+            BeanMethod<Object, Object> candidate = candidates.get(candidateIndex);
+            boolean mostSpecific = true;
+            for (int otherIndex = 0; otherIndex < candidates.size(); otherIndex++) {
+                if (candidateIndex != otherIndex && !moreSpecific(candidate.getArguments(), candidates.get(otherIndex).getArguments())) {
+                    mostSpecific = false;
+                    break;
+                }
+            }
+            if (!mostSpecific) {
+                continue;
+            }
+            if (result != null) {
+                return List.of();
+            }
+            result = candidate;
+        }
+        return result == null ? List.of() : List.of(result);
+    }
+
+    private static boolean moreSpecific(Argument<?>[] first, Argument<?>[] second) {
+        for (int i = 0; i < first.length; i++) {
+            if (!second[i].getWrapperType().isAssignableFrom(first[i].getWrapperType())) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private static boolean accepts(Argument<?>[] parameters, Object[] arguments) {
