@@ -54,4 +54,14 @@ public class Formatting {
     public String ambiguous(Serializable value) {
         return "serializable";
     }
+
+    @Executable
+    public String ambiguousCoercion(Integer value) {
+        return "integer";
+    }
+
+    @Executable
+    public String ambiguousCoercion(Long value) {
+        return "long";
+    }
 }

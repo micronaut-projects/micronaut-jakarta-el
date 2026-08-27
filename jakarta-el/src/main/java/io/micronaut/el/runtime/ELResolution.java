@@ -34,7 +34,6 @@ import jakarta.el.VariableMapper;
 import java.util.List;
 import java.util.Map;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
@@ -490,27 +489,7 @@ public final class ELResolution {
                                       Object base,
                                       Method method,
                                       Object @Nullable [] arguments) {
-        Class<?>[] parameterTypes = method.getParameterTypes();
-        Object[] provided = arguments == null ? new Object[0] : arguments;
-        if (provided.length != parameterTypes.length) {
-            throw new IllegalArgumentException("The method '" + method.getName() + "' expects "
-                + parameterTypes.length + " argument(s) but " + provided.length + " were provided");
-        }
-        Object[] coerced = new Object[parameterTypes.length];
-        for (int i = 0; i < parameterTypes.length; i++) {
-            coerced[i] = ELSupport.coerceToType(context, provided[i], parameterTypes[i]);
-        }
-        try {
-            return method.invoke(base, coerced);
-        } catch (IllegalAccessException e) {
-            throw new ELException("Cannot invoke the method '" + method.getName() + "'", e);
-        } catch (InvocationTargetException e) {
-            Throwable cause = e.getCause();
-            if (cause instanceof ELException elException) {
-                throw elException;
-            }
-            throw new ELException("The method '" + method.getName() + "' failed", cause);
-        }
+        return ELMethods.invoke(context, method, base, arguments);
     }
 
     /**
