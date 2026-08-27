@@ -1,6 +1,8 @@
 package io.micronaut.el.runtime;
 
+import io.micronaut.el.CompiledELContext;
 import jakarta.el.ELException;
+import jakarta.el.LambdaExpression;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -15,6 +17,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ELSupportTest {
+
+    interface UnannotatedFunction {
+        String apply(String value);
+
+        @Override
+        boolean equals(Object object);
+    }
 
     enum Suit {
         HEART,
@@ -116,5 +125,16 @@ class ELSupportTest {
         assertThrows(ELException.class, () -> ELSupport.equals(1L, "1.0"));
         // while the arithmetic rule still applies to strings
         assertEquals(2.5d, ELArithmetic.add("1.5", 1L));
+    }
+
+    @Test
+    void lambdaCoercesToAnUnannotatedFunctionalInterface() {
+        CompiledELContext context = new CompiledELContext();
+        LambdaExpression lambda = ELLambdas.create(context, List.of("value"),
+            evaluated -> evaluated.getLambdaArgument("value"));
+
+        UnannotatedFunction function = ELSupport.coerceToType(context, lambda, UnannotatedFunction.class);
+
+        assertEquals("lambda", function.apply("lambda"));
     }
 }

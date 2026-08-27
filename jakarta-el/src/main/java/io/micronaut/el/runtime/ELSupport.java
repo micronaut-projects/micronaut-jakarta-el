@@ -26,11 +26,15 @@ import jakarta.el.LambdaExpression;
 import java.beans.PropertyEditor;
 import java.beans.PropertyEditorManager;
 import java.lang.reflect.Array;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * The type conversion, comparison and emptiness rules of the Jakarta Expression Language specification.
@@ -62,7 +66,7 @@ public final class ELSupport {
         if (type == null) {
             return coerce(value, null);
         }
-        if (value instanceof LambdaExpression && type.isAnnotationPresent(FunctionalInterface.class)) {
+        if (value instanceof LambdaExpression && isFunctionalInterface(type)) {
             return coerceToFunctionalInterface(context, value, type);
         }
         if (context != null) {
@@ -102,7 +106,7 @@ public final class ELSupport {
     @SuppressWarnings({"unchecked", "java:S3776"})
     @Nullable
     public static <T> T coerce(@Nullable Object value, @Nullable Class<T> type) {
-        if (type != null && value instanceof LambdaExpression && type.isAnnotationPresent(FunctionalInterface.class)) {
+        if (type != null && value instanceof LambdaExpression && isFunctionalInterface(type)) {
             return coerceToFunctionalInterface(null, value, type);
         }
         if (type == null || type == Object.class) {
@@ -167,7 +171,7 @@ public final class ELSupport {
     public static <T> T coerceToFunctionalInterface(@Nullable ELContext context,
                                                     @Nullable Object value,
                                                     @Nullable Class<T> type) {
-        if (type != null && value instanceof LambdaExpression lambda && type.isAnnotationPresent(FunctionalInterface.class)) {
+        if (type != null && value instanceof LambdaExpression lambda && isFunctionalInterface(type)) {
             if (context != null) {
                 lambda.setELContext(context);
             }
@@ -185,6 +189,28 @@ public final class ELSupport {
             );
         }
         return coerceToType(context, value, type);
+    }
+
+    private static boolean isFunctionalInterface(@Nullable Class<?> type) {
+        if (type == null || !type.isInterface()) {
+            return false;
+        }
+        Set<String> abstractMethods = new HashSet<>();
+        for (Method method : type.getMethods()) {
+            if (Modifier.isAbstract(method.getModifiers()) && !isObjectMethod(method)) {
+                abstractMethods.add(method.getName() + java.util.Arrays.toString(method.getParameterTypes()));
+            }
+        }
+        return abstractMethods.size() == 1;
+    }
+
+    private static boolean isObjectMethod(Method method) {
+        try {
+            Object.class.getMethod(method.getName(), method.getParameterTypes());
+            return true;
+        } catch (NoSuchMethodException e) {
+            return false;
+        }
     }
 
     /**
