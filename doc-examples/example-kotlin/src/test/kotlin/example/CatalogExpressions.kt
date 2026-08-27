@@ -15,7 +15,7 @@ import io.micronaut.el.annotation.ELVariable
 )
 @ELExpression(value = "\${text:shout(book.title)}", expectedType = String::class, name = "SHOUTED") // <4>
 @ELExpression(value = "\${text:initials(book.title)}", expectedType = String::class, name = "INITIALS")
-@ELExpression(value = "\${Math.max(book.unitPrice, 25)}", expectedType = Double::class, name = "FLOOR_PRICE") // <5>
+@ELExpression(value = "\${Math.max(book.unitPrice, 25.0)}", expectedType = Double::class, name = "FLOOR_PRICE") // <5>
 @ELExpression(
     value = "\${books.stream().filter(b -> b.unitPrice > 10).map(b -> b.title).toList()}", // <6>
     expectedType = List::class,

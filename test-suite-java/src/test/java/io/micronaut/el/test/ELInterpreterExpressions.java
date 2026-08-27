@@ -10,7 +10,7 @@ import jakarta.el.MethodExpression;
 import java.util.List;
 
 /**
- * Compile-time counterparts of every expression evaluated by {@code ELInterpreterTest}.
+ * Compile-time counterparts of the interpreter regression expressions that share this environment.
  */
 @ELEnvironment(
     variables = {
@@ -21,6 +21,7 @@ import java.util.List;
         @ELVariable(name = "varargs", type = Varargs.class),
         @ELVariable(name = "strings", type = String[].class),
         @ELVariable(name = "functions", type = Formatting.class),
+        @ELVariable(name = "integer", type = Integer.class),
         @ELVariable(name = "twice", type = Long.class),
         @ELVariable(name = "target", type = MethodExpression.class)
     },
@@ -72,7 +73,11 @@ import java.util.List;
 @ELExpression(value = "${twice2(3)}", expectedType = Object.class, name = "missingFunction")
 @ELExpression(value = "${varargs.choose(1, 1)}", name = "assignableOverCoercible")
 @ELExpression(value = "${varargs.specific(1)}", name = "mostSpecificOverload")
+@ELExpression(value = "${varargs.boxed(integer)}", name = "boxedOverload")
+@ELExpression(value = "${varargs.emptyVarargs()}", expectedType = Object.class, name = "emptyVarargsAmbiguity")
+@ELExpression(value = "${varargs.numeric(1)}", expectedType = Object.class, name = "numericAmbiguity")
 @ELExpression(value = "${varargs.reject(value -> value)}", expectedType = Object.class, name = "nonFunctionalInterface")
+@ELExpression(value = "${varargs.rejectSealed(value -> value)}", expectedType = Object.class, name = "sealedInterface")
 @ELExpression(value = "${'1'}", expectedType = Integer.class, name = "coercionListenerValue")
 @ELMethodExpression(value = "#{xs.size}", expectedReturnType = Object.class, name = "listSizeMethod")
 @ELMethodExpression(value = "#{Integer.valueOf}", expectedReturnType = Integer.class,
@@ -88,6 +93,10 @@ import java.util.List;
     name = "coercionListenerMethod")
 @ELMethodExpression(value = "#{varargs.specific}", expectedReturnType = String.class,
     expectedParamTypes = Number.class, name = "specificMethod")
+@ELMethodExpression(value = "#{varargs.compatible}", expectedReturnType = String.class,
+    expectedParamTypes = String.class, name = "compatibleMethod")
+@ELMethodExpression(value = "#{varargs.expanded}", expectedReturnType = String.class,
+    expectedParamTypes = {String.class, String.class}, name = "expandedVarargsMethod")
 public final class ELInterpreterExpressions {
 
     private ELInterpreterExpressions() {

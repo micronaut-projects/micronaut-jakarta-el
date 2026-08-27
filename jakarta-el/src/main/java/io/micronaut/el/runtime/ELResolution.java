@@ -471,8 +471,8 @@ public final class ELResolution {
             return result;
         }
         Method fallback = base instanceof ELClass elClass
-            ? ELMethods.findStaticMethod(elClass.getKlass(), method.toString(), paramTypes, null)
-            : ELMethods.findMethod(base.getClass(), method.toString(), paramTypes, null);
+            ? ELMethods.findStaticMethod(elClass.getKlass(), method.toString(), paramTypes, arguments)
+            : ELMethods.findMethod(base.getClass(), method.toString(), paramTypes, arguments);
         return ELMethods.invoke(context, fallback, base instanceof ELClass ? null : base, arguments);
     }
 

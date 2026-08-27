@@ -8,6 +8,17 @@ public final class Varargs {
         Integer map(Integer value);
     }
 
+    public sealed interface SealedFunction permits SealedFunctionImpl {
+        String map(String value);
+    }
+
+    public static final class SealedFunctionImpl implements SealedFunction {
+        @Override
+        public String map(String value) {
+            return value;
+        }
+    }
+
     private final String value;
 
     public Varargs(String... values) {
@@ -44,6 +55,42 @@ public final class Varargs {
 
     public String reject(NotFunctional function) {
         return "unexpected";
+    }
+
+    public String rejectSealed(SealedFunction function) {
+        return "unexpected";
+    }
+
+    public String compatible(Object value) {
+        return value.getClass().getSimpleName();
+    }
+
+    public String expanded(String... values) {
+        return String.join(",", values);
+    }
+
+    public String emptyVarargs(String... values) {
+        return "string";
+    }
+
+    public String emptyVarargs(Integer... values) {
+        return "integer";
+    }
+
+    public String numeric(Integer value) {
+        return "integer";
+    }
+
+    public String numeric(Double value) {
+        return "double";
+    }
+
+    public String boxed(int value) {
+        return "primitive";
+    }
+
+    public String boxed(Integer value) {
+        return "wrapper";
     }
 
     public String numberText() {

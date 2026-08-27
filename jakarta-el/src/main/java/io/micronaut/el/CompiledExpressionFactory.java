@@ -164,9 +164,9 @@ public class CompiledExpressionFactory extends ExpressionFactory {
     @Override
     public MethodExpression createMethodExpression(ELContext context,
                                                    String expression,
-                                                   Class<?> expectedReturnType,
-                                                   Class<?>[] expectedParamTypes) {
-        Class<?>[] paramTypes = expectedParamTypes;
+                                                   @Nullable Class<?> expectedReturnType,
+                                                   Class<?> @Nullable [] expectedParamTypes) {
+        Class<?> @Nullable [] paramTypes = expectedParamTypes;
         for (ELExpressionSource source : sourcesOf(expression)) {
             MethodExpression methodExpression = source.createMethodExpression(expression, expectedReturnType, paramTypes);
             if (methodExpression != null) {
@@ -205,7 +205,7 @@ public class CompiledExpressionFactory extends ExpressionFactory {
      * The parameter types can only be omitted when the expression provides its own parameters.
      */
     private static MethodExpression requireParamTypes(MethodExpression methodExpression,
-                                                      @Nullable Class<?>[] paramTypes) {
+                                                      Class<?> @Nullable [] paramTypes) {
         if (paramTypes == null && !methodExpression.isParametersProvided()) {
             throw new NullPointerException("The expected parameter types are required for the method expression '"
                 + methodExpression.getExpressionString() + "', which does not provide its own parameters");

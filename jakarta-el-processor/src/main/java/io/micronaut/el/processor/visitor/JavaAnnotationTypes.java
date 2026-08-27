@@ -21,6 +21,8 @@ import io.micronaut.inject.visitor.VisitorContext;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.ArrayType;
 import javax.lang.model.type.DeclaredType;
@@ -36,6 +38,13 @@ import java.util.Optional;
 final class JavaAnnotationTypes {
 
     private JavaAnnotationTypes() {
+    }
+
+    static boolean isFunctionalInterfaceCandidate(Object nativeType) {
+        return !(nativeType instanceof JavaNativeElement javaElement)
+            || javaElement.element() == null
+            || (javaElement.element().getKind() != ElementKind.ANNOTATION_TYPE
+                && !javaElement.element().getModifiers().contains(Modifier.SEALED));
     }
 
     static Optional<ClassElement> resolveNestedMember(Object nativeType,

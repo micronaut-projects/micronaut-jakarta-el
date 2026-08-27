@@ -41,7 +41,7 @@ public final class LiteralMethodExpression extends CompiledMethodExpression {
      */
     public LiteralMethodExpression(String text,
                                    Class<?> expectedReturnType,
-                                   Class<?>[] expectedParamTypes) {
+                                   Class<?> @Nullable [] expectedParamTypes) {
         super(text, expectedReturnType, expectedParamTypes, false);
     }
 

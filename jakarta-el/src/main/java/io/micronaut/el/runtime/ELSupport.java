@@ -52,7 +52,7 @@ public final class ELSupport {
     private static final ClassValue<Boolean> FUNCTIONAL_INTERFACES = new ClassValue<>() {
         @Override
         protected Boolean computeValue(Class<?> type) {
-            if (!type.isInterface()) {
+            if (!type.isInterface() || type.isAnnotation() || type.isSealed()) {
                 return false;
             }
             Set<String> abstractMethods = new HashSet<>();

@@ -19,7 +19,7 @@ class CatalogExpressionsTest {
 
         assertEquals("JAKARTA EL!", factory.createValueExpression(context, '${text:shout(book.title)}', String).getValue(context))
         assertEquals("JE", factory.createValueExpression(context, '${text:initials(book.title)}', String).getValue(context))
-        assertEquals(25d, factory.createValueExpression(context, '${Math.max(book.unitPrice, 25)}', double).getValue(context))
+        assertEquals(25d, factory.createValueExpression(context, '${Math.max(book.unitPrice, 25.0)}', double).getValue(context))
         assertEquals(["Jakarta EL"], factory.createValueExpression(context,
             '${books.stream().filter(b -> b.unitPrice > 10).map(b -> b.title).toList()}', List).getValue(context))
         assertEquals(40d, factory.createValueExpression(context, '${(price -> price * 2)(book.unitPrice)}', double).getValue(context))

@@ -68,7 +68,7 @@ public final class InterpretingELExpressionParser implements ELExpressionParser 
     public MethodExpression createMethodExpression(@Nullable ELContext context,
                                                    String expression,
                                                    Class<?> expectedReturnType,
-                                                   Class<?>[] expectedParamTypes) {
+                                                   Class<?> @Nullable [] expectedParamTypes) {
         ELNode node = parse(expression).node();
         if (node instanceof ELNode.Composite) {
             throw new ELException("A method expression must consist of a single eval-expression: " + expression);

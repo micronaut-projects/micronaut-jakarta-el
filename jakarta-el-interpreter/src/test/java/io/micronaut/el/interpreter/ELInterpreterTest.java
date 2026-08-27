@@ -147,9 +147,18 @@ class ELInterpreterTest {
     void functionsPackVariableArityArguments() throws NoSuchMethodException {
         processor.defineFunction("fn", "join", Varargs.class.getMethod("join", CharSequence[].class));
         processor.defineBean("sequences", new CharSequence[]{"a", "b"});
+        processor.defineBean("strings", new String[]{"a", "b"});
 
         assertEquals("a,b", processor.eval("fn:join('a', 'b')"));
         assertEquals("a,b", processor.eval("fn:join(sequences)"));
+        assertEquals("a,b", processor.eval("fn:join(strings)"));
+    }
+
+    @Test
+    void unqualifiedFunctionsPackVariableArityArguments() throws NoSuchMethodException {
+        processor.defineFunction("", "join", Varargs.class.getMethod("join", CharSequence[].class));
+
+        assertEquals("a,b", processor.eval("join('a', 'b')"));
     }
 
     @Test
@@ -165,8 +174,10 @@ class ELInterpreterTest {
     void constructorsPackVariableArityArguments() {
         ELContext context = processor.getELManager().getELContext();
         context.getImportHandler().importClass(Varargs.class.getName());
+        context.getImportHandler().importClass(VarargsConstructor.class.getName());
 
         assertEquals("a,b", processor.eval("Varargs('a', 'b').value"));
+        assertEquals("a,b", processor.eval("VarargsConstructor('a', 'b').value"));
     }
 
     @Test
@@ -182,18 +193,91 @@ class ELInterpreterTest {
     @Test
     void lambdasCoerceToUnannotatedFunctionalInterfaces() {
         processor.defineBean("functions", new InterpreterFunctions());
+        processor.defineBean("f", new InterpreterFunctions());
 
         assertEquals("default:EL", processor.eval("functions.map(value -> value.toUpperCase(), 'el')"));
+        assertEquals("default:EL", processor.eval("f.map(value -> value.toUpperCase(), 'el')"));
+    }
+
+    @Test
+    void generatedLvalueRegressionsHaveExactInterpretedCounterparts() {
+        processor.defineBean("book", new InterpreterBook());
+        processor.defineBean("item", new InterpreterBook());
+        processor.defineBean("formatting", new InterpreterFunctions());
+        processor.defineBean("xs", List.of(1, 2, 3));
+        processor.defineBean("strings", new String[]{"a", "b"});
+        ELContext context = processor.getELManager().getELContext();
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+
+        assertEquals("1:int[]", processor.eval("formatting.argumentType(formatting.numbers)"));
+        assertEquals("1:java.lang.String[]", processor.eval("formatting.argumentType(strings)"));
+        assertEquals((Object) 7, processor.eval("Math.max(item.quantity, Integer.valueOf(7))"));
+        assertEquals(25d, processor.eval("Math.max(book.unitPrice, 25.0)"));
+
+        MethodExpression selectInteger = factory.createMethodExpression(context, "${formatting.select}",
+            String.class, new Class<?>[]{Integer.class});
+        MethodExpression selectString = factory.createMethodExpression(context, "${formatting.select}",
+            String.class, new Class<?>[]{String.class});
+        MethodExpression valueOf = factory.createMethodExpression(context, "${Integer.valueOf}", Integer.class,
+            new Class<?>[]{String.class});
+        MethodExpression size = factory.createMethodExpression(context, "${xs.size}", Integer.class,
+            new Class<?>[0]);
+        MethodExpression discounted = factory.createMethodExpression(context, "${book.discounted(50)}",
+            Double.class, null);
+        MethodExpression describe = factory.createMethodExpression(context, "${book.describe}", String.class,
+            new Class<?>[0]);
+
+        assertEquals("integer", selectInteger.invoke(context, new Object[]{"1"}));
+        assertEquals("string", selectString.invoke(context, new Object[]{"1"}));
+        assertEquals(42, valueOf.invoke(context, new Object[]{"42"}));
+        assertEquals(3, size.invoke(context, null));
+        assertEquals(10d, discounted.invoke(context, null));
+        assertEquals("EL (history)", describe.invoke(context, null));
     }
 
     @Test
     void overloadSelectionUsesJakartaElPrecedenceAndSpecificity() {
         processor.defineBean("varargs", new Varargs());
+        processor.defineBean("integer", 1);
 
         assertEquals("assignable", processor.eval("varargs.choose(1, 1)"));
         assertEquals("number", processor.eval("varargs.specific(1)"));
+        assertEquals("wrapper", processor.eval("varargs.boxed(integer)"));
+        assertThrows(jakarta.el.MethodNotFoundException.class,
+            () -> processor.eval("varargs.emptyVarargs()"));
+        assertThrows(jakarta.el.MethodNotFoundException.class,
+            () -> processor.eval("varargs.numeric(1)"));
         assertThrows(jakarta.el.MethodNotFoundException.class,
             () -> processor.eval("varargs.reject(value -> value)"));
+        assertThrows(jakarta.el.MethodNotFoundException.class,
+            () -> processor.eval("varargs.rejectSealed(value -> value)"));
+    }
+
+    @Test
+    void declaredParameterTypesSelectCompatibleAndExpandedVarargsMethods() {
+        processor.defineBean("varargs", new Varargs());
+        ELContext context = processor.getELManager().getELContext();
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+
+        MethodExpression compatible = factory.createMethodExpression(context, "#{varargs.compatible}", String.class,
+            new Class<?>[]{String.class});
+        MethodExpression expanded = factory.createMethodExpression(context, "#{varargs.expanded}", String.class,
+            new Class<?>[]{String.class, String.class});
+
+        assertEquals("String", compatible.invoke(context, new Object[]{"value"}));
+        assertEquals("a,b", expanded.invoke(context, new Object[]{"a", "b"}));
+    }
+
+    @Test
+    void compileTimeRejectionsHaveInterpretedContracts() {
+        ELContext context = processor.getELManager().getELContext();
+        context.getImportHandler().importStatic(AmbiguousFunctions.class.getName() + ".ambiguous");
+
+        // Static selection is provably ambiguous, so a generated expression must reject it during compilation.
+        assertThrows(jakarta.el.MethodNotFoundException.class, () -> processor.eval("ambiguous('x')"));
+        // A method expression must be a single eval-expression, so it cannot be generated for composite text.
+        assertThrows(ELException.class, () -> ExpressionFactory.newInstance()
+            .createMethodExpression(context, "Hello ${book.describe}", Object.class, new Class<?>[0]));
     }
 
     @Test

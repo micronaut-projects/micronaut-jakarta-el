@@ -187,26 +187,18 @@ public final class ELMethods {
                                  Class<?> @Nullable [] paramTypes,
                                  Object @Nullable [] arguments,
                                  boolean isStatic) {
-        if (paramTypes != null) {
-            for (Candidate candidate : candidates) {
-                if ((!isStatic || candidate.isStatic()) && sameTypes(candidate.parameterTypes(), paramTypes)) {
-                    return candidate.method();
-                }
-            }
-            throw notFound(type, name, paramTypes.length);
-        }
         Object[] values = arguments == null ? new Object[0] : arguments;
+        Class<?>[] matchingTypes = paramTypes == null ? Arrays.stream(values)
+            .map(value -> value == null ? null : value.getClass())
+            .toArray(Class<?>[]::new) : paramTypes;
         List<Candidate> assignable = new ArrayList<>();
         List<Candidate> coercible = new ArrayList<>();
         List<Candidate> varArgs = new ArrayList<>();
-        Class<?>[] argumentTypes = Arrays.stream(values)
-            .map(value -> value == null ? null : value.getClass())
-            .toArray(Class<?>[]::new);
         for (Candidate candidate : candidates) {
             if (isStatic && !candidate.isStatic()) {
                 continue;
             }
-            Match match = match(candidate, values);
+            Match match = match(candidate, matchingTypes, values);
             switch (match) {
                 case EXACT -> {
                     return candidate.method();
@@ -224,16 +216,11 @@ public final class ELMethods {
         List<Candidate> best = !assignable.isEmpty() ? assignable
             : !coercible.isEmpty() ? coercible : varArgs;
         if (best.isEmpty()) {
-            throw notFound(type, name, values.length);
+            throw notFound(type, name, matchingTypes.length);
         }
-        return mostSpecific(type, name, best, argumentTypes, elSpecific).method();
+        return mostSpecific(type, name, best, matchingTypes, elSpecific).method();
     }
 
-    /**
-     * Compares declared parameter types with the ones provided at parse time, treating a primitive and its
-     * wrapper as the same type: a class literal such as {@code double.class} cannot reach an annotation member
-     * of a Micronaut annotation, so the wrapper is what a declaration can provide.
-     */
     /**
      * Compares parameter types, treating a primitive and its wrapper as the same type.
      *
@@ -301,16 +288,16 @@ public final class ELMethods {
         return findAccessible(superclass, method);
     }
 
-    private static Match match(Candidate candidate, Object[] arguments) {
+    private static Match match(Candidate candidate, Class<?>[] matchingTypes, Object[] arguments) {
         Class<?>[] parameterTypes = candidate.parameterTypes();
         boolean varArgs = candidate.varArgs();
-        if (varArgs ? arguments.length < parameterTypes.length - 1 : arguments.length != parameterTypes.length) {
+        if (varArgs ? matchingTypes.length < parameterTypes.length - 1 : matchingTypes.length != parameterTypes.length) {
             return Match.NONE;
         }
         Match match = Match.EXACT;
         int fixed = varArgs ? parameterTypes.length - 1 : parameterTypes.length;
         for (int i = 0; i < fixed; i++) {
-            Match argument = match(parameterTypes[i], arguments[i]);
+            Match argument = match(parameterTypes[i], matchingTypes[i], argument(arguments, i));
             if (argument == Match.NONE) {
                 return Match.NONE;
             }
@@ -320,12 +307,12 @@ public final class ELMethods {
         }
         if (varArgs) {
             Class<?> arrayType = parameterTypes[parameterTypes.length - 1];
-            if (arguments.length == parameterTypes.length && arrayType.isInstance(arguments[fixed])) {
+            if (matchingTypes.length == parameterTypes.length && arrayType == matchingTypes[fixed]) {
                 return Match.VARARGS;
             }
             Class<?> componentType = arrayType.getComponentType();
-            for (int i = fixed; i < arguments.length; i++) {
-                if (match(componentType, arguments[i]) == Match.NONE) {
+            for (int i = fixed; i < matchingTypes.length; i++) {
+                if (match(componentType, matchingTypes[i], argument(arguments, i)) == Match.NONE) {
                     return Match.NONE;
                 }
             }
@@ -334,16 +321,20 @@ public final class ELMethods {
         return match;
     }
 
-    private static Match match(Class<?> parameterType, @Nullable Object argument) {
-        if (argument == null) {
-            return parameterType.isPrimitive() ? Match.COERCIBLE : Match.ASSIGNABLE;
-        }
-        Class<?> argumentType = argument.getClass();
-        if (parameterType == argumentType) {
+    private static Match match(Class<?> parameterType,
+                               @Nullable Class<?> matchingType,
+                               @Nullable Object argument) {
+        if (parameterType == matchingType) {
             return Match.EXACT;
         }
-        if (ReflectionUtils.getWrapperType(parameterType).isAssignableFrom(argumentType)) {
+        if (matchingType == null) {
+            return parameterType.isPrimitive() ? Match.COERCIBLE : Match.ASSIGNABLE;
+        }
+        if (ReflectionUtils.getWrapperType(parameterType).isAssignableFrom(matchingType)) {
             return Match.ASSIGNABLE;
+        }
+        if (argument == null) {
+            return Match.NONE;
         }
         try {
             ELSupport.coerce(argument, parameterType);
@@ -351,6 +342,11 @@ public final class ELMethods {
         } catch (ELException | IllegalArgumentException e) {
             return Match.NONE;
         }
+    }
+
+    @Nullable
+    private static Object argument(Object[] arguments, int index) {
+        return index < arguments.length ? arguments[index] : null;
     }
 
     private static Candidate mostSpecific(Class<?> type,
@@ -396,7 +392,8 @@ public final class ELMethods {
             }
             int comparison = secondType.isAssignableFrom(firstType) ? 1
                 : firstType.isAssignableFrom(secondType) ? -1
-                : numericSpecificity(firstType, secondType, argumentTypes[i], elSpecific);
+                : numericSpecificity(firstType, secondType,
+                    i < argumentTypes.length ? argumentTypes[i] : null, elSpecific);
             if (comparison == 0 || (result != 0 && result != comparison)) {
                 return 0;
             }
