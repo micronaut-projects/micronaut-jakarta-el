@@ -10,6 +10,10 @@ import java.util.stream.Collectors;
 @Introspected
 public class Formatting {
 
+    interface TextMapper {
+        String apply(String value);
+    }
+
     @Executable
     public String join(String separator, Object... parts) {
         return Arrays.stream(parts).map(String::valueOf).collect(Collectors.joining(separator));
@@ -33,6 +37,11 @@ public class Formatting {
     @Executable
     public String format(String format, Object... args) {
         return String.format(format, args);
+    }
+
+    @Executable
+    public String map(TextMapper mapper, String value) {
+        return mapper.apply(value);
     }
 
     @Executable

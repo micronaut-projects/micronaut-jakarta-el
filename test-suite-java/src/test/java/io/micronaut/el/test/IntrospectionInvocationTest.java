@@ -81,5 +81,6 @@ class IntrospectionInvocationTest {
         assertEquals("0.50", FormattingExpressions$ELExpressions.FORMATTED.getValue(context));
         assertEquals("a-b-c", FormattingExpressions$ELExpressions.JOINED.getValue(context));
         assertEquals("only:-", FormattingExpressions$ELExpressions.JOINED_ALONE.getValue(context));
+        assertEquals("EL", FormattingExpressions$ELExpressions.MAPPED.getValue(context));
     }
 }
