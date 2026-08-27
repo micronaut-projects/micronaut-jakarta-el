@@ -40,6 +40,15 @@ public class Formatting {
     }
 
     @Executable
+    public String argumentType(Object... values) {
+        return values.length + ":" + values[0].getClass().getTypeName();
+    }
+
+    public int[] getNumbers() {
+        return new int[]{1, 2};
+    }
+
+    @Executable
     public String map(TextMapper mapper, String value) {
         return mapper.apply(value);
     }

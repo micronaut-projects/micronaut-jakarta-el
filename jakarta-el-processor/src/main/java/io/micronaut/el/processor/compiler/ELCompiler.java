@@ -1361,7 +1361,8 @@ public final class ELCompiler {
             if (method.isVarArgs() && i == parameters.length - 1 && arguments.size() == parameters.length
                 && !(argument instanceof ELNode.Lambda)) {
                 directValue = compileTyped(argument, ctx);
-                if (directValue.type() != null && directValue.type().isArray()) {
+                ClassElement arrayParameter = parameters[parameters.length - 1].getType();
+                if (directValue.type() != null && directValue.type().getName().equals(arrayParameter.getName())) {
                     directVarargsArray = true;
                 } else {
                     parameter = parameters[parameters.length - 1].getType().fromArray();
@@ -1678,10 +1679,15 @@ public final class ELCompiler {
         if (method.isVarArgs() ? arguments.size() < fixed : arguments.size() != fixed) {
             return -1;
         }
-        int total = method.isVarArgs() ? 1 << 20 : 0;
+        boolean directVarargsArray = method.isVarArgs() && arguments.size() == parameters.length
+            && argumentTypes.get(parameters.length - 1) != null
+            && argumentTypes.get(parameters.length - 1).getName().equals(parameters[parameters.length - 1].getType().getName());
+        int total = method.isVarArgs() && !directVarargsArray ? 1 << 20 : 0;
         for (int i = 0; i < arguments.size(); i++) {
-            ClassElement parameter = method.isVarArgs() && i >= fixed
-                ? parameters[parameters.length - 1].getType().fromArray() : parameters[i].getType();
+            ClassElement argument = argumentTypes.get(i);
+            boolean directArray = directVarargsArray && i == fixed;
+            ClassElement parameter = directArray ? parameters[parameters.length - 1].getType()
+                : method.isVarArgs() && i >= fixed ? parameters[parameters.length - 1].getType().fromArray() : parameters[i].getType();
             if (arguments.get(i) instanceof ELNode.Lambda) {
                 // a lambda expression is compiled to a functional interface, section 1.25.8, and is itself a
                 // LambdaExpression, the former being the direct form
@@ -1694,7 +1700,6 @@ public final class ELCompiler {
                 }
                 continue;
             }
-            ClassElement argument = argumentTypes.get(i);
             if (argument == null) {
                 return -1;
             }
@@ -1703,7 +1708,7 @@ public final class ELCompiler {
             if (parameterRank >= 0 && argumentRank >= 0) {
                 total += parameterRank == argumentRank ? EXACT : parameterRank > argumentRank ? WIDENING : COERCIBLE;
             } else if (argument.isAssignable(parameter) || parameter.getName().equals(Object.class.getName())) {
-                total += EXACT;
+                total += WIDENING;
             } else if (argument.isAssignable(String.class) || parameterRank >= 0 || parameter.isAssignable(String.class)) {
                 total += COERCIBLE;
             } else {
