@@ -177,7 +177,7 @@ public final class MethodExpressionWriter {
         return switch (node) {
             case ELNode.Method method -> compiler.compile(method.base(), context);
             case ELNode.Property property -> compiler.compile(property.base(), context);
-            default -> ExpressionDef.nullValue();
+            default -> compiler.compile(node, context);
         };
     }
 

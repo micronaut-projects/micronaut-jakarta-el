@@ -5,6 +5,7 @@ import io.micronaut.el.annotation.ELExpression;
 import io.micronaut.el.annotation.ELFunctions;
 import io.micronaut.el.annotation.ELMethodExpression;
 import io.micronaut.el.annotation.ELVariable;
+import jakarta.el.MethodExpression;
 
 import java.util.List;
 
@@ -20,7 +21,8 @@ import java.util.List;
         @ELVariable(name = "varargs", type = Varargs.class),
         @ELVariable(name = "strings", type = String[].class),
         @ELVariable(name = "functions", type = Formatting.class),
-        @ELVariable(name = "twice", type = Long.class)
+        @ELVariable(name = "twice", type = Long.class),
+        @ELVariable(name = "target", type = MethodExpression.class)
     },
     imports = Varargs.class,
     functions = {
@@ -68,6 +70,10 @@ import java.util.List;
 @ELExpression(value = "${functions.map(value -> value.toUpperCase(), 'el')}", name = "functionalInterface")
 @ELExpression(value = "${twice(3)}", name = "mappedFunctionFallback")
 @ELExpression(value = "${twice2(3)}", expectedType = Object.class, name = "missingFunction")
+@ELExpression(value = "${varargs.choose(1, 1)}", name = "assignableOverCoercible")
+@ELExpression(value = "${varargs.specific(1)}", name = "mostSpecificOverload")
+@ELExpression(value = "${varargs.reject(value -> value)}", expectedType = Object.class, name = "nonFunctionalInterface")
+@ELExpression(value = "${'1'}", expectedType = Integer.class, name = "coercionListenerValue")
 @ELMethodExpression(value = "#{xs.size}", expectedReturnType = Object.class, name = "listSizeMethod")
 @ELMethodExpression(value = "#{Integer.valueOf}", expectedReturnType = Integer.class,
     expectedParamTypes = String.class, name = "integerValueOfMethod")
@@ -77,6 +83,11 @@ import java.util.List;
     expectedParamTypes = Object[].class, name = "objectVarargsMethod")
 @ELMethodExpression(value = "#{varargs.join('a', 'b')}", expectedReturnType = String.class,
     name = "providedVarargsMethod")
+@ELMethodExpression(value = "#{target}", expectedReturnType = Object.class, name = "identifierMethod")
+@ELMethodExpression(value = "#{varargs.numberText}", expectedReturnType = Integer.class,
+    name = "coercionListenerMethod")
+@ELMethodExpression(value = "#{varargs.specific}", expectedReturnType = String.class,
+    expectedParamTypes = Number.class, name = "specificMethod")
 public final class ELInterpreterExpressions {
 
     private ELInterpreterExpressions() {

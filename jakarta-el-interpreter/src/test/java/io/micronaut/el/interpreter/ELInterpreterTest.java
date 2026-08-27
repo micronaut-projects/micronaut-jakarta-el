@@ -20,6 +20,8 @@ import jakarta.el.ELContext;
 import jakarta.el.ELException;
 import jakarta.el.ELProcessor;
 import jakarta.el.ELResolver;
+import jakarta.el.ELException;
+import jakarta.el.EvaluationListener;
 import jakarta.el.ExpressionFactory;
 import jakarta.el.FunctionMapper;
 import jakarta.el.MethodExpression;
@@ -35,6 +37,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -292,6 +295,71 @@ class ELInterpreterTest {
     }
 
     @Test
+    void overloadSelectionUsesJakartaElPrecedenceAndSpecificity() {
+        processor.defineBean("varargs", new Varargs());
+
+        assertEquals("assignable", processor.eval("varargs.choose(1, 1)"));
+        assertEquals("number", processor.eval("varargs.specific(1)"));
+        assertThrows(jakarta.el.MethodNotFoundException.class,
+            () -> processor.eval("varargs.reject(value -> value)"));
+    }
+
+    @Test
+    void identifierMethodExpressionsDelegateMetadata() {
+        ELContext context = processor.getELManager().getELContext();
+        processor.defineBean("xs", List.of(1, 2, 3));
+        MethodExpression target = ExpressionFactory.newInstance().createMethodExpression(context,
+            "#{xs.size}", Object.class, new Class<?>[0]);
+        processor.defineBean("target", target);
+        MethodExpression expression = ExpressionFactory.newInstance().createMethodExpression(context,
+            "#{target}", Object.class, new Class<?>[0]);
+
+        assertEquals(3, expression.invoke(context, null));
+        assertEquals("size", expression.getMethodInfo(context).getName());
+        assertEquals("size", expression.getMethodReference(context).getMethodInfo().getName());
+    }
+
+    @Test
+    void declaredParameterTypesAreDefensivelyCopied() {
+        processor.defineBean("varargs", new Varargs());
+        ELContext context = processor.getELManager().getELContext();
+        Class<?>[] parameterTypes = {Number.class};
+        MethodExpression expression = ExpressionFactory.newInstance().createMethodExpression(context,
+            "#{varargs.specific}", String.class, parameterTypes);
+        int hash = expression.hashCode();
+
+        parameterTypes[0] = Object.class;
+
+        assertEquals("number", expression.invoke(context, new Object[]{1L}));
+        assertEquals(hash, expression.hashCode());
+    }
+
+    @Test
+    void listenersObserveMethodReferencesAndCompletedCoercions() {
+        List<String> events = new ArrayList<>();
+        processor.getELManager().addELResolver(new FailingIntegerConversionResolver(events));
+        ELContext context = processor.getELManager().getELContext();
+        context.addEvaluationListener(new RecordingListener(events));
+        processor.defineBean("varargs", new Varargs());
+
+        MethodExpression reference = ExpressionFactory.newInstance().createMethodExpression(context,
+            "#{varargs.numberText}", String.class, new Class<?>[0]);
+        reference.getMethodReference(context);
+        assertEquals(List.of("before:#{varargs.numberText}", "after:#{varargs.numberText}"), events);
+
+        events.clear();
+        assertThrows(ELException.class, () -> ExpressionFactory.newInstance()
+            .createValueExpression(context, "${'1'}", Integer.class).getValue(context));
+        assertEquals(List.of("before:${'1'}", "coerce"), events);
+
+        events.clear();
+        MethodExpression method = ExpressionFactory.newInstance().createMethodExpression(context,
+            "#{varargs.numberText}", Integer.class, new Class<?>[0]);
+        assertThrows(ELException.class, () -> method.invoke(context, null));
+        assertEquals(List.of("before:#{varargs.numberText}", "coerce"), events);
+    }
+
+    @Test
     void methodExpressionsWithProvidedParametersSurviveSerialization() throws Exception {
         ELContext context = processor.getELManager().getELContext();
         processor.defineBean("varargs", new Varargs());
@@ -384,6 +452,66 @@ class ELInterpreterTest {
 
         @Override
         public VariableMapper getVariableMapper() {
+            return null;
+        }
+    }
+
+    private static final class RecordingListener extends EvaluationListener {
+        private final List<String> events;
+
+        private RecordingListener(List<String> events) {
+            this.events = events;
+        }
+
+        @Override
+        public void beforeEvaluation(ELContext context, String expression) {
+            events.add("before:" + expression);
+        }
+
+        @Override
+        public void afterEvaluation(ELContext context, String expression) {
+            events.add("after:" + expression);
+        }
+    }
+
+    private static final class FailingIntegerConversionResolver extends ELResolver {
+        private final List<String> events;
+
+        private FailingIntegerConversionResolver(List<String> events) {
+            this.events = events;
+        }
+
+        @Override
+        public <T> T convertToType(ELContext context, Object value, Class<T> type) {
+            if (type == Integer.class) {
+                context.setPropertyResolved(true);
+                events.add("coerce");
+                throw new ELException("conversion failed");
+            }
+            return null;
+        }
+
+        @Override
+        public Object getValue(ELContext context, Object base, Object property) {
+            return null;
+        }
+
+        @Override
+        public Class<?> getType(ELContext context, Object base, Object property) {
+            return null;
+        }
+
+        @Override
+        public void setValue(ELContext context, Object base, Object property, Object value) {
+        }
+
+        @Override
+        public boolean isReadOnly(ELContext context, Object base, Object property) {
+            return true;
+        }
+
+        @Override
+        public Class<?> getCommonPropertyType(ELContext context, Object base) {
             return null;
         }
     }

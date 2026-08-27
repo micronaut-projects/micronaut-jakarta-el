@@ -60,7 +60,7 @@ final class InterpretedMethodExpression extends MethodExpression {
                                 ELInterpreter interpreter) {
         this.expressionString = Objects.requireNonNull(expressionString, "expressionString");
         this.expectedReturnType = Objects.requireNonNull(expectedReturnType, "expectedReturnType");
-        this.expectedParamTypes = expectedParamTypes;
+        this.expectedParamTypes = expectedParamTypes == null ? null : expectedParamTypes.clone();
         this.node = Objects.requireNonNull(node, "node");
         this.invocation = unwrap(node) instanceof ELNode.Method method ? method : null;
         this.interpreter = Objects.requireNonNull(interpreter, "interpreter");
@@ -68,25 +68,33 @@ final class InterpretedMethodExpression extends MethodExpression {
 
     @Override
     @Nullable
-    public Object invoke(ELContext context, @Nullable Object[] params) {
+    public Object invoke(ELContext context, Object @Nullable [] params) {
         context.notifyBeforeEvaluation(expressionString);
         Object result = doInvoke(context, params);
+        Object coerced = expectedReturnType == void.class ? null : ELSupport.coerceToType(context, result, expectedReturnType);
         context.notifyAfterEvaluation(expressionString);
-        if (expectedReturnType == void.class) {
-            return null;
-        }
-        Object coerced = ELSupport.coerceToType(context, result, expectedReturnType);
         return ELSandbox.checksResultOf(expectedReturnType) ? ELSandboxGuard.checkResult(context, coerced) : coerced;
     }
 
     @Override
     public MethodInfo getMethodInfo(ELContext context) {
+        MethodExpression identifier = identifierMethodExpression(context);
+        if (identifier != null) {
+            return identifier.getMethodInfo(context);
+        }
         Method method = findMethod(context);
         return new MethodInfo(method.getName(), method.getReturnType(), method.getParameterTypes());
     }
 
     @Override
     public MethodReference getMethodReference(ELContext context) {
+        context.notifyBeforeEvaluation(expressionString);
+        MethodExpression identifier = identifierMethodExpression(context);
+        if (identifier != null) {
+            MethodReference reference = identifier.getMethodReference(context);
+            context.notifyAfterEvaluation(expressionString);
+            return reference;
+        }
         ELNode.Method providedInvocation = invocation();
         ELInterpreter.Target target = interpreter().resolveTarget(context,
             providedInvocation == null ? node() : methodTargetNode());
@@ -96,7 +104,9 @@ final class InterpretedMethodExpression extends MethodExpression {
             : interpreter().evaluateArguments(context, providedInvocation.arguments());
         Method method = findMethod(base, target == null ? null : target.property(), arguments);
         MethodInfo methodInfo = new MethodInfo(method.getName(), method.getReturnType(), method.getParameterTypes());
-        return new MethodReference(base, methodInfo, method.getAnnotations(), arguments);
+        MethodReference reference = new MethodReference(base, methodInfo, method.getAnnotations(), arguments);
+        context.notifyAfterEvaluation(expressionString);
+        return reference;
     }
 
     @Override
@@ -151,7 +161,7 @@ final class InterpretedMethodExpression extends MethodExpression {
     }
 
     @Nullable
-    private Object doInvoke(ELContext context, @Nullable Object[] params) {
+    private Object doInvoke(ELContext context, Object @Nullable [] params) {
         if (invocation() != null) {
             // the expression provides its own parameters, the ones passed to invoke are ignored
             return interpreter().evaluate(context, node());
@@ -187,6 +197,22 @@ final class InterpretedMethodExpression extends MethodExpression {
         Object[] arguments = interpreter().evaluateArguments(context, providedInvocation.arguments());
         return findMethod(target == null ? null : target.base(),
             target == null ? null : target.property(), arguments);
+    }
+
+    @Nullable
+    private MethodExpression identifierMethodExpression(ELContext context) {
+        if (invocation() != null) {
+            return null;
+        }
+        ELInterpreter.Target target = interpreter().resolveTarget(context, node());
+        if (target == null || target.base() != null) {
+            return null;
+        }
+        Object identifier = ELResolution.resolveIdentifier(context, ELSupport.coerceToString(target.property()));
+        if (identifier instanceof MethodExpression expression) {
+            return expression;
+        }
+        throw new MethodNotFoundException("The expression '" + expressionString + "' does not resolve to a method expression");
     }
 
     private Method findMethod(@Nullable Object base,

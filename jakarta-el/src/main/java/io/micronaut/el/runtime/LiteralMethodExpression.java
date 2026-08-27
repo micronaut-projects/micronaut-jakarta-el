@@ -58,7 +58,7 @@ public final class LiteralMethodExpression extends CompiledMethodExpression {
     }
 
     @Override
-    protected Object doInvoke(ELContext context, @Nullable Object[] arguments) {
+    protected Object doInvoke(ELContext context, Object @Nullable [] arguments) {
         if (getExpectedReturnType() == void.class) {
             throw new ELException("A literal-expression cannot be used as a method expression returning void");
         }

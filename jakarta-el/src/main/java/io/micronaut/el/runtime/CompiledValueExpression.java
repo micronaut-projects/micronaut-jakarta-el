@@ -90,8 +90,9 @@ public abstract class CompiledValueExpression extends ValueExpression implements
     public <T> T getValue(ELContext context) {
         context.notifyBeforeEvaluation(expressionString);
         Object value = evaluate(context);
+        T result = (T) (coerced ? ELSupport.coerceToType(context, value, expectedType) : value);
         context.notifyAfterEvaluation(expressionString);
-        return (T) (coerced ? ELSupport.coerceToType(context, value, expectedType) : value);
+        return result;
     }
 
     @Override

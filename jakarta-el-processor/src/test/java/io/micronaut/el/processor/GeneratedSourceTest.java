@@ -30,7 +30,10 @@ class GeneratedSourceTest {
 
             import io.micronaut.el.annotation.*;
 
-            @ELEnvironment(variables = @ELVariable(name = "book", type = Book.class))
+            @ELEnvironment(variables = {
+                @ELVariable(name = "book", type = Book.class),
+                @ELVariable(name = "varargs", type = Book.class)
+            })
             @ELExpression(value = "%s", expectedType = String.class)
             public class Expressions {
             }
@@ -42,6 +45,8 @@ class GeneratedSourceTest {
                 public Object apply(jakarta.el.LambdaExpression lambda) { return lambda.invoke("title"); }
                 public double discount(double percent) { return percent; }
                 public long count(java.util.function.Predicate<String> predicate) { return getTags().stream().filter(predicate).count(); }
+                public String choose(Number first, Number second) { return "assignable"; }
+                public String choose(Long first, String second) { return "coercible"; }
             }
             """.formatted(expression.replace("\"", "\\\""));
     }
@@ -191,6 +196,13 @@ class GeneratedSourceTest {
     void aLiteralArgumentIsCoercedAtCompilationTime() throws IOException {
         Map<String, Integer> calls = runtimeCalls("${book.discount(10)}");
         assertEquals(Map.of("resolveVariable", 1), calls);
+    }
+
+    @Test
+    void anAssignableOverloadIsCalledDirectlyBeforeACoercibleOne() throws IOException {
+        Map<String, Integer> calls = runtimeCalls("${varargs.choose(1, 1)}");
+        assertEquals(0, calls.getOrDefault("invoke", 0), calls.toString());
+        assertEquals(1, calls.getOrDefault("resolveVariable", 0), calls.toString());
     }
 
     @Test
