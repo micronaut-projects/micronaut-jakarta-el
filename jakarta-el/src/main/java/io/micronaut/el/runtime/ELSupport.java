@@ -49,6 +49,22 @@ import java.util.Set;
 @Internal
 public final class ELSupport {
 
+    private static final ClassValue<Boolean> FUNCTIONAL_INTERFACES = new ClassValue<>() {
+        @Override
+        protected Boolean computeValue(Class<?> type) {
+            if (!type.isInterface()) {
+                return false;
+            }
+            Set<String> abstractMethods = new HashSet<>();
+            for (Method method : type.getMethods()) {
+                if (Modifier.isAbstract(method.getModifiers()) && !isObjectMethod(method)) {
+                    abstractMethods.add(method.getName() + java.util.Arrays.toString(method.getParameterTypes()));
+                }
+            }
+            return abstractMethods.size() == 1;
+        }
+    };
+
     private ELSupport() {
     }
 
@@ -67,8 +83,8 @@ public final class ELSupport {
         if (type == null) {
             return coerce(value, null);
         }
-        if (value instanceof LambdaExpression && isFunctionalInterface(type)) {
-            return coerceToFunctionalInterface(context, value, type);
+        if (value instanceof LambdaExpression lambda && isFunctionalInterface(type)) {
+            return functionalInterface(context, lambda, type);
         }
         if (context != null) {
             ELResolver resolver = context.getELResolver();
@@ -107,8 +123,8 @@ public final class ELSupport {
     @SuppressWarnings({"unchecked", "java:S3776"})
     @Nullable
     public static <T> T coerce(@Nullable Object value, @Nullable Class<T> type) {
-        if (type != null && value instanceof LambdaExpression && isFunctionalInterface(type)) {
-            return coerceToFunctionalInterface(null, value, type);
+        if (type != null && value instanceof LambdaExpression lambda && isFunctionalInterface(type)) {
+            return functionalInterface(null, lambda, type);
         }
         if (type == null || type == Object.class) {
             return (T) value;
@@ -173,44 +189,38 @@ public final class ELSupport {
                                                     @Nullable Object value,
                                                     @Nullable Class<T> type) {
         if (type != null && value instanceof LambdaExpression lambda && isFunctionalInterface(type)) {
-            if (context != null) {
-                lambda.setELContext(context);
-            }
-            return (T) Proxy.newProxyInstance(
-                type.getClassLoader(),
-                new Class<?>[]{type},
-                (proxy, method, args) -> {
-                    if (isObjectMethod(method)) {
-                        return switch (method.getName()) {
-                            case "equals" -> proxy == args[0];
-                            case "hashCode" -> System.identityHashCode(proxy);
-                            case "toString" -> lambda.toString();
-                            default -> throw new IllegalStateException("Unexpected Object method: " + method);
-                        };
-                    }
-                    if (method.isDefault()) {
-                        return InvocationHandler.invokeDefault(proxy, method, args == null ? new Object[0] : args);
-                    }
-                    Object result = lambda.invoke(args == null ? new Object[0] : args);
-                    Class<?> returnType = method.getReturnType();
-                    return returnType == void.class ? null : coerceToType(context, result, returnType);
-                }
-            );
+            return functionalInterface(context, lambda, type);
         }
         return coerceToType(context, value, type);
     }
 
     private static boolean isFunctionalInterface(@Nullable Class<?> type) {
-        if (type == null || !type.isInterface()) {
-            return false;
-        }
-        Set<String> abstractMethods = new HashSet<>();
-        for (Method method : type.getMethods()) {
-            if (Modifier.isAbstract(method.getModifiers()) && !isObjectMethod(method)) {
-                abstractMethods.add(method.getName() + java.util.Arrays.toString(method.getParameterTypes()));
+        return type != null && FUNCTIONAL_INTERFACES.get(type);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> T functionalInterface(@Nullable ELContext context, LambdaExpression lambda, Class<T> type) {
+        return (T) Proxy.newProxyInstance(
+            type.getClassLoader(),
+            new Class<?>[]{type},
+            (proxy, method, args) -> {
+                if (isObjectMethod(method)) {
+                    return switch (method.getName()) {
+                        case "equals" -> proxy == args[0];
+                        case "hashCode" -> System.identityHashCode(proxy);
+                        case "toString" -> lambda.toString();
+                        default -> throw new IllegalStateException("Unexpected Object method: " + method);
+                    };
+                }
+                if (method.isDefault()) {
+                    return InvocationHandler.invokeDefault(proxy, method, args == null ? new Object[0] : args);
+                }
+                Object[] arguments = args == null ? new Object[0] : args;
+                Object result = context == null ? lambda.invoke(arguments) : lambda.invoke(context, arguments);
+                Class<?> returnType = method.getReturnType();
+                return returnType == void.class ? null : coerceToType(context, result, returnType);
             }
-        }
-        return abstractMethods.size() == 1;
+        );
     }
 
     private static boolean isObjectMethod(Method method) {

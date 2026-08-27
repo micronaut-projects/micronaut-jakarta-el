@@ -147,6 +147,31 @@ class ELParserTest {
         assertInstanceOf(ELNode.MapData.class, map.entries().get(0).value());
     }
 
+    @Test
+    void expressionSizeIsBounded() {
+        ELParsingException tooLong = assertThrows(ELParsingException.class,
+            () -> ELParser.parse("x".repeat(ELParser.MAX_EXPRESSION_LENGTH + 1)));
+        assertTrue(tooLong.getMessage().contains("cannot exceed " + ELParser.MAX_EXPRESSION_LENGTH + " characters"));
+
+        String tooManyTokens = "${" + "1+".repeat(ELParser.MAX_TOKENS / 2) + "1}";
+        ELParsingException tokenFailure = assertThrows(ELParsingException.class,
+            () -> ELParser.parse(tooManyTokens));
+        assertTrue(tokenFailure.getMessage().contains("cannot exceed " + ELParser.MAX_TOKENS + " tokens"));
+    }
+
+    @Test
+    void expressionNestingIsBounded() {
+        String accepted = "${" + "(".repeat(ELParser.MAX_NESTING - 1) + "1"
+            + ")".repeat(ELParser.MAX_NESTING - 1) + "}";
+        String nested = "${" + "(".repeat(ELParser.MAX_NESTING) + "1"
+            + ")".repeat(ELParser.MAX_NESTING) + "}";
+
+        assertEquals(new ELNode.IntegerLiteral("1"), eval(accepted));
+        ELParsingException failure = assertThrows(ELParsingException.class, () -> ELParser.parse(nested));
+
+        assertTrue(failure.getMessage().contains("cannot exceed " + ELParser.MAX_NESTING + " levels"));
+    }
+
     private static ELNode eval(String expression) {
         return assertInstanceOf(ELNode.Eval.class, ELParser.parse(expression)).expression();
     }

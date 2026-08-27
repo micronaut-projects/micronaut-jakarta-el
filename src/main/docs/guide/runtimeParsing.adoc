@@ -7,6 +7,14 @@ It registers an `ELExpressionParser` service, which `CompiledExpressionFactory` 
 no generated source provides. Such an expression is parsed once, when it is created, and its tree is then
 evaluated by the interpreter.
 
+WARNING: Runtime expressions are executable application code, not sandboxed data. The standard Jakarta EL
+context can construct imported classes and invoke their public static and instance methods. Only parse strings
+from a fully trusted source; an operator or database field that an untrusted user can modify must not be passed
+directly to the expression factory.
+
+To bound CPU, memory and stack use, the parser rejects an expression longer than 16,384 characters, containing
+more than 1,024 tokens or nested more than 128 levels.
+
 snippet::example.RuntimeExpressionTest[project-base="doc-examples/example", title="RuntimeExpressionTest"]
 
 <1> The property is only known at runtime, so no declaration can have compiled the expression.

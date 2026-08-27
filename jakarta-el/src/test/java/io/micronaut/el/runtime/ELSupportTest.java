@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -145,6 +146,27 @@ class ELSupportTest {
         assertEquals("lambda", function.apply("lambda"));
         assertEquals(function, function);
         assertFalse(function.equals(new Object()));
+    }
+
+    @Test
+    void functionalInterfaceProxyKeepsTheContextItWasCreatedWith() {
+        CompiledELContext firstContext = new CompiledELContext().setBean("value", "first");
+        CompiledELContext secondContext = new CompiledELContext().setBean("value", "second");
+        assertContextIsCaptured(firstContext, secondContext, ELLambdas.create(firstContext, List.of(),
+            evaluated -> ((CompiledELContext) evaluated).getBean("value")));
+        assertContextIsCaptured(firstContext, secondContext, ELLambdas.lambda0(firstContext,
+            evaluated -> ((CompiledELContext) evaluated).getBean("value")));
+    }
+
+    private static void assertContextIsCaptured(CompiledELContext firstContext,
+                                                CompiledELContext secondContext,
+                                                LambdaExpression lambda) {
+        Supplier<?> first = ELSupport.coerceToType(firstContext, lambda, Supplier.class);
+        Supplier<?> second = ELSupport.coerceToType(secondContext, lambda, Supplier.class);
+
+        assertEquals("first", first.get());
+        assertEquals("second", second.get());
+        assertEquals("first", first.get());
     }
 
     @Test

@@ -24,8 +24,8 @@ import jakarta.el.ELException;
 import jakarta.el.MethodExpression;
 import jakarta.el.ValueExpression;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -44,9 +44,14 @@ public final class InterpretingELExpressionParser implements ELExpressionParser 
      * The number of parsed expressions kept: the syntax trees are immutable and an application evaluates the
      * same strings repeatedly, so a bounded cache saves the parse, as the other implementations do.
      */
-    private static final int CACHE_SIZE = 2048;
+    static final int CACHE_SIZE = 2048;
 
-    private final Map<String, Parsed> parsed = new ConcurrentHashMap<>();
+    private final Map<String, Parsed> parsed = new LinkedHashMap<>(CACHE_SIZE, 0.75f, true) {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<String, Parsed> eldest) {
+            return size() > CACHE_SIZE;
+        }
+    };
 
     @Override
     public ValueExpression createValueExpression(@Nullable ELContext context,
@@ -73,19 +78,24 @@ public final class InterpretingELExpressionParser implements ELExpressionParser 
             ELInterpreter.of(context, node));
     }
 
-    private Parsed parse(String expression) {
+    private synchronized Parsed parse(String expression) {
         Parsed entry = parsed.get(expression);
         if (entry == null) {
             ELNode node = ELParser.parse(expression);
             // an expression without functions evaluates the same way under every context, so its evaluators
             // are compiled once and shared by the expressions created from the string
             entry = new Parsed(node, ELInterpreter.containsFunction(node) ? null : ELInterpreter.of(null, node).compile(node));
-            if (parsed.size() >= CACHE_SIZE) {
-                parsed.clear();
-            }
             parsed.put(expression, entry);
         }
         return entry;
+    }
+
+    synchronized int cachedExpressions() {
+        return parsed.size();
+    }
+
+    synchronized boolean isCached(String expression) {
+        return parsed.containsKey(expression);
     }
 
     /**

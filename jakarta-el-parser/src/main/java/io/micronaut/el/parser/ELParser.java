@@ -36,13 +36,24 @@ import java.util.List;
 @Experimental
 public final class ELParser {
 
+    static final int MAX_EXPRESSION_LENGTH = 16_384;
+    static final int MAX_TOKENS = 1_024;
+    static final int MAX_NESTING = 128;
+
     private final String expression;
     private final List<Token> tokens;
     private int index;
+    private int nesting;
 
     private ELParser(String expression) {
+        if (expression.length() > MAX_EXPRESSION_LENGTH) {
+            throw new ELParsingException("An expression cannot exceed " + MAX_EXPRESSION_LENGTH + " characters");
+        }
         this.expression = expression;
         this.tokens = ELTokenizer.tokenize(expression);
+        if (tokens.size() > MAX_TOKENS) {
+            throw new ELParsingException("An expression cannot exceed " + MAX_TOKENS + " tokens");
+        }
     }
 
     /**
@@ -107,7 +118,12 @@ public final class ELParser {
     }
 
     private ELNode parseExpression() {
-        return parseSemicolon();
+        enterNesting();
+        try {
+            return parseSemicolon();
+        } finally {
+            nesting--;
+        }
     }
 
     private ELNode parseSemicolon() {
@@ -126,7 +142,12 @@ public final class ELParser {
         ELNode left = parseChoice();
         if (at(TokenType.ASSIGN)) {
             next();
-            return new ELNode.Assign(left, parseAssignment());
+            enterNesting();
+            try {
+                return new ELNode.Assign(left, parseAssignment());
+            } finally {
+                nesting--;
+            }
         }
         return left;
     }
@@ -134,8 +155,13 @@ public final class ELParser {
     private ELNode parseLambda() {
         List<String> parameters = parseLambdaParameters();
         expect(TokenType.ARROW);
-        ELNode body = isLambdaParametersAt(index) ? parseLambda() : parseChoice();
-        return new ELNode.Lambda(parameters, body);
+        enterNesting();
+        try {
+            ELNode body = isLambdaParametersAt(index) ? parseLambda() : parseChoice();
+            return new ELNode.Lambda(parameters, body);
+        } finally {
+            nesting--;
+        }
     }
 
     private List<String> parseLambdaParameters() {
@@ -159,10 +185,15 @@ public final class ELParser {
         ELNode condition = parseOr();
         if (at(TokenType.QUESTIONMARK)) {
             next();
-            ELNode ifTrue = parseChoice();
-            expect(TokenType.COLON);
-            ELNode ifFalse = parseChoice();
-            return new ELNode.Ternary(condition, ifTrue, ifFalse);
+            enterNesting();
+            try {
+                ELNode ifTrue = parseChoice();
+                expect(TokenType.COLON);
+                ELNode ifFalse = parseChoice();
+                return new ELNode.Ternary(condition, ifTrue, ifFalse);
+            } finally {
+                nesting--;
+            }
         }
         return condition;
     }
@@ -242,17 +273,26 @@ public final class ELParser {
     private ELNode parseUnary() {
         if (at(TokenType.MINUS)) {
             next();
-            return new ELNode.Unary(UnaryOperator.NEGATE, parseUnary());
+            return parseUnary(UnaryOperator.NEGATE);
         }
         if (at(TokenType.NOT)) {
             next();
-            return new ELNode.Unary(UnaryOperator.NOT, parseUnary());
+            return parseUnary(UnaryOperator.NOT);
         }
         if (at(TokenType.EMPTY)) {
             next();
-            return new ELNode.Unary(UnaryOperator.EMPTY, parseUnary());
+            return parseUnary(UnaryOperator.EMPTY);
         }
         return parseValue();
+    }
+
+    private ELNode parseUnary(UnaryOperator operator) {
+        enterNesting();
+        try {
+            return new ELNode.Unary(operator, parseUnary());
+        } finally {
+            nesting--;
+        }
     }
 
     private ELNode parseValue() {
@@ -418,6 +458,12 @@ public final class ELParser {
             return new ELNode.MapData.MapEntry(key, parseExpression());
         }
         return new ELNode.MapData.MapEntry(key, null);
+    }
+
+    private void enterNesting() {
+        if (++nesting > MAX_NESTING) {
+            throw error("An expression cannot exceed " + MAX_NESTING + " levels of nesting");
+        }
     }
 
     private boolean isLambdaParametersAt(int position) {
