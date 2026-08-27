@@ -12,7 +12,7 @@ import java.util.List;
         @ELVariable(name = "author", type = Author.class),
         @ELVariable(name = "books", type = List.class)
     },
-    imports = {Suit.class, Book.class, VarargsConstructor.class},
+    imports = {Suit.class, Book.class, VarargsConstructor.class, Varargs.class},
     staticImports = {Suit.class, TextFunctions.class},
     functions = @ELFunctions(prefix = "fn", value = TextFunctions.class)
 )
@@ -29,6 +29,7 @@ import java.util.List;
 @ELExpression(value = "${SPADE}", name = "importedSuit")
 @ELExpression(value = "${Book('EL', 'history', 10)}", name = "newBook")
 @ELExpression(value = "${VarargsConstructor('a', 'b').value}", name = "varargsConstructor")
+@ELExpression(value = "${Varargs('a', 'b').value}", name = "varargs")
 @ELExpression(value = "${Boolean.TRUE}", name = "booleanConstant")
 @ELExpression(value = "${Integer.valueOf('42')}", name = "staticMethod")
 @ELExpression(value = "${books.stream().filter(b->b.unitPrice ge 10).map(b->b.title).toList()}", name = "expensive")

@@ -50,6 +50,7 @@ class CatalogExpressionsTest {
         assertEquals(42, value(CatalogExpressions$ELExpressions.STATIC_METHOD));
         assertEquals("EL", ((Book) value(CatalogExpressions$ELExpressions.NEW_BOOK)).getTitle());
         assertEquals("a,b", value(CatalogExpressions$ELExpressions.VARARGS_CONSTRUCTOR));
+        assertEquals("a,b", value(CatalogExpressions$ELExpressions.VARARGS));
     }
 
     @Test
