@@ -3,6 +3,7 @@ package io.micronaut.el.test;
 import io.micronaut.context.annotation.Executable;
 import io.micronaut.core.annotation.Introspected;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
@@ -42,5 +43,15 @@ public class Formatting {
     @Executable
     public String select(String value) {
         return "string";
+    }
+
+    @Executable
+    public String ambiguous(Comparable<?> value) {
+        return "comparable";
+    }
+
+    @Executable
+    public String ambiguous(Serializable value) {
+        return "serializable";
     }
 }

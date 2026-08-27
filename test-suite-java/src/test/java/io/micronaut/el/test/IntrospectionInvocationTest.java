@@ -3,6 +3,7 @@ package io.micronaut.el.test;
 import io.micronaut.el.CompiledELContext;
 import jakarta.el.ELContext;
 import jakarta.el.ELResolver;
+import jakarta.el.MethodNotFoundException;
 import io.micronaut.el.resolver.IntrospectionELResolver;
 import jakarta.el.ELException;
 import org.junit.jupiter.api.Test;
@@ -39,6 +40,11 @@ class IntrospectionInvocationTest {
     @Test
     void theFixedArityOverloadWinsWhenItFits() {
         assertEquals("only:-", invoke("join", "-"));
+    }
+
+    @Test
+    void equallySpecificOverloadsAreAmbiguous() {
+        assertThrows(MethodNotFoundException.class, () -> invoke("ambiguous", 1));
     }
 
     @Test
