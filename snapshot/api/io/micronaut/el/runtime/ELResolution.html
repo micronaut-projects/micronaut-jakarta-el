@@ -64,6 +64,9 @@ loadScripts(document, 'script');</script>
 <li><a href="#getIdentifierType(jakarta.el.ELContext,java.lang.String)" tabindex="0">getIdentifierType(ELContext, String)</a></li>
 <li><a href="#isIdentifierReadOnly(jakarta.el.ELContext,java.lang.String)" tabindex="0">isIdentifierReadOnly(ELContext, String)</a></li>
 <li><a href="#getValue(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" tabindex="0">getValue(ELContext, Object, Object)</a></li>
+<li><a href="#access(jakarta.el.ELContext,java.lang.Object,io.micronaut.el.runtime.ELLambdaBody.Unary)" tabindex="0">access(ELContext, Object, ELLambdaBody.Unary)</a></li>
+<li><a href="#accessRequired(jakarta.el.ELContext,java.lang.Object,io.micronaut.el.runtime.ELLambdaBody.Unary)" tabindex="0">accessRequired(ELContext, Object, ELLambdaBody.Unary)</a></li>
+<li><a href="#requireBase(java.lang.Object)" tabindex="0">requireBase(Object)</a></li>
 <li><a href="#getValueRequired(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" tabindex="0">getValueRequired(ELContext, Object, Object)</a></li>
 <li><a href="#setValue(jakarta.el.ELContext,java.lang.Object,java.lang.Object,java.lang.Object)" tabindex="0">setValue(ELContext, Object, Object, Object)</a></li>
 <li><a href="#getType(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" tabindex="0">getType(ELContext, Object, Object)</a></li>
@@ -76,6 +79,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#invokeWithParamTypes(jakarta.el.ELContext,java.lang.Object,java.lang.Object,java.lang.Class%5B%5D,java.lang.Object%5B%5D)" tabindex="0">invokeWithParamTypes(ELContext, Object, Object, Class[], Object[])</a></li>
 <li><a href="#invokeMethod(jakarta.el.ELContext,java.lang.Object,java.lang.reflect.Method,java.lang.Object%5B%5D)" tabindex="0">invokeMethod(ELContext, Object, Method, Object[])</a></li>
 <li><a href="#invokeCallable(jakarta.el.ELContext,java.lang.Object,java.lang.Object...)" tabindex="0">invokeCallable(ELContext, Object, Object...)</a></li>
+<li><a href="#resolveCallableIdentifier(jakarta.el.ELContext,java.lang.String)" tabindex="0">resolveCallableIdentifier(ELContext, String)</a></li>
 <li><a href="#newInstance(jakarta.el.ELContext,jakarta.el.ELClass,java.lang.Object...)" tabindex="0">newInstance(ELContext, ELClass, Object...)</a></li>
 <li><a href="#resolveStaticMember(jakarta.el.ELContext,jakarta.el.ELClass,java.lang.String)" tabindex="0">resolveStaticMember(ELContext, ELClass, String)</a></li>
 <li><a href="#functionProvider(jakarta.el.ELContext,java.lang.Class)" tabindex="0">functionProvider(ELContext, Class)</a></li>
@@ -123,6 +127,20 @@ API of the module.</p></div>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#access(jakarta.el.ELContext,java.lang.Object,io.micronaut.el.runtime.ELLambdaBody.Unary)" class="member-name-link">access</a><wbr>(jakarta.el.ELContext&nbsp;context,
+ @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;base,
+ <a href="ELLambdaBody.Unary.html" title="interface in io.micronaut.el.runtime">ELLambdaBody.Unary</a>&nbsp;access)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Evaluates a property or method continuation only when its base is non-null.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#accessRequired(jakarta.el.ELContext,java.lang.Object,io.micronaut.el.runtime.ELLambdaBody.Unary)" class="member-name-link">accessRequired</a><wbr>(jakarta.el.ELContext&nbsp;context,
+ @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;base,
+ <a href="ELLambdaBody.Unary.html" title="interface in io.micronaut.el.runtime">ELLambdaBody.Unary</a>&nbsp;access)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Evaluates an lvalue continuation after requiring its base.</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#assignIdentifier(jakarta.el.ELContext,java.lang.String,java.lang.Object)" class="member-name-link">assignIdentifier</a><wbr>(jakarta.el.ELContext&nbsp;context,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
@@ -199,7 +217,7 @@ method expression that does not provide its own parameters.</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#invokeMethodExpression(jakarta.el.ELContext,java.lang.Object,java.lang.Object%5B%5D)" class="member-name-link">invokeMethodExpression</a><wbr>(jakarta.el.ELContext&nbsp;context,
  @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;target,
- @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>[]&nbsp;arguments)</code></div>
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a> @Nullable []&nbsp;arguments)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Invokes a method expression resolved from a single identifier, as described in the section 1.5.4 of
 the specification.</div>
@@ -208,7 +226,7 @@ the specification.</div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#invokeWithParams(jakarta.el.ELContext,java.lang.Object,java.lang.Object,java.lang.Object%5B%5D)" class="member-name-link">invokeWithParams</a><wbr>(jakarta.el.ELContext&nbsp;context,
  @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;base,
  @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;method,
- @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>[]&nbsp;params)</code></div>
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a> @Nullable []&nbsp;params)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Invokes a method of a base object with the parameters passed to
 <code>jakarta.el.MethodExpression.invoke(ELContext, Object[])</code>.</div>
@@ -218,7 +236,7 @@ the specification.</div>
  @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;base,
  @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;method,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt; @Nullable []&nbsp;paramTypes,
- @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>[]&nbsp;params)</code></div>
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a> @Nullable []&nbsp;params)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Invokes a method of a base object with the parameter types provided when the expression was created,
 which is how the section 1.6 of the specification resolves an overloaded method.</div>
@@ -253,6 +271,17 @@ knows to be a map; a null base or key is null, section 1.6 of the specification.
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>...&nbsp;arguments)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Invokes the constructor of an imported class as described in the section 1.24.3 of the specification.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#requireBase(java.lang.Object)" class="member-name-link">requireBase</a><wbr>(@Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;base)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Requires the evaluated base of an lvalue to be non-null before its property or value is evaluated.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#resolveCallableIdentifier(jakarta.el.ELContext,java.lang.String)" class="member-name-link">resolveCallableIdentifier</a><wbr>(jakarta.el.ELContext&nbsp;context,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Resolves an identifier used as a function, reporting a missing identifier as a missing function.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#resolveIdentifier(jakarta.el.ELContext,java.lang.String)" class="member-name-link">resolveIdentifier</a><wbr>(jakarta.el.ELContext&nbsp;context,
@@ -448,6 +477,61 @@ and so does a null base or index, section 1.6 of the specification.</div>
 </section>
 </li>
 <li>
+<section class="detail" id="access(jakarta.el.ELContext,java.lang.Object,io.micronaut.el.runtime.ELLambdaBody.Unary)">
+<h3>access</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">@Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span>&nbsp;<span class="element-name">access</span><wbr><span class="parameters">(jakarta.el.ELContext&nbsp;context,
+ @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;base,
+ <a href="ELLambdaBody.Unary.html" title="interface in io.micronaut.el.runtime">ELLambdaBody.Unary</a>&nbsp;access)</span></div>
+<div class="block">Evaluates a property or method continuation only when its base is non-null. Section 1.6 evaluates the
+base first and returns <code>null</code> without evaluating the property or parameters when the base is null.
+Generated expressions use this helper so statically resolved, direct member accesses retain that order
+without falling back to reflective resolution.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>context</code> - The context</dd>
+<dd><code>base</code> - The evaluated base</dd>
+<dd><code>access</code> - The compiled continuation, receiving the non-null base</dd>
+<dt>Returns:</dt>
+<dd>The result, or <code>null</code> for a null base</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="accessRequired(jakarta.el.ELContext,java.lang.Object,io.micronaut.el.runtime.ELLambdaBody.Unary)">
+<h3>accessRequired</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">@Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span>&nbsp;<span class="element-name">accessRequired</span><wbr><span class="parameters">(jakarta.el.ELContext&nbsp;context,
+ @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;base,
+ <a href="ELLambdaBody.Unary.html" title="interface in io.micronaut.el.runtime">ELLambdaBody.Unary</a>&nbsp;access)</span></div>
+<div class="block">Evaluates an lvalue continuation after requiring its base. Assigning an lvalue with a null base fails
+before its property or assigned value is evaluated.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>context</code> - The context</dd>
+<dd><code>base</code> - The evaluated base</dd>
+<dd><code>access</code> - The compiled continuation</dd>
+<dt>Returns:</dt>
+<dd>The continuation result</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="requireBase(java.lang.Object)">
+<h3>requireBase</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">requireBase</span><wbr><span class="parameters">(@Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;base)</span></div>
+<div class="block">Requires the evaluated base of an lvalue to be non-null before its property or value is evaluated.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>base</code> - The evaluated base</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
 <section class="detail" id="getValueRequired(jakarta.el.ELContext,java.lang.Object,java.lang.Object)">
 <h3>getValueRequired</h3>
 <div class="horizontal-scroll">
@@ -569,7 +653,7 @@ specification.</div>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">@Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span>&nbsp;<span class="element-name">invokeMethodExpression</span><wbr><span class="parameters">(jakarta.el.ELContext&nbsp;context,
  @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;target,
- @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>[]&nbsp;arguments)</span></div>
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a> @Nullable []&nbsp;arguments)</span></div>
 <div class="block">Invokes a method expression resolved from a single identifier, as described in the section 1.5.4 of
 the specification.</div>
 <dl class="notes">
@@ -611,7 +695,7 @@ the specification.</div>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">@Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span>&nbsp;<span class="element-name">invokeWithParams</span><wbr><span class="parameters">(jakarta.el.ELContext&nbsp;context,
  @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;base,
  @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;method,
- @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>[]&nbsp;params)</span></div>
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a> @Nullable []&nbsp;params)</span></div>
 <div class="block">Invokes a method of a base object with the parameters passed to
 <code>jakarta.el.MethodExpression.invoke(ELContext, Object[])</code>.</div>
 <dl class="notes">
@@ -634,7 +718,7 @@ the specification.</div>
  @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;base,
  @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;method,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt; @Nullable []&nbsp;paramTypes,
- @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>[]&nbsp;params)</span></div>
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a> @Nullable []&nbsp;params)</span></div>
 <div class="block">Invokes a method of a base object with the parameter types provided when the expression was created,
 which is how the section 1.6 of the specification resolves an overloaded method.</div>
 <dl class="notes">
@@ -688,6 +772,23 @@ which covers the invocation of lambda expressions returning lambda expressions.<
 <dd><code>arguments</code> - The arguments</dd>
 <dt>Returns:</dt>
 <dd>The result of the invocation</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="resolveCallableIdentifier(jakarta.el.ELContext,java.lang.String)">
+<h3>resolveCallableIdentifier</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">@Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span>&nbsp;<span class="element-name">resolveCallableIdentifier</span><wbr><span class="parameters">(jakarta.el.ELContext&nbsp;context,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</span></div>
+<div class="block">Resolves an identifier used as a function, reporting a missing identifier as a missing function.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>context</code> - The context</dd>
+<dd><code>name</code> - The identifier</dd>
+<dt>Returns:</dt>
+<dd>The callable value</dd>
 </dl>
 </div>
 </section>

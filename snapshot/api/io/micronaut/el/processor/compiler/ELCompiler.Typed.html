@@ -59,6 +59,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#constructor-detail" tabindex="0">Constructor Details</a>
 <ol class="toc-list">
 <li><a href="#%3Cinit%3E(io.micronaut.sourcegen.model.ExpressionDef,io.micronaut.inject.ast.ClassElement)" tabindex="0">Typed(ExpressionDef, ClassElement)</a></li>
+<li><a href="#%3Cinit%3E(io.micronaut.sourcegen.model.ExpressionDef,io.micronaut.inject.ast.ClassElement,io.micronaut.sourcegen.model.ExpressionDef)" tabindex="0">Typed(ExpressionDef, ClassElement, ExpressionDef)</a></li>
 </ol>
 </li>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
@@ -68,6 +69,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#equals(java.lang.Object)" tabindex="0">equals(Object)</a></li>
 <li><a href="#expression()" tabindex="0">expression()</a></li>
 <li><a href="#type()" tabindex="0">type()</a></li>
+<li><a href="#primitiveExpression()" tabindex="0">primitiveExpression()</a></li>
 </ol>
 </li>
 </ol>
@@ -86,7 +88,8 @@ loadScripts(document, 'script');</script>
 <dl class="notes">
 <dt>Record Components:</dt>
 <dd><code><span id="param-expression">expression</span></code> - The compiled expression</dd>
-<dd><code><span id="param-type">type</span></code> - The statically known type, <code>null</code> when the expression is resolved dynamically</dd>
+<dd><code><span id="param-type">type</span></code> - The static type, or <code>null</code></dd>
+<dd><code><span id="param-primitiveExpression">primitiveExpression</span></code> - The non-null primitive form used by operators, or <code>null</code></dd>
 </dl>
 <dl class="notes">
 <dt>Enclosing class:</dt>
@@ -94,9 +97,9 @@ loadScripts(document, 'script');</script>
 </dl>
 <hr>
 <div class="horizontal-scroll">
-<div class="type-signature"><span class="modifiers">public static record </span><span class="element-name type-name-label">ELCompiler.Typed</span>(io.micronaut.sourcegen.model.ExpressionDef&nbsp;expression, @Nullable io.micronaut.inject.ast.ClassElement&nbsp;type)
+<div class="type-signature"><span class="modifiers">public static record </span><span class="element-name type-name-label">ELCompiler.Typed</span>(io.micronaut.sourcegen.model.ExpressionDef&nbsp;expression, @Nullable io.micronaut.inject.ast.ClassElement&nbsp;type, @Nullable io.micronaut.sourcegen.model.ExpressionDef&nbsp;primitiveExpression)
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Record.html" title="class or interface in java.lang" class="external-link">Record</a></span></div>
-<div class="block">A compiled expression with the type known at compilation time, when there is one.</div>
+<div class="block">A compiled expression and its statically known type, when available.</div>
 <dl class="notes">
 <dt>Since:</dt>
 <dd>1.0</dd>
@@ -117,7 +120,11 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-last">Description</div>
 <div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(io.micronaut.sourcegen.model.ExpressionDef,io.micronaut.inject.ast.ClassElement)" class="member-name-link">Typed</a><wbr>(io.micronaut.sourcegen.model.ExpressionDef&nbsp;expression,
  @Nullable io.micronaut.inject.ast.ClassElement&nbsp;type)</code></div>
-<div class="col-last even-row-color">
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(io.micronaut.sourcegen.model.ExpressionDef,io.micronaut.inject.ast.ClassElement,io.micronaut.sourcegen.model.ExpressionDef)" class="member-name-link">Typed</a><wbr>(io.micronaut.sourcegen.model.ExpressionDef&nbsp;expression,
+ @Nullable io.micronaut.inject.ast.ClassElement&nbsp;type,
+ @Nullable io.micronaut.sourcegen.model.ExpressionDef&nbsp;primitiveExpression)</code></div>
+<div class="col-last odd-row-color">
 <div class="block">Creates an instance of a <code>Typed</code> record class.</div>
 </div>
 </div>
@@ -149,14 +156,19 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns a hash code value for this object.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toString()" class="member-name-link">toString</a>()</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@Nullable io.micronaut.sourcegen.model.ExpressionDef</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#primitiveExpression()" class="member-name-link">primitiveExpression</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the value of the <a href="#param-primitiveExpression"><code>primitiveExpression</code></a> record component.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toString()" class="member-name-link">toString</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns a string representation of this record class.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@Nullable io.micronaut.inject.ast.ClassElement</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#type()" class="member-name-link">type</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@Nullable io.micronaut.inject.ast.ClassElement</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#type()" class="member-name-link">type</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the value of the <a href="#param-type"><code>type</code></a> record component.</div>
 </div>
 </div>
@@ -182,11 +194,22 @@ loadScripts(document, 'script');</script>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">Typed</span><wbr><span class="parameters">(io.micronaut.sourcegen.model.ExpressionDef&nbsp;expression,
  @Nullable io.micronaut.inject.ast.ClassElement&nbsp;type)</span></div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="&lt;init&gt;(io.micronaut.sourcegen.model.ExpressionDef,io.micronaut.inject.ast.ClassElement,io.micronaut.sourcegen.model.ExpressionDef)">
+<h3>Typed</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">Typed</span><wbr><span class="parameters">(io.micronaut.sourcegen.model.ExpressionDef&nbsp;expression,
+ @Nullable io.micronaut.inject.ast.ClassElement&nbsp;type,
+ @Nullable io.micronaut.sourcegen.model.ExpressionDef&nbsp;primitiveExpression)</span></div>
 <div class="block">Creates an instance of a <code>Typed</code> record class.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>expression</code> - the value for the <a href="#param-expression"><code>expression</code></a> record component</dd>
 <dd><code>type</code> - the value for the <a href="#param-type"><code>type</code></a> record component</dd>
+<dd><code>primitiveExpression</code> - the value for the <a href="#param-primitiveExpression"><code>primitiveExpression</code></a> record component</dd>
 </dl>
 </div>
 </section>
@@ -268,6 +291,19 @@ loadScripts(document, 'script');</script>
 <dl class="notes">
 <dt>Returns:</dt>
 <dd>the value of the <a href="#param-type"><code>type</code></a> record component</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="primitiveExpression()">
+<h3>primitiveExpression</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">@Nullable io.micronaut.sourcegen.model.ExpressionDef</span>&nbsp;<span class="element-name">primitiveExpression</span>()</div>
+<div class="block">Returns the value of the <a href="#param-primitiveExpression"><code>primitiveExpression</code></a> record component.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>the value of the <a href="#param-primitiveExpression"><code>primitiveExpression</code></a> record component</dd>
 </dl>
 </div>
 </section>

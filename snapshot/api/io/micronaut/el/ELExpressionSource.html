@@ -58,7 +58,9 @@ loadScripts(document, 'script');</script>
 <ol class="toc-list">
 <li><a href="#expressions()" tabindex="0">expressions()</a></li>
 <li><a href="#createValueExpression(java.lang.String,java.lang.Class)" tabindex="0">createValueExpression(String, Class)</a></li>
+<li><a href="#createValueExpression(jakarta.el.ELContext,java.lang.String,java.lang.Class)" tabindex="0">createValueExpression(ELContext, String, Class)</a></li>
 <li><a href="#createMethodExpression(java.lang.String,java.lang.Class,java.lang.Class%5B%5D)" tabindex="0">createMethodExpression(String, Class, Class[])</a></li>
+<li><a href="#createMethodExpression(jakarta.el.ELContext,java.lang.String,java.lang.Class,java.lang.Class%5B%5D)" tabindex="0">createMethodExpression(ELContext, String, Class, Class[])</a></li>
 </ol>
 </li>
 </ol>
@@ -100,10 +102,25 @@ string.</p></div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default @Nullable jakarta.el.MethodExpression</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#createMethodExpression(java.lang.String,java.lang.Class,java.lang.Class%5B%5D)" class="member-name-link">createMethodExpression</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;expression,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;expectedReturnType,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;[]&nbsp;expectedParamTypes)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">&nbsp;</div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#createMethodExpression(jakarta.el.ELContext,java.lang.String,java.lang.Class,java.lang.Class%5B%5D)" class="member-name-link">createMethodExpression</a><wbr>(@Nullable jakarta.el.ELContext&nbsp;context,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;expression,
+ @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;expectedReturnType,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt; @Nullable []&nbsp;expectedParamTypes)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
+<div class="block">Creates a compiled method expression and binds its variables against the creation context.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default @Nullable jakarta.el.MethodExpression</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#createMethodExpression(java.lang.String,java.lang.Class,java.lang.Class%5B%5D)" class="member-name-link">createMethodExpression</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;expression,
+ @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;expectedReturnType,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt; @Nullable []&nbsp;expectedParamTypes)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default @Nullable jakarta.el.ValueExpression</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#createValueExpression(jakarta.el.ELContext,java.lang.String,java.lang.Class)" class="member-name-link">createValueExpression</a><wbr>(@Nullable jakarta.el.ELContext&nbsp;context,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;expression,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;expectedType)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
+<div class="block">Creates a compiled value expression and binds its variables against the creation context.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default @Nullable jakarta.el.ValueExpression</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#createValueExpression(java.lang.String,java.lang.Class)" class="member-name-link">createValueExpression</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;expression,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;expectedType)</code></div>
@@ -162,19 +179,69 @@ before this method existed working, at the cost of a lookup per expression.</p><
 </section>
 </li>
 <li>
+<section class="detail" id="createValueExpression(jakarta.el.ELContext,java.lang.String,java.lang.Class)">
+<h3>createValueExpression</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type">@Nullable jakarta.el.ValueExpression</span>&nbsp;<span class="element-name">createValueExpression</span><wbr><span class="parameters">(@Nullable jakarta.el.ELContext&nbsp;context,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;expression,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;expectedType)</span></div>
+<div class="block">Creates a compiled value expression and binds its variables against the creation context.
+
+<p>The default delegates to the original context-free method so sources generated before this overload
+existed remain compatible.</p></div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>context</code> - The creation context</dd>
+<dd><code>expression</code> - The expression string</dd>
+<dd><code>expectedType</code> - The expected type</dd>
+<dt>Returns:</dt>
+<dd>The compiled value expression or <code>null</code> when this source does not declare it</dd>
+<dt>Since:</dt>
+<dd>1.0.1</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
 <section class="detail" id="createMethodExpression(java.lang.String,java.lang.Class,java.lang.Class[])">
 <h3>createMethodExpression</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type">@Nullable jakarta.el.MethodExpression</span>&nbsp;<span class="element-name">createMethodExpression</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;expression,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;expectedReturnType,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;[]&nbsp;expectedParamTypes)</span></div>
+ @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;expectedReturnType,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt; @Nullable []&nbsp;expectedParamTypes)</span></div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>expression</code> - The expression string</dd>
-<dd><code>expectedReturnType</code> - The expected return type</dd>
-<dd><code>expectedParamTypes</code> - The expected parameter types</dd>
+<dd><code>expectedReturnType</code> - The expected return type, or <code>null</code> when the caller does not care</dd>
+<dd><code>expectedParamTypes</code> - The expected parameter types, or <code>null</code> when the expression provides them</dd>
 <dt>Returns:</dt>
 <dd>The compiled method expression or <code>null</code> when this source does not declare it</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="createMethodExpression(jakarta.el.ELContext,java.lang.String,java.lang.Class,java.lang.Class[])">
+<h3>createMethodExpression</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type">@Nullable jakarta.el.MethodExpression</span>&nbsp;<span class="element-name">createMethodExpression</span><wbr><span class="parameters">(@Nullable jakarta.el.ELContext&nbsp;context,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;expression,
+ @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;expectedReturnType,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt; @Nullable []&nbsp;expectedParamTypes)</span></div>
+<div class="block">Creates a compiled method expression and binds its variables against the creation context.
+
+<p>The default delegates to the original context-free method so sources generated before this overload
+existed remain compatible.</p></div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>context</code> - The creation context</dd>
+<dd><code>expression</code> - The expression string</dd>
+<dd><code>expectedReturnType</code> - The expected return type, or <code>null</code> when the caller does not care</dd>
+<dd><code>expectedParamTypes</code> - The expected parameter types, or <code>null</code> when the expression provides them</dd>
+<dt>Returns:</dt>
+<dd>The compiled method expression or <code>null</code> when this source does not declare it</dd>
+<dt>Since:</dt>
+<dd>1.0.1</dd>
 </dl>
 </div>
 </section>

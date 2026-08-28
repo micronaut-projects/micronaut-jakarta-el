@@ -63,6 +63,8 @@ loadScripts(document, 'script');</script>
 </li>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
 <ol class="toc-list">
+<li><a href="#beginClass(java.lang.String)" tabindex="0">beginClass(String)</a></li>
+<li><a href="#accessMethods()" tabindex="0">accessMethods()</a></li>
 <li><a href="#compile(io.micronaut.el.parser.ast.ELNode,io.micronaut.sourcegen.model.ExpressionDef)" tabindex="0">compile(ELNode, ExpressionDef)</a></li>
 <li><a href="#compileEvaluation(io.micronaut.el.parser.ast.ELNode,io.micronaut.sourcegen.model.ExpressionDef,java.util.function.Function)" tabindex="0">compileEvaluation(ELNode, ExpressionDef, Function)</a></li>
 <li><a href="#evaluationType()" tabindex="0">evaluationType()</a></li>
@@ -73,6 +75,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#invokeRuntime(io.micronaut.sourcegen.model.ClassTypeDef,java.lang.String,io.micronaut.sourcegen.model.TypeDef,io.micronaut.sourcegen.model.ExpressionDef...)" tabindex="0">invokeRuntime(ClassTypeDef, String, TypeDef, ExpressionDef...)</a></li>
 <li><a href="#compileTyped(io.micronaut.el.parser.ast.ELNode,io.micronaut.sourcegen.model.ExpressionDef)" tabindex="0">compileTyped(ELNode, ExpressionDef)</a></li>
 <li><a href="#unresolvedIdentifiers()" tabindex="0">unresolvedIdentifiers()</a></li>
+<li><a href="#canonical(io.micronaut.el.parser.ast.ELNode)" tabindex="0">canonical(ELNode)</a></li>
 <li><a href="#hasAssignments(io.micronaut.el.parser.ast.ELNode)" tabindex="0">hasAssignments(ELNode)</a></li>
 </ol>
 </li>
@@ -92,15 +95,10 @@ loadScripts(document, 'script');</script>
 <div class="type-signature"><span class="annotations">@Internal
 </span><span class="modifiers">public final class </span><span class="element-name type-name-label">ELCompiler</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span></div>
-<div class="block">The compiler lowering the abstract syntax tree of an expression to the source model of Micronaut
-SourceGen.
+<div class="block">Lowers an expression syntax tree to the Micronaut SourceGen model.
 
-<p>Every construct of the language is compiled to the equivalent Java expression. The property
-accesses, the method invocations, the static references and the functions whose types are known at
-compilation time are compiled to direct invocations, the remaining ones are compiled to the resolution
-described in the sections 1.5 and 1.6 of the specification. The operators whose operand types are known
-at compilation time are compiled to the Java operators the runtime would reach, see
-<code>inlineBinary(BinaryOperator, Typed, Typed)</code>.</p></div>
+<p>Statically known accesses and operators become direct Java operations. The remainder uses the runtime
+resolution described in sections 1.5 and 1.6 of the specification.</p></div>
 <dl class="notes">
 <dt>Since:</dt>
 <dd>1.0</dd>
@@ -123,12 +121,12 @@ at compilation time are compiled to the Java operators the runtime would reach, 
 <div class="col-first even-row-color"><code>static final record&nbsp;</code></div>
 <div class="col-second even-row-color"><code><a href="ELCompiler.LValue.html" class="type-name-link" title="class in io.micronaut.el.processor.compiler">ELCompiler.LValue</a></code></div>
 <div class="col-last even-row-color">
-<div class="block">The base object and the property of an lvalue.</div>
+<div class="block">The base and property of an lvalue.</div>
 </div>
 <div class="col-first odd-row-color"><code>static final record&nbsp;</code></div>
 <div class="col-second odd-row-color"><code><a href="ELCompiler.Typed.html" class="type-name-link" title="class in io.micronaut.el.processor.compiler">ELCompiler.Typed</a></code></div>
 <div class="col-last odd-row-color">
-<div class="block">A compiled expression with the type known at compilation time, when there is one.</div>
+<div class="block">A compiled expression and its statically known type, when available.</div>
 </div>
 </div>
 </section>
@@ -157,64 +155,80 @@ at compilation time are compiled to the Java operators the runtime would reach, 
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>io.micronaut.sourcegen.model.ExpressionDef</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#compile(io.micronaut.el.parser.ast.ELNode,io.micronaut.sourcegen.model.ExpressionDef)" class="member-name-link">compile</a><wbr>(<a href="../../parser/ast/ELNode.html" title="interface in io.micronaut.el.parser.ast">ELNode</a>&nbsp;node,
- io.micronaut.sourcegen.model.ExpressionDef&nbsp;elContext)</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;io.micronaut.sourcegen.model.MethodDef&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#accessMethods()" class="member-name-link">accessMethods</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the private helpers accumulated while compiling the current expression class.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#beginClass(java.lang.String)" class="member-name-link">beginClass</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;className)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Starts compiling one generated expression class.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#canonical(io.micronaut.el.parser.ast.ELNode)" class="member-name-link">canonical</a><wbr>(<a href="../../parser/ast/ELNode.html" title="interface in io.micronaut.el.parser.ast">ELNode</a>&nbsp;node)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the equality form of a generated expression, replacing declared function names with the methods
+bound to them as required by the Jakarta EL expression equality contract.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>io.micronaut.sourcegen.model.ExpressionDef</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#compile(io.micronaut.el.parser.ast.ELNode,io.micronaut.sourcegen.model.ExpressionDef)" class="member-name-link">compile</a><wbr>(<a href="../../parser/ast/ELNode.html" title="interface in io.micronaut.el.parser.ast">ELNode</a>&nbsp;node,
+ io.micronaut.sourcegen.model.ExpressionDef&nbsp;elContext)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Compiles an expression.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>io.micronaut.sourcegen.model.StatementDef</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#compileEvaluation(io.micronaut.el.parser.ast.ELNode,io.micronaut.sourcegen.model.ExpressionDef,java.util.function.Function)" class="member-name-link">compileEvaluation</a><wbr>(<a href="../../parser/ast/ELNode.html" title="interface in io.micronaut.el.parser.ast">ELNode</a>&nbsp;node,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>io.micronaut.sourcegen.model.StatementDef</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#compileEvaluation(io.micronaut.el.parser.ast.ELNode,io.micronaut.sourcegen.model.ExpressionDef,java.util.function.Function)" class="member-name-link">compileEvaluation</a><wbr>(<a href="../../parser/ast/ELNode.html" title="interface in io.micronaut.el.parser.ast">ELNode</a>&nbsp;node,
  io.micronaut.sourcegen.model.ExpressionDef&nbsp;elContext,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;io.micronaut.sourcegen.model.ExpressionDef, <a href="ELCompiler.Typed.html" title="class in io.micronaut.el.processor.compiler">ELCompiler.Typed</a>&gt;&nbsp;body)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Compiles the evaluation of an expression as the body of a method returning its result.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@Nullable <a href="ELCompiler.LValue.html" title="class in io.micronaut.el.processor.compiler">ELCompiler.LValue</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#compileLValue(io.micronaut.el.parser.ast.ELNode,io.micronaut.sourcegen.model.ExpressionDef)" class="member-name-link">compileLValue</a><wbr>(<a href="../../parser/ast/ELNode.html" title="interface in io.micronaut.el.parser.ast">ELNode</a>&nbsp;node,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@Nullable <a href="ELCompiler.LValue.html" title="class in io.micronaut.el.processor.compiler">ELCompiler.LValue</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#compileLValue(io.micronaut.el.parser.ast.ELNode,io.micronaut.sourcegen.model.ExpressionDef)" class="member-name-link">compileLValue</a><wbr>(<a href="../../parser/ast/ELNode.html" title="interface in io.micronaut.el.parser.ast">ELNode</a>&nbsp;node,
  io.micronaut.sourcegen.model.ExpressionDef&nbsp;elContext)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Compiles the base object and the property of an lvalue, as described in the section 1.13 of the
 specification.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="ELCompiler.Typed.html" title="class in io.micronaut.el.processor.compiler">ELCompiler.Typed</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#compileTyped(io.micronaut.el.parser.ast.ELNode,io.micronaut.sourcegen.model.ExpressionDef)" class="member-name-link">compileTyped</a><wbr>(<a href="../../parser/ast/ELNode.html" title="interface in io.micronaut.el.parser.ast">ELNode</a>&nbsp;node,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="ELCompiler.Typed.html" title="class in io.micronaut.el.processor.compiler">ELCompiler.Typed</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#compileTyped(io.micronaut.el.parser.ast.ELNode,io.micronaut.sourcegen.model.ExpressionDef)" class="member-name-link">compileTyped</a><wbr>(<a href="../../parser/ast/ELNode.html" title="interface in io.micronaut.el.parser.ast">ELNode</a>&nbsp;node,
  io.micronaut.sourcegen.model.ExpressionDef&nbsp;ctx)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Compiles an expression, with its static type.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#evaluatesTo(io.micronaut.inject.ast.ClassElement)" class="member-name-link">evaluatesTo</a><wbr>(io.micronaut.inject.ast.ClassElement&nbsp;expected)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@Nullable io.micronaut.inject.ast.ClassElement</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#evaluationType()" class="member-name-link">evaluationType</a>()</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#evaluatesTo(io.micronaut.inject.ast.ClassElement)" class="member-name-link">evaluatesTo</a><wbr>(io.micronaut.inject.ast.ClassElement&nbsp;expected)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#hasAssignments(io.micronaut.el.parser.ast.ELNode)" class="member-name-link">hasAssignments</a><wbr>(<a href="../../parser/ast/ELNode.html" title="interface in io.micronaut.el.parser.ast">ELNode</a>&nbsp;node)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>io.micronaut.inject.ast.ClassElement</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#inferredEvaluationType()" class="member-name-link">inferredEvaluationType</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@Nullable io.micronaut.inject.ast.ClassElement</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#evaluationType()" class="member-name-link">evaluationType</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#hasAssignments(io.micronaut.el.parser.ast.ELNode)" class="member-name-link">hasAssignments</a><wbr>(<a href="../../parser/ast/ELNode.html" title="interface in io.micronaut.el.parser.ast">ELNode</a>&nbsp;node)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>io.micronaut.inject.ast.ClassElement</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#inferredEvaluationType()" class="member-name-link">inferredEvaluationType</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">The expected type inferred for an expression whose declaration omits it: the static type of the result,
 a primitive as the wrapper the evaluation returns, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link"><code>Object</code></a> when the compiler does not know the
 type.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>io.micronaut.inject.ast.ClassElement</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#inferredType(io.micronaut.el.parser.ast.ELNode)" class="member-name-link">inferredType</a><wbr>(<a href="../../parser/ast/ELNode.html" title="interface in io.micronaut.el.parser.ast">ELNode</a>&nbsp;node)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>io.micronaut.inject.ast.ClassElement</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#inferredType(io.micronaut.el.parser.ast.ELNode)" class="member-name-link">inferredType</a><wbr>(<a href="../../parser/ast/ELNode.html" title="interface in io.micronaut.el.parser.ast">ELNode</a>&nbsp;node)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">The static type of an expression, for the return type of a method expression whose declaration omits it.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>io.micronaut.sourcegen.model.ExpressionDef</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#invokeRuntime(io.micronaut.sourcegen.model.ClassTypeDef,java.lang.String,io.micronaut.sourcegen.model.TypeDef,io.micronaut.sourcegen.model.ExpressionDef...)" class="member-name-link">invokeRuntime</a><wbr>(io.micronaut.sourcegen.model.ClassTypeDef&nbsp;owner,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>io.micronaut.sourcegen.model.ExpressionDef</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#invokeRuntime(io.micronaut.sourcegen.model.ClassTypeDef,java.lang.String,io.micronaut.sourcegen.model.TypeDef,io.micronaut.sourcegen.model.ExpressionDef...)" class="member-name-link">invokeRuntime</a><wbr>(io.micronaut.sourcegen.model.ClassTypeDef&nbsp;owner,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
  io.micronaut.sourcegen.model.TypeDef&nbsp;returning,
  io.micronaut.sourcegen.model.ExpressionDef...&nbsp;values)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Invokes a static method of the runtime with the signature the runtime actually declares, for the writers.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a><wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#unresolvedIdentifiers()" class="member-name-link">unresolvedIdentifiers</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a><wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#unresolvedIdentifiers()" class="member-name-link">unresolvedIdentifiers</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
 </div>
@@ -253,6 +267,32 @@ type.</div>
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
+<section class="detail" id="beginClass(java.lang.String)">
+<h3>beginClass</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">beginClass</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;className)</span></div>
+<div class="block">Starts compiling one generated expression class.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>className</code> - The generated class name</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="accessMethods()">
+<h3>accessMethods</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;io.micronaut.sourcegen.model.MethodDef&gt;</span>&nbsp;<span class="element-name">accessMethods</span>()</div>
+<div class="block">Returns the private helpers accumulated while compiling the current expression class.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>The generated access helpers</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
 <section class="detail" id="compile(io.micronaut.el.parser.ast.ELNode,io.micronaut.sourcegen.model.ExpressionDef)">
 <h3>compile</h3>
 <div class="horizontal-scroll">
@@ -278,21 +318,14 @@ type.</div>
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;io.micronaut.sourcegen.model.ExpressionDef, <a href="ELCompiler.Typed.html" title="class in io.micronaut.el.processor.compiler">ELCompiler.Typed</a>&gt;&nbsp;body)</span></div>
 <div class="block">Compiles the evaluation of an expression as the body of a method returning its result.
 
-<p>An identifier the expression resolves more than once is resolved once, into a local the references
-share, when nothing in the expression can change what the identifier denotes during the evaluation: the
-section 1.5.1 of the specification resolves an identifier through the lambda arguments, the variable
-mapper and the resolvers, and only the assignment and the semicolon operators can alter any of these
-within one evaluation. The bodies of the lambda expressions keep resolving through their own context.</p>
-
-<p>When the expression holds a lambda expression, the context is first bound to a local: a Java lambda
-compiled from it captures the context, and the Java source writer of SourceGen 2.1.0 cannot render a
-captured method parameter, while its bytecode writer captures a local.</p></div>
+<p>Repeated stable identifiers share a local. Lambda bodies retain their own context, and an outer
+context captured by a generated Java lambda is first bound to a local for both source and bytecode
+generation.</p></div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>node</code> - The parsed expression</dd>
 <dd><code>elContext</code> - The expression holding the <code>jakarta.el.ELContext</code></dd>
-<dd><code>body</code> - The compilation of the result with the context to use, once the shared identifiers are in
-                 place</dd>
+<dd><code>body</code> - Compiles the result after shared identifiers are in place</dd>
 <dt>Returns:</dt>
 <dd>The body of the method</dd>
 </dl>
@@ -428,6 +461,22 @@ specification.</div>
 <dt>Returns:</dt>
 <dd>The identifiers the compiled code resolves dynamically because nothing declares them: not a
 variable, not a lambda parameter, not an import</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="canonical(io.micronaut.el.parser.ast.ELNode)">
+<h3>canonical</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">canonical</span><wbr><span class="parameters">(<a href="../../parser/ast/ELNode.html" title="interface in io.micronaut.el.parser.ast">ELNode</a>&nbsp;node)</span></div>
+<div class="block">Returns the equality form of a generated expression, replacing declared function names with the methods
+bound to them as required by the Jakarta EL expression equality contract.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>node</code> - The parsed expression</dd>
+<dt>Returns:</dt>
+<dd>The equality form</dd>
 </dl>
 </div>
 </section>

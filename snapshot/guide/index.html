@@ -805,7 +805,7 @@ import java.util.List;
 )
 @ELExpression(value = "${text:shout(book.title)}", expectedType = String.class, name = "SHOUTED") // <b class="conum">(4)</b>
 @ELExpression(value = "${text:initials(book.title)}", expectedType = String.class, name = "INITIALS")
-@ELExpression(value = "${Math.max(book.unitPrice, 25)}", expectedType = double.class, name = "FLOOR_PRICE") // <b class="conum">(5)</b>
+@ELExpression(value = "${Math.max(book.unitPrice, 25.0)}", expectedType = double.class, name = "FLOOR_PRICE") // <b class="conum">(5)</b>
 @ELExpression(
     value = "${books.stream().filter(b -&gt; b.unitPrice &gt; 10).map(b -&gt; b.title).toList()}", // <b class="conum">(6)</b>
     expectedType = List.class,
@@ -846,7 +846,7 @@ import io.micronaut.el.annotation.ELVariable
 )
 @ELExpression(value = "\${text:shout(book.title)}", expectedType = String::class, name = "SHOUTED") // <b class="conum">(4)</b>
 @ELExpression(value = "\${text:initials(book.title)}", expectedType = String::class, name = "INITIALS")
-@ELExpression(value = "\${Math.max(book.unitPrice, 25)}", expectedType = Double::class, name = "FLOOR_PRICE") // <b class="conum">(5)</b>
+@ELExpression(value = "\${Math.max(book.unitPrice, 25.0)}", expectedType = Double::class, name = "FLOOR_PRICE") // <b class="conum">(5)</b>
 @ELExpression(
     value = "\${books.stream().filter(b -&gt; b.unitPrice &gt; 10).map(b -&gt; b.title).toList()}", // <b class="conum">(6)</b>
     expectedType = List::class,
@@ -886,7 +886,7 @@ import io.micronaut.el.annotation.ELVariable
 )
 @ELExpression(value = '${text:shout(book.title)}', expectedType = String, name = "SHOUTED") // <b class="conum">(4)</b>
 @ELExpression(value = '${text:initials(book.title)}', expectedType = String, name = "INITIALS")
-@ELExpression(value = '${Math.max(book.unitPrice, 25)}', expectedType = double, name = "FLOOR_PRICE") // <b class="conum">(5)</b>
+@ELExpression(value = '${Math.max(book.unitPrice, 25.0)}', expectedType = double, name = "FLOOR_PRICE") // <b class="conum">(5)</b>
 @ELExpression(
     value = '${books.stream().filter(b -&gt; b.unitPrice &gt; 10).map(b -&gt; b.title).toList()}', // <b class="conum">(6)</b>
     expectedType = List,
@@ -1734,7 +1734,8 @@ public Dashboard newDashboard(Customer customer) { ... }</code></pre>
 <div class="paragraph">
 <p>When the expression itself is data — a discount rule from a database, a condition an operator edits — add the
 <a href="#runtimeParsing">interpreter module</a> and create the expression from its string with the standard
-<code>jakarta.el.ExpressionFactory</code>; everything an application declares in source stays compiled.</p>
+<code>jakarta.el.ExpressionFactory</code>; everything an application declares in source stays compiled. The rule source
+must be fully trusted because runtime expressions are executable application code, not sandboxed data.</p>
 </div>
 </div>
 <div class="sect2">
@@ -2659,6 +2660,25 @@ expression string is built at runtime, add the interpreter module:</p>
 no generated source provides. Such an expression is parsed once, when it is created, and its tree is then
 evaluated by the interpreter.</p>
 </div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+Runtime expressions are executable application code, not sandboxed data. The standard Jakarta EL
+context can construct imported classes and invoke their public static and instance methods. Only parse strings
+from a fully trusted source; an operator or database field that an untrusted user can modify must not be passed
+directly to the expression factory.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>To bound CPU, memory and stack use, the parser rejects an expression longer than 16,384 characters, containing
+more than 1,024 tokens or nested more than 128 levels.</p>
+</div>
 <div class="listingblock multi-language-sample">
 <div class="title">RuntimeExpressionTest</div>
 <div class="content">
@@ -2814,6 +2834,11 @@ dispatch instead;</p>
 <code>java.lang.reflect</code> types;</p>
 </li>
 <li>
+<p>an expanded variable arity call, <code>${bean.join('-', 'a', 'b')}</code>, of a method that takes the trailing arguments
+as an array: the bean introspection does not record which methods were declared with varargs, so the standard
+resolvers select and pack the call;</p>
+</li>
+<li>
 <p>coercing a <code>LambdaExpression</code> held in a variable to a functional interface (a lambda written in place is
 compiled to the interface directly), and coercing a string through a <code>PropertyEditor</code>;</p>
 </li>
@@ -2838,6 +2863,11 @@ enters the bean introspection of its type.
 </td>
 </tr>
 </table>
+</div>
+<div class="paragraph">
+<p>Serializing an expression, which section 1.14 of the specification requires of every one of them, needs no
+configuration either: the annotation processor declares the classes it generates for the declared expressions
+next to the registry it generates them into, and the runtime declares its own hierarchy.</p>
 </div>
 
 <h1 id="repository"><a class="anchor" href="#repository"></a>10 Repository</h1>

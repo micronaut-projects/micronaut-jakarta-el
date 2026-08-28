@@ -91,6 +91,7 @@ loadScripts(document, 'script');</script>
 <li class="circle">io.micronaut.el.processor.compiler.<a href="io/micronaut/el/processor/compiler/ELFunctionBinder.html" class="type-name-link" title="class in io.micronaut.el.processor.compiler">ELFunctionBinder</a></li>
 <li class="circle">io.micronaut.el.processor.compiler.<a href="io/micronaut/el/processor/compiler/ELFunctionDiscovery.html" class="type-name-link" title="class in io.micronaut.el.processor.compiler">ELFunctionDiscovery</a></li>
 <li class="circle">io.micronaut.el.processor.visitor.<a href="io/micronaut/el/processor/visitor/ELFunctionVisitor.html" class="type-name-link" title="class in io.micronaut.el.processor.visitor">ELFunctionVisitor</a> (implements io.micronaut.inject.visitor.TypeElementVisitor&lt;C,<wbr>E&gt;)</li>
+<li class="circle">io.micronaut.el.parser.<a href="io/micronaut/el/parser/ELIdentifiers.html" class="type-name-link" title="class in io.micronaut.el.parser">ELIdentifiers</a></li>
 <li class="circle">io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELLambdas.html" class="type-name-link" title="class in io.micronaut.el.runtime">ELLambdas</a></li>
 <li class="circle">io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELLiterals.html" class="type-name-link" title="class in io.micronaut.el.runtime">ELLiterals</a></li>
 <li class="circle">io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELMethods.html" class="type-name-link" title="class in io.micronaut.el.runtime">ELMethods</a></li>
@@ -114,11 +115,12 @@ loadScripts(document, 'script');</script>
 <li class="circle">io.micronaut.el.stream.<a href="io/micronaut/el/stream/ELStream.html" class="type-name-link" title="class in io.micronaut.el.stream">ELStream</a>&lt;T&gt;</li>
 <li class="circle">io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELSupport.html" class="type-name-link" title="class in io.micronaut.el.runtime">ELSupport</a></li>
 <li class="circle">io.micronaut.el.processor.visitor.<a href="io/micronaut/el/processor/visitor/ELTypes.html" class="type-name-link" title="class in io.micronaut.el.processor.visitor">ELTypes</a></li>
+<li class="circle">io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELVariableBindings.html" class="type-name-link" title="class in io.micronaut.el.runtime">ELVariableBindings</a></li>
 <li class="circle">jakarta.el.Expression (implements java.io.<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a>)
 <ul>
 <li class="circle">jakarta.el.MethodExpression
 <ul>
-<li class="circle">io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/CompiledMethodExpression.html" class="type-name-link" title="class in io.micronaut.el.runtime">CompiledMethodExpression</a> (implements io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/CompiledExpression.html" title="interface in io.micronaut.el.runtime">CompiledExpression</a>)
+<li class="circle">io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/CompiledMethodExpression.html" class="type-name-link" title="class in io.micronaut.el.runtime">CompiledMethodExpression</a> (implements io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/CompiledExpression.html" title="interface in io.micronaut.el.runtime">CompiledExpression</a>, io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELExpressionIdentity.html" title="interface in io.micronaut.el.runtime">ELExpressionIdentity</a>)
 <ul>
 <li class="circle">io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/LiteralMethodExpression.html" class="type-name-link" title="class in io.micronaut.el.runtime">LiteralMethodExpression</a></li>
 </ul>
@@ -127,7 +129,7 @@ loadScripts(document, 'script');</script>
 </li>
 <li class="circle">jakarta.el.ValueExpression
 <ul>
-<li class="circle">io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/CompiledValueExpression.html" class="type-name-link" title="class in io.micronaut.el.runtime">CompiledValueExpression</a> (implements io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/CompiledExpression.html" title="interface in io.micronaut.el.runtime">CompiledExpression</a>)
+<li class="circle">io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/CompiledValueExpression.html" class="type-name-link" title="class in io.micronaut.el.runtime">CompiledValueExpression</a> (implements io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/CompiledExpression.html" title="interface in io.micronaut.el.runtime">CompiledExpression</a>, io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELExpressionIdentity.html" title="interface in io.micronaut.el.runtime">ELExpressionIdentity</a>)
 <ul>
 <li class="circle">io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/LiteralValueExpression.html" class="type-name-link" title="class in io.micronaut.el.runtime">LiteralValueExpression</a></li>
 </ul>
@@ -187,6 +189,7 @@ loadScripts(document, 'script');</script>
 <ul>
 <li class="circle">io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/CompiledExpression.html" class="type-name-link" title="interface in io.micronaut.el.runtime">CompiledExpression</a></li>
 <li class="circle">io.micronaut.el.<a href="io/micronaut/el/ELBeanProvider.html" class="type-name-link" title="interface in io.micronaut.el">ELBeanProvider</a></li>
+<li class="circle">io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELExpressionIdentity.html" class="type-name-link" title="interface in io.micronaut.el.runtime">ELExpressionIdentity</a></li>
 <li class="circle">io.micronaut.el.<a href="io/micronaut/el/ELExpressionParser.html" class="type-name-link" title="interface in io.micronaut.el">ELExpressionParser</a></li>
 <li class="circle">io.micronaut.el.<a href="io/micronaut/el/ELExpressionSource.html" class="type-name-link" title="interface in io.micronaut.el">ELExpressionSource</a></li>
 <li class="circle">io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELLambdaBody.html" class="type-name-link" title="interface in io.micronaut.el.runtime">ELLambdaBody</a>

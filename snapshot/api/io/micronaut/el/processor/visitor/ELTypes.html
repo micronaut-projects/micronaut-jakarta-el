@@ -59,6 +59,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#isStatic(io.micronaut.inject.ast.MethodElement)" tabindex="0">isStatic(MethodElement)</a></li>
 <li><a href="#staticOwner(io.micronaut.inject.ast.MethodElement)" tabindex="0">staticOwner(MethodElement)</a></li>
 <li><a href="#isCompanion(io.micronaut.inject.ast.ClassElement)" tabindex="0">isCompanion(ClassElement)</a></li>
+<li><a href="#isFunctionalInterfaceCandidate(io.micronaut.inject.ast.ClassElement,io.micronaut.inject.visitor.VisitorContext)" tabindex="0">isFunctionalInterfaceCandidate(ClassElement, VisitorContext)</a></li>
 <li><a href="#isPublicStatic(io.micronaut.inject.ast.FieldElement)" tabindex="0">isPublicStatic(FieldElement)</a></li>
 </ol>
 </li>
@@ -104,18 +105,24 @@ loadScripts(document, 'script');</script>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isCompanion(io.micronaut.inject.ast.ClassElement)" class="member-name-link">isCompanion</a><wbr>(io.micronaut.inject.ast.ClassElement&nbsp;type)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isPublicStatic(io.micronaut.inject.ast.FieldElement)" class="member-name-link">isPublicStatic</a><wbr>(io.micronaut.inject.ast.FieldElement&nbsp;field)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isFunctionalInterfaceCandidate(io.micronaut.inject.ast.ClassElement,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">isFunctionalInterfaceCandidate</a><wbr>(io.micronaut.inject.ast.ClassElement&nbsp;type,
+ io.micronaut.inject.visitor.VisitorContext&nbsp;context)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Whether the field is a public static field of the class.</div>
+<div class="block">Whether an interface can be the target of a generated Java lambda.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isStatic(io.micronaut.inject.ast.MethodElement)" class="member-name-link">isStatic</a><wbr>(io.micronaut.inject.ast.MethodElement&nbsp;method)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isPublicStatic(io.micronaut.inject.ast.FieldElement)" class="member-name-link">isPublicStatic</a><wbr>(io.micronaut.inject.ast.FieldElement&nbsp;field)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Whether the field is a public static field of the class.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isStatic(io.micronaut.inject.ast.MethodElement)" class="member-name-link">isStatic</a><wbr>(io.micronaut.inject.ast.MethodElement&nbsp;method)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Whether the method is invoked statically.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static io.micronaut.sourcegen.model.ClassTypeDef</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#staticOwner(io.micronaut.inject.ast.MethodElement)" class="member-name-link">staticOwner</a><wbr>(io.micronaut.inject.ast.MethodElement&nbsp;method)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static io.micronaut.sourcegen.model.ClassTypeDef</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#staticOwner(io.micronaut.inject.ast.MethodElement)" class="member-name-link">staticOwner</a><wbr>(io.micronaut.inject.ast.MethodElement&nbsp;method)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">The class a static function is invoked on.</div>
 </div>
 </div>
@@ -177,6 +184,24 @@ declared on the companion, while the JVM static method it generates belongs to t
 <dd><code>type</code> - The type</dd>
 <dt>Returns:</dt>
 <dd>Whether the type is the companion object of a Kotlin class; KSP names it <code>Outer$Companion</code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="isFunctionalInterfaceCandidate(io.micronaut.inject.ast.ClassElement,io.micronaut.inject.visitor.VisitorContext)">
+<h3>isFunctionalInterfaceCandidate</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isFunctionalInterfaceCandidate</span><wbr><span class="parameters">(io.micronaut.inject.ast.ClassElement&nbsp;type,
+ io.micronaut.inject.visitor.VisitorContext&nbsp;context)</span></div>
+<div class="block">Whether an interface can be the target of a generated Java lambda. Sealed Java interfaces cannot be
+implemented by the synthetic lambda class, even when they declare a single abstract method.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>type</code> - The interface</dd>
+<dd><code>context</code> - The visitor context</dd>
+<dt>Returns:</dt>
+<dd>True when generated code may use the interface as a lambda target</dd>
 </dl>
 </div>
 </section>

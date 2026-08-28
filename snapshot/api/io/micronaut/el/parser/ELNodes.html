@@ -57,6 +57,8 @@ loadScripts(document, 'script');</script>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
 <ol class="toc-list">
 <li><a href="#canonical(io.micronaut.el.parser.ast.ELNode)" tabindex="0">canonical(ELNode)</a></li>
+<li><a href="#canonical(io.micronaut.el.parser.ast.ELNode,java.util.function.BiFunction)" tabindex="0">canonical(ELNode, BiFunction)</a></li>
+<li><a href="#functionIdentity(java.lang.String,java.lang.String,java.util.List)" tabindex="0">functionIdentity(String, String, List)</a></li>
 </ol>
 </li>
 </ol>
@@ -102,6 +104,19 @@ loadScripts(document, 'script');</script>
 <div class="block">Renders a parsed expression in a canonical form, so that two expressions that differ only in whitespace,
 in the delimiters or in the spelling of an operator render identically.</div>
 </div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#canonical(io.micronaut.el.parser.ast.ELNode,java.util.function.BiFunction)" class="member-name-link">canonical</a><wbr>(<a href="ast/ELNode.html" title="interface in io.micronaut.el.parser.ast">ELNode</a>&nbsp;node,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/BiFunction.html" title="class or interface in java.util.function" class="external-link">BiFunction</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>, @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;functionName)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Renders the canonical form while replacing mapped function names with their bound-method identities.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#functionIdentity(java.lang.String,java.lang.String,java.util.List)" class="member-name-link">functionIdentity</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;owner,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;parameterTypes)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Builds the stable identity of a method bound as a function.</div>
+</div>
 </div>
 </div>
 </div>
@@ -135,6 +150,44 @@ sub-expression is parenthesised, so precedence never has to be reconstructed.</p
 <dd><code>node</code> - The parsed expression</dd>
 <dt>Returns:</dt>
 <dd>The canonical form</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="canonical(io.micronaut.el.parser.ast.ELNode,java.util.function.BiFunction)">
+<h3>canonical</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">canonical</span><wbr><span class="parameters">(<a href="ast/ELNode.html" title="interface in io.micronaut.el.parser.ast">ELNode</a>&nbsp;node,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/BiFunction.html" title="class or interface in java.util.function" class="external-link">BiFunction</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>, @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;functionName)</span></div>
+<div class="block">Renders the canonical form while replacing mapped function names with their bound-method identities.
+The Jakarta EL equality contract compares bound functions rather than the prefixes used to name them.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>node</code> - The parsed expression</dd>
+<dd><code>functionName</code> - Maps a function prefix and local name to its bound identity, or <code>null</code> to
+                     retain the parsed name</dd>
+<dt>Returns:</dt>
+<dd>The canonical form</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="functionIdentity(java.lang.String,java.lang.String,java.util.List)">
+<h3>functionIdentity</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">functionIdentity</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;owner,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;parameterTypes)</span></div>
+<div class="block">Builds the stable identity of a method bound as a function.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>owner</code> - The declaring class name</dd>
+<dd><code>name</code> - The method name</dd>
+<dd><code>parameterTypes</code> - The parameter type names</dd>
+<dt>Returns:</dt>
+<dd>The identity</dd>
 </dl>
 </div>
 </section>

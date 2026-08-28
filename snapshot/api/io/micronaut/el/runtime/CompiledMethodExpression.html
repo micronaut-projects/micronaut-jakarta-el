@@ -71,12 +71,14 @@ loadScripts(document, 'script');</script>
 <li><a href="#getMethodInfo(jakarta.el.ELContext)" tabindex="0">getMethodInfo(ELContext)</a></li>
 <li><a href="#getMethodReference(jakarta.el.ELContext)" tabindex="0">getMethodReference(ELContext)</a></li>
 <li><a href="#isParametersProvided()" tabindex="0">isParametersProvided()</a></li>
+<li><a href="#withoutExpectedReturnType()" tabindex="0">withoutExpectedReturnType()</a></li>
 <li><a href="#getExpectedReturnType()" tabindex="0">getExpectedReturnType()</a></li>
 <li><a href="#getExpectedParamTypes()" tabindex="0">getExpectedParamTypes()</a></li>
 <li><a href="#getExpressionString()" tabindex="0">getExpressionString()</a></li>
 <li><a href="#isLiteralText()" tabindex="0">isLiteralText()</a></li>
 <li><a href="#equals(java.lang.Object)" tabindex="0">equals(Object)</a></li>
 <li><a href="#hashCode()" tabindex="0">hashCode()</a></li>
+<li><a href="#equalityForm()" tabindex="0">equalityForm()</a></li>
 <li><a href="#toString()" tabindex="0">toString()</a></li>
 </ol>
 </li>
@@ -97,7 +99,7 @@ loadScripts(document, 'script');</script>
 <section class="class-description" id="class-description">
 <dl class="notes">
 <dt>All Implemented Interfaces:</dt>
-<dd><code><a href="CompiledExpression.html" title="interface in io.micronaut.el.runtime">CompiledExpression</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></code></dd>
+<dd><code><a href="CompiledExpression.html" title="interface in io.micronaut.el.runtime">CompiledExpression</a>, <a href="ELExpressionIdentity.html" title="interface in io.micronaut.el.runtime">ELExpressionIdentity</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></code></dd>
 </dl>
 <dl class="notes">
 <dt>Direct Known Subclasses:</dt>
@@ -107,7 +109,7 @@ loadScripts(document, 'script');</script>
 <div class="horizontal-scroll">
 <div class="type-signature"><span class="modifiers">public abstract class </span><span class="element-name type-name-label">CompiledMethodExpression</span>
 <span class="extends-implements">extends jakarta.el.MethodExpression
-implements <a href="CompiledExpression.html" title="interface in io.micronaut.el.runtime">CompiledExpression</a></span></div>
+implements <a href="CompiledExpression.html" title="interface in io.micronaut.el.runtime">CompiledExpression</a>, <a href="ELExpressionIdentity.html" title="interface in io.micronaut.el.runtime">ELExpressionIdentity</a></span></div>
 <div class="block">The base class of the <code>MethodExpression</code> implementations generated at compilation time.</div>
 <dl class="notes">
 <dt>Since:</dt>
@@ -136,15 +138,15 @@ implements <a href="CompiledExpression.html" title="interface in io.micronaut.el
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code>protected </code></div>
 <div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(java.lang.String,java.lang.Class,java.lang.Class%5B%5D,boolean)" class="member-name-link">CompiledMethodExpression</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;expressionString,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;expectedReturnType,
- @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;[]&nbsp;expectedParamTypes,
+ @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;expectedReturnType,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt; @Nullable []&nbsp;expectedParamTypes,
  boolean&nbsp;parametersProvided)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>protected </code></div>
 <div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(java.lang.String,java.lang.String,java.lang.Class,java.lang.Class%5B%5D,boolean)" class="member-name-link">CompiledMethodExpression</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;expressionString,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;canonicalForm,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;expectedReturnType,
- @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;[]&nbsp;expectedParamTypes,
+ @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;expectedReturnType,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt; @Nullable []&nbsp;expectedParamTypes,
  boolean&nbsp;parametersProvided)</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 </div>
@@ -163,58 +165,66 @@ implements <a href="CompiledExpression.html" title="interface in io.micronaut.el
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>protected abstract @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#doInvoke(jakarta.el.ELContext,java.lang.Object%5B%5D)" class="member-name-link">doInvoke</a><wbr>(jakarta.el.ELContext&nbsp;context,
- @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>[]&nbsp;arguments)</code></div>
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a> @Nullable []&nbsp;arguments)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Performs the compiled invocation.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#equals(java.lang.Object)" class="member-name-link">equals</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;obj)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a> @Nullable []</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#evaluateArguments(jakarta.el.ELContext)" class="member-name-link">evaluateArguments</a><wbr>(jakarta.el.ELContext&nbsp;context)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Evaluates the parameters an expression such as <code>${bean.method(a, b)}</code> provides itself.</div>
-</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>protected abstract @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#evaluateBase(jakarta.el.ELContext)" class="member-name-link">evaluateBase</a><wbr>(jakarta.el.ELContext&nbsp;context)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Evaluates the base object the method is invoked on, <code>null</code> for a method expression consisting
-of a single identifier.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>protected abstract @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#evaluateProperty(jakarta.el.ELContext)" class="member-name-link">evaluateProperty</a><wbr>(jakarta.el.ELContext&nbsp;context)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;[]</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getExpectedParamTypes()" class="member-name-link">getExpectedParamTypes</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a><wbr>&lt;?&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getExpectedReturnType()" class="member-name-link">getExpectedReturnType</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getExpressionString()" class="member-name-link">getExpressionString</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>jakarta.el.MethodInfo</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getMethodInfo(jakarta.el.ELContext)" class="member-name-link">getMethodInfo</a><wbr>(jakarta.el.ELContext&nbsp;context)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>jakarta.el.MethodReference</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getMethodReference(jakarta.el.ELContext)" class="member-name-link">getMethodReference</a><wbr>(jakarta.el.ELContext&nbsp;context)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#hashCode()" class="member-name-link">hashCode</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#invoke(jakarta.el.ELContext,java.lang.Object%5B%5D)" class="member-name-link">invoke</a><wbr>(jakarta.el.ELContext&nbsp;context,
- @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>[]&nbsp;params)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#equalityForm()" class="member-name-link">equalityForm</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isLiteralText()" class="member-name-link">isLiteralText</a>()</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#equals(java.lang.Object)" class="member-name-link">equals</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;obj)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a> @Nullable []</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#evaluateArguments(jakarta.el.ELContext)" class="member-name-link">evaluateArguments</a><wbr>(jakarta.el.ELContext&nbsp;context)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Evaluates the parameters an expression such as <code>${bean.method(a, b)}</code> provides itself.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>protected abstract @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#evaluateBase(jakarta.el.ELContext)" class="member-name-link">evaluateBase</a><wbr>(jakarta.el.ELContext&nbsp;context)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Evaluates the base object the method is invoked on, or the resolved method expression for an expression
+consisting of a single identifier.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>protected abstract @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#evaluateProperty(jakarta.el.ELContext)" class="member-name-link">evaluateProperty</a><wbr>(jakarta.el.ELContext&nbsp;context)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;[]</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getExpectedParamTypes()" class="member-name-link">getExpectedParamTypes</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a><wbr>&lt;?&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getExpectedReturnType()" class="member-name-link">getExpectedReturnType</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getExpressionString()" class="member-name-link">getExpressionString</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>jakarta.el.MethodInfo</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getMethodInfo(jakarta.el.ELContext)" class="member-name-link">getMethodInfo</a><wbr>(jakarta.el.ELContext&nbsp;context)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@Nullable jakarta.el.MethodReference</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getMethodReference(jakarta.el.ELContext)" class="member-name-link">getMethodReference</a><wbr>(jakarta.el.ELContext&nbsp;context)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#hashCode()" class="member-name-link">hashCode</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#invoke(jakarta.el.ELContext,java.lang.Object%5B%5D)" class="member-name-link">invoke</a><wbr>(jakarta.el.ELContext&nbsp;context,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a> @Nullable []&nbsp;params)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isParametersProvided()" class="member-name-link">isParametersProvided</a>()</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isLiteralText()" class="member-name-link">isLiteralText</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toString()" class="member-name-link">toString</a>()</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isParametersProvided()" class="member-name-link">isParametersProvided</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toString()" class="member-name-link">toString</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>final jakarta.el.MethodExpression</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#withoutExpectedReturnType()" class="member-name-link">withoutExpectedReturnType</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns an equivalent expression that does not coerce its invocation result.</div>
+</div>
 </div>
 </div>
 </div>
@@ -237,13 +247,13 @@ of a single identifier.</div>
 <h3>CompiledMethodExpression</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="element-name">CompiledMethodExpression</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;expressionString,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;expectedReturnType,
- @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;[]&nbsp;expectedParamTypes,
+ @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;expectedReturnType,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt; @Nullable []&nbsp;expectedParamTypes,
  boolean&nbsp;parametersProvided)</span></div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>expressionString</code> - The original expression</dd>
-<dd><code>expectedReturnType</code> - The expected return type</dd>
+<dd><code>expectedReturnType</code> - The expected return type, or <code>null</code> to return the result without coercion</dd>
 <dd><code>expectedParamTypes</code> - The expected parameter types</dd>
 <dd><code>parametersProvided</code> - Whether the parameters are provided by the expression itself</dd>
 </dl>
@@ -256,14 +266,14 @@ of a single identifier.</div>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="element-name">CompiledMethodExpression</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;expressionString,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;canonicalForm,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;expectedReturnType,
- @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;[]&nbsp;expectedParamTypes,
+ @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;expectedReturnType,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt; @Nullable []&nbsp;expectedParamTypes,
  boolean&nbsp;parametersProvided)</span></div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>expressionString</code> - The original expression</dd>
 <dd><code>canonicalForm</code> - The canonical form of the expression, which is what equality compares</dd>
-<dd><code>expectedReturnType</code> - The expected return type</dd>
+<dd><code>expectedReturnType</code> - The expected return type, or <code>null</code> to return the result without coercion</dd>
 <dd><code>expectedParamTypes</code> - The expected parameter types</dd>
 <dd><code>parametersProvided</code> - Whether the parameters are provided by the expression itself</dd>
 </dl>
@@ -283,8 +293,8 @@ of a single identifier.</div>
 <h3>evaluateBase</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">protected abstract</span>&nbsp;<span class="return-type">@Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span>&nbsp;<span class="element-name">evaluateBase</span><wbr><span class="parameters">(jakarta.el.ELContext&nbsp;context)</span></div>
-<div class="block">Evaluates the base object the method is invoked on, <code>null</code> for a method expression consisting
-of a single identifier.</div>
+<div class="block">Evaluates the base object the method is invoked on, or the resolved method expression for an expression
+consisting of a single identifier.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>context</code> - The context</dd>
@@ -313,7 +323,7 @@ of a single identifier.</div>
 <h3>doInvoke</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">protected abstract</span>&nbsp;<span class="return-type">@Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span>&nbsp;<span class="element-name">doInvoke</span><wbr><span class="parameters">(jakarta.el.ELContext&nbsp;context,
- @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>[]&nbsp;arguments)</span></div>
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a> @Nullable []&nbsp;arguments)</span></div>
 <div class="block">Performs the compiled invocation.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
@@ -345,7 +355,7 @@ of a single identifier.</div>
 <h3>invoke</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">@Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span>&nbsp;<span class="element-name">invoke</span><wbr><span class="parameters">(jakarta.el.ELContext&nbsp;context,
- @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>[]&nbsp;params)</span></div>
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a> @Nullable []&nbsp;params)</span></div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code>invoke</code>&nbsp;in class&nbsp;<code>jakarta.el.MethodExpression</code></dd>
@@ -369,7 +379,7 @@ of a single identifier.</div>
 <section class="detail" id="getMethodReference(jakarta.el.ELContext)">
 <h3>getMethodReference</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">jakarta.el.MethodReference</span>&nbsp;<span class="element-name">getMethodReference</span><wbr><span class="parameters">(jakarta.el.ELContext&nbsp;context)</span></div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">@Nullable jakarta.el.MethodReference</span>&nbsp;<span class="element-name">getMethodReference</span><wbr><span class="parameters">(jakarta.el.ELContext&nbsp;context)</span></div>
 <dl class="notes">
 <dt>Overrides:</dt>
 <dd><code>getMethodReference</code>&nbsp;in class&nbsp;<code>jakarta.el.MethodExpression</code></dd>
@@ -385,6 +395,22 @@ of a single identifier.</div>
 <dl class="notes">
 <dt>Overrides:</dt>
 <dd><code>isParametersProvided</code>&nbsp;in class&nbsp;<code>jakarta.el.MethodExpression</code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="withoutExpectedReturnType()">
+<h3>withoutExpectedReturnType</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public final</span>&nbsp;<span class="return-type">jakarta.el.MethodExpression</span>&nbsp;<span class="element-name">withoutExpectedReturnType</span>()</div>
+<div class="block">Returns an equivalent expression that does not coerce its invocation result. Generated expression
+registries use this when a caller supplies no expected return type.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>This expression when it is already uncoerced, or an uncoerced view</dd>
+<dt>Since:</dt>
+<dd>1.0.1</dd>
 </dl>
 </div>
 </section>
@@ -461,6 +487,20 @@ of a single identifier.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code>hashCode</code>&nbsp;in class&nbsp;<code>jakarta.el.Expression</code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="equalityForm()">
+<h3>equalityForm</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">equalityForm</span>()</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="ELExpressionIdentity.html#equalityForm()">equalityForm</a></code>&nbsp;in interface&nbsp;<code><a href="ELExpressionIdentity.html" title="interface in io.micronaut.el.runtime">ELExpressionIdentity</a></code></dd>
+<dt>Returns:</dt>
+<dd>The bound parsed representation</dd>
 </dl>
 </div>
 </section>

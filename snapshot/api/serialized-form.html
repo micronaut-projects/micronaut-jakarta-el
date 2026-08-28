@@ -117,7 +117,7 @@ loadScripts(document, 'script');</script>
 </li>
 <li class="block-list">
 <h5>expectedReturnType</h5>
-<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt; expectedReturnType</pre>
+<pre>@Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt; expectedReturnType</pre>
 </li>
 <li class="block-list">
 <h5>expressionString</h5>
@@ -204,6 +204,13 @@ loadScripts(document, 'script');</script>
 <li class="block-list">
 <h5>expectedType</h5>
 <pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt; expectedType</pre>
+</li>
+<li class="block-list">
+<h5>value</h5>
+<pre>@Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a> value</pre>
+<div class="block">The value the caller wrapped. Whether it can be written is the caller's: an expression is serializable,
+section 1.14 of the specification, and this one is only as serializable as the value it was given, just
+like the <code>ValueExpression</code> the reference implementation creates for a value.</div>
 </li>
 </ul>
 </section>

@@ -67,12 +67,14 @@ loadScripts(document, 'script');</script>
 <li><a href="#variableType(java.lang.String)" tabindex="0">variableType(String)</a></li>
 <li><a href="#isLambdaParameter(java.lang.String)" tabindex="0">isLambdaParameter(String)</a></li>
 <li><a href="#lambdaParameter(java.lang.String)" tabindex="0">lambdaParameter(String)</a></li>
+<li><a href="#lambdaParameters()" tabindex="0">lambdaParameters()</a></li>
 <li><a href="#inValueLambda()" tabindex="0">inValueLambda()</a></li>
 <li><a href="#enterLambdaScope(java.util.Map,boolean)" tabindex="0">enterLambdaScope(Map, boolean)</a></li>
 <li><a href="#exitLambdaScope()" tabindex="0">exitLambdaScope()</a></li>
 <li><a href="#resolveClass(java.lang.String)" tabindex="0">resolveClass(String)</a></li>
 <li><a href="#resolveStaticField(java.lang.String)" tabindex="0">resolveStaticField(String)</a></li>
 <li><a href="#resolveStaticMethod(java.lang.String,int)" tabindex="0">resolveStaticMethod(String, int)</a></li>
+<li><a href="#staticImports()" tabindex="0">staticImports()</a></li>
 <li><a href="#resolveFunction(java.lang.String,java.lang.String)" tabindex="0">resolveFunction(String, String)</a></li>
 <li><a href="#qualifiedFunctionName(java.lang.String,java.lang.String)" tabindex="0">qualifiedFunctionName(String, String)</a></li>
 </ol>
@@ -165,30 +167,39 @@ functions of the expressions of a type, as declared with <code>io.micronaut.el.a
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@Nullable <a href="ELCompiler.Typed.html" title="class in io.micronaut.el.processor.compiler">ELCompiler.Typed</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#lambdaParameter(java.lang.String)" class="member-name-link">lambdaParameter</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#qualifiedFunctionName(java.lang.String,java.lang.String)" class="member-name-link">qualifiedFunctionName</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;prefix,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a><wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>, <a href="ELCompiler.Typed.html" title="class in io.micronaut.el.processor.compiler">ELCompiler.Typed</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#lambdaParameters()" class="member-name-link">lambdaParameters</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the parameters visible in the current lambda body, with an inner declaration shadowing an outer
+one.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#qualifiedFunctionName(java.lang.String,java.lang.String)" class="member-name-link">qualifiedFunctionName</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;prefix,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;localName)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@Nullable io.micronaut.inject.ast.ClassElement</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#resolveClass(java.lang.String)" class="member-name-link">resolveClass</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;simpleName)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@Nullable io.micronaut.inject.ast.ClassElement</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#resolveClass(java.lang.String)" class="member-name-link">resolveClass</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;simpleName)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Resolves a class by its simple name, as described in the section 1.24.2 of the specification.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@Nullable io.micronaut.inject.ast.MethodElement</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#resolveFunction(java.lang.String,java.lang.String)" class="member-name-link">resolveFunction</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;prefix,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@Nullable io.micronaut.inject.ast.MethodElement</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#resolveFunction(java.lang.String,java.lang.String)" class="member-name-link">resolveFunction</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;prefix,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;localName)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@Nullable io.micronaut.inject.ast.FieldElement</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#resolveStaticField(java.lang.String)" class="member-name-link">resolveStaticField</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@Nullable io.micronaut.inject.ast.FieldElement</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#resolveStaticField(java.lang.String)" class="member-name-link">resolveStaticField</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Resolves a static field imported statically, as described in the section 1.24.2 of the specification.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@Nullable io.micronaut.inject.ast.MethodElement</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#resolveStaticMethod(java.lang.String,int)" class="member-name-link">resolveStaticMethod</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@Nullable io.micronaut.inject.ast.MethodElement</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#resolveStaticMethod(java.lang.String,int)" class="member-name-link">resolveStaticMethod</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
  int&nbsp;arguments)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Resolves a static method imported statically, as described in the section 1.24.2 of the specification.</div>
 </div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;io.micronaut.inject.ast.ClassElement&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#staticImports()" class="member-name-link">staticImports</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@Nullable io.micronaut.inject.ast.ClassElement</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#variableType(java.lang.String)" class="member-name-link">variableType</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
@@ -311,6 +322,20 @@ functions of the expressions of a type, as declared with <code>io.micronaut.el.a
 </section>
 </li>
 <li>
+<section class="detail" id="lambdaParameters()">
+<h3>lambdaParameters</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>, <a href="ELCompiler.Typed.html" title="class in io.micronaut.el.processor.compiler">ELCompiler.Typed</a>&gt;</span>&nbsp;<span class="element-name">lambdaParameters</span>()</div>
+<div class="block">Returns the parameters visible in the current lambda body, with an inner declaration shadowing an outer
+one.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>The visible parameters by EL name</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
 <section class="detail" id="inValueLambda()">
 <h3>inValueLambda</h3>
 <div class="horizontal-scroll">
@@ -392,6 +417,14 @@ be invoked later, with another context, so that nothing of the evaluation can be
 <dt>Returns:</dt>
 <dd>The method or <code>null</code></dd>
 </dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="staticImports()">
+<h3>staticImports</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;io.micronaut.inject.ast.ClassElement&gt;</span>&nbsp;<span class="element-name">staticImports</span>()</div>
 </div>
 </section>
 </li>

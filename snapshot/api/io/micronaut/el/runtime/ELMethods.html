@@ -59,6 +59,8 @@ loadScripts(document, 'script');</script>
 <li><a href="#findMethodOrNull(java.lang.Class,java.lang.String,java.lang.Class%5B%5D,java.lang.Object%5B%5D,boolean)" tabindex="0">findMethodOrNull(Class, String, Class[], Object[], boolean)</a></li>
 <li><a href="#invoke(jakarta.el.ELContext,java.lang.reflect.Method,java.lang.Object,java.lang.Object%5B%5D)" tabindex="0">invoke(ELContext, Method, Object, Object[])</a></li>
 <li><a href="#findMethod(java.lang.Class,java.lang.String,java.lang.Class%5B%5D,java.lang.Object%5B%5D)" tabindex="0">findMethod(Class, String, Class[], Object[])</a></li>
+<li><a href="#findStaticMethod(java.lang.Class,java.lang.String,java.lang.Class%5B%5D,java.lang.Object%5B%5D)" tabindex="0">findStaticMethod(Class, String, Class[], Object[])</a></li>
+<li><a href="#sameTypes(java.lang.Class%5B%5D,java.lang.Class%5B%5D)" tabindex="0">sameTypes(Class[], Class[])</a></li>
 <li><a href="#accessible(java.lang.reflect.Method)" tabindex="0">accessible(Method)</a></li>
 </ol>
 </li>
@@ -129,15 +131,29 @@ ambiguous, which is an error.</p></div>
 <div class="block">Finds a method by name and arguments, as <a href="#findMethod(java.lang.Class,java.lang.String,java.lang.Class%5B%5D,java.lang.Object%5B%5D)"><code>findMethod(Class, String, Class[], Object[])</code></a> does, or
 returns <code>null</code> when the type declares no public method of the name.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#invoke(jakarta.el.ELContext,java.lang.reflect.Method,java.lang.Object,java.lang.Object%5B%5D)" class="member-name-link">invoke</a><wbr>(jakarta.el.ELContext&nbsp;context,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/reflect/Method.html" title="class or interface in java.lang.reflect" class="external-link">Method</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#findStaticMethod(java.lang.Class,java.lang.String,java.lang.Class%5B%5D,java.lang.Object%5B%5D)" class="member-name-link">findStaticMethod</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;type,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt; @Nullable []&nbsp;paramTypes,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a> @Nullable []&nbsp;arguments)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Finds the static method a method expression refers to.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#invoke(jakarta.el.ELContext,java.lang.reflect.Method,java.lang.Object,java.lang.Object%5B%5D)" class="member-name-link">invoke</a><wbr>(jakarta.el.ELContext&nbsp;context,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/reflect/Method.html" title="class or interface in java.lang.reflect" class="external-link">Method</a>&nbsp;method,
  @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;base,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a> @Nullable []&nbsp;values)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Invokes a method reflectively, the arguments coerced to the parameter types as described in the section
 1.23 of the specification, the variable arity arguments packed into an array, the exceptions of the
 method unwrapped.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#sameTypes(java.lang.Class%5B%5D,java.lang.Class%5B%5D)" class="member-name-link">sameTypes</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;[]&nbsp;declared,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;[]&nbsp;provided)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Compares parameter types, treating a primitive and its wrapper as the same type.</div>
 </div>
 </div>
 </div>
@@ -220,6 +236,44 @@ method unwrapped.</div>
 <dd><code>arguments</code> - The evaluated arguments, can be <code>null</code></dd>
 <dt>Returns:</dt>
 <dd>The method</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="findStaticMethod(java.lang.Class,java.lang.String,java.lang.Class[],java.lang.Object[])">
+<h3>findStaticMethod</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/reflect/Method.html" title="class or interface in java.lang.reflect" class="external-link">Method</a></span>&nbsp;<span class="element-name">findStaticMethod</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;type,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt; @Nullable []&nbsp;paramTypes,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a> @Nullable []&nbsp;arguments)</span></div>
+<div class="block">Finds the static method a method expression refers to.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>type</code> - The type declaring the method</dd>
+<dd><code>name</code> - The name of the method</dd>
+<dd><code>paramTypes</code> - The parameter types provided at parse time, can be <code>null</code></dd>
+<dd><code>arguments</code> - The evaluated arguments, can be <code>null</code></dd>
+<dt>Returns:</dt>
+<dd>The method</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="sameTypes(java.lang.Class[],java.lang.Class[])">
+<h3>sameTypes</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">sameTypes</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;[]&nbsp;declared,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;[]&nbsp;provided)</span></div>
+<div class="block">Compares parameter types, treating a primitive and its wrapper as the same type.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>declared</code> - The declared parameter types</dd>
+<dd><code>provided</code> - The parameter types to match</dd>
+<dt>Returns:</dt>
+<dd>Whether every declared type matches its provided counterpart</dd>
 </dl>
 </div>
 </section>

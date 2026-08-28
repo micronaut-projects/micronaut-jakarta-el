@@ -106,16 +106,15 @@ Language specification.</div>
 </div>
 <div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/processor/compiler/ELCompiler.html" title="class in io.micronaut.el.processor.compiler">ELCompiler</a></div>
 <div class="col-last even-row-color all-classes-table all-classes-table-tab2">
-<div class="block">The compiler lowering the abstract syntax tree of an expression to the source model of Micronaut
-SourceGen.</div>
+<div class="block">Lowers an expression syntax tree to the Micronaut SourceGen model.</div>
 </div>
 <div class="col-first odd-row-color all-classes-table all-classes-table-tab4"><a href="io/micronaut/el/processor/compiler/ELCompiler.LValue.html" title="class in io.micronaut.el.processor.compiler">ELCompiler.LValue</a></div>
 <div class="col-last odd-row-color all-classes-table all-classes-table-tab4">
-<div class="block">The base object and the property of an lvalue.</div>
+<div class="block">The base and property of an lvalue.</div>
 </div>
 <div class="col-first even-row-color all-classes-table all-classes-table-tab4"><a href="io/micronaut/el/processor/compiler/ELCompiler.Typed.html" title="class in io.micronaut.el.processor.compiler">ELCompiler.Typed</a></div>
 <div class="col-last even-row-color all-classes-table all-classes-table-tab4">
-<div class="block">A compiled expression with the type known at compilation time, when there is one.</div>
+<div class="block">A compiled expression and its statically known type, when available.</div>
 </div>
 <div class="col-first odd-row-color all-classes-table all-classes-table-tab6"><a href="io/micronaut/el/annotation/ELEnvironment.html" title="annotation interface in io.micronaut.el.annotation">ELEnvironment</a></div>
 <div class="col-last odd-row-color all-classes-table all-classes-table-tab6">
@@ -129,43 +128,51 @@ SourceGen.</div>
 <div class="col-last odd-row-color all-classes-table all-classes-table-tab4">
 <div class="block">A value expression declared with <code>io.micronaut.el.annotation.ELExpression</code>.</div>
 </div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab1"><a href="io/micronaut/el/ELExpressionParser.html" title="interface in io.micronaut.el">ELExpressionParser</a></div>
+<div class="col-first even-row-color all-classes-table all-classes-table-tab1"><a href="io/micronaut/el/runtime/ELExpressionIdentity.html" title="interface in io.micronaut.el.runtime">ELExpressionIdentity</a></div>
 <div class="col-last even-row-color all-classes-table all-classes-table-tab1">
+<div class="block">Exposes the bound parsed representation used to compare expressions produced by different execution modes.</div>
+</div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab1"><a href="io/micronaut/el/ELExpressionParser.html" title="interface in io.micronaut.el">ELExpressionParser</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab1">
 <div class="block">Creates the expressions that were not compiled at compilation time.</div>
 </div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab6"><a href="io/micronaut/el/annotation/ELExpressions.html" title="annotation interface in io.micronaut.el.annotation">ELExpressions</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab6">
+<div class="col-first even-row-color all-classes-table all-classes-table-tab6"><a href="io/micronaut/el/annotation/ELExpressions.html" title="annotation interface in io.micronaut.el.annotation">ELExpressions</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab6">
 <div class="block">The container annotation of <a href="io/micronaut/el/annotation/ELExpression.html" title="annotation interface in io.micronaut.el.annotation"><code>ELExpression</code></a>.</div>
 </div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab1"><a href="io/micronaut/el/ELExpressionSource.html" title="interface in io.micronaut.el">ELExpressionSource</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab1">
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab1"><a href="io/micronaut/el/ELExpressionSource.html" title="interface in io.micronaut.el">ELExpressionSource</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab1">
 <div class="block">A source of the expressions compiled at compilation time.</div>
 </div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/processor/visitor/ELExpressionVisitor.html" title="class in io.micronaut.el.processor.visitor">ELExpressionVisitor</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/processor/visitor/ELExpressionVisitor.html" title="class in io.micronaut.el.processor.visitor">ELExpressionVisitor</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
 <div class="block">The visitor compiling the expressions declared with <a href="io/micronaut/el/annotation/ELExpression.html" title="annotation interface in io.micronaut.el.annotation"><code>ELExpression</code></a> and <a href="io/micronaut/el/annotation/ELMethodExpression.html" title="annotation interface in io.micronaut.el.annotation"><code>ELMethodExpression</code></a>.</div>
 </div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab6"><a href="io/micronaut/el/annotation/ELFunction.html" title="annotation interface in io.micronaut.el.annotation">ELFunction</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab6">
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab6"><a href="io/micronaut/el/annotation/ELFunction.html" title="annotation interface in io.micronaut.el.annotation">ELFunction</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab6">
 <div class="block">Declares a method as a Jakarta Expression Language function, with its own name and namespace prefix.</div>
 </div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/processor/compiler/ELFunctionBinder.html" title="class in io.micronaut.el.processor.compiler">ELFunctionBinder</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/processor/compiler/ELFunctionBinder.html" title="class in io.micronaut.el.processor.compiler">ELFunctionBinder</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
 <div class="block">Binds the functions a class declares to their qualified names.</div>
 </div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/processor/compiler/ELFunctionDiscovery.html" title="class in io.micronaut.el.processor.compiler">ELFunctionDiscovery</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/processor/compiler/ELFunctionDiscovery.html" title="class in io.micronaut.el.processor.compiler">ELFunctionDiscovery</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
 <div class="block">The functions declared with <code>@ELFunction</code> in the current compilation, registered as their classes are
 visited, which the expressions of the module use without listing them.</div>
 </div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab6"><a href="io/micronaut/el/annotation/ELFunctions.html" title="annotation interface in io.micronaut.el.annotation">ELFunctions</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab6">
+<div class="col-first even-row-color all-classes-table all-classes-table-tab6"><a href="io/micronaut/el/annotation/ELFunctions.html" title="annotation interface in io.micronaut.el.annotation">ELFunctions</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab6">
 <div class="block">Maps the public static methods of a class, and the public instance methods it declares, to Jakarta
 Expression Language functions.</div>
 </div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/processor/visitor/ELFunctionVisitor.html" title="class in io.micronaut.el.processor.visitor">ELFunctionVisitor</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/processor/visitor/ELFunctionVisitor.html" title="class in io.micronaut.el.processor.visitor">ELFunctionVisitor</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
 <div class="block">Registers the functions declared with <a href="io/micronaut/el/annotation/ELFunction.html" title="annotation interface in io.micronaut.el.annotation"><code>ELFunction</code></a> in the module, for its expressions.</div>
+</div>
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/parser/ELIdentifiers.html" title="class in io.micronaut.el.parser">ELIdentifiers</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
+<div class="block">Finds identifiers whose variable-mapper bindings are fixed when an expression is created.</div>
 </div>
 <div class="col-first odd-row-color all-classes-table all-classes-table-tab1"><a href="io/micronaut/el/runtime/ELLambdaBody.html" title="interface in io.micronaut.el.runtime">ELLambdaBody</a></div>
 <div class="col-last odd-row-color all-classes-table all-classes-table-tab1">
@@ -366,84 +373,90 @@ Language specification.</div>
 <div class="col-last even-row-color all-classes-table all-classes-table-tab6">
 <div class="block">Declares the compilation time type of an expression variable.</div>
 </div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/processor/writer/ExpressionSourceWriter.html" title="class in io.micronaut.el.processor.writer">ExpressionSourceWriter</a></div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/runtime/ELVariableBindings.html" title="class in io.micronaut.el.runtime">ELVariableBindings</a></div>
 <div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
+<div class="block">Captures the variable expressions resolved while an expression is created, as required by section 1.19.</div>
+</div>
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/processor/writer/ExpressionSourceWriter.html" title="class in io.micronaut.el.processor.writer">ExpressionSourceWriter</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
 <div class="block">The writer of the <a href="io/micronaut/el/ELExpressionSource.html" title="interface in io.micronaut.el"><code>ELExpressionSource</code></a> implementations, which give access to the expressions
 compiled for a type.</div>
 </div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab4"><a href="io/micronaut/el/processor/writer/ExpressionSourceWriter.CompiledMethod.html" title="class in io.micronaut.el.processor.writer">ExpressionSourceWriter.CompiledMethod</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab4">
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab4"><a href="io/micronaut/el/processor/writer/ExpressionSourceWriter.CompiledMethod.html" title="class in io.micronaut.el.processor.writer">ExpressionSourceWriter.CompiledMethod</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab4">
 <div class="block">A compiled method expression and the class generated for it.</div>
 </div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab4"><a href="io/micronaut/el/processor/writer/ExpressionSourceWriter.CompiledValue.html" title="class in io.micronaut.el.processor.writer">ExpressionSourceWriter.CompiledValue</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/interpreter/InterpretingELExpressionParser.html" title="class in io.micronaut.el.interpreter">InterpretingELExpressionParser</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first even-row-color all-classes-table all-classes-table-tab4"><a href="io/micronaut/el/processor/writer/ExpressionSourceWriter.CompiledValue.html" title="class in io.micronaut.el.processor.writer">ExpressionSourceWriter.CompiledValue</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab4">
+<div class="block">A compiled value expression and the class generated for it.</div>
+</div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/interpreter/InterpretingELExpressionParser.html" title="class in io.micronaut.el.interpreter">InterpretingELExpressionParser</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
 <div class="block">Creates the expressions that were not compiled at compilation time by parsing them at runtime.</div>
 </div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/resolver/IntrospectionELResolver.html" title="class in io.micronaut.el.resolver">IntrospectionELResolver</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/resolver/IntrospectionELResolver.html" title="class in io.micronaut.el.resolver">IntrospectionELResolver</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
 <div class="block">The <code>ELResolver</code> resolving the types annotated with <code>Introspected</code>
 through the bean introspection generated for them at compilation time.</div>
 </div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/runtime/LiteralMethodExpression.html" title="class in io.micronaut.el.runtime">LiteralMethodExpression</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/runtime/LiteralMethodExpression.html" title="class in io.micronaut.el.runtime">LiteralMethodExpression</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
 <div class="block">A literal-expression used as a method expression, as described in the section 1.2.2 of the Jakarta
 Expression Language specification.</div>
 </div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/runtime/LiteralValueExpression.html" title="class in io.micronaut.el.runtime">LiteralValueExpression</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/runtime/LiteralValueExpression.html" title="class in io.micronaut.el.runtime">LiteralValueExpression</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
 <div class="block">A literal-expression as described in the section 1.2.2 of the Jakarta Expression Language specification.</div>
 </div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/runtime/MapVariableMapper.html" title="class in io.micronaut.el.runtime">MapVariableMapper</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/runtime/MapVariableMapper.html" title="class in io.micronaut.el.runtime">MapVariableMapper</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
 <div class="block">A <code>VariableMapper</code> keeping the variables of the section 1.19 of the Jakarta Expression Language
 specification in a map.</div>
 </div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/processor/writer/MethodExpressionWriter.html" title="class in io.micronaut.el.processor.writer">MethodExpressionWriter</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/processor/writer/MethodExpressionWriter.html" title="class in io.micronaut.el.processor.writer">MethodExpressionWriter</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
 <div class="block">The writer of the <code>jakarta.el.MethodExpression</code> implementations.</div>
 </div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab4"><a href="io/micronaut/el/processor/writer/MethodExpressionWriter.Written.html" title="class in io.micronaut.el.processor.writer">MethodExpressionWriter.Written</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab4">
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab4"><a href="io/micronaut/el/processor/writer/MethodExpressionWriter.Written.html" title="class in io.micronaut.el.processor.writer">MethodExpressionWriter.Written</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab4">
 <div class="block">A written method expression class, with its definition: inference fills the return type in.</div>
 </div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/info/MicronautJakartaElAnnotationsModuleInfo.html" title="class in io.micronaut.el.info">MicronautJakartaElAnnotationsModuleInfo</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/info/MicronautJakartaElInterpreterModuleInfo.html" title="class in io.micronaut.el.info">MicronautJakartaElInterpreterModuleInfo</a></div>
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/info/MicronautJakartaElAnnotationsModuleInfo.html" title="class in io.micronaut.el.info">MicronautJakartaElAnnotationsModuleInfo</a></div>
 <div class="col-last even-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/info/MicronautJakartaElModuleInfo.html" title="class in io.micronaut.el.info">MicronautJakartaElModuleInfo</a></div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/info/MicronautJakartaElInterpreterModuleInfo.html" title="class in io.micronaut.el.info">MicronautJakartaElInterpreterModuleInfo</a></div>
 <div class="col-last odd-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/info/MicronautJakartaElParserModuleInfo.html" title="class in io.micronaut.el.info">MicronautJakartaElParserModuleInfo</a></div>
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/info/MicronautJakartaElModuleInfo.html" title="class in io.micronaut.el.info">MicronautJakartaElModuleInfo</a></div>
 <div class="col-last even-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/info/MicronautJakartaElProcessorModuleInfo.html" title="class in io.micronaut.el.info">MicronautJakartaElProcessorModuleInfo</a></div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/info/MicronautJakartaElParserModuleInfo.html" title="class in io.micronaut.el.info">MicronautJakartaElParserModuleInfo</a></div>
 <div class="col-last odd-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/runtime/ObjectValueExpression.html" title="class in io.micronaut.el.runtime">ObjectValueExpression</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/info/MicronautJakartaElProcessorModuleInfo.html" title="class in io.micronaut.el.info">MicronautJakartaElProcessorModuleInfo</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/runtime/ObjectValueExpression.html" title="class in io.micronaut.el.runtime">ObjectValueExpression</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
 <div class="block">A value expression wrapping an already resolved value, as created by
 <code>ExpressionFactory.createValueExpression(Object, Class)</code>.</div>
 </div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/resolver/ReflectiveMethodELResolver.html" title="class in io.micronaut.el.resolver">ReflectiveMethodELResolver</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/resolver/ReflectiveMethodELResolver.html" title="class in io.micronaut.el.resolver">ReflectiveMethodELResolver</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
 <div class="block">Invokes the methods of the types that have no bean introspection, reflectively, as <code>BeanELResolver</code>
 and <code>StaticFieldELResolver</code> do, with the method looked up through the cache of <a href="io/micronaut/el/runtime/ELMethods.html" title="class in io.micronaut.el.runtime"><code>ELMethods</code></a>:
 the resolvers of the specification read <code>Class.getMethods()</code> on every invocation.</div>
 </div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/resolver/StreamELResolver.html" title="class in io.micronaut.el.resolver">StreamELResolver</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/resolver/StreamELResolver.html" title="class in io.micronaut.el.resolver">StreamELResolver</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
 <div class="block">The <code>ELResolver</code> implementing the operations on collection objects described in the chapter 2 of
 the Jakarta Expression Language specification.</div>
 </div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab3"><a href="io/micronaut/el/parser/ast/UnaryOperator.html" title="enum class in io.micronaut.el.parser.ast">UnaryOperator</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab3">
+<div class="col-first even-row-color all-classes-table all-classes-table-tab3"><a href="io/micronaut/el/parser/ast/UnaryOperator.html" title="enum class in io.micronaut.el.parser.ast">UnaryOperator</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab3">
 <div class="block">The unary operators of the Jakarta Expression Language.</div>
 </div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/processor/writer/ValueExpressionWriter.html" title="class in io.micronaut.el.processor.writer">ValueExpressionWriter</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="io/micronaut/el/processor/writer/ValueExpressionWriter.html" title="class in io.micronaut.el.processor.writer">ValueExpressionWriter</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
 <div class="block">The writer of the <code>jakarta.el.ValueExpression</code> implementations.</div>
 </div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab4"><a href="io/micronaut/el/processor/writer/ValueExpressionWriter.Written.html" title="class in io.micronaut.el.processor.writer">ValueExpressionWriter.Written</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab4">
+<div class="col-first even-row-color all-classes-table all-classes-table-tab4"><a href="io/micronaut/el/processor/writer/ValueExpressionWriter.Written.html" title="class in io.micronaut.el.processor.writer">ValueExpressionWriter.Written</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab4">
 <div class="block">A written expression class, with its definition: inference fills the expected type in.</div>
 </div>
 </div>
