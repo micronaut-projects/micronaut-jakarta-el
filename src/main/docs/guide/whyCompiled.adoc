@@ -18,27 +18,29 @@ OpenJDK 25.0.2 on Apple Silicon, JMH 1.37, 1 fork, 3 warmup and 5 measurement it
 |Implementation |Geometric mean of the average times |Relative to the compiled stack
 
 |Micronaut compiled
-|8.63 ns
+|9.26 ns
 |1.0x
 
 |Micronaut interpreted
-|82.9 ns
-|9.6x
+|101 ns
+|10.9x
 
 |Eclipse Expressly
-|367 ns
-|42.5x
+|388 ns
+|41.9x
 
 |Tomcat Jasper EL
-|449 ns
-|52.0x
+|473 ns
+|51.1x
 
 |===
 // results:end
 
 image::evaluation-benchmark-aggregate.svg[Geometric mean of the evaluation times per implementation, link="../img/evaluation-benchmark-results.svg"]
 
-In this run a compiled expression evaluated in 8.6 ns on average — about 43 times faster than the reference implementation and 52 times faster than Tomcat's. The gap is narrowest, around 6x, where every implementation resolves at runtime (a bean not declared with a type), and widest — one hundred times and more — wherever the others fall back to reflection: a method call on a `List` or a `String`, a lambda expression coerced to a functional interface, a stream pipeline. The interpreter of this module, the fallback for expressions created at runtime, averaged 83 ns — itself over 4 times faster than the reference implementation — because it walks its trees against the same compiled runtime.
+In this run a compiled expression evaluated in 9.3 ns on average — about 42 times faster than the reference implementation and 51 times faster than Tomcat's. The gap is narrowest, around 8x, where every implementation resolves at runtime (a bean not declared with a type), and widest — one hundred times and more — wherever the others fall back to reflection: a method call on a `List` or a `String`, a lambda expression coerced to a functional interface, a stream pipeline. The interpreter of this module, the fallback for expressions created at runtime, averaged 101 ns — itself close to 4 times faster than the reference implementation — because it walks its trees against the same compiled runtime.
+
+The interpreted figures carry the sandbox of the <<runtimeParsing,expressions parsed at runtime>>, which asks of every base object an expression reaches whether it is allowed. That costs a few nanoseconds per resolution, and shows up as around a fifth on the expressions that do little else: a bare property read is 22.6 ns against the 16.5 ns it would be without the check. The compiled expressions do not go through it and are unaffected.
 
 Click the chart for the chart of every benchmark; the `benchmarks` module of the repository holds the harness,
 every figure with its error in its `README.md`, and runs with `./gradlew :micronaut-benchmarks:jmh`.

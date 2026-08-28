@@ -16,6 +16,7 @@
 package io.micronaut.el.interpreter;
 
 import io.micronaut.core.annotation.Internal;
+import io.micronaut.el.ELSandbox;
 import io.micronaut.el.parser.ELParser;
 import io.micronaut.el.parser.ast.ELNode;
 import io.micronaut.el.runtime.ELMethods;
@@ -70,9 +71,11 @@ final class InterpretedMethodExpression extends MethodExpression {
         context.notifyBeforeEvaluation(expressionString);
         Object result = doInvoke(context, params);
         context.notifyAfterEvaluation(expressionString);
-        return expectedReturnType == void.class
-            ? null
-            : ELSandboxGuard.checkResult(context, ELSupport.coerceToType(context, result, expectedReturnType));
+        if (expectedReturnType == void.class) {
+            return null;
+        }
+        Object coerced = ELSupport.coerceToType(context, result, expectedReturnType);
+        return ELSandbox.checksResultOf(expectedReturnType) ? ELSandboxGuard.checkResult(context, coerced) : coerced;
     }
 
     @Override

@@ -91,6 +91,26 @@ public interface ELSandbox {
     }
 
     /**
+     * Whether a value coerced to the given type can be an instance of a type a sandbox denies, which decides
+     * whether the value an expression returns has to be checked at all.
+     *
+     * <p>The coercions of the section 1.25 to a string, to a boolean, to a character, to a number and to an
+     * enum all produce an instance of the target type, and none of those is ever denied. Every other target,
+     * {@link Object} first among them, hands the value back as it is.</p>
+     *
+     * @param expectedType The type the result of an expression is coerced to
+     * @return Whether the coerced value has to be checked
+     */
+    static boolean checksResultOf(Class<?> expectedType) {
+        return !(expectedType == String.class
+            || expectedType == Boolean.class || expectedType == boolean.class
+            || expectedType == Character.class || expectedType == char.class
+            || expectedType.isEnum()
+            || expectedType.isPrimitive()
+            || Number.class.isAssignableFrom(expectedType));
+    }
+
+    /**
      * Whether an expression may read the properties of a type and invoke its methods, which is asked of the
      * base object of every property access and method invocation, of the class of every static reference and
      * of the class of every constructor reference.
@@ -125,7 +145,7 @@ public interface ELSandbox {
          * The types that hand an expression the process, the class loaders or the reflection API. Every
          * subtype of one of them is denied too.
          */
-        private static final Set<String> DENIED_TYPES = Set.of(
+        static final Set<String> DENIED_TYPES = Set.of(
             "java.lang.Class",
             "java.lang.ClassLoader",
             "java.lang.Module",
@@ -153,7 +173,7 @@ public interface ELSandbox {
          * {@code com.sun} is not one of them, applications and specification kits alike publish under it,
          * and what it holds that matters is reached through a package that is listed or through reflection.
          */
-        private static final List<String> DENIED_PACKAGES = List.of(
+        static final List<String> DENIED_PACKAGES = List.of(
             "java.lang.invoke.",
             "java.lang.module.",
             "java.lang.reflect.",
@@ -168,8 +188,11 @@ public interface ELSandbox {
         /**
          * The members that hand an expression a denied type from a type that is allowed. The type of the
          * value they return is denied too, so these only make the failure name what the expression did.
+         *
+         * <p>{@link #allowsMember} does not read this set, it switches on the length of the name instead.
+         * The two are held together by a test.</p>
          */
-        private static final Set<String> DENIED_MEMBERS = Set.of(
+        static final Set<String> DENIED_MEMBERS = Set.of(
             "class",
             "getClass",
             "classLoader",
@@ -204,7 +227,20 @@ public interface ELSandbox {
 
         @Override
         public boolean allowsMember(Class<?> type, String member) {
-            return !DENIED_MEMBERS.contains(member);
+            // this is asked of every property an expression reads, and the answer is almost always yes: a
+            // switch on the length reaches at most two comparisons, where hashing the name costs more
+            return switch (member.length()) {
+                case 4 -> !member.equals("wait");
+                case 5 -> !member.equals("class");
+                case 6 -> !(member.equals("module") || member.equals("notify"));
+                case 8 -> !member.equals("getClass");
+                case 9 -> !(member.equals("getModule") || member.equals("notifyAll"));
+                case 11 -> !member.equals("classLoader");
+                case 14 -> !member.equals("getClassLoader");
+                case 16 -> !member.equals("protectionDomain");
+                case 19 -> !member.equals("getProtectionDomain");
+                default -> true;
+            };
         }
 
         @Override
