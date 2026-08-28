@@ -29,6 +29,13 @@ remains the fast one and the interpreted path is the fallback.
 The parser is a module of its own for the same reason: the compiler is not its only consumer, and any code that
 needs to inspect an expression without generating one can depend on it alone.
 
+One difference between the two paths is not a defect. The compiler selects an overload from the *static* types
+of the arguments, where the interpreter has only their runtime types: `${Math.max(book.pages, 1)}` compiles to
+`Math.max(long, long)`, while at runtime an `Integer` and a `Long` match `max(int,int)`, `max(long,long)`,
+`max(float,float)` and `max(double,double)` equally well, which makes the reference ambiguous, as it is for
+both reference implementations. Declaring an expression therefore resolves overloads that a string built at
+runtime cannot.
+
 == Expressions Built From Untrusted Input
 
 An expression declared with `@ELExpression` is source of the application, as trusted as the code around it.

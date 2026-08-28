@@ -577,10 +577,9 @@ final class ELInterpreter {
             case ELNode.Identifier identifier -> new Target(null, identifier.name());
             case ELNode.Property property ->
                 new Target(evaluate(context, property.base()), evaluate(context, property.property()));
-            case ELNode.Semicolon semicolon -> {
-                evaluate(context, semicolon.left());
-                yield resolveTarget(context, semicolon.right());
-            }
+            // a semicolon expression is not an lvalue: the compiled path does not treat it as one, and
+            // neither reference implementation does, so resolving one would evaluate its left operand for
+            // nothing on every getType, isReadOnly and getValueReference
             default -> null;
         };
     }

@@ -22,4 +22,6 @@ dependencies {
 dependencies {
     // compiles sources in memory with the Micronaut annotation processors, this one included
     testImplementation mn.micronaut.inject.java.test
+    // CompiledVersusInterpretedTest evaluates the same expression both ways and compares the two
+    testImplementation projects.micronautJakartaElInterpreter
 }

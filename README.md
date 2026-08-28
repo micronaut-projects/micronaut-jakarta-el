@@ -123,6 +123,15 @@ generated source provides. Such an expression is parsed once, when it is created
 The interpreter is not a second implementation of the language: it walks the same abstract syntax tree the compiler
 consumes and calls the same runtime as the generated code, so both share one definition of the semantics of the
 specification. The compiled path remains the fast one, and the interpreted path is the fallback.
+`CompiledVersusInterpretedTest` compiles expressions with the annotation processor and evaluates each of them
+both ways, comparing the value, the type, the read-only flag, the value reference and the value after a write.
+
+One difference between the two is not a defect. The compiler selects an overload from the **static** types of
+the arguments, where the interpreter has only their runtime types: `${Math.max(book.pages, 1)}` compiles to
+`Math.max(long, long)`, while at runtime an `Integer` and a `Long` match `max(int,int)`, `max(long,long)`,
+`max(float,float)` and `max(double,double)` equally well and the reference is ambiguous. Both Expressly and
+Tomcat Jasper EL report it ambiguous too. Declaring an expression therefore resolves overloads a runtime string
+cannot.
 
 ## Expressions built from untrusted input
 

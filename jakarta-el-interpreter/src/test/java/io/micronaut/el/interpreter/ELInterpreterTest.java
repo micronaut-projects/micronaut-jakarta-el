@@ -15,20 +15,28 @@
  */
 package io.micronaut.el.interpreter;
 
+import io.micronaut.el.CompiledExpressionFactory;
+import jakarta.el.ELContext;
 import jakarta.el.ELException;
 import jakarta.el.ELProcessor;
+import jakarta.el.ExpressionFactory;
+import jakarta.el.StandardELContext;
+import jakarta.el.ValueExpression;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ELInterpreterTest {
 
     private final ELProcessor processor = new ELProcessor();
+    private final ExpressionFactory factory = new CompiledExpressionFactory(List.of(),
+        new InterpretingELExpressionParser());
 
     @Test
     void literalsAndArithmetic() {
@@ -143,6 +151,20 @@ class ELInterpreterTest {
     }
 
     @Test
+    void aSemicolonExpressionIsNotAnLvalue() {
+        // the compiled path does not treat one as an lvalue and neither reference implementation does, so
+        // resolving one would evaluate its left operand for nothing on every getType and isReadOnly
+        ELContext context = new StandardELContext(factory);
+        context.getVariableMapper().setVariable("bean", factory.createValueExpression(new Holder(), Object.class));
+        ValueExpression expression =
+            factory.createValueExpression(context, "${1 ; bean.name}", Object.class);
+        assertTrue(expression.isReadOnly(context));
+        assertNull(expression.getType(context));
+        assertNull(expression.getValueReference(context));
+        assertEquals("n", expression.getValue(context));
+    }
+
+    @Test
     void collectionConstruction() {
         assertEquals(List.of(1L, 2L, 3L), processor.eval("[1,2,3]"));
         assertEquals(Map.of("one", 1L), processor.eval("{'one':1}"));
@@ -202,5 +224,21 @@ class ELInterpreterTest {
 
     public static long twice(long value) {
         return value * 2;
+    }
+
+    /**
+     * A bean with a writable property, so that an lvalue has something to resolve to.
+     */
+    public static final class Holder {
+
+        private String name = "n";
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
     }
 }
