@@ -49,6 +49,8 @@ class ELInterpreterExpressionsTest {
         assertEquals(true, value(ELInterpreterExpressions$ELExpressions.LESS_THAN));
         assertEquals(true, value(ELInterpreterExpressions$ELExpressions.EQUALITY));
         assertEquals(false, value(ELInterpreterExpressions$ELExpressions.NULL_EQUALITY));
+        assertEquals(false, value(ELInterpreterExpressions$ELExpressions.NULL_RELATIONAL_SHORT_CIRCUIT));
+        assertEquals(false, value(ELInterpreterExpressions$ELExpressions.NULL_GREATER_THAN_SHORT_CIRCUIT));
         assertEquals(true, value(ELInterpreterExpressions$ELExpressions.LOGICAL));
         assertEquals(true, value(ELInterpreterExpressions$ELExpressions.EMPTY_NULL));
         assertEquals(true, value(ELInterpreterExpressions$ELExpressions.EMPTY_LIST));

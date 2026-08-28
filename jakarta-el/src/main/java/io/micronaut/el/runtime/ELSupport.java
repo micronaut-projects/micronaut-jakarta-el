@@ -546,6 +546,18 @@ public final class ELSupport {
     }
 
     /**
+     * Evaluates the right operand and applies {@code <} only when the left operand is not {@code null}.
+     *
+     * @param left    The already evaluated left operand
+     * @param context The context for the compiled right operand
+     * @param right   The compiled right operand
+     * @return The result of the comparison
+     */
+    public static boolean lessThanLazy(@Nullable Object left, ELContext context, ELLambdaBody.Nullary right) {
+        return left != null && lessThan(left, right.evaluate(context));
+    }
+
+    /**
      * The {@code >} operator described in the section 1.9.1 of the specification.
      *
      * @param left  The left operand
@@ -557,6 +569,18 @@ public final class ELSupport {
             return false;
         }
         return compare(left, right) > 0;
+    }
+
+    /**
+     * Evaluates the right operand and applies {@code >} only when the left operand is not {@code null}.
+     *
+     * @param left    The already evaluated left operand
+     * @param context The context for the compiled right operand
+     * @param right   The compiled right operand
+     * @return The result of the comparison
+     */
+    public static boolean greaterThanLazy(@Nullable Object left, ELContext context, ELLambdaBody.Nullary right) {
+        return left != null && greaterThan(left, right.evaluate(context));
     }
 
     /**

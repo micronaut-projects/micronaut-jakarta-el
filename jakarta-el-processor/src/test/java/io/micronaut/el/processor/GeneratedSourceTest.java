@@ -115,7 +115,7 @@ class GeneratedSourceTest {
     void theOperatorsOnUnknownTypesUseTheRuntime() throws IOException {
         Map<String, Integer> calls = runtimeCalls("${book.tags[0] + 1 > 10}");
         assertEquals(1, calls.getOrDefault("add", 0), calls.toString());
-        assertEquals(1, calls.getOrDefault("greaterThan", 0), calls.toString());
+        assertEquals(1, calls.getOrDefault("greaterThanLazy", 0), calls.toString());
     }
 
     @Test
