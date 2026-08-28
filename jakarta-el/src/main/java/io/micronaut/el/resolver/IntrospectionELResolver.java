@@ -149,35 +149,37 @@ public final class IntrospectionELResolver extends ELResolver {
             return null;
         }
         Object[] arguments = params == null ? new Object[0] : params;
-        Invocation invocation = paramTypes == null
-            ? select(context, named, arguments)
-            : declaredWith(context, named, paramTypes, arguments);
-        if (invocation == null) {
-            return null;
-        }
-        context.setPropertyResolved(base, method);
-        return invocation.method().invoke(base, invocation.arguments());
+        return paramTypes == null
+            ? invokeSelected(context, base, method, named, arguments)
+            : invokeDeclaredWith(context, base, method, named, paramTypes, arguments);
     }
 
     /**
-     * The invocation of the overload declaring exactly the given parameter types, as a {@code MethodExpression}
-     * asks for it, or no invocation when the type declares no such overload or the arguments do not fit it.
+     * Invokes the overload declaring exactly the given parameter types, as a {@code MethodExpression} asks for
+     * it, and declines when the type declares no such overload or the arguments do not fit it.
      */
     @Nullable
-    private static Invocation declaredWith(ELContext context,
-                                           BeanMethod<Object, Object>[] named,
-                                           Class<?>[] paramTypes,
-                                           Object[] arguments) {
+    private static Object invokeDeclaredWith(ELContext context,
+                                             Object base,
+                                             Object method,
+                                             BeanMethod<Object, Object>[] named,
+                                             Class<?>[] paramTypes,
+                                             Object[] arguments) {
         for (BeanMethod<Object, Object> candidate : named) {
             if (sameTypes(candidate.getArguments(), paramTypes)) {
-                return Invocation.of(candidate, coerce(context, candidate.getArguments(), arguments));
+                Object[] coerced = coerce(context, candidate.getArguments(), arguments);
+                if (coerced == null) {
+                    return null;
+                }
+                context.setPropertyResolved(base, method);
+                return candidate.invoke(base, coerced);
             }
         }
         return null;
     }
 
     /**
-     * The invocation the arguments select, or no invocation when none of the overloads fits or several fit
+     * Invokes the overload the arguments select, and declines when none of the overloads fits or several fit
      * equally well.
      *
      * <p>Coercing the arguments is part of selecting the overload, so it happens before the resolver commits:
@@ -185,11 +187,16 @@ public final class IntrospectionELResolver extends ELResolver {
      * standard resolvers get their chance.</p>
      */
     @Nullable
-    private static Invocation select(ELContext context, BeanMethod<Object, Object>[] named, Object[] arguments) {
-        Invocation selected = null;
+    private static Object invokeSelected(ELContext context,
+                                         Object base,
+                                         Object method,
+                                         BeanMethod<Object, Object>[] named,
+                                         Object[] arguments) {
+        BeanMethod<Object, Object> selected = null;
+        Object[] selectedArguments = arguments;
         for (BeanMethod<Object, Object> candidate : named.length == 1 ? List.of(named[0]) : candidates(named, arguments)) {
-            Invocation invocation = Invocation.of(candidate, coerce(context, candidate.getArguments(), arguments));
-            if (invocation == null) {
+            Object[] coerced = coerce(context, candidate.getArguments(), arguments);
+            if (coerced == null) {
                 continue;
             }
             if (selected != null) {
@@ -197,9 +204,14 @@ public final class IntrospectionELResolver extends ELResolver {
                 // the ambiguity instead of depending on the order of the generated introspection methods.
                 return null;
             }
-            selected = invocation;
+            selected = candidate;
+            selectedArguments = coerced;
         }
-        return selected;
+        if (selected == null) {
+            return null;
+        }
+        context.setPropertyResolved(base, method);
+        return selected.invoke(base, selectedArguments);
     }
 
     @Override
@@ -334,20 +346,6 @@ public final class IntrospectionELResolver extends ELResolver {
 
     private boolean isReadOnly(BeanProperty<Object, Object> beanProperty) {
         return readOnly || beanProperty.isReadOnly();
-    }
-
-    /**
-     * An overload and the arguments coerced to its parameters.
-     *
-     * @param method    The method
-     * @param arguments The coerced arguments
-     */
-    private record Invocation(BeanMethod<Object, Object> method, Object[] arguments) {
-
-        @Nullable
-        static Invocation of(BeanMethod<Object, Object> method, Object @Nullable [] arguments) {
-            return arguments == null ? null : new Invocation(method, arguments);
-        }
     }
 
     /**

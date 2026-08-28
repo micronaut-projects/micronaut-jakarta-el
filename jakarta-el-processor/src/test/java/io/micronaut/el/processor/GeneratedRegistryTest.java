@@ -1,18 +1,12 @@
 package io.micronaut.el.processor;
 
-import io.micronaut.annotation.processing.test.JavaParser;
 import io.micronaut.el.CompiledELContext;
 import io.micronaut.el.ELExpressionSource;
 import jakarta.el.MethodExpression;
 import jakarta.el.ValueExpression;
 import org.junit.jupiter.api.Test;
 
-import javax.tools.JavaFileObject;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -55,60 +49,12 @@ class GeneratedRegistryTest {
         }
         """;
 
-    /**
-     * Compiles the source with the processor and loads the generated registry, so that what it serves is what
-     * the compiled classes do rather than what they look like.
-     */
-    private static Generated registry() throws Exception {
-        List<JavaFileObject> generated;
-        try (JavaParser parser = new JavaParser()) {
-            generated = new ArrayList<>();
-            parser.generate(PACKAGE + ".Expressions", SOURCE).forEach(generated::add);
-        }
-        Map<String, byte[]> classes = new HashMap<>();
-        for (JavaFileObject file : generated) {
-            String name = file.getName();
-            if (!name.endsWith(".class")) {
-                continue;
-            }
-            try (InputStream input = file.openInputStream()) {
-                classes.put(className(name), input.readAllBytes());
-            }
-        }
-        ClassLoader loader = new ClassLoader(GeneratedRegistryTest.class.getClassLoader()) {
-            @Override
-            protected Class<?> findClass(String name) throws ClassNotFoundException {
-                byte[] bytes = classes.get(name);
-                if (bytes == null) {
-                    throw new ClassNotFoundException(name);
-                }
-                return defineClass(name, bytes, 0, bytes.length);
-            }
-        };
-        return new Generated(loader,
-            (ELExpressionSource) loader.loadClass(PACKAGE + ".Expressions$ELExpressions")
-                .getDeclaredConstructor()
-                .newInstance());
+    private static GeneratedExpressions registry() throws Exception {
+        return GeneratedExpressions.of(PACKAGE + ".Expressions", SOURCE);
     }
 
-    /**
-     * The registry and the loader it was defined by, which also defines the types the expressions were
-     * compiled against and therefore the beans they can be evaluated with.
-     *
-     * @param loader   The loader
-     * @param registry The registry
-     */
-    private record Generated(ClassLoader loader, ELExpressionSource registry) {
-
-        Object book() throws Exception {
-            return loader.loadClass(PACKAGE + ".Expressions$Book").getDeclaredConstructor().newInstance();
-        }
-    }
-
-    private static String className(String fileName) {
-        String name = fileName.replace('\\', '/');
-        int start = name.indexOf(PACKAGE.replace('.', '/'));
-        return name.substring(start, name.length() - ".class".length()).replace('/', '.');
+    private static Object book(GeneratedExpressions generated) throws Exception {
+        return generated.instantiate(PACKAGE + ".Expressions$Book");
     }
 
     @Test
@@ -121,10 +67,10 @@ class GeneratedRegistryTest {
 
     @Test
     void theRegistryServesTheValueExpressionsOfTheDeclaredTypes() throws Exception {
-        Generated generated = registry();
+        GeneratedExpressions generated = registry();
         ELExpressionSource registry = generated.registry();
         CompiledELContext context = new CompiledELContext()
-            .setBean("book", generated.book())
+            .setBean("book", book(generated))
             .setBean("quantity", 3)
             .setBean("tags", new String[]{"first", "second"});
 
@@ -147,9 +93,9 @@ class GeneratedRegistryTest {
 
     @Test
     void theRegistryServesTheMethodExpressionsOfTheDeclaredSignatures() throws Exception {
-        Generated generated = registry();
+        GeneratedExpressions generated = registry();
         ELExpressionSource registry = generated.registry();
-        CompiledELContext context = new CompiledELContext().setBean("book", generated.book());
+        CompiledELContext context = new CompiledELContext().setBean("book", book(generated));
 
         MethodExpression describe = registry.createMethodExpression(context, "#{book.describe}",
             String.class, new Class<?>[0]);
