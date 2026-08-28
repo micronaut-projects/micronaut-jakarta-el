@@ -119,6 +119,13 @@ class GeneratedSourceTest {
     }
 
     @Test
+    void theDeferredRelationalOperandIsGeneratedOnce() throws IOException {
+        Map<String, Integer> calls = runtimeCalls("${book.tags[0] < book.tags[1]}");
+        assertEquals(1, calls.getOrDefault("lessThanLazy", 0), calls.toString());
+        assertEquals(2, calls.getOrDefault("resolveVariable", 0), calls.toString());
+    }
+
+    @Test
     void aSemicolonKeepsEveryReferenceResolving() throws IOException {
         Map<String, Integer> calls = runtimeCalls("${book.title; book.title}");
         assertEquals(2, calls.getOrDefault("resolveVariable", 0), calls.toString());

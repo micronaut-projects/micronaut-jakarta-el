@@ -21,6 +21,10 @@ public final class InterpreterFunctions {
         return new int[]{1, 2};
     }
 
+    public static boolean identity(boolean value) {
+        return value;
+    }
+
     public interface TextMapper {
         String apply(String value);
 

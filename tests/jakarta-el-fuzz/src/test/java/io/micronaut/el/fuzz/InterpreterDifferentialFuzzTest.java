@@ -260,7 +260,8 @@ final class InterpreterDifferentialFuzzTest {
 
     private static boolean equivalent(Outcome actual, Outcome expected) {
         if (actual.failure() != null || expected.failure() != null) {
-            return actual.failure() != null && expected.failure() != null;
+            return actual.failure() != null && expected.failure() != null
+                && actual.failure().getClass().equals(expected.failure().getClass());
         }
         return equivalentValue(actual.value(), expected.value());
     }

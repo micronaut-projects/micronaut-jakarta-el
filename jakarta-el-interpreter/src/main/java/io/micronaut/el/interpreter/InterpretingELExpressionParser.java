@@ -18,7 +18,9 @@ package io.micronaut.el.interpreter;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.el.ELExpressionParser;
 import io.micronaut.el.parser.ELParser;
+import io.micronaut.el.parser.ELIdentifiers;
 import io.micronaut.el.parser.ast.ELNode;
+import io.micronaut.el.runtime.ELVariableBindings;
 import jakarta.el.ELContext;
 import jakarta.el.ELException;
 import jakarta.el.MethodExpression;
@@ -58,10 +60,14 @@ public final class InterpretingELExpressionParser implements ELExpressionParser 
                                                  String expression,
                                                  Class<?> expectedType) {
         Parsed entry = parse(expression);
+        Map<String, ELInterpreter.BoundFunction> functions = ELInterpreter.bindFunctions(context, entry.node());
         ELInterpreter interpreter = entry.root() == null
-            ? ELInterpreter.of(context, entry.node())
+            ? ELInterpreter.of(functions)
             : ELInterpreter.sharing(entry.root());
-        return new InterpretedValueExpression(expression, expectedType, entry.node(), interpreter);
+        ValueExpression interpreted = new InterpretedValueExpression(expression, expectedType, entry.node(),
+            functions, interpreter);
+        return ELVariableBindings.bind(context, interpreted,
+            ELIdentifiers.free(entry.node()).toArray(String[]::new));
     }
 
     @Override
@@ -74,8 +80,10 @@ public final class InterpretingELExpressionParser implements ELExpressionParser 
             throw new ELException("A method expression must consist of a single eval-expression: " + expression);
         }
         requireMethodReference(expression, node);
-        return new InterpretedMethodExpression(expression, expectedReturnType, expectedParamTypes, node,
-            ELInterpreter.of(context, node));
+        Map<String, ELInterpreter.BoundFunction> functions = ELInterpreter.bindFunctions(context, node);
+        MethodExpression interpreted = new InterpretedMethodExpression(expression, expectedReturnType,
+            expectedParamTypes, node, functions, ELInterpreter.of(functions));
+        return ELVariableBindings.bind(context, interpreted, ELIdentifiers.free(node).toArray(String[]::new));
     }
 
     private synchronized Parsed parse(String expression) {

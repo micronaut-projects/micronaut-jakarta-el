@@ -1,5 +1,8 @@
 package io.micronaut.el.interpreter;
 
+import java.util.function.Function;
+import java.util.function.Predicate;
+
 public final class Varargs {
 
     public interface NotFunctional {
@@ -54,6 +57,22 @@ public final class Varargs {
 
     public String specific(Object value) {
         return "object";
+    }
+
+    public String pick(Number value) {
+        return "number";
+    }
+
+    public String pick(Integer value) {
+        return "integer";
+    }
+
+    public String route(Predicate<String> predicate) {
+        return "predicate";
+    }
+
+    public String route(Function<String, String> function) {
+        return "function";
     }
 
     public String reject(NotFunctional function) {

@@ -27,6 +27,7 @@ import jakarta.el.ValueReference;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
+import java.util.Map;
 
 /**
  * A {@link ValueExpression} evaluating the abstract syntax tree produced by the parser.
@@ -46,16 +47,19 @@ final class InterpretedValueExpression extends ValueExpression {
      * character, a number or an enum answers on its own.
      */
     private final boolean checkedResult;
+    private final Map<String, ELInterpreter.BoundFunction> functions;
     private transient @Nullable ELNode node;
     private transient @Nullable ELInterpreter interpreter;
 
     InterpretedValueExpression(String expressionString,
                                Class<?> expectedType,
                                ELNode node,
+                               Map<String, ELInterpreter.BoundFunction> functions,
                                ELInterpreter interpreter) {
         this.expressionString = Objects.requireNonNull(expressionString, "expressionString");
         this.expectedType = Objects.requireNonNull(expectedType, "expectedType");
         this.checkedResult = ELSandbox.checksResultOf(expectedType);
+        this.functions = Map.copyOf(functions);
         this.node = Objects.requireNonNull(node, "node");
         this.interpreter = Objects.requireNonNull(interpreter, "interpreter");
     }
@@ -133,7 +137,7 @@ final class InterpretedValueExpression extends ValueExpression {
     private ELInterpreter interpreter() {
         ELInterpreter resolved = interpreter;
         if (resolved == null) {
-            resolved = ELInterpreter.of(null, node());
+            resolved = ELInterpreter.of(functions);
             interpreter = resolved;
         }
         return resolved;

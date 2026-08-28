@@ -131,6 +131,33 @@ class CompilationErrorsTest {
     }
 
     @Test
+    void aLambdaWithUnrelatedFunctionalTargetsIsRejectedAsAmbiguous() {
+        String source = """
+            package io.micronaut.el.test.errors;
+
+            import io.micronaut.el.annotation.*;
+            import java.util.function.Function;
+            import java.util.function.Predicate;
+
+            @ELEnvironment(variables = @ELVariable(name = "varargs", type = Router.class))
+            @ELExpression(value = "${varargs.route(value -> value)}", expectedType = String.class)
+            public class Expressions {
+            }
+
+            class Router {
+                public String route(Predicate<String> predicate) { return "predicate"; }
+                public String route(Function<String, String> function) { return "function"; }
+            }
+            """;
+        try (JavaParser parser = new JavaParser()) {
+            RuntimeException failure = assertThrows(RuntimeException.class,
+                () -> parser.generate(PACKAGE + ".Expressions", source));
+            assertTrue(failure.getMessage().contains("is ambiguous for the lambda expression"),
+                failure.getMessage());
+        }
+    }
+
+    @Test
     void aMemberTheTypedVariableDoesNotDeclareIsAWarning() {
         try (JavaParser parser = new JavaParser()) {
             Iterable<? extends JavaFileObject> generated = parser.generate(PACKAGE + ".Expressions",

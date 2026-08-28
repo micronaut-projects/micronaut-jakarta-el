@@ -2,6 +2,7 @@ package io.micronaut.el.test;
 
 import io.micronaut.el.CompiledELContext;
 import io.micronaut.el.CompiledExpressionFactory;
+import io.micronaut.el.runtime.ELLambdas;
 import jakarta.el.ELContext;
 import jakarta.el.ELException;
 import jakarta.el.ELResolver;
@@ -36,8 +37,15 @@ class ELInterpreterExpressionsTest {
         .setBean("strings", new String[]{"a", "b"})
         .setBean("functions", new Formatting())
         .setBean("integer", 1)
+        .setBean("number", 1)
+        .setBean("counter", new EvaluationCounter())
         .setBean("twice", 42L)
         .setBean("target", ELInterpreterExpressions$ELExpressions.LIST_SIZE_METHOD);
+
+    {
+        ((CompiledELContext) context).setBean("shadow", ELLambdas.create(context, List.of("value"),
+            lambdaContext -> "variable:" + lambdaContext.getLambdaArgument("value")));
+    }
 
     @Test
     void literalsAndOperators() {
@@ -103,6 +111,10 @@ class ELInterpreterExpressionsTest {
         assertEquals("assignable", value(ELInterpreterExpressions$ELExpressions.ASSIGNABLE_OVER_COERCIBLE));
         assertEquals("number", value(ELInterpreterExpressions$ELExpressions.MOST_SPECIFIC_OVERLOAD));
         assertEquals("wrapper", value(ELInterpreterExpressions$ELExpressions.BOXED_OVERLOAD));
+        assertEquals("integer", value(ELInterpreterExpressions$ELExpressions.RUNTIME_SUBTYPE_OVERLOAD));
+        assertEquals(false, value(ELInterpreterExpressions$ELExpressions.NESTED_RELATIONAL_SHORT_CIRCUIT));
+        assertEquals(0, ((EvaluationCounter) ((CompiledELContext) context).getBean("counter")).getCalls());
+        assertEquals("variable:x", value(ELInterpreterExpressions$ELExpressions.LAMBDA_VARIABLE_SHADOWS_FUNCTION));
         assertThrows(MethodNotFoundException.class,
             () -> value(ELInterpreterExpressions$ELExpressions.EMPTY_VARARGS_AMBIGUITY));
         assertThrows(MethodNotFoundException.class,
@@ -170,6 +182,11 @@ class ELInterpreterExpressionsTest {
             new Class<?>[0]).invoke(context, null));
     }
 
+    @Test
+    void generatedFunctionExpressionsSurviveSerialization() throws Exception {
+        assertEquals("a,b", roundTrip(ELInterpreterExpressions$ELExpressions.FUNCTION_JOIN).getValue(context));
+    }
+
     private Object value(ValueExpression expression) {
         return expression.getValue(context);
     }
@@ -181,6 +198,16 @@ class ELInterpreterExpressionsTest {
         }
         try (ObjectInputStream input = new ObjectInputStream(new ByteArrayInputStream(bytes.toByteArray()))) {
             return (MethodExpression) input.readObject();
+        }
+    }
+
+    private static ValueExpression roundTrip(ValueExpression expression) throws IOException, ClassNotFoundException {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        try (ObjectOutputStream output = new ObjectOutputStream(bytes)) {
+            output.writeObject(expression);
+        }
+        try (ObjectInputStream input = new ObjectInputStream(new ByteArrayInputStream(bytes.toByteArray()))) {
+            return (ValueExpression) input.readObject();
         }
     }
 
