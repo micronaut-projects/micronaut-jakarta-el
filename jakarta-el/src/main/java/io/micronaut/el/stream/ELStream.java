@@ -261,8 +261,41 @@ public final class ELStream<T> {
      * @param binaryOperator The accumulator, as compiled from a lambda expression
      * @return An optional holding the reduced value
      */
+    /**
+     * The first or the last element in the order of a comparator.
+     *
+     * <p>{@code Stream.max} and {@code Stream.min} wrap the element in an {@link java.util.Optional}, which a
+     * stream holding a null element cannot hold, where the empty {@link ELOptional} of the section 2.3 of the
+     * specification is exactly what an absent element is.</p>
+     */
+    @Nullable
+    private T best(Comparator<? super T> comparator, boolean minimum) {
+        Iterator<T> iterator = stream.iterator();
+        if (!iterator.hasNext()) {
+            return null;
+        }
+        T best = iterator.next();
+        while (iterator.hasNext()) {
+            T element = iterator.next();
+            int comparison = comparator.compare(element, best);
+            if (minimum ? comparison < 0 : comparison > 0) {
+                best = element;
+            }
+        }
+        return best;
+    }
+
     public ELOptional<T> reduce(BinaryOperator<T> binaryOperator) {
-        return ELOptional.of(stream.reduce(binaryOperator).orElse(null));
+        // Stream.reduce wraps the result in an Optional, which a stream holding a null element cannot hold
+        Iterator<T> iterator = stream.iterator();
+        if (!iterator.hasNext()) {
+            return ELOptional.of(null);
+        }
+        T result = iterator.next();
+        while (iterator.hasNext()) {
+            result = binaryOperator.apply(result, iterator.next());
+        }
+        return ELOptional.of(result);
     }
 
     /**
@@ -293,7 +326,7 @@ public final class ELStream<T> {
      * @return An optional holding the maximum element
      */
     public ELOptional<T> max() {
-        return ELOptional.of(stream.max(ELSupport::compare).orElse(null));
+        return ELOptional.of(best(ELSupport::compare, false));
     }
 
     /**
@@ -309,14 +342,14 @@ public final class ELStream<T> {
      * @return An optional holding the maximum element
      */
     public ELOptional<T> max(Comparator<? super T> comparator) {
-        return ELOptional.of(stream.max(comparator).orElse(null));
+        return ELOptional.of(best(comparator, false));
     }
 
     /**
      * @return An optional holding the minimum element
      */
     public ELOptional<T> min() {
-        return ELOptional.of(stream.min(ELSupport::compare).orElse(null));
+        return ELOptional.of(best(ELSupport::compare, true));
     }
 
     /**
@@ -332,7 +365,7 @@ public final class ELStream<T> {
      * @return An optional holding the minimum element
      */
     public ELOptional<T> min(Comparator<? super T> comparator) {
-        return ELOptional.of(stream.min(comparator).orElse(null));
+        return ELOptional.of(best(comparator, true));
     }
 
     /**
@@ -421,7 +454,8 @@ public final class ELStream<T> {
      * @return An optional holding the first element of the stream
      */
     public ELOptional<T> findFirst() {
-        return ELOptional.of(stream.findFirst().orElse(null));
+        Iterator<T> iterator = stream.iterator();
+        return ELOptional.of(iterator.hasNext() ? iterator.next() : null);
     }
 
     /**

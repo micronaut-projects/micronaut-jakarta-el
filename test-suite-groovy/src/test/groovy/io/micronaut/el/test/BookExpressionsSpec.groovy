@@ -9,6 +9,7 @@ import jakarta.el.ExpressionFactory
 import org.junit.jupiter.api.Test
 
 import static org.junit.jupiter.api.Assertions.assertEquals
+import static org.junit.jupiter.api.Assertions.assertFalse
 import static org.junit.jupiter.api.Assertions.assertThrows
 import static org.junit.jupiter.api.Assertions.assertTrue
 
@@ -51,6 +52,21 @@ class BookExpressionsSpec {
         assertEquals(3L, factory.createValueExpression(context, '${(x -> y -> x + y)(1)(2)}', Object).getValue(context))
         assertEquals(10L, factory.createValueExpression(context, '${((a, b, c, d) -> a + b + c + d)(1, 2, 3, 4)}', Object).getValue(context))
         assertEquals(null, factory.createValueExpression(context, '${book.tags.stream().forEach(t -> t.length())}', Object).getValue(context))
+    }
+
+    @Test
+    void resolvesTheLValueProtocolOfACompiledExpression() {
+        // the expressions of this suite are written as bytecode rather than as Java source, so the calls the
+        // generated methods make are the ones the writer emitted, with no compiler of the language to bind
+        // them: getValueReference builds a jakarta.el.ValueReference from the base and the property
+        def expression = factory.createValueExpression(context, '${book.title}', String)
+        assertFalse(expression.isReadOnly(context))
+        assertEquals(String, expression.getType(context))
+        def reference = expression.getValueReference(context)
+        assertEquals(context.getBean("book"), reference.base)
+        assertEquals("title", reference.property)
+        expression.setValue(context, "Sourcegen")
+        assertEquals("Sourcegen", expression.getValue(context))
     }
 
     @Test

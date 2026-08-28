@@ -34,6 +34,8 @@ import io.micronaut.sourcegen.model.TypeDef;
 import jakarta.el.ELContext;
 import jakarta.el.ValueReference;
 
+import java.util.List;
+
 import javax.lang.model.element.Modifier;
 
 /**
@@ -196,8 +198,10 @@ public final class ValueExpressionWriter {
                 ExpressionDef context = parameters.get(0);
                 ELCompiler.LValue lValue = lValueOf(compiler, node, context);
                 ExpressionDef base = lValue.base() == null ? ExpressionDef.nullValue() : lValue.base();
+                // the constructor takes two Objects, and selecting it by the static types of the base and of
+                // the property would emit a call to a constructor that does not exist
                 return ClassTypeDef.of(ValueReference.class)
-                    .instantiate(base, lValue.property())
+                    .instantiate(List.of(TypeDef.OBJECT, TypeDef.OBJECT), base, lValue.property())
                     .returning();
             });
     }

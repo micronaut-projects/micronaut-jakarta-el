@@ -110,7 +110,7 @@ final class ELInterpreter {
                     @Override
                     @Nullable
                     Object evaluate(ELContext context) {
-                        return ELResolution.resolveIdentifier(context, name);
+                        return ELSandboxGuard.resolveIdentifier(context, name);
                     }
                 };
             }
@@ -132,7 +132,7 @@ final class ELInterpreter {
                     @Override
                     @Nullable
                     Object evaluate(ELContext context) {
-                        return ELResolution.getValue(context, base.evaluate(context), name.evaluate(context));
+                        return ELSandboxGuard.getValue(context, base.evaluate(context), name.evaluate(context));
                     }
                 };
             }
@@ -145,8 +145,8 @@ final class ELInterpreter {
                     @Override
                     @Nullable
                     Object evaluate(ELContext context) {
-                        return ELResolution.invokeWithParams(context, base.evaluate(context), name.evaluate(context),
-                            evaluateAll(context, arguments));
+                        return ELSandboxGuard.invokeWithParams(context, base.evaluate(context),
+                            name.evaluate(context), evaluateAll(context, arguments));
                     }
                 };
             }
@@ -158,7 +158,7 @@ final class ELInterpreter {
                     @Override
                     @Nullable
                     Object evaluate(ELContext context) {
-                        return ELResolution.invokeCallable(context, target.evaluate(context), evaluateAll(context, arguments));
+                        return ELSandboxGuard.invokeCallable(context, target.evaluate(context), evaluateAll(context, arguments));
                     }
                 };
             }
@@ -522,15 +522,15 @@ final class ELInterpreter {
             case INTEGER_LITERAL -> ((ELNode.IntegerLiteral) node).value();
             case FLOATING_POINT_LITERAL -> ((ELNode.FloatingPointLiteral) node).value();
             case STRING_LITERAL -> ((ELNode.StringLiteral) node).value();
-            case IDENTIFIER -> ELResolution.resolveIdentifier(context, ((ELNode.Identifier) node).name());
+            case IDENTIFIER -> ELSandboxGuard.resolveIdentifier(context, ((ELNode.Identifier) node).name());
             case FUNCTION -> evaluateFunction(context, (ELNode.Function) node);
             case PROPERTY -> {
                 ELNode.Property property = (ELNode.Property) node;
-                yield ELResolution.getValue(context, evaluate(context, property.base()), evaluate(context, property.property()));
+                yield ELSandboxGuard.getValue(context, evaluate(context, property.base()), evaluate(context, property.property()));
             }
             case METHOD -> {
                 ELNode.Method method = (ELNode.Method) node;
-                yield ELResolution.invokeWithParams(
+                yield ELSandboxGuard.invokeWithParams(
                     context,
                     evaluate(context, method.base()),
                     evaluate(context, method.property()),
@@ -538,7 +538,7 @@ final class ELInterpreter {
             }
             case CALL -> {
                 ELNode.Call call = (ELNode.Call) node;
-                yield ELResolution.invokeCallable(context, evaluate(context, call.target()), evaluateAll(context, call.arguments()));
+                yield ELSandboxGuard.invokeCallable(context, evaluate(context, call.target()), evaluateAll(context, call.arguments()));
             }
             case UNARY -> evaluateUnary(context, (ELNode.Unary) node);
             case BINARY -> evaluateBinary(context, (ELNode.Binary) node);
@@ -577,10 +577,9 @@ final class ELInterpreter {
             case ELNode.Identifier identifier -> new Target(null, identifier.name());
             case ELNode.Property property ->
                 new Target(evaluate(context, property.base()), evaluate(context, property.property()));
-            case ELNode.Semicolon semicolon -> {
-                evaluate(context, semicolon.left());
-                yield resolveTarget(context, semicolon.right());
-            }
+            // a semicolon expression is not an lvalue: the compiled path does not treat it as one, and
+            // neither reference implementation does, so resolving one would evaluate its left operand for
+            // nothing on every getType, isReadOnly and getValueReference
             default -> null;
         };
     }
@@ -593,7 +592,13 @@ final class ELInterpreter {
     @Nullable
     ValueReference valueReference(ELContext context, ELNode node) {
         Target target = resolveTarget(context, node);
-        return target == null ? null : new ValueReference(target.base(), target.property());
+        if (target == null) {
+            return null;
+        }
+        // the reference names the base and the property of an lvalue, so it is the same access as getType and
+        // isReadOnly and the sandbox has the same say over it
+        ELSandboxGuard.check(context, target.base(), target.property());
+        return new ValueReference(target.base(), target.property());
     }
 
     private Object evaluateComposite(ELContext context, ELNode.Composite composite) {
@@ -664,7 +669,7 @@ final class ELInterpreter {
         if (target.base() == null) {
             return ELResolution.assignIdentifier(context, ELSupport.coerceToString(target.property()), value);
         }
-        return ELResolution.assignProperty(context, target.base(), target.property(), value);
+        return ELSandboxGuard.assignProperty(context, target.base(), target.property(), value);
     }
 
     /**
@@ -676,7 +681,7 @@ final class ELInterpreter {
         List<List<ELNode>> invocations = function.invocations();
         // the first invocation is consumed by the resolution of the function itself
         for (int i = 1; i < invocations.size(); i++) {
-            result = ELResolution.invokeCallable(context, result, evaluateAll(context, invocations.get(i)));
+            result = ELSandboxGuard.invokeCallable(context, result, evaluateAll(context, invocations.get(i)));
         }
         return result;
     }
@@ -688,7 +693,7 @@ final class ELInterpreter {
         String localName = function.localName();
         Object identifier = prefix.isEmpty() ? resolveIdentifierOrNull(context, localName) : null;
         if (identifier instanceof LambdaExpression || identifier instanceof ELClass) {
-            return ELResolution.invokeCallable(context, identifier, evaluateAll(context, firstArguments));
+            return ELSandboxGuard.invokeCallable(context, identifier, evaluateAll(context, firstArguments));
         }
         Method method = resolveMappedFunction(context, function);
         if (method != null) {
@@ -699,11 +704,11 @@ final class ELInterpreter {
             if (importHandler != null) {
                 Class<?> resolvedClass = importHandler.resolveClass(localName);
                 if (resolvedClass != null) {
-                    return ELResolution.newInstance(context, new ELClass(resolvedClass), evaluateAll(context, firstArguments));
+                    return ELSandboxGuard.newInstance(context, new ELClass(resolvedClass), evaluateAll(context, firstArguments));
                 }
                 Class<?> staticClass = importHandler.resolveStatic(localName);
                 if (staticClass != null) {
-                    return ELResolution.invokeWithParams(context, new ELClass(staticClass), localName,
+                    return ELSandboxGuard.invokeWithParams(context, new ELClass(staticClass), localName,
                         evaluateAll(context, firstArguments));
                 }
             }

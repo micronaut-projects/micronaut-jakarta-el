@@ -6,6 +6,7 @@ import io.micronaut.el.runtime.CompiledExpression
 import jakarta.el.ELException
 import jakarta.el.ExpressionFactory
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -70,6 +71,21 @@ class BookExpressionsTest {
         assertEquals(3L, factory.createValueExpression(context, "\${(x -> y -> x + y)(1)(2)}", Any::class.java).getValue(context))
         assertEquals(10L, factory.createValueExpression(context, "\${((a, b, c, d) -> a + b + c + d)(1, 2, 3, 4)}", Any::class.java).getValue(context))
         assertNull(factory.createValueExpression(context, "\${book.tags.stream().forEach(t -> t.length())}", Any::class.java).getValue<Any?>(context))
+    }
+
+    @Test
+    fun `resolves the lvalue protocol of a compiled expression`() {
+        // the expressions of this suite are written as bytecode rather than as Java source, so the calls the
+        // generated methods make are the ones the writer emitted, with no compiler of the language to bind
+        // them: getValueReference builds a jakarta.el.ValueReference from the base and the property
+        val expression = factory.createValueExpression(context, "\${book.title}", String::class.java)
+        assertFalse(expression.isReadOnly(context))
+        assertEquals(String::class.java, expression.getType(context))
+        val reference = expression.getValueReference(context)
+        assertEquals(context.getBean("book"), reference.base)
+        assertEquals("title", reference.property)
+        expression.setValue(context, "Sourcegen")
+        assertEquals("Sourcegen", expression.getValue(context))
     }
 
     @Test

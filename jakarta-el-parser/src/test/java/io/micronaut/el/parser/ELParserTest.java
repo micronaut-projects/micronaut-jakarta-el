@@ -8,6 +8,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -26,6 +27,50 @@ class ELParserTest {
         assertEquals(3, composite.parts().size());
         assertEquals(new ELNode.LiteralText("Welcome "), composite.parts().get(0));
         assertEquals(new ELNode.LiteralText(" to our site"), composite.parts().get(2));
+    }
+
+    @Test
+    void anExpressionNestedDeeperThanTheLimitIsRejected() {
+        String nested = "${" + "(".repeat(5000) + "1" + ")".repeat(5000) + "}";
+        ELParsingException e = assertThrows(ELParsingException.class, () -> ELParser.parse(nested));
+        assertTrue(e.getMessage().contains("nests more than " + ELParser.DEFAULT_MAX_DEPTH + " levels deep"));
+    }
+
+    @Test
+    void everyConstructThatNestsCountsTowardsTheLimit() {
+        // the operand of a unary operator, the element of a list, the right side of an assignment and the
+        // body of a lambda nest through a recursion of the parser; a left associative chain nests through a
+        // loop, and deepens the tree just the same
+        for (String nested : List.of(
+            "${" + "!".repeat(5000) + "true}",
+            "${" + "-".repeat(5000) + "1}",
+            "${" + "empty ".repeat(5000) + "1}",
+            "${" + "[".repeat(5000) + "]".repeat(5000) + "}",
+            "${" + "{".repeat(5000) + "}".repeat(5000) + "}",
+            "${" + "1+".repeat(5000) + "1}",
+            "${" + "a.".repeat(5000) + "a}",
+            "${" + "true?".repeat(5000) + "1" + ":2".repeat(5000) + "}",
+            "${" + "a=".repeat(5000) + "1}",
+            "${" + "x->".repeat(5000) + "1}",
+            "${" + "1;".repeat(5000) + "1}",
+            "${a" + "[0]".repeat(5000) + "}",
+            "${f(".repeat(5000) + "1" + ")".repeat(5000) + "}")) {
+            assertThrows(ELParsingException.class, () -> ELParser.parse(nested), nested.substring(0, 20));
+        }
+    }
+
+    @Test
+    void anExpressionWithinTheLimitIsParsed() {
+        int depth = ELParser.DEFAULT_MAX_DEPTH - 2;
+        assertNotNull(ELParser.parse("${" + "(".repeat(depth) + "1" + ")".repeat(depth) + "}"));
+        assertNotNull(ELParser.parse("${" + "!".repeat(depth) + "true}"));
+    }
+
+    @Test
+    void theLimitCanBeRaisedForAGeneratedExpression() {
+        String nested = "${" + "(".repeat(200) + "1" + ")".repeat(200) + "}";
+        assertThrows(ELParsingException.class, () -> ELParser.parse(nested));
+        assertNotNull(ELParser.parse(nested, 400));
     }
 
     @Test

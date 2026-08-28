@@ -15,19 +15,28 @@
  */
 package io.micronaut.el.interpreter;
 
+import io.micronaut.el.CompiledExpressionFactory;
+import jakarta.el.ELContext;
+import jakarta.el.ELException;
 import jakarta.el.ELProcessor;
+import jakarta.el.ExpressionFactory;
+import jakarta.el.StandardELContext;
+import jakarta.el.ValueExpression;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ELInterpreterTest {
 
     private final ELProcessor processor = new ELProcessor();
+    private final ExpressionFactory factory = new CompiledExpressionFactory(List.of(),
+        new InterpretingELExpressionParser());
 
     @Test
     void literalsAndArithmetic() {
@@ -49,9 +58,110 @@ class ELInterpreterTest {
     }
 
     @Test
+    void aBooleanOperandDecidesARelationalComparison() {
+        // the section 1.9.1 orders its rules the way the equality of the section 1.9.2 does, so a boolean
+        // operand is coerced with the other rather than the two being compared as strings
+        assertEquals((Object) false, processor.eval("false gt '9'"));
+        assertEquals((Object) true, processor.eval("false le '9'"));
+        assertEquals((Object) false, processor.eval("false lt '9'"));
+        assertEquals((Object) true, processor.eval("false ge '9'"));
+        assertEquals((Object) false, processor.eval("'9' gt false"));
+        assertEquals((Object) true, processor.eval("true gt '9'"));
+        assertEquals((Object) true, processor.eval("true gt false"));
+        assertEquals((Object) false, processor.eval("true lt false"));
+        assertEquals((Object) true, processor.eval("true ge true"));
+    }
+
+    @Test
+    void aCharacterIsANumberForTheUnaryMinus() {
+        // the section 1.25.3 coerces a character to its numeric value, which the binary operators already do
+        assertEquals((Object) (short) -49, processor.eval("-Character.valueOf(49)"));
+        assertEquals((Object) 49L, processor.eval("Character.valueOf(49) + 0"));
+        assertEquals((Object) (-49L), processor.eval("-Character.valueOf(49) + 0"));
+    }
+
+    @Test
     void conditionalAndSemicolonOperators() {
         assertEquals("yes", processor.eval("true ? 'yes' : 'no'"));
         assertEquals((Object) 2L, processor.eval("1; 2"));
+    }
+
+    @Test
+    void anOverloadIsSelectedTheWayTheSpecificationSelectsIt() {
+        // the coercions of the section 1.25 make several overloads applicable, and the section 1.6 reduces
+        // them to the most specific one rather than calling the reference ambiguous
+        assertEquals((Object) 1, processor.eval("Integer.valueOf(1)"));
+        assertEquals((Object) 1L, processor.eval("Long.valueOf(1)"));
+        assertEquals((Object) 1.0d, processor.eval("Double.valueOf(1)"));
+        assertEquals("1", processor.eval("String.valueOf(1)"));
+        assertEquals((Object) 'A', processor.eval("Character.valueOf(65)"));
+        // a number is not coercible to a boolean, so valueOf(boolean) is not a candidate at all and
+        // valueOf(String) is the only one left
+        assertEquals((Object) false, processor.eval("Boolean.valueOf(1)"));
+        assertEquals((Object) true, processor.eval("Boolean.valueOf('true')"));
+    }
+
+    @Test
+    void aStreamHoldingANullElementDoesNotFail() {
+        // Stream.reduce, Stream.max, Stream.min and Stream.findFirst of the platform wrap their result in an
+        // Optional, which cannot hold a null, where the optional of the section 2.3 is empty for one
+        assertEquals("", processor.eval("[null].stream().reduce((x,y)->x).orElse('')"));
+        assertEquals("", processor.eval("[null].stream().max().orElse('')"));
+        assertEquals("", processor.eval("[null].stream().min().orElse('')"));
+        assertEquals("", processor.eval("[null].stream().findFirst().orElse('')"));
+        assertEquals((Object) 3L, processor.eval("[3,1,2].stream().max().get()"));
+        assertEquals((Object) 1L, processor.eval("[3,1,2].stream().min().get()"));
+        assertEquals((Object) 3L, processor.eval("[3,1,2].stream().findFirst().get()"));
+    }
+
+    @Test
+    void aComparisonThatTheOperandsCannotAnswerIsAnExpressionLanguageError() {
+        // the section 1.9.1 of the specification: when compareTo fails, the failure is an error of the
+        // language, not the ClassCastException the comparison happened to raise
+        assertThrows(ELException.class, () -> processor.eval("[true, []].stream().min()"));
+        assertThrows(ELException.class, () -> processor.eval("[[], null].stream().sorted().toList()"));
+    }
+
+    @Test
+    void theOperandsOfARelationalOperatorAreBothEvaluated() {
+        // only the section 1.10 and the section 1.11 specify a short circuit, for the logical operators and
+        // for the conditional. A relational operator whose left operand is null answers false whatever the
+        // right one is, but skipping it would drop whatever it does on the way
+        assertThrows(ELException.class, () -> processor.eval("null gt undefinedIdentifier"));
+        assertThrows(ELException.class, () -> processor.eval("null lt undefinedIdentifier"));
+        assertEquals((Object) false, processor.eval("y = 1; null gt (y = 2)"));
+        assertEquals((Object) 2L, processor.eval("y = 1; null gt (y = 2); y"));
+    }
+
+    @Test
+    void aSetOrMapConstructionKeepsTheOrderItWasWrittenIn() {
+        // the section 2.2 leaves the iteration order of a construction open, and an order that is the order
+        // of the expression is the one that does not surprise
+        assertEquals("[b, a]", processor.eval("{'b','a'}").toString());
+        assertEquals("[3, 1, 2]", processor.eval("{3,1,2}").toString());
+        assertEquals("{b=1, a=2}", processor.eval("{'b':1,'a':2}").toString());
+    }
+
+    @Test
+    void theIndexOfANullBaseIsEvaluated() {
+        // the section 1.6 makes the value of a null base null, and says nothing of the index, which is an
+        // expression like any other
+        assertThrows(ELException.class, () -> processor.eval("null[undefinedIdentifier]"));
+        assertEquals((Object) 2L, processor.eval("y = 1; null[y = 2]; y"));
+    }
+
+    @Test
+    void aSemicolonExpressionIsNotAnLvalue() {
+        // the compiled path does not treat one as an lvalue and neither reference implementation does, so
+        // resolving one would evaluate its left operand for nothing on every getType and isReadOnly
+        ELContext context = new StandardELContext(factory);
+        context.getVariableMapper().setVariable("bean", factory.createValueExpression(new Holder(), Object.class));
+        ValueExpression expression =
+            factory.createValueExpression(context, "${1 ; bean.name}", Object.class);
+        assertTrue(expression.isReadOnly(context));
+        assertNull(expression.getType(context));
+        assertNull(expression.getValueReference(context));
+        assertEquals("n", expression.getValue(context));
     }
 
     @Test
@@ -114,5 +224,21 @@ class ELInterpreterTest {
 
     public static long twice(long value) {
         return value * 2;
+    }
+
+    /**
+     * A bean with a writable property, so that an lvalue has something to resolve to.
+     */
+    public static final class Holder {
+
+        private String name = "n";
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
     }
 }

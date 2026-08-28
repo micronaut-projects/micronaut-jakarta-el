@@ -16,6 +16,7 @@
 package io.micronaut.el.interpreter;
 
 import io.micronaut.core.annotation.Internal;
+import io.micronaut.el.ELSandbox;
 import io.micronaut.el.parser.ELParser;
 import io.micronaut.el.parser.ast.ELNode;
 import io.micronaut.el.runtime.ELMethods;
@@ -70,7 +71,11 @@ final class InterpretedMethodExpression extends MethodExpression {
         context.notifyBeforeEvaluation(expressionString);
         Object result = doInvoke(context, params);
         context.notifyAfterEvaluation(expressionString);
-        return expectedReturnType == void.class ? null : ELSupport.coerceToType(context, result, expectedReturnType);
+        if (expectedReturnType == void.class) {
+            return null;
+        }
+        Object coerced = ELSupport.coerceToType(context, result, expectedReturnType);
+        return ELSandbox.checksResultOf(expectedReturnType) ? ELSandboxGuard.checkResult(context, coerced) : coerced;
     }
 
     @Override
@@ -155,12 +160,13 @@ final class InterpretedMethodExpression extends MethodExpression {
             throw new MethodNotFoundException("The expression '" + expressionString + "' is not a method expression");
         }
         if (target.base() == null) {
-            Object identifier = ELResolution.resolveIdentifier(context, ELSupport.coerceToString(target.property()));
+            Object identifier = ELSandboxGuard.resolveIdentifier(context, ELSupport.coerceToString(target.property()));
             return ELResolution.invokeMethodExpression(context, identifier, params);
         }
         Object base = target.base();
-        return ELResolution.invokeMethod(context, base,
-            findMethod(context, base, target.property(), null), params);
+        Method method = ELSandboxGuard.findMethod(context, base, target.property(),
+            () -> findMethod(context, base, target.property(), null));
+        return ELResolution.invokeMethod(context, base, method, params);
     }
 
     private ELNode methodTargetNode() {
