@@ -3,6 +3,7 @@ package io.micronaut.el.runtime;
 import io.micronaut.el.CompiledELContext;
 import jakarta.el.ELException;
 import jakarta.el.LambdaExpression;
+import jakarta.el.MethodNotFoundException;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
@@ -156,6 +157,16 @@ class ELSupportTest {
             evaluated -> ((CompiledELContext) evaluated).getBean("value")));
         assertContextIsCaptured(firstContext, secondContext, ELLambdas.lambda0(firstContext,
             evaluated -> ((CompiledELContext) evaluated).getBean("value")));
+    }
+
+    @Test
+    void onlyTheInvokePropertyInvokesALambdaMethodExpression() {
+        CompiledELContext context = new CompiledELContext();
+        LambdaExpression lambda = ELLambdas.create(context, List.of(), evaluated -> "called");
+
+        assertThrows(MethodNotFoundException.class,
+            () -> ELResolution.invokeWithParamTypes(context, lambda, "other", new Class<?>[0], null));
+        assertEquals("called", ELResolution.invokeWithParamTypes(context, lambda, "invoke", new Class<?>[0], null));
     }
 
     private static void assertContextIsCaptured(CompiledELContext firstContext,

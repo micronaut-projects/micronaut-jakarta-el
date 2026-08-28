@@ -2,10 +2,16 @@ package io.micronaut.el.test;
 
 import io.micronaut.el.CompiledELContext;
 import io.micronaut.el.ELExpressionSource;
+import io.micronaut.el.runtime.CompiledExpression;
+import io.micronaut.el.runtime.ELLambdas;
 import jakarta.el.ELException;
 import jakarta.el.ExpressionFactory;
+import jakarta.el.LambdaExpression;
+import jakarta.el.MethodExpression;
 import jakarta.el.ValueExpression;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -27,7 +33,9 @@ class ExpressionFactoryTest {
     @Test
     void compiledExpressionsAreResolvedByTheirString() {
         ValueExpression expression = factory.createValueExpression(context, "${suit == 'SPADE'}", Boolean.class);
-        assertEquals(FactoryExpressions$ELExpressions.IS_SPADE, expression);
+        assertTrue(expression instanceof CompiledExpression);
+        assertEquals(FactoryExpressions$ELExpressions.IS_SPADE.getExpressionString(), expression.getExpressionString());
+        assertEquals(FactoryExpressions$ELExpressions.IS_SPADE.getExpectedType(), expression.getExpectedType());
         assertEquals(Boolean.TRUE, expression.getValue(context));
     }
 
@@ -77,6 +85,34 @@ class ExpressionFactoryTest {
     void objectValueExpressions() {
         ValueExpression expression = factory.createValueExpression(Suit.HEART, Suit.class);
         assertEquals(Suit.HEART, expression.getValue(context));
+    }
+
+    @Test
+    void compiledVariablesAreBoundWhenTheExpressionIsCreated() {
+        context.getVariableMapper().setVariable("customer", factory.createValueExpression("first", String.class));
+        ValueExpression expression = factory.createValueExpression(context, "${customer}", String.class);
+
+        context.getVariableMapper().setVariable("customer", factory.createValueExpression("second", String.class));
+
+        assertEquals("first", expression.getValue(context));
+    }
+
+    @Test
+    void compiledMethodExpressionVariablesAreBoundWhenTheExpressionIsCreated() {
+        context.getVariableMapper().setVariable("action", factory.createValueExpression(
+            action("first"), LambdaExpression.class));
+        MethodExpression expression = factory.createMethodExpression(context, "${action}", String.class,
+            new Class<?>[]{String.class});
+
+        context.getVariableMapper().setVariable("action", factory.createValueExpression(
+            action("second"), LambdaExpression.class));
+
+        assertEquals("first:x", expression.invoke(context, new Object[]{"x"}));
+    }
+
+    private LambdaExpression action(String prefix) {
+        return ELLambdas.create(context, List.of("value"),
+            lambda -> prefix + ":" + lambda.getLambdaArgument("value"));
     }
 
     @Test

@@ -37,8 +37,9 @@ import org.jspecify.annotations.Nullable;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,11 +58,11 @@ final class ELInterpreter {
 
     private static final Object[] NO_ARGUMENTS = new Object[0];
 
-    private final Map<ELNode.Function, Method> functions;
+    private final Map<String, BoundFunction> functions;
     @Nullable
     private Evaluator root;
 
-    private ELInterpreter(Map<ELNode.Function, Method> functions) {
+    private ELInterpreter(Map<String, BoundFunction> functions) {
         this.functions = functions;
     }
 
@@ -402,6 +403,10 @@ final class ELInterpreter {
         return new ELInterpreter(bindFunctions(context, node));
     }
 
+    static ELInterpreter of(Map<String, BoundFunction> functions) {
+        return new ELInterpreter(functions);
+    }
+
     /**
      * Creates an interpreter for a parsed expression holding no function, whose compiled evaluators are
      * therefore the same for every context and shared through the cache of the parser.
@@ -442,7 +447,7 @@ final class ELInterpreter {
      * @param node    The parsed expression
      * @return The bound functions
      */
-    static Map<ELNode.Function, Method> bindFunctions(@Nullable ELContext context, ELNode node) {
+    static Map<String, BoundFunction> bindFunctions(@Nullable ELContext context, ELNode node) {
         if (context == null) {
             return Map.of();
         }
@@ -453,18 +458,18 @@ final class ELInterpreter {
         if (!containsFunction(node)) {
             return Map.of();
         }
-        Map<ELNode.Function, Method> bindings = new IdentityHashMap<>();
+        Map<String, BoundFunction> bindings = new LinkedHashMap<>();
         bindFunctions(functionMapper, node, bindings);
-        return bindings;
+        return Map.copyOf(bindings);
     }
 
     private static void bindFunctions(FunctionMapper functionMapper,
                                       ELNode node,
-                                      Map<ELNode.Function, Method> bindings) {
+                                      Map<String, BoundFunction> bindings) {
         if (node instanceof ELNode.Function function) {
             Method method = functionMapper.resolveFunction(function.prefix(), function.localName());
             if (method != null) {
-                bindings.put(function, method);
+                bindings.put(qualifiedName(function.prefix(), function.localName()), BoundFunction.of(method));
             }
         }
         for (ELNode child : children(node)) {
@@ -639,6 +644,9 @@ final class ELInterpreter {
                 || ELSupport.toBoolean(evaluate(context, binary.right()));
         }
         Object left = evaluate(context, binary.left());
+        if ((operator == BinaryOperator.LESS_THAN || operator == BinaryOperator.GREATER_THAN) && left == null) {
+            return false;
+        }
         Object right = evaluate(context, binary.right());
         return switch (operator) {
             case ADD -> ELArithmetic.add(left, right);
@@ -720,9 +728,9 @@ final class ELInterpreter {
 
     @Nullable
     private Method resolveMappedFunction(ELContext context, ELNode.Function function) {
-        Method bound = functions.get(function);
+        BoundFunction bound = functions.get(qualifiedName(function.prefix(), function.localName()));
         if (bound != null) {
-            return bound;
+            return bound.method();
         }
         FunctionMapper functionMapper = context.getFunctionMapper();
         if (functionMapper == null) {
@@ -775,8 +783,11 @@ final class ELInterpreter {
         if (context.isLambdaArgument(name)) {
             return context.getLambdaArgument(name);
         }
-        if (context.getVariableMapper() != null && context.getVariableMapper().resolveVariable(name) != null) {
-            return context.getVariableMapper().resolveVariable(name).getValue(context);
+        if (context.getVariableMapper() != null) {
+            var expression = context.getVariableMapper().resolveVariable(name);
+            if (expression != null) {
+                return expression.getValue(context);
+            }
         }
         context.setPropertyResolved(false);
         Object value = context.getELResolver().getValue(context, null, name);
@@ -809,6 +820,38 @@ final class ELInterpreter {
      * @param property The property
      */
     record Target(@Nullable Object base, @Nullable Object property) {
+    }
+
+    /**
+     * A serializable description of a function bound when the expression is created.
+     */
+    static final class BoundFunction implements Serializable {
+
+        @Serial
+        private static final long serialVersionUID = 1L;
+
+        private final Class<?> owner;
+        private final String name;
+        private final Class<?>[] parameterTypes;
+
+        private BoundFunction(Class<?> owner, String name, Class<?>[] parameterTypes) {
+            this.owner = owner;
+            this.name = name;
+            this.parameterTypes = parameterTypes.clone();
+        }
+
+        private static BoundFunction of(Method method) {
+            return new BoundFunction(method.getDeclaringClass(), method.getName(), method.getParameterTypes());
+        }
+
+        private Method method() {
+            try {
+                return owner.getMethod(name, parameterTypes);
+            } catch (NoSuchMethodException e) {
+                throw new ELException("Cannot restore the bound function '" + owner.getName() + "." + name + "'", e);
+            }
+        }
+
     }
 
     /**

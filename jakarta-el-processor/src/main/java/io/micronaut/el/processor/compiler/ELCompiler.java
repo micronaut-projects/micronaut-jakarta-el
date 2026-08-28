@@ -63,15 +63,10 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 /**
- * The compiler lowering the abstract syntax tree of an expression to the source model of Micronaut
- * SourceGen.
+ * Lowers an expression syntax tree to the Micronaut SourceGen model.
  *
- * <p>Every construct of the language is compiled to the equivalent Java expression. The property
- * accesses, the method invocations, the static references and the functions whose types are known at
- * compilation time are compiled to direct invocations, the remaining ones are compiled to the resolution
- * described in the sections 1.5 and 1.6 of the specification. The operators whose operand types are known
- * at compilation time are compiled to the Java operators the runtime would reach, see
- * {@link #inlineBinary(BinaryOperator, Typed, Typed)}.</p>
+ * <p>Statically known accesses and operators become direct Java operations. The remainder uses the runtime
+ * resolution described in sections 1.5 and 1.6 of the specification.</p>
  *
  * @author Denis Stepanov
  * @since 1.0
@@ -130,20 +125,13 @@ public final class ELCompiler {
     /**
      * Compiles the evaluation of an expression as the body of a method returning its result.
      *
-     * <p>An identifier the expression resolves more than once is resolved once, into a local the references
-     * share, when nothing in the expression can change what the identifier denotes during the evaluation: the
-     * section 1.5.1 of the specification resolves an identifier through the lambda arguments, the variable
-     * mapper and the resolvers, and only the assignment and the semicolon operators can alter any of these
-     * within one evaluation. The bodies of the lambda expressions keep resolving through their own context.</p>
-     *
-     * <p>When the expression holds a lambda expression, the context is first bound to a local: a Java lambda
-     * compiled from it captures the context, and the Java source writer of SourceGen 2.1.0 cannot render a
-     * captured method parameter, while its bytecode writer captures a local.</p>
+     * <p>Repeated stable identifiers share a local. Lambda bodies retain their own context, and an outer
+     * context captured by a generated Java lambda is first bound to a local for both source and bytecode
+     * generation.</p>
      *
      * @param node      The parsed expression
      * @param elContext The expression holding the {@code jakarta.el.ELContext}
-     * @param body      The compilation of the result with the context to use, once the shared identifiers are in
-     *                  place
+     * @param body      Compiles the result after shared identifiers are in place
      * @return The body of the method
      */
     public StatementDef compileEvaluation(ELNode node, ExpressionDef elContext, Function<ExpressionDef, Typed> body) {
@@ -605,11 +593,6 @@ public final class ELCompiler {
     }
 
     /**
-     * What the compiler knows of an identifier selects the resolution: a parameter of an enclosing lambda
-     * expression is the Java parameter holding it, a declared variable goes through the variable mapper and the
-     * resolvers, and only an identifier the compiler knows nothing about takes every step of the section 1.5.1.
-     */
-    /**
      * @return The identifiers the compiled code resolves dynamically because nothing declares them: not a
      * variable, not a lambda parameter, not an import
      */
@@ -783,6 +766,14 @@ public final class ELCompiler {
     }
 
     private Typed compileFirstInvocation(ELNode.Function function, List<ELNode> arguments, ExpressionDef ctx) {
+        String localName = function.localName();
+        ClassElement variableType = function.prefix().isEmpty() ? context.variableType(localName) : null;
+        if (function.prefix().isEmpty() && (context.isLambdaParameter(localName)
+            || (variableType != null && (variableType.isAssignable(LambdaExpression.class)
+                || variableType.isAssignable("jakarta.el.ELClass"))))) {
+            return dynamic(runtime(EL_RESOLUTION, "invokeCallable", TypeDef.OBJECT,
+                arguments(ctx, resolveIdentifier(localName, ctx).expression(), arguments)));
+        }
         MethodElement declared = context.resolveFunction(function.prefix(), function.localName());
         if (declared != null) {
             if ((!declared.isVarArgs() && declared.getParameters().length != arguments.size())
@@ -813,7 +804,7 @@ public final class ELCompiler {
             throw new ELUndeclaredFunctionException(
                 CompilationContext.qualifiedFunctionName(function.prefix(), function.localName()));
         }
-        String name = function.localName();
+        String name = localName;
         if (!context.isLambdaParameter(name) && context.variableType(name) == null) {
             ClassElement importedClass = context.resolveClass(name);
             if (importedClass != null) {
@@ -919,6 +910,11 @@ public final class ELCompiler {
             return bool(binary.operator() == BinaryOperator.AND ? left.and(right) : left.or(right));
         }
         Typed leftOperand = compileTyped(binary.left(), ctx);
+        if ((binary.operator() == BinaryOperator.LESS_THAN || binary.operator() == BinaryOperator.GREATER_THAN)
+            && !(leftOperand.expression().type() instanceof TypeDef.Primitive)) {
+            return bool(shortCircuitNullLeft(binary.right(), ctx, leftOperand,
+                binary.operator() == BinaryOperator.LESS_THAN ? "lessThan" : "greaterThan"));
+        }
         Typed rightOperand = compileTyped(binary.right(), ctx);
         if (binary.operator() == BinaryOperator.CONCAT) {
             return new Typed(concat(stringOperand(leftOperand), stringOperand(rightOperand)), ClassElement.of(String.class));
@@ -937,8 +933,8 @@ public final class ELCompiler {
             case MODULO -> dynamic(runtime(EL_ARITHMETIC, "mod", TypeDef.OBJECT, left, right));
             case EQUAL -> bool(runtime(EL_SUPPORT, "equals", BOOLEAN, left, right));
             case NOT_EQUAL -> bool(runtime(EL_SUPPORT, "notEquals", BOOLEAN, left, right));
-            case LESS_THAN -> bool(shortCircuitNullLeft(binary, ctx, leftOperand, right, "lessThan"));
-            case GREATER_THAN -> bool(shortCircuitNullLeft(binary, ctx, leftOperand, right, "greaterThan"));
+            case LESS_THAN -> bool(runtime(EL_SUPPORT, "lessThan", BOOLEAN, left, right));
+            case GREATER_THAN -> bool(runtime(EL_SUPPORT, "greaterThan", BOOLEAN, left, right));
             case LESS_THAN_OR_EQUAL -> bool(runtime(EL_SUPPORT, "lessThanOrEqual", BOOLEAN, left, right));
             case GREATER_THAN_OR_EQUAL -> bool(runtime(EL_SUPPORT, "greaterThanOrEqual", BOOLEAN, left, right));
             case AND, OR, CONCAT -> throw new IllegalStateException("The operator is compiled separately");
@@ -946,22 +942,17 @@ public final class ELCompiler {
     }
 
     /**
-     * The strict relational operators return false as soon as their left operand is {@code null}. Keep the
-     * right operand inside that branch so a generated expression preserves the evaluation order and side
-     * effects of the runtime interpreter. A primitive cannot be {@code null}; dynamic references use the
-     * project's compiled lambda body to defer the right operand without reflection.
+     * Defers the right operand of a strict comparison so a {@code null} left operand short-circuits it.
      */
-    private ExpressionDef shortCircuitNullLeft(ELNode.Binary binary,
+    private ExpressionDef shortCircuitNullLeft(ELNode right,
                                                ExpressionDef ctx,
                                                Typed left,
-                                               ExpressionDef right,
                                                String operation) {
-        if (left.expression().type() instanceof TypeDef.Primitive) {
-            return runtime(EL_SUPPORT, operation, BOOLEAN, left.expression(), right);
-        }
         ClassElement bodyType = elementOf(ELLambdaBody.Nullary.class);
         MethodElement evaluate = Objects.requireNonNull(functionalMethod(bodyType));
-        ExpressionDef lazyRight = javaLambda(null, bodyType, evaluate, List.of(), binary.right(), ctx, false);
+        // The body consumes the context supplied by the runtime helper, so the generated lambda captures
+        // nothing and the JVM can reuse one instance instead of allocating one per evaluation.
+        ExpressionDef lazyRight = javaLambda(null, bodyType, evaluate, List.of(), right, null, false);
         return runtime(EL_SUPPORT, operation + "Lazy", BOOLEAN, left.expression(), ctx, lazyRight);
     }
 
@@ -1668,14 +1659,58 @@ public final class ELCompiler {
     }
 
     /**
-     * The method of the given name taking the arguments. Among several overloads of the right arity the one
-     * whose parameters fit the static types of the arguments best is selected, exact over assignable over
-     * coercible and fixed arity over variable arity. Ties are resolved by parameter specificity. When the
-     * static argument types cannot decide, resolution is left to the resolvers at runtime.
+     * Selects the best statically known overload, deferring an undecidable call to runtime resolution.
      */
     @Nullable
     private MethodElement selectMethod(ClassElement type, String name, List<ELNode> arguments, boolean onlyStatic, ExpressionDef ctx) {
-        return selectMethods(methodCandidates(type, name, arguments, onlyStatic), arguments, ctx).method();
+        List<MethodElement> candidates = methodCandidates(type, name, arguments, onlyStatic);
+        if (requiresRuntimeOverloadSelection(candidates, arguments, ctx)) {
+            return null;
+        }
+        MethodSelection selection = selectMethods(candidates, arguments, ctx);
+        if (selection.ambiguous() && arguments.stream().anyMatch(ELNode.Lambda.class::isInstance)) {
+            List<MethodElement> functionalTargets = candidates.stream()
+                .filter(candidate -> {
+                    for (int i = 0; i < arguments.size(); i++) {
+                        if (arguments.get(i) instanceof ELNode.Lambda
+                            && functionalMethod(comparisonType(candidate, i)) == null) {
+                            return false;
+                        }
+                    }
+                    return true;
+                })
+                .toList();
+            MethodSelection functionalSelection = selectMethods(functionalTargets, arguments, ctx);
+            if (functionalSelection.method() != null) {
+                return functionalSelection.method();
+            }
+            throw new ELCompilationException("The method '" + type.getName() + "." + name
+                + "' is ambiguous for the lambda expression");
+        }
+        return selection.method();
+    }
+
+    // A non-final declared type cannot determine which overload best matches its runtime subtype.
+    private boolean requiresRuntimeOverloadSelection(List<MethodElement> candidates,
+                                                     List<ELNode> arguments,
+                                                     ExpressionDef ctx) {
+        if (candidates.size() < 2 || arguments.stream().anyMatch(ELNode.Lambda.class::isInstance)) {
+            return false;
+        }
+        for (ELNode argument : arguments) {
+            if (argument instanceof ELNode.NullLiteral || argument instanceof ELNode.BooleanLiteral
+                || argument instanceof ELNode.IntegerLiteral || argument instanceof ELNode.FloatingPointLiteral
+                || argument instanceof ELNode.StringLiteral) {
+                continue;
+            }
+            Typed compiled = compileTyped(argument, ctx);
+            ClassElement type = compiled.type();
+            if (type != null && !(compiled.expression().type() instanceof TypeDef.Primitive)
+                && !type.isEnum() && !type.isFinal()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static List<MethodElement> methodCandidates(ClassElement type,
@@ -1700,15 +1735,14 @@ public final class ELCompiler {
         List<ClassElement> argumentTypes = arguments.stream()
             .map(argument -> argument instanceof ELNode.Lambda ? null : compileTyped(argument, ctx).type())
             .toList();
+        List<MethodElement> exact = new ArrayList<>();
         List<MethodElement> assignable = new ArrayList<>();
         List<MethodElement> coercible = new ArrayList<>();
         List<MethodElement> varArgs = new ArrayList<>();
         for (MethodElement candidate : candidates) {
             MethodMatch match = match(candidate, arguments, argumentTypes);
             switch (match) {
-                case EXACT -> {
-                    return new MethodSelection(candidate, false);
-                }
+                case EXACT -> exact.add(candidate);
                 case ASSIGNABLE -> assignable.add(candidate);
                 case COERCIBLE -> coercible.add(candidate);
                 case VARARGS -> varArgs.add(candidate);
@@ -1718,8 +1752,8 @@ public final class ELCompiler {
                 default -> throw new IllegalStateException("Unexpected method match " + match);
             }
         }
-        boolean elSpecific = assignable.isEmpty();
-        List<MethodElement> best = !assignable.isEmpty() ? assignable
+        boolean elSpecific = exact.isEmpty() && assignable.isEmpty();
+        List<MethodElement> best = !exact.isEmpty() ? exact : !assignable.isEmpty() ? assignable
             : !coercible.isEmpty() ? coercible : varArgs;
         return mostSpecific(best, argumentTypes, elSpecific);
     }
@@ -1947,19 +1981,19 @@ public final class ELCompiler {
     }
 
     /**
-     * A compiled expression with the type known at compilation time, when there is one.
+     * A compiled expression and its statically known type, when available.
      *
      * @param expression The compiled expression
-     * @param type       The statically known type, {@code null} when the expression is resolved dynamically
+     * @param type       The static type, or {@code null}
      */
     public record Typed(ExpressionDef expression, @Nullable ClassElement type) {
     }
 
     /**
-     * The base object and the property of an lvalue.
+     * The base and property of an lvalue.
      *
-     * @param base     The base object, {@code null} when the lvalue is a single identifier
-     * @param property The property, or the name of the identifier
+     * @param base     The base, or {@code null} for an identifier
+     * @param property The property
      */
     public record LValue(@Nullable ExpressionDef base, ExpressionDef property) {
     }

@@ -6,6 +6,7 @@ import io.micronaut.el.annotation.ELFunctions;
 import io.micronaut.el.annotation.ELMethodExpression;
 import io.micronaut.el.annotation.ELVariable;
 import jakarta.el.MethodExpression;
+import jakarta.el.LambdaExpression;
 
 import java.util.List;
 
@@ -22,6 +23,9 @@ import java.util.List;
         @ELVariable(name = "strings", type = String[].class),
         @ELVariable(name = "functions", type = Formatting.class),
         @ELVariable(name = "integer", type = Integer.class),
+        @ELVariable(name = "number", type = Number.class),
+        @ELVariable(name = "counter", type = EvaluationCounter.class),
+        @ELVariable(name = "shadow", type = LambdaExpression.class),
         @ELVariable(name = "twice", type = Long.class),
         @ELVariable(name = "target", type = MethodExpression.class)
     },
@@ -76,6 +80,9 @@ import java.util.List;
 @ELExpression(value = "${varargs.choose(1, 1)}", name = "assignableOverCoercible")
 @ELExpression(value = "${varargs.specific(1)}", name = "mostSpecificOverload")
 @ELExpression(value = "${varargs.boxed(integer)}", name = "boxedOverload")
+@ELExpression(value = "${varargs.pick(number)}", name = "runtimeSubtypeOverload")
+@ELExpression(value = "${fn:identity(null < counter.bump())}", name = "nestedRelationalShortCircuit")
+@ELExpression(value = "${shadow('x')}", name = "lambdaVariableShadowsFunction")
 @ELExpression(value = "${varargs.emptyVarargs()}", expectedType = Object.class, name = "emptyVarargsAmbiguity")
 @ELExpression(value = "${varargs.numeric(1)}", expectedType = Object.class, name = "numericAmbiguity")
 @ELExpression(value = "${varargs.reject(value -> value)}", expectedType = Object.class, name = "nonFunctionalInterface")

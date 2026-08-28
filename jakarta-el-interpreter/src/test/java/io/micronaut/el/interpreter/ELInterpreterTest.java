@@ -15,6 +15,7 @@
  */
 package io.micronaut.el.interpreter;
 
+import io.micronaut.el.runtime.ELLambdas;
 import jakarta.el.ELProcessor;
 import jakarta.el.ELContext;
 import jakarta.el.ELResolver;
@@ -24,6 +25,7 @@ import jakarta.el.ExpressionFactory;
 import jakarta.el.FunctionMapper;
 import jakarta.el.MethodExpression;
 import jakarta.el.VariableMapper;
+import jakarta.el.ValueExpression;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
@@ -241,10 +243,12 @@ class ELInterpreterTest {
     void overloadSelectionUsesJakartaElPrecedenceAndSpecificity() {
         processor.defineBean("varargs", new Varargs());
         processor.defineBean("integer", 1);
+        processor.defineBean("number", 1);
 
         assertEquals("assignable", processor.eval("varargs.choose(1, 1)"));
         assertEquals("number", processor.eval("varargs.specific(1)"));
         assertEquals("wrapper", processor.eval("varargs.boxed(integer)"));
+        assertEquals("integer", processor.eval("varargs.pick(number)"));
         assertThrows(jakarta.el.MethodNotFoundException.class,
             () -> processor.eval("varargs.emptyVarargs()"));
         assertThrows(jakarta.el.MethodNotFoundException.class,
@@ -253,6 +257,56 @@ class ELInterpreterTest {
             () -> processor.eval("varargs.reject(value -> value)"));
         assertThrows(jakarta.el.MethodNotFoundException.class,
             () -> processor.eval("varargs.rejectSealed(value -> value)"));
+        // The unrelated functional targets are ambiguous, so the generated counterpart must fail compilation.
+        assertThrows(jakarta.el.MethodNotFoundException.class,
+            () -> processor.eval("varargs.route(value -> value)"));
+    }
+
+    @Test
+    void aNestedStrictComparisonDoesNotEvaluateItsRightOperandWhenTheLeftIsNull() throws Exception {
+        Counter counter = new Counter();
+        processor.defineBean("counter", counter);
+        processor.defineFunction("fn", "identity", InterpreterFunctions.class.getMethod("identity", boolean.class));
+
+        assertEquals(false, processor.eval("fn:identity(null < counter.bump())"));
+        assertEquals(0, counter.calls);
+    }
+
+    @Test
+    void aLambdaVariableShadowsAMappedFunction() throws Exception {
+        processor.setVariable("shadow", "value -> 'variable:' += value");
+        processor.defineFunction("", "shadow", ELInterpreterTest.class.getMethod("shadow", String.class));
+
+        assertEquals("variable:x", processor.eval("shadow('x')"));
+    }
+
+    @Test
+    void variablesAreBoundWhenTheExpressionIsCreated() {
+        ELContext context = processor.getELManager().getELContext();
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        processor.setVariable("customer", "'first'");
+        ValueExpression expression = factory.createValueExpression(context, "${customer}", String.class);
+
+        processor.setVariable("customer", "'second'");
+
+        assertEquals("first", expression.getValue(context));
+    }
+
+    @Test
+    void methodExpressionVariablesAreBoundWhenTheExpressionIsCreated() {
+        ELContext context = processor.getELManager().getELContext();
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        context.getVariableMapper().setVariable("action", factory.createValueExpression(
+            ELLambdas.create(context, List.of("value"), lambda -> "first:" + lambda.getLambdaArgument("value")),
+            jakarta.el.LambdaExpression.class));
+        MethodExpression expression = factory.createMethodExpression(context, "${action}", String.class,
+            new Class<?>[]{String.class});
+
+        context.getVariableMapper().setVariable("action", factory.createValueExpression(
+            ELLambdas.create(context, List.of("value"), lambda -> "second:" + lambda.getLambdaArgument("value")),
+            jakarta.el.LambdaExpression.class));
+
+        assertEquals("first:x", expression.invoke(context, new Object[]{"x"}));
     }
 
     @Test
@@ -350,6 +404,16 @@ class ELInterpreterTest {
     }
 
     @Test
+    void boundFunctionsSurviveSerialization() throws Exception {
+        processor.defineFunction("fn", "join", Varargs.class.getMethod("join", CharSequence[].class));
+        ELContext context = processor.getELManager().getELContext();
+        ValueExpression expression = ExpressionFactory.newInstance().createValueExpression(context,
+            "${fn:join('a', 'b')}", String.class);
+
+        assertEquals("a,b", roundTrip(expression).getValue(context));
+    }
+
+    @Test
     void anIdentifierThatIsNotInvocableDefersToTheFunctionMapper() throws NoSuchMethodException {
         processor.defineBean("twice", 42L);
         processor.defineFunction("", "twice", ELInterpreterTest.class.getMethod("twice", long.class));
@@ -361,6 +425,10 @@ class ELInterpreterTest {
         return value * 2;
     }
 
+    public static String shadow(String value) {
+        return "mapped:" + value;
+    }
+
     private static MethodExpression roundTrip(MethodExpression expression) throws IOException, ClassNotFoundException {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         try (ObjectOutputStream output = new ObjectOutputStream(bytes)) {
@@ -368,6 +436,25 @@ class ELInterpreterTest {
         }
         try (ObjectInputStream input = new ObjectInputStream(new ByteArrayInputStream(bytes.toByteArray()))) {
             return (MethodExpression) input.readObject();
+        }
+    }
+
+    private static ValueExpression roundTrip(ValueExpression expression) throws IOException, ClassNotFoundException {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        try (ObjectOutputStream output = new ObjectOutputStream(bytes)) {
+            output.writeObject(expression);
+        }
+        try (ObjectInputStream input = new ObjectInputStream(new ByteArrayInputStream(bytes.toByteArray()))) {
+            return (ValueExpression) input.readObject();
+        }
+    }
+
+    public static final class Counter {
+        private int calls;
+
+        public long bump() {
+            calls++;
+            return calls;
         }
     }
 

@@ -280,15 +280,17 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
                 collect(parameter, annotation, declared);
             }
         }
-        Map<String, Declared<A>> distinct = new LinkedHashMap<>();
+        Map<DeclarationKey, Declared<A>> distinct = new LinkedHashMap<>();
         for (Declared<A> value : declared) {
-            String key = expressionOf(value.annotation()).orElse("") + "|"
+            String signature = expressionOf(value.annotation()).orElse("") + "|"
                 + value.annotation().annotationClassValue("expectedType").map(AnnotationClassValue::getName).orElse("")
                 + "|" + value.annotation().annotationClassValue("expectedReturnType").map(AnnotationClassValue::getName).orElse("")
                 + "|" + Arrays.stream(value.annotation().annotationClassValues("expectedParamTypes"))
                     .map(AnnotationClassValue::getName)
                     .collect(java.util.stream.Collectors.joining(","));
-            distinct.putIfAbsent(key, value);
+            // The owner contributes method parameters and member-level @ELEnvironment declarations. Identical
+            // text and result types on different owners can therefore compile to different expressions.
+            distinct.putIfAbsent(new DeclarationKey(value.owner(), signature), value);
         }
         return new ArrayList<>(distinct.values());
     }
@@ -462,5 +464,8 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
      * @param <A>        The annotation type
      */
     private record Declared<A extends Annotation>(AnnotationValue<A> annotation, Element owner) {
+    }
+
+    private record DeclarationKey(Element owner, String signature) {
     }
 }

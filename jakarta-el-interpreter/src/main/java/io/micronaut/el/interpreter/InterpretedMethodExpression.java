@@ -32,6 +32,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -48,6 +49,7 @@ final class InterpretedMethodExpression extends MethodExpression {
     private final String expressionString;
     private final Class<?> expectedReturnType;
     private final Class<?> @Nullable [] expectedParamTypes;
+    private final Map<String, ELInterpreter.BoundFunction> functions;
     private transient @Nullable ELNode node;
     private transient ELNode.@Nullable Method invocation;
     private transient @Nullable ELInterpreter interpreter;
@@ -56,10 +58,12 @@ final class InterpretedMethodExpression extends MethodExpression {
                                 Class<?> expectedReturnType,
                                 Class<?> @Nullable [] expectedParamTypes,
                                 ELNode node,
+                                Map<String, ELInterpreter.BoundFunction> functions,
                                 ELInterpreter interpreter) {
         this.expressionString = Objects.requireNonNull(expressionString, "expressionString");
         this.expectedReturnType = Objects.requireNonNull(expectedReturnType, "expectedReturnType");
         this.expectedParamTypes = expectedParamTypes == null ? null : expectedParamTypes.clone();
+        this.functions = Map.copyOf(functions);
         this.node = Objects.requireNonNull(node, "node");
         this.invocation = unwrap(node) instanceof ELNode.Method method ? method : null;
         this.interpreter = Objects.requireNonNull(interpreter, "interpreter");
@@ -135,7 +139,7 @@ final class InterpretedMethodExpression extends MethodExpression {
     private ELInterpreter interpreter() {
         ELInterpreter resolved = interpreter;
         if (resolved == null) {
-            resolved = ELInterpreter.of(null, node());
+            resolved = ELInterpreter.of(functions);
             interpreter = resolved;
         }
         return resolved;

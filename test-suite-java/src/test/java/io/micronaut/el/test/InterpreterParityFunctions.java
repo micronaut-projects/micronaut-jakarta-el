@@ -15,4 +15,12 @@ public final class InterpreterParityFunctions {
     public static long twice(long value) {
         return value * 2;
     }
+
+    public static boolean identity(boolean value) {
+        return value;
+    }
+
+    public static String shadow(String value) {
+        return "mapped:" + value;
+    }
 }

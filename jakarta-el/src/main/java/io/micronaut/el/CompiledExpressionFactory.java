@@ -141,7 +141,7 @@ public class CompiledExpressionFactory extends ExpressionFactory {
     public ValueExpression createValueExpression(ELContext context, String expression, Class<?> expectedType) {
         Class<?> type = Objects.requireNonNull(expectedType, "The expected type cannot be null");
         for (ELExpressionSource source : sourcesOf(expression)) {
-            ValueExpression valueExpression = source.createValueExpression(expression, type);
+            ValueExpression valueExpression = source.createValueExpression(context, expression, type);
             if (valueExpression != null) {
                 return valueExpression;
             }
@@ -168,7 +168,8 @@ public class CompiledExpressionFactory extends ExpressionFactory {
                                                    Class<?> @Nullable [] expectedParamTypes) {
         Class<?> @Nullable [] paramTypes = expectedParamTypes;
         for (ELExpressionSource source : sourcesOf(expression)) {
-            MethodExpression methodExpression = source.createMethodExpression(expression, expectedReturnType, paramTypes);
+            MethodExpression methodExpression = source.createMethodExpression(context, expression, expectedReturnType,
+                paramTypes);
             if (methodExpression != null) {
                 return requireParamTypes(methodExpression, paramTypes);
             }

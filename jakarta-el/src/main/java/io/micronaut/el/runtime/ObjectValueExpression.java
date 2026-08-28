@@ -36,7 +36,7 @@ public final class ObjectValueExpression extends ValueExpression {
 
     private static final long serialVersionUID = 1L;
 
-    private final transient @Nullable Object value;
+    private final @Nullable Object value;
     private final Class<?> expectedType;
 
     /**

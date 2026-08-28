@@ -18,11 +18,13 @@ package io.micronaut.el.processor.writer;
 import io.micronaut.core.annotation.Generated;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.el.ELExpressionSource;
+import io.micronaut.el.parser.ELIdentifiers;
 import io.micronaut.el.processor.compiler.ELExpressionDefinition;
 import io.micronaut.el.processor.compiler.ELMethodExpressionDefinition;
 import io.micronaut.el.parser.ast.ELNode;
 import io.micronaut.el.runtime.CompiledMethodExpression;
 import io.micronaut.el.runtime.ELMethods;
+import io.micronaut.el.runtime.ELVariableBindings;
 import io.micronaut.core.reflect.ClassUtils;
 import io.micronaut.core.reflect.ReflectionUtils;
 import io.micronaut.inject.ast.ClassElement;
@@ -34,6 +36,7 @@ import io.micronaut.sourcegen.model.FieldDef;
 import io.micronaut.sourcegen.model.MethodDef;
 import io.micronaut.sourcegen.model.TypeDef;
 import jakarta.el.MethodExpression;
+import jakarta.el.ELContext;
 import jakarta.el.ValueExpression;
 
 import javax.lang.model.element.Modifier;
@@ -43,6 +46,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.lang.reflect.Method;
 
 /**
  * The writer of the {@link ELExpressionSource} implementations, which give access to the expressions
@@ -62,6 +66,11 @@ public final class ExpressionSourceWriter {
     private static final TypeDef.Array STRING_ARRAY = TypeDef.array(STRING);
     private static final TypeDef STRING_LIST = TypeDef.parameterized(ClassTypeDef.of(List.class), STRING);
     private static final TypeDef.Array OBJECT_ARRAY = TypeDef.array(TypeDef.OBJECT);
+    private static final ClassTypeDef EL_CONTEXT = ClassTypeDef.of(ELContext.class);
+    private static final Method BIND_VALUE = ReflectionUtils.getRequiredMethod(ELVariableBindings.class, "bindNullable",
+        ELContext.class, ValueExpression.class, String[].class);
+    private static final Method BIND_METHOD = ReflectionUtils.getRequiredMethod(ELVariableBindings.class, "bindNullable",
+        ELContext.class, MethodExpression.class, String[].class);
     private static final String EXPRESSION = "expression";
 
     private ExpressionSourceWriter() {
@@ -92,10 +101,14 @@ public final class ExpressionSourceWriter {
         }
         builder.addMethod(expressions(valueExpressions, methodExpressions));
         if (!valueExpressions.isEmpty()) {
-            builder.addMethod(createValueExpression(className, valueExpressions));
+            MethodDef create = createValueExpression(className, valueExpressions);
+            builder.addMethod(create);
+            builder.addMethod(createBoundValueExpression(create, valueExpressions));
         }
         if (!methodExpressions.isEmpty()) {
-            builder.addMethod(createMethodExpression(className, methodExpressions));
+            MethodDef create = createMethodExpression(className, methodExpressions);
+            builder.addMethod(create);
+            builder.addMethod(createBoundMethodExpression(create, methodExpressions));
         }
         return builder.build();
     }
@@ -164,6 +177,23 @@ public final class ExpressionSourceWriter {
             });
     }
 
+    private static MethodDef createBoundValueExpression(MethodDef create, List<CompiledValue> expressions) {
+        return MethodDef.builder("createValueExpression")
+            .addModifiers(Modifier.PUBLIC)
+            .overrides()
+            .addParameter("context", EL_CONTEXT)
+            .addParameter(EXPRESSION, STRING)
+            .addParameter("expectedType", CLASS_TYPE)
+            .returns(VALUE_EXPRESSION)
+            .build((aThis, parameters) -> ClassTypeDef.of(ELVariableBindings.class).invokeStatic(BIND_VALUE,
+                parameters.get(0),
+                aThis.invoke(create, parameters.get(1), parameters.get(2)),
+                freeIdentifiers(parameters.get(1), expressions.stream()
+                    .collect(java.util.stream.Collectors.toMap(value -> value.definition().expression(),
+                        value -> value.definition().node(), (first, ignored) -> first, LinkedHashMap::new))))
+                .returning());
+    }
+
     private static MethodDef createMethodExpression(String className, List<CompiledMethod> expressions) {
         return MethodDef.builder("createMethodExpression")
             .addModifiers(Modifier.PUBLIC)
@@ -217,6 +247,31 @@ public final class ExpressionSourceWriter {
                     .asExpressionSwitch(METHOD_EXPRESSION, cases, ExpressionDef.nullValue())
                     .returning();
             });
+    }
+
+    private static MethodDef createBoundMethodExpression(MethodDef create, List<CompiledMethod> expressions) {
+        return MethodDef.builder("createMethodExpression")
+            .addModifiers(Modifier.PUBLIC)
+            .overrides()
+            .addParameter("context", EL_CONTEXT)
+            .addParameter(EXPRESSION, STRING)
+            .addParameter("expectedReturnType", CLASS_TYPE)
+            .addParameter("expectedParamTypes", CLASS_ARRAY)
+            .returns(METHOD_EXPRESSION)
+            .build((aThis, parameters) -> ClassTypeDef.of(ELVariableBindings.class).invokeStatic(BIND_METHOD,
+                parameters.get(0),
+                aThis.invoke(create, parameters.get(1), parameters.get(2), parameters.get(3)),
+                freeIdentifiers(parameters.get(1), expressions.stream()
+                    .collect(java.util.stream.Collectors.toMap(method -> method.definition().expression(),
+                        method -> method.definition().node(), (first, ignored) -> first, LinkedHashMap::new))))
+                .returning());
+    }
+
+    private static ExpressionDef freeIdentifiers(ExpressionDef expression, Map<String, ELNode> nodes) {
+        Map<ExpressionDef.Constant, ExpressionDef> cases = new LinkedHashMap<>();
+        nodes.forEach((text, node) -> cases.put(ExpressionDef.constant(text), STRING_ARRAY.instantiate(
+            ELIdentifiers.free(node).stream().map(name -> (ExpressionDef) ExpressionDef.constant(name)).toList())));
+        return expression.asExpressionSwitch(STRING_ARRAY, cases, STRING_ARRAY.instantiate());
     }
 
     private static boolean providesParameters(ELNode node) {

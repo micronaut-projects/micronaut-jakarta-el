@@ -461,7 +461,7 @@ public final class ELResolution {
             throw propertyNotFound(base, method);
         }
         Object[] arguments = params == null ? new Object[0] : params;
-        if (base instanceof LambdaExpression lambda) {
+        if (base instanceof LambdaExpression lambda && "invoke".equals(method)) {
             lambda.setELContext(context);
             return lambda.invoke(context, arguments);
         }
