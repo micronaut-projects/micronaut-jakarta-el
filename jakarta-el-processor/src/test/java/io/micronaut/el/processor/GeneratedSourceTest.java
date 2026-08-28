@@ -64,7 +64,7 @@ class GeneratedSourceTest {
                         new ClassReader(input.readAllBytes()).accept(new ClassVisitor(Opcodes.ASM9) {
                             @Override
                             public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
-                                if (!name.equals("evaluate") && !name.startsWith("lambda$")) {
+                                if (!name.equals("evaluate") && !name.startsWith("lambda$") && !name.startsWith("access")) {
                                     return null;
                                 }
                                 return new MethodVisitor(Opcodes.ASM9) {
@@ -141,7 +141,7 @@ class GeneratedSourceTest {
     @Test
     void theElementsOfAStreamAreTyped() throws IOException {
         Map<String, Integer> calls = runtimeCalls("${book.tags.stream().filter(t -> t.length() > 1).sorted((a, b) -> b.length() - a.length()).toList()}");
-        assertEquals(Map.of("resolveVariable", 1, "coerceToType", 1), calls);
+        assertEquals(Map.of("coerceToType", 1, "resolveVariable", 1), calls);
     }
 
     @Test
@@ -152,8 +152,9 @@ class GeneratedSourceTest {
     }
 
     @Test
-    void aLambdaValueResolvesItsFreeIdentifiersWhenInvoked() throws IOException {
-        // the lambda is a value invoked later, possibly with another context: its body resolves the variable
+    void aLambdaValueResolvesItsFreeIdentifierWhenInvoked() throws IOException {
+        // one resolution is the immediate receiver and the other belongs to the generated lambda body; the
+        // runtime re-binding behavior is covered by ELInterpreterExpressionsTest
         Map<String, Integer> calls = runtimeCalls("${book.apply(t -> t += book.title)}");
         assertEquals(2, calls.getOrDefault("resolveVariable", 0), calls.toString());
     }

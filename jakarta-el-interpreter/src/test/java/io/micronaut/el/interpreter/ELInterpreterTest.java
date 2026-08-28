@@ -39,6 +39,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
+import java.util.function.Predicate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -195,12 +196,29 @@ class ELInterpreterTest {
     }
 
     @Test
+    void lambdaValuesResolveFreeVariablesWhenInvoked() {
+        processor.defineBean("book", new Book("First"));
+        jakarta.el.LambdaExpression title = (jakarta.el.LambdaExpression) processor.eval("ignored -> book.title");
+        processor.defineBean("book", new Book("Updated"));
+
+        assertEquals("Updated", title.invoke("unused"));
+    }
+
+    @Test
     void collectionOperations() {
         assertEquals(List.of(2L, 4L), processor.eval("[1,2,3,4].stream().filter(i->i mod 2 == 0).toList()"));
         assertEquals((Object) 10L, processor.eval("[1,2,3,4].stream().sum()"));
         assertEquals((Object) 4L, processor.eval("[1,2,3,4].stream().count()"));
         assertEquals(List.of(1L, 2L, 3L), processor.eval("[3,1,2].stream().sorted().toList()"));
         assertEquals((Object) 3L, processor.eval("[1,2,3].stream().max().get()"));
+    }
+
+    @Test
+    void nestedFunctionalLambdasBehindNullGuards() {
+        processor.defineBean("book", new Book("EL"));
+
+        assertEquals((Object) 3L,
+            processor.eval("book.count(t -> [t].stream().allMatch(x -> x.length() > 0).get())"));
     }
 
     @Test
@@ -216,6 +234,28 @@ class ELInterpreterTest {
         assertThrows(ELException.class,
             () -> processor.eval("[1,2].stream().substream(2, 1).toList()"));
         assertNull(processor.eval("[1].stream().findFirst().ifPresent(x -> x)"));
+        assertNull(processor.eval("[].stream().findFirst().orElse(null)"));
+        assertEquals(List.of(), processor.eval("[1].stream().limit(null).toList()"));
+        assertEquals(List.of(1L), processor.eval("[1].stream().substream(null).toList()"));
+        assertEquals((Object) 1L, processor.eval("[1].stream().reduce(null,(a,b)->b)"));
+    }
+
+    @Test
+    void nullBasesShortCircuitPropertiesAndMethodArguments() {
+        Counter counter = new Counter();
+        processor.defineBean("counter", counter);
+        processor.defineBean("book", null);
+        processor.defineBean("xs", null);
+
+        assertNull(processor.eval("null[counter.bump()]"));
+        assertNull(processor.eval("null.foo(counter.bump())"));
+        assertNull(processor.eval("book.title"));
+        assertNull(processor.eval("book.discounted(counter.bump())"));
+        assertNull(processor.eval("xs[counter.bump()]"));
+        assertNull(processor.eval("xs.stream().count()"));
+        assertThrows(jakarta.el.PropertyNotFoundException.class,
+            () -> processor.eval("null[counter.bump()] = counter.bump()"));
+        assertEquals(0, counter.calls);
     }
 
     @Test
@@ -520,6 +560,42 @@ class ELInterpreterTest {
     }
 
     @Test
+    void expressionEqualityUsesTheParsedAndBoundRepresentation() throws Exception {
+        ELContext context = processor.getELManager().getELContext();
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ValueExpression addition = factory.createValueExpression(context, "${1 + 2}", Object.class);
+        ValueExpression coercedAddition = factory.createValueExpression(context, "${1 + 2}", String.class);
+        assertEquals(addition, coercedAddition);
+        assertEquals(addition.hashCode(), coercedAddition.hashCode());
+
+        processor.defineFunction("fn", "join", Varargs.class.getMethod("join", CharSequence[].class));
+        processor.defineFunction("alias", "join", Varargs.class.getMethod("join", CharSequence[].class));
+        processor.defineFunction("other", "joinDifferently",
+            ELInterpreterTest.class.getMethod("joinDifferently", CharSequence[].class));
+        ValueExpression joined = factory.createValueExpression(context, "${fn:join('a', 'b')}", Object.class);
+        ValueExpression aliased = factory.createValueExpression(context, "${alias:join('a', 'b')}", String.class);
+        ValueExpression different = factory.createValueExpression(context,
+            "${other:joinDifferently('a', 'b')}", Object.class);
+        assertEquals(joined, aliased);
+        assertEquals(joined.hashCode(), aliased.hashCode());
+        org.junit.jupiter.api.Assertions.assertNotEquals(joined, different);
+
+        processor.defineBean("xs", List.of(1, 2, 3));
+        MethodExpression size = factory.createMethodExpression(context, "#{xs.size}", Object.class,
+            new Class<?>[0]);
+        MethodExpression coercedSize = factory.createMethodExpression(context, "#{xs.size}", String.class,
+            new Class<?>[0]);
+        assertEquals(size, coercedSize);
+        assertEquals(size.hashCode(), coercedSize.hashCode());
+
+        ValueExpression object = factory.createValueExpression("value", Object.class);
+        ValueExpression coercedObject = factory.createValueExpression("value", String.class);
+        assertEquals(object, coercedObject);
+        assertEquals("value", object.getExpressionString());
+        assertTrue(object.isLiteralText());
+    }
+
+    @Test
     void listenersObserveMethodReferencesAndCompletedCoercions() {
         List<String> events = new ArrayList<>();
         processor.getELManager().addELResolver(new FailingIntegerConversionResolver(events));
@@ -582,6 +658,10 @@ class ELInterpreterTest {
         return "mapped:" + value;
     }
 
+    public static String joinDifferently(CharSequence... values) {
+        return String.join(";", values);
+    }
+
     private static MethodExpression roundTrip(MethodExpression expression) throws IOException, ClassNotFoundException {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         try (ObjectOutputStream output = new ObjectOutputStream(bytes)) {
@@ -608,6 +688,21 @@ class ELInterpreterTest {
         public long bump() {
             calls++;
             return calls;
+        }
+    }
+
+    public record Book(String title) {
+
+        public String getTitle() {
+            return title;
+        }
+
+        public List<String> getTags() {
+            return List.of("new", "sale", "b");
+        }
+
+        public long count(Predicate<String> predicate) {
+            return getTags().stream().filter(predicate).count();
         }
     }
 

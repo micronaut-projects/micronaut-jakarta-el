@@ -212,7 +212,7 @@ public final class ELStream<T> {
      * @param count The maximum number of elements
      * @return A stream of at most {@code count} elements
      */
-    public ELStream<T> limit(Object count) {
+    public ELStream<T> limit(@Nullable Object count) {
         long limit = longValue(count);
         if (limit < 0) {
             throw new ELException(new IllegalArgumentException("limit must be non-negative"));
@@ -224,7 +224,7 @@ public final class ELStream<T> {
      * @param start The number of elements to skip
      * @return A stream skipping the first elements
      */
-    public ELStream<T> substream(Object start) {
+    public ELStream<T> substream(@Nullable Object start) {
         long from = longValue(start);
         if (from < 0) {
             throw new ELException(new IllegalArgumentException("substream index must be non-negative"));
@@ -237,7 +237,7 @@ public final class ELStream<T> {
      * @param end   The exclusive end position
      * @return A stream of the elements between the two positions
      */
-    public ELStream<T> substream(Object start, Object end) {
+    public ELStream<T> substream(@Nullable Object start, @Nullable Object end) {
         long from = longValue(start);
         long to = longValue(end);
         if (from < 0 || to < 0) {
@@ -539,17 +539,13 @@ public final class ELStream<T> {
             + (index + 1));
     }
 
+    @Nullable
     static Object argument(Object[] arguments, int index, String operation) {
         if (index >= arguments.length) {
             throw new ELException("The operation '" + operation + "' expects at least " + (index + 1)
                 + " argument(s)");
         }
-        Object argument = arguments[index];
-        if (argument == null) {
-            throw new NullPointerException("The argument " + (index + 1) + " of the operation '" + operation
-                + "' is null");
-        }
-        return argument;
+        return arguments[index];
     }
 
     private ELOptional<Boolean> match(Predicate<? super T> predicate, MatchKind kind) {

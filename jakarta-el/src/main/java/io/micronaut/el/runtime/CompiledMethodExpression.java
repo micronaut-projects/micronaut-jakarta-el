@@ -26,7 +26,6 @@ import jakarta.el.MethodReference;
 import jakarta.el.PropertyNotFoundException;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -36,7 +35,7 @@ import java.util.Objects;
  * @since 1.0
  */
 @Experimental
-public abstract class CompiledMethodExpression extends MethodExpression implements CompiledExpression {
+public abstract class CompiledMethodExpression extends MethodExpression implements CompiledExpression, ELExpressionIdentity {
 
     private static final long serialVersionUID = 1L;
     private static final Class<?>[] NO_PARAM_TYPES = new Class<?>[0];
@@ -198,15 +197,20 @@ public abstract class CompiledMethodExpression extends MethodExpression implemen
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof CompiledMethodExpression other
-            && other.canonicalForm.equals(canonicalForm)
-            && Objects.equals(other.expectedReturnType, expectedReturnType)
-            && Arrays.equals(other.expectedParamTypes, expectedParamTypes);
+        Object unwrapped = obj instanceof MethodExpression expression ? ELVariableBindings.unwrap(expression) : obj;
+        return unwrapped instanceof MethodExpression
+            && unwrapped instanceof ELExpressionIdentity identity
+            && identity.equalityForm().equals(canonicalForm);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(canonicalForm, expectedReturnType, Arrays.hashCode(expectedParamTypes));
+        return canonicalForm.hashCode();
+    }
+
+    @Override
+    public final String equalityForm() {
+        return canonicalForm;
     }
 
     @Override

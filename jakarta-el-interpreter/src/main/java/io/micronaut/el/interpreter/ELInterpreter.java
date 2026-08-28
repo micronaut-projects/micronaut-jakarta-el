@@ -18,6 +18,7 @@ package io.micronaut.el.interpreter;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.el.parser.ast.BinaryOperator;
 import io.micronaut.el.parser.ast.ELNode;
+import io.micronaut.el.parser.ELNodes;
 import io.micronaut.el.runtime.ELArithmetic;
 import io.micronaut.el.runtime.ELCollections;
 import io.micronaut.el.runtime.ELLambdas;
@@ -31,6 +32,7 @@ import jakarta.el.ImportHandler;
 import jakarta.el.LambdaExpression;
 import jakarta.el.MethodNotFoundException;
 import jakarta.el.PropertyNotWritableException;
+import jakarta.el.PropertyNotFoundException;
 import jakarta.el.ValueReference;
 import org.jspecify.annotations.Nullable;
 
@@ -40,6 +42,7 @@ import java.lang.reflect.Method;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -134,7 +137,9 @@ final class ELInterpreter {
                     @Override
                     @Nullable
                     Object evaluate(ELContext context) {
-                        return ELSandboxGuard.getValue(context, base.evaluate(context), name.evaluate(context));
+                        Object evaluatedBase = base.evaluate(context);
+                        return evaluatedBase == null ? null
+                            : ELSandboxGuard.getValue(context, evaluatedBase, name.evaluate(context));
                     }
                 };
             }
@@ -147,8 +152,14 @@ final class ELInterpreter {
                     @Override
                     @Nullable
                     Object evaluate(ELContext context) {
-                        return ELSandboxGuard.invokeWithParams(context, base.evaluate(context),
-                            name.evaluate(context), evaluateAll(context, arguments));
+                        Object evaluatedBase = base.evaluate(context);
+                        if (evaluatedBase == null) {
+                            return null;
+                        }
+                        Object evaluatedName = name.evaluate(context);
+                        return evaluatedName == null ? null
+                            : ELSandboxGuard.invokeWithParams(context, evaluatedBase, evaluatedName,
+                                evaluateAll(context, arguments));
                     }
                 };
             }
@@ -539,15 +550,19 @@ final class ELInterpreter {
             case FUNCTION -> evaluateFunction(context, (ELNode.Function) node);
             case PROPERTY -> {
                 ELNode.Property property = (ELNode.Property) node;
-                yield ELSandboxGuard.getValue(context, evaluate(context, property.base()), evaluate(context, property.property()));
+                Object base = evaluate(context, property.base());
+                yield base == null ? null
+                    : ELSandboxGuard.getValue(context, base, evaluate(context, property.property()));
             }
             case METHOD -> {
                 ELNode.Method method = (ELNode.Method) node;
-                yield ELSandboxGuard.invokeWithParams(
-                    context,
-                    evaluate(context, method.base()),
-                    evaluate(context, method.property()),
-                    evaluateAll(context, method.arguments()));
+                Object base = evaluate(context, method.base());
+                if (base == null) {
+                    yield null;
+                }
+                Object property = evaluate(context, method.property());
+                yield property == null ? null : ELSandboxGuard.invokeWithParams(
+                    context, base, property, evaluateAll(context, method.arguments()));
             }
             case CALL -> {
                 ELNode.Call call = (ELNode.Call) node;
@@ -588,8 +603,13 @@ final class ELInterpreter {
         return switch (node) {
             case ELNode.Eval eval -> resolveTarget(context, eval.expression());
             case ELNode.Identifier identifier -> new Target(null, identifier.name());
-            case ELNode.Property property ->
-                new Target(evaluate(context, property.base()), evaluate(context, property.property()));
+            case ELNode.Property property -> {
+                Object base = evaluate(context, property.base());
+                if (base == null) {
+                    throw new PropertyNotFoundException("Cannot resolve an lvalue with a null base object");
+                }
+                yield new Target(base, evaluate(context, property.property()));
+            }
             // a semicolon expression is not an lvalue: the compiled path does not treat it as one, and
             // neither reference implementation does, so resolving one would evaluate its left operand for
             // nothing on every getType, isReadOnly and getValueReference
@@ -853,6 +873,11 @@ final class ELInterpreter {
             } catch (NoSuchMethodException e) {
                 throw new ELException("Cannot restore the bound function '" + owner.getName() + "." + name + "'", e);
             }
+        }
+
+        String identity() {
+            return ELNodes.functionIdentity(owner.getName(), name,
+                Arrays.stream(parameterTypes).map(Class::getTypeName).toList());
         }
 
     }

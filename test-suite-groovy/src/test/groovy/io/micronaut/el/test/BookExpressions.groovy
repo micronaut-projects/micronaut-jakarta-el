@@ -18,5 +18,6 @@ import io.micronaut.el.annotation.ELVariable
 @ELExpression(value = '${(x -> y -> x + y)(1)(2)}', name = "NESTED_LAMBDA")
 @ELExpression(value = '${((a, b, c, d) -> a + b + c + d)(1, 2, 3, 4)}', name = "FOUR_PARAMETERS")
 @ELExpression(value = '${book.tags.stream().forEach(t -> t.length())}', name = "FOR_EACH")
+@ELExpression(value = '${book.count(t -> [t].stream().allMatch(x -> x.length() > 0).get())}', name = "NESTED_FUNCTIONAL")
 class BookExpressions {
 }

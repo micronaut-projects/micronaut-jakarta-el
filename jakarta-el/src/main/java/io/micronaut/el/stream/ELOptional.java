@@ -83,23 +83,18 @@ public final class ELOptional<T> {
 
     /**
      * @param consumer The consumer invoked with the value when it is present
-     * @return Always {@code null}
      */
-    @Nullable
-    public Object ifPresent(LambdaExpression consumer) {
-        return ifPresent(consumer::invoke);
+    public void ifPresent(LambdaExpression consumer) {
+        ifPresent(consumer::invoke);
     }
 
     /**
      * @param consumer The consumer invoked with the value when it is present, as compiled from a lambda expression
-     * @return Always {@code null}
      */
-    @Nullable
-    public Object ifPresent(Consumer<? super T> consumer) {
+    public void ifPresent(Consumer<? super T> consumer) {
         if (value != null) {
             consumer.accept(value);
         }
-        return null;
     }
 
     /**

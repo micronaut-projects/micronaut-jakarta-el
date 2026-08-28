@@ -58,6 +58,7 @@ class ELInterpreterExpressionsTest {
     @Test
     void literalsAndOperators() {
         assertEquals(3L, value(ELInterpreterExpressions$ELExpressions.ADDITION));
+        assertEquals("3", value(ELInterpreterExpressions$ELExpressions.ADDITION_AS_STRING));
         assertEquals(2.5d, value(ELInterpreterExpressions$ELExpressions.DIVISION));
         assertEquals(1L, value(ELInterpreterExpressions$ELExpressions.MODULO));
         assertEquals(-3L, value(ELInterpreterExpressions$ELExpressions.NEGATION));
@@ -86,6 +87,15 @@ class ELInterpreterExpressionsTest {
     }
 
     @Test
+    void lambdaValuesResolveFreeVariablesWhenInvoked() {
+        jakarta.el.LambdaExpression title = (jakarta.el.LambdaExpression) value(
+            ELInterpreterExpressions$ELExpressions.DEFERRED_BOOK_TITLE);
+        ((CompiledELContext) context).setBean("book", new Book("Updated", "history", 20d));
+
+        assertEquals("Updated", title.invoke("unused"));
+    }
+
+    @Test
     void streamOperations() {
         assertEquals(List.of(2L, 4L), value(ELInterpreterExpressions$ELExpressions.FILTERED_STREAM));
         assertEquals(10L, value(ELInterpreterExpressions$ELExpressions.STREAM_SUM));
@@ -103,6 +113,29 @@ class ELInterpreterExpressionsTest {
         assertThrows(ELException.class,
             () -> value(ELInterpreterExpressions$ELExpressions.REVERSED_SUBSTREAM));
         assertNull(value(ELInterpreterExpressions$ELExpressions.OPTIONAL_IF_PRESENT));
+        assertNull(value(ELInterpreterExpressions$ELExpressions.OPTIONAL_NULL_FALLBACK));
+        assertEquals(List.of(), value(ELInterpreterExpressions$ELExpressions.NULL_STREAM_LIMIT));
+        assertEquals(List.of(1L), value(ELInterpreterExpressions$ELExpressions.NULL_STREAM_START));
+        assertEquals(1L, value(ELInterpreterExpressions$ELExpressions.NULL_REDUCTION_SEED));
+    }
+
+    @Test
+    void nullBasesShortCircuitPropertiesAndMethodArguments() {
+        EvaluationCounter counter = new EvaluationCounter();
+        ELContext nullContext = new CompiledELContext()
+            .setBean("counter", counter)
+            .setBean("book", null)
+            .setBean("xs", null);
+
+        assertNull(ELInterpreterExpressions$ELExpressions.NULL_BASE_PROPERTY_SHORT_CIRCUIT.getValue(nullContext));
+        assertNull(ELInterpreterExpressions$ELExpressions.NULL_BASE_METHOD_SHORT_CIRCUIT.getValue(nullContext));
+        assertNull(ELInterpreterExpressions$ELExpressions.NULL_TYPED_PROPERTY.getValue(nullContext));
+        assertNull(ELInterpreterExpressions$ELExpressions.NULL_TYPED_METHOD.getValue(nullContext));
+        assertNull(ELInterpreterExpressions$ELExpressions.NULL_TYPED_COLLECTION.getValue(nullContext));
+        assertNull(ELInterpreterExpressions$ELExpressions.NULL_TYPED_STREAM.getValue(nullContext));
+        assertThrows(jakarta.el.PropertyNotFoundException.class,
+            () -> ELInterpreterExpressions$ELExpressions.NULL_BASE_ASSIGNMENT.getValue(nullContext));
+        assertEquals(0, counter.getCalls());
     }
 
     @Test
@@ -213,6 +246,27 @@ class ELInterpreterExpressionsTest {
     @Test
     void generatedFunctionExpressionsSurviveSerialization() throws Exception {
         assertEquals("a,b", roundTrip(ELInterpreterExpressions$ELExpressions.FUNCTION_JOIN).getValue(context));
+    }
+
+    @Test
+    void expressionEqualityUsesTheParsedAndBoundRepresentation() {
+        ValueExpression addition = ELInterpreterExpressions$ELExpressions.ADDITION;
+        ValueExpression coercedAddition = ELInterpreterExpressions$ELExpressions.ADDITION_AS_STRING;
+        assertEquals(addition, coercedAddition);
+        assertEquals(addition.hashCode(), coercedAddition.hashCode());
+
+        ValueExpression joined = ELInterpreterExpressions$ELExpressions.FUNCTION_JOIN;
+        ValueExpression aliased = ELInterpreterExpressions$ELExpressions.ALIASED_FUNCTION_JOIN;
+        assertEquals(joined, aliased);
+        assertEquals(joined.hashCode(), aliased.hashCode());
+        org.junit.jupiter.api.Assertions.assertNotEquals(joined,
+            ELInterpreterExpressions$ELExpressions.DIFFERENT_FUNCTION_JOIN);
+
+        assertEquals(ELInterpreterExpressions$ELExpressions.LIST_SIZE_METHOD,
+            ELInterpreterExpressions$ELExpressions.LIST_SIZE_STRING_METHOD);
+        assertEquals(ELInterpreterExpressions$ELExpressions.LIST_SIZE_METHOD.hashCode(),
+            ELInterpreterExpressions$ELExpressions.LIST_SIZE_STRING_METHOD.hashCode());
+
     }
 
     private Object value(ValueExpression expression) {

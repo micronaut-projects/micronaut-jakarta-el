@@ -34,7 +34,7 @@ import java.util.Objects;
  * @since 1.0
  */
 @Experimental
-public abstract class CompiledValueExpression extends ValueExpression implements CompiledExpression {
+public abstract class CompiledValueExpression extends ValueExpression implements CompiledExpression, ELExpressionIdentity {
 
     private static final long serialVersionUID = 1L;
 
@@ -128,15 +128,21 @@ public abstract class CompiledValueExpression extends ValueExpression implements
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof CompiledValueExpression other
+        Object unwrapped = obj instanceof ValueExpression expression ? ELVariableBindings.unwrap(expression) : obj;
+        return unwrapped instanceof ValueExpression other
+            && unwrapped instanceof ELExpressionIdentity identity
             && other.isLiteralText() == isLiteralText()
-            && other.canonicalForm.equals(canonicalForm)
-            && other.expectedType.equals(expectedType);
+            && identity.equalityForm().equals(canonicalForm);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(canonicalForm, expectedType);
+        return canonicalForm.hashCode();
+    }
+
+    @Override
+    public final String equalityForm() {
+        return canonicalForm;
     }
 
     @Override
