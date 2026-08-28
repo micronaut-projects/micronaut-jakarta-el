@@ -18,14 +18,16 @@ package io.micronaut.el.interpreter;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.el.ELExpressionParser;
 import io.micronaut.el.parser.ELParser;
+import io.micronaut.el.parser.ELIdentifiers;
 import io.micronaut.el.parser.ast.ELNode;
+import io.micronaut.el.runtime.ELVariableBindings;
 import jakarta.el.ELContext;
 import jakarta.el.ELException;
 import jakarta.el.MethodExpression;
 import jakarta.el.ValueExpression;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -44,48 +46,64 @@ public final class InterpretingELExpressionParser implements ELExpressionParser 
      * The number of parsed expressions kept: the syntax trees are immutable and an application evaluates the
      * same strings repeatedly, so a bounded cache saves the parse, as the other implementations do.
      */
-    private static final int CACHE_SIZE = 2048;
+    static final int CACHE_SIZE = 2048;
 
-    private final Map<String, Parsed> parsed = new ConcurrentHashMap<>();
+    private final Map<String, Parsed> parsed = new LinkedHashMap<>(CACHE_SIZE, 0.75f, true) {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<String, Parsed> eldest) {
+            return size() > CACHE_SIZE;
+        }
+    };
 
     @Override
     public ValueExpression createValueExpression(@Nullable ELContext context,
                                                  String expression,
                                                  Class<?> expectedType) {
         Parsed entry = parse(expression);
+        Map<String, ELInterpreter.BoundFunction> functions = ELInterpreter.bindFunctions(context, entry.node());
         ELInterpreter interpreter = entry.root() == null
-            ? ELInterpreter.of(context, entry.node())
+            ? ELInterpreter.of(functions)
             : ELInterpreter.sharing(entry.root());
-        return new InterpretedValueExpression(expression, expectedType, entry.node(), interpreter);
+        ValueExpression interpreted = new InterpretedValueExpression(expression, expectedType, entry.node(),
+            functions, interpreter);
+        return ELVariableBindings.bind(context, interpreted,
+            ELIdentifiers.free(entry.node()).toArray(String[]::new));
     }
 
     @Override
     public MethodExpression createMethodExpression(@Nullable ELContext context,
                                                    String expression,
                                                    Class<?> expectedReturnType,
-                                                   Class<?>[] expectedParamTypes) {
+                                                   Class<?> @Nullable [] expectedParamTypes) {
         ELNode node = parse(expression).node();
         if (node instanceof ELNode.Composite) {
             throw new ELException("A method expression must consist of a single eval-expression: " + expression);
         }
         requireMethodReference(expression, node);
-        return new InterpretedMethodExpression(expression, expectedReturnType, expectedParamTypes, node,
-            ELInterpreter.of(context, node));
+        Map<String, ELInterpreter.BoundFunction> functions = ELInterpreter.bindFunctions(context, node);
+        MethodExpression interpreted = new InterpretedMethodExpression(expression, expectedReturnType,
+            expectedParamTypes, node, functions, ELInterpreter.of(functions));
+        return ELVariableBindings.bind(context, interpreted, ELIdentifiers.free(node).toArray(String[]::new));
     }
 
-    private Parsed parse(String expression) {
+    private synchronized Parsed parse(String expression) {
         Parsed entry = parsed.get(expression);
         if (entry == null) {
             ELNode node = ELParser.parse(expression);
             // an expression without functions evaluates the same way under every context, so its evaluators
             // are compiled once and shared by the expressions created from the string
             entry = new Parsed(node, ELInterpreter.containsFunction(node) ? null : ELInterpreter.of(null, node).compile(node));
-            if (parsed.size() >= CACHE_SIZE) {
-                parsed.clear();
-            }
             parsed.put(expression, entry);
         }
         return entry;
+    }
+
+    synchronized int cachedExpressions() {
+        return parsed.size();
+    }
+
+    synchronized boolean isCached(String expression) {
+        return parsed.containsKey(expression);
     }
 
     /**

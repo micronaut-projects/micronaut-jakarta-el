@@ -19,7 +19,6 @@ import io.micronaut.core.annotation.Generated;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.el.processor.compiler.ELCompiler;
 import io.micronaut.el.processor.compiler.ELMethodExpressionDefinition;
-import io.micronaut.el.parser.ELNodes;
 import io.micronaut.el.parser.ast.ELNode;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.el.runtime.CompiledMethodExpression;
@@ -32,7 +31,6 @@ import io.micronaut.sourcegen.model.TypeDef;
 import jakarta.el.ELContext;
 
 import javax.lang.model.element.Modifier;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -72,23 +70,27 @@ public final class MethodExpressionWriter {
             ValueExpressionWriter.requireInferrable(inferred, definition.expression(), node, compiler, "expectedReturnType");
             definition = definition.inferring(inferred);
         }
+        compiler.beginClass(className);
         ClassDef.ClassDefBuilder builder = ClassDef.builder(className)
             .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
             .addAnnotation(Generated.class)
             .superclass(ClassTypeDef.of(CompiledMethodExpression.class))
             // the source writer interprets a '$' in the javadoc
             .addJavadoc("The compiled form of the method expression <code>" + definition.expression().replace("$", "$$") + "</code>.")
-            .addMethod(constructor(definition, node))
+            .addMethod(constructor(definition, compiler, node))
             .addMethod(evaluateBase(node, compiler))
             .addMethod(evaluateProperty(node, compiler))
-            .addMethod(doInvoke(node, compiler));
+            .addMethod(doInvoke(node, definition, compiler));
         if (node instanceof ELNode.Method method) {
             builder.addMethod(evaluateArguments(method, compiler));
         }
+        builder.addMethods(compiler.accessMethods());
         return new Written(builder.build(), definition);
     }
 
-    private static MethodDef constructor(ELMethodExpressionDefinition definition, ELNode node) {
+    private static MethodDef constructor(ELMethodExpressionDefinition definition,
+                                         ELCompiler compiler,
+                                         ELNode node) {
         List<ExpressionDef> parameterTypes = definition.parameterTypes().stream()
             .map(type -> (ExpressionDef) ExpressionDef.constant(TypeDef.erasure(type)))
             .toList();
@@ -96,7 +98,7 @@ public final class MethodExpressionWriter {
             .addModifiers(Modifier.PUBLIC)
             .build((aThis, parameters) -> aThis.superRef().invokeSuperConstructor(
                 ExpressionDef.constant(definition.expression()),
-                ExpressionDef.constant(ELNodes.canonical(definition.node())),
+                ExpressionDef.constant(compiler.canonical(definition.node())),
                 ExpressionDef.constant(TypeDef.erasure(definition.requireReturnType())),
                 CLASS_ARRAY.instantiate(parameterTypes),
                 ExpressionDef.constant(node instanceof ELNode.Method)
@@ -121,7 +123,9 @@ public final class MethodExpressionWriter {
             .build((aThis, parameters) -> property(node, compiler, parameters.get(0)).returning());
     }
 
-    private static MethodDef doInvoke(ELNode node, ELCompiler compiler) {
+    private static MethodDef doInvoke(ELNode node,
+                                      ELMethodExpressionDefinition definition,
+                                      ELCompiler compiler) {
         return MethodDef.builder("doInvoke")
             .addModifiers(Modifier.PROTECTED)
             .overrides()
@@ -133,26 +137,19 @@ public final class MethodExpressionWriter {
                 ExpressionDef arguments = parameters.get(1);
                 return switch (node) {
                     case ELNode.Method method -> compiler.compileEvaluation(method, context,
-                        ctx -> new ELCompiler.Typed(compiler.invokeRuntime(EL_RESOLUTION, "invoke", TypeDef.OBJECT,
-                            invocation(compiler, ctx, method).toArray(ExpressionDef[]::new)), null));
-                    case ELNode.Property property -> compiler.invokeRuntime(EL_RESOLUTION, "invokeWithParams", TypeDef.OBJECT,
+                        ctx -> compiler.compileTyped(method, ctx));
+                    case ELNode.Property property -> compiler.invokeRuntime(EL_RESOLUTION, "invokeWithParamTypes", TypeDef.OBJECT,
                         context,
                         compiler.compile(property.base(), context),
                         compiler.compile(property.property(), context),
+                        CLASS_ARRAY.instantiate(definition.parameterTypes().stream()
+                            .map(type -> (ExpressionDef) ExpressionDef.constant(TypeDef.erasure(type)))
+                            .toList()),
                         arguments).returning();
                     default -> compiler.invokeRuntime(EL_RESOLUTION, "invokeMethodExpression", TypeDef.OBJECT,
                         context, compiler.compile(node, context), arguments).returning();
                 };
             });
-    }
-
-    private static List<ExpressionDef> invocation(ELCompiler compiler, ExpressionDef context, ELNode.Method method) {
-        List<ExpressionDef> values = new ArrayList<>();
-        values.add(context);
-        values.add(compiler.compile(method.base(), context));
-        values.add(compiler.compile(method.property(), context));
-        method.arguments().forEach(argument -> values.add(compiler.compile(argument, context)));
-        return values;
     }
 
     private static MethodDef evaluateArguments(ELNode.Method method, ELCompiler compiler) {
@@ -172,7 +169,7 @@ public final class MethodExpressionWriter {
         return switch (node) {
             case ELNode.Method method -> compiler.compile(method.base(), context);
             case ELNode.Property property -> compiler.compile(property.base(), context);
-            default -> ExpressionDef.nullValue();
+            default -> compiler.compile(node, context);
         };
     }
 

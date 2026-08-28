@@ -19,7 +19,6 @@ import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.reflect.ReflectionUtils;
 import jakarta.el.ELContext;
 import jakarta.el.ELException;
-import jakarta.el.LambdaExpression;
 import jakarta.el.MethodNotFoundException;
 import org.jspecify.annotations.Nullable;
 
@@ -47,11 +46,6 @@ import java.util.Map;
  */
 @Internal
 public final class ELMethods {
-
-    private static final int EXACT = 0;
-    private static final int ASSIGNABLE = 1;
-    private static final int COERCIBLE = 2;
-    private static final int NO_MATCH = -1;
 
     /**
      * The public methods of a class by name, each as its accessible declaration with its parameter types read
@@ -117,12 +111,17 @@ public final class ELMethods {
         Object[] arguments = values == null ? new Object[0] : values;
         int count = arguments.length;
         int fixed = method.isVarArgs() ? parameterTypes.length - 1 : parameterTypes.length;
+        if (method.isVarArgs() ? count < fixed : count != fixed) {
+            throw new IllegalArgumentException("The method '" + method.getName() + "' expects "
+                + (method.isVarArgs() ? "at least " + fixed : fixed) + " argument(s) but " + count + " were provided");
+        }
         for (int i = 0; i < fixed && i < count; i++) {
             parameters[i] = ELSupport.coerceToType(context, arguments[i], parameterTypes[i]);
         }
         if (method.isVarArgs()) {
             Class<?> componentType = parameterTypes[fixed].getComponentType();
-            if (count == parameterTypes.length && arguments[fixed] != null && parameterTypes[fixed] == arguments[fixed].getClass()) {
+            if (count == parameterTypes.length && arguments[fixed] != null
+                && arguments[fixed].getClass() == parameterTypes[fixed]) {
                 parameters[fixed] = arguments[fixed];
             } else {
                 Object varargs = Array.newInstance(componentType, Math.max(0, count - fixed));
@@ -162,55 +161,74 @@ public final class ELMethods {
         return select(type, name, candidates, paramTypes, arguments, false);
     }
 
+    /**
+     * Finds the static method a method expression refers to.
+     *
+     * @param type       The type declaring the method
+     * @param name       The name of the method
+     * @param paramTypes The parameter types provided at parse time, can be {@code null}
+     * @param arguments  The evaluated arguments, can be {@code null}
+     * @return The method
+     */
+    public static Method findStaticMethod(Class<?> type,
+                                          String name,
+                                          Class<?> @Nullable [] paramTypes,
+                                          Object @Nullable [] arguments) {
+        List<Candidate> candidates = METHODS.get(type).get(name);
+        if (candidates == null) {
+            throw notFound(type, name, paramTypes != null ? paramTypes.length : arguments == null ? 0 : arguments.length);
+        }
+        return select(type, name, candidates, paramTypes, arguments, true);
+    }
+
     private static Method select(Class<?> type,
                                  String name,
                                  List<Candidate> candidates,
                                  Class<?> @Nullable [] paramTypes,
                                  Object @Nullable [] arguments,
                                  boolean isStatic) {
-        if (paramTypes != null) {
-            for (Candidate candidate : candidates) {
-                if ((!isStatic || candidate.isStatic()) && sameTypes(candidate.parameterTypes(), paramTypes)) {
-                    return candidate.method();
-                }
-            }
-            throw notFound(type, name, paramTypes.length);
-        }
         Object[] values = arguments == null ? new Object[0] : arguments;
-        List<Candidate> best = new ArrayList<>(1);
-        long bestScore = Long.MAX_VALUE;
+        Class<?>[] matchingTypes = paramTypes == null ? Arrays.stream(values)
+            .map(value -> value == null ? null : value.getClass())
+            .toArray(Class<?>[]::new) : paramTypes;
+        List<Candidate> assignable = new ArrayList<>();
+        List<Candidate> coercible = new ArrayList<>();
+        List<Candidate> varArgs = new ArrayList<>();
         for (Candidate candidate : candidates) {
             if (isStatic && !candidate.isStatic()) {
                 continue;
             }
-            long score = score(candidate, values);
-            if (score == NO_MATCH) {
-                continue;
-            }
-            if (score < bestScore) {
-                bestScore = score;
-                best.clear();
-                best.add(candidate);
-            } else if (score == bestScore && !overrides(best, candidate)) {
-                best.add(candidate);
+            Match match = match(candidate, matchingTypes, values);
+            switch (match) {
+                case EXACT -> {
+                    return candidate.method();
+                }
+                case ASSIGNABLE -> assignable.add(candidate);
+                case COERCIBLE -> coercible.add(candidate);
+                case VARARGS -> varArgs.add(candidate);
+                case NONE -> {
+                    // not a candidate
+                }
+                default -> throw new IllegalStateException("Unexpected method match " + match);
             }
         }
+        boolean elSpecific = assignable.isEmpty();
+        List<Candidate> best = !assignable.isEmpty() ? assignable
+            : !coercible.isEmpty() ? coercible : varArgs;
         if (best.isEmpty()) {
-            throw notFound(type, name, values.length);
+            throw notFound(type, name, matchingTypes.length);
         }
-        if (best.size() > 1) {
-            throw new MethodNotFoundException("The reference to the method '" + name + "' of " + type.getName()
-                + " is ambiguous, " + best.size() + " methods match the arguments");
-        }
-        return best.get(0).method();
+        return mostSpecific(type, name, best, matchingTypes, elSpecific).method();
     }
 
     /**
-     * Compares declared parameter types with the ones provided at parse time, treating a primitive and its
-     * wrapper as the same type: a class literal such as {@code double.class} cannot reach an annotation member
-     * of a Micronaut annotation, so the wrapper is what a declaration can provide.
+     * Compares parameter types, treating a primitive and its wrapper as the same type.
+     *
+     * @param declared The declared parameter types
+     * @param provided The parameter types to match
+     * @return Whether every declared type matches its provided counterpart
      */
-    private static boolean sameTypes(Class<?>[] declared, Class<?>[] provided) {
+    public static boolean sameTypes(Class<?>[] declared, Class<?>[] provided) {
         if (declared.length != provided.length) {
             return false;
         }
@@ -270,68 +288,186 @@ public final class ELMethods {
         return findAccessible(superclass, method);
     }
 
-    /**
-     * Scores how well the arguments fit a method, the lower the better, {@link #NO_MATCH} when they do not fit.
-     */
-    private static long score(Candidate candidate, Object[] arguments) {
+    private static Match match(Candidate candidate, Class<?>[] matchingTypes, Object[] arguments) {
         Class<?>[] parameterTypes = candidate.parameterTypes();
         boolean varArgs = candidate.varArgs();
-        if (varArgs ? arguments.length < parameterTypes.length - 1 : arguments.length != parameterTypes.length) {
-            return NO_MATCH;
+        if (varArgs ? matchingTypes.length < parameterTypes.length - 1 : matchingTypes.length != parameterTypes.length) {
+            return Match.NONE;
         }
-        // a variable arity method is only considered once every fixed arity method has been ruled out
-        long score = varArgs ? 1L << 32 : 0;
         int fixed = varArgs ? parameterTypes.length - 1 : parameterTypes.length;
-        for (int i = 0; i < fixed; i++) {
-            int argument = score(parameterTypes[i], arguments[i]);
-            if (argument == NO_MATCH) {
-                return NO_MATCH;
-            }
-            score += argument;
+        Match match = matchFixed(parameterTypes, matchingTypes, arguments, fixed);
+        if (match == Match.NONE || !varArgs) {
+            return match;
         }
-        if (varArgs) {
-            Class<?> componentType = parameterTypes[parameterTypes.length - 1].getComponentType();
-            for (int i = fixed; i < arguments.length; i++) {
-                int argument = score(componentType, arguments[i]);
-                if (argument == NO_MATCH) {
-                    return NO_MATCH;
-                }
-                score += argument;
-            }
-        }
-        return score;
-    }
-
-    private static int score(Class<?> parameterType, @Nullable Object argument) {
-        if (argument == null) {
-            return parameterType.isPrimitive() ? COERCIBLE : ASSIGNABLE;
-        }
-        Class<?> argumentType = argument.getClass();
-        if (parameterType == argumentType) {
-            return EXACT;
-        }
-        if (parameterType.isAssignableFrom(argumentType)) {
-            return ASSIGNABLE;
-        }
-        if (argument instanceof LambdaExpression && parameterType.isInterface()) {
-            // the section 1.25.8 of the specification coerces a lambda expression to a functional interface
-            return COERCIBLE;
-        }
-        return isCoercible(parameterType) ? COERCIBLE : NO_MATCH;
-    }
-
-    private static boolean isCoercible(Class<?> parameterType) {
-        return parameterType.isPrimitive()
-            || Number.class.isAssignableFrom(parameterType)
-            || parameterType == String.class
-            || parameterType == Boolean.class
-            || parameterType == Character.class
-            || parameterType.isEnum();
+        return matchVarArgs(parameterTypes[fixed], matchingTypes, arguments, fixed);
     }
 
     /**
-     * A method inherited from a supertype is the same method for the purpose of the reference.
+     * The match of the arguments the parameters take one by one: the weakest of their matches, as the section
+     * 1.6 of the specification prefers a method whose parameters all take their argument as it is.
      */
+    private static Match matchFixed(Class<?>[] parameterTypes, Class<?>[] matchingTypes, Object[] arguments, int fixed) {
+        Match match = Match.EXACT;
+        for (int i = 0; i < fixed; i++) {
+            Match argument = match(parameterTypes[i], matchingTypes[i], argument(arguments, i));
+            if (argument == Match.NONE) {
+                return Match.NONE;
+            }
+            if (argument == Match.COERCIBLE || (argument == Match.ASSIGNABLE && match == Match.EXACT)) {
+                match = argument;
+            }
+        }
+        return match;
+    }
+
+    /**
+     * The match of the trailing arguments of a variable arity call: the array given directly, or the arguments
+     * the call packs into one.
+     */
+    private static Match matchVarArgs(Class<?> arrayType, Class<?>[] matchingTypes, Object[] arguments, int fixed) {
+        if (matchingTypes.length == fixed + 1 && arrayType == matchingTypes[fixed]) {
+            return Match.VARARGS;
+        }
+        Class<?> componentType = arrayType.getComponentType();
+        for (int i = fixed; i < matchingTypes.length; i++) {
+            if (match(componentType, matchingTypes[i], argument(arguments, i)) == Match.NONE) {
+                return Match.NONE;
+            }
+        }
+        return Match.VARARGS;
+    }
+
+    private static Match match(Class<?> parameterType,
+                               @Nullable Class<?> matchingType,
+                               @Nullable Object argument) {
+        if (parameterType == matchingType) {
+            return Match.EXACT;
+        }
+        if (matchingType == null) {
+            return parameterType.isPrimitive() ? Match.COERCIBLE : Match.ASSIGNABLE;
+        }
+        if (ReflectionUtils.getWrapperType(parameterType).isAssignableFrom(matchingType)) {
+            return Match.ASSIGNABLE;
+        }
+        if (argument == null) {
+            return Match.NONE;
+        }
+        try {
+            ELSupport.coerce(argument, parameterType);
+            return Match.COERCIBLE;
+        } catch (ELException | IllegalArgumentException e) {
+            return Match.NONE;
+        }
+    }
+
+    @Nullable
+    private static Object argument(Object[] arguments, int index) {
+        return index < arguments.length ? arguments[index] : null;
+    }
+
+    private static Candidate mostSpecific(Class<?> type,
+                                          String name,
+                                          List<Candidate> candidates,
+                                          Class<?>[] argumentTypes,
+                                          boolean elSpecific) {
+        List<Candidate> best = new ArrayList<>(1);
+        for (Candidate candidate : candidates) {
+            boolean lessSpecific = false;
+            for (int i = best.size() - 1; i >= 0; i--) {
+                int comparison = compareSpecificity(candidate, best.get(i), argumentTypes, elSpecific);
+                if (comparison > 0) {
+                    best.remove(i);
+                } else if (comparison < 0) {
+                    lessSpecific = true;
+                }
+            }
+            if (!lessSpecific && !overrides(best, candidate)) {
+                best.add(candidate);
+            }
+        }
+        if (best.size() != 1) {
+            throw new MethodNotFoundException("The reference to the method '" + name + "' of " + type.getName()
+                + " is ambiguous, " + best.size() + " methods match the arguments");
+        }
+        return best.get(0);
+    }
+
+    private static int compareSpecificity(Candidate first,
+                                          Candidate second,
+                                          Class<?>[] argumentTypes,
+                                          boolean elSpecific) {
+        int length = Math.max(Math.max(first.parameterTypes().length, second.parameterTypes().length), argumentTypes.length);
+        Class<?>[] firstTypes = comparisonTypes(first, length);
+        Class<?>[] secondTypes = comparisonTypes(second, length);
+        int result = 0;
+        for (int i = 0; i < length; i++) {
+            Class<?> firstType = ReflectionUtils.getWrapperType(firstTypes[i]);
+            Class<?> secondType = ReflectionUtils.getWrapperType(secondTypes[i]);
+            if (firstType == secondType) {
+                continue;
+            }
+            int comparison = compareParameter(firstType, secondType,
+                i < argumentTypes.length ? argumentTypes[i] : null, elSpecific);
+            // neither parameter is the more specific one, or the methods each win a parameter
+            if (comparison == 0 || (result != 0 && result != comparison)) {
+                return 0;
+            }
+            result = comparison;
+        }
+        return result == 0 ? compareBridge(first, second) : result;
+    }
+
+    /**
+     * Which of two parameters of the same position is the more specific one: the one the other is assignable
+     * to, or, when neither is, the numeric one for a numeric argument of an EL-specific call.
+     */
+    private static int compareParameter(Class<?> firstType,
+                                        Class<?> secondType,
+                                        @Nullable Class<?> argumentType,
+                                        boolean elSpecific) {
+        if (secondType.isAssignableFrom(firstType)) {
+            return 1;
+        }
+        if (firstType.isAssignableFrom(secondType)) {
+            return -1;
+        }
+        return numericSpecificity(firstType, secondType, argumentType, elSpecific);
+    }
+
+    /**
+     * The declaration a bridge method was generated for wins over the bridge itself, whose erased parameters
+     * are equally specific.
+     */
+    private static int compareBridge(Candidate first, Candidate second) {
+        if (first.method().isBridge() == second.method().isBridge()) {
+            return 0;
+        }
+        return first.method().isBridge() ? -1 : 1;
+    }
+
+    private static Class<?>[] comparisonTypes(Candidate candidate, int length) {
+        Class<?>[] declared = candidate.parameterTypes();
+        if (!candidate.varArgs()) {
+            return declared;
+        }
+        Class<?>[] expanded = Arrays.copyOf(declared, length);
+        Class<?> component = declared[declared.length - 1].getComponentType();
+        Arrays.fill(expanded, declared.length - 1, length, component);
+        return expanded;
+    }
+
+    private static int numericSpecificity(Class<?> first,
+                                          Class<?> second,
+                                          @Nullable Class<?> argument,
+                                          boolean elSpecific) {
+        if (!elSpecific || argument == null || !Number.class.isAssignableFrom(argument)) {
+            return 0;
+        }
+        boolean firstNumeric = Number.class.isAssignableFrom(first);
+        boolean secondNumeric = Number.class.isAssignableFrom(second);
+        return firstNumeric == secondNumeric ? 0 : firstNumeric ? 1 : -1;
+    }
+
     private static boolean overrides(List<Candidate> candidates, Candidate candidate) {
         for (Candidate other : candidates) {
             if (Arrays.equals(other.parameterTypes(), candidate.parameterTypes())) {
@@ -355,5 +491,13 @@ public final class ELMethods {
      * @param isStatic       Whether it is static
      */
     private record Candidate(Method method, Class<?>[] parameterTypes, boolean varArgs, boolean isStatic) {
+    }
+
+    private enum Match {
+        EXACT,
+        ASSIGNABLE,
+        COERCIBLE,
+        VARARGS,
+        NONE
     }
 }

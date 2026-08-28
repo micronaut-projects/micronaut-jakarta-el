@@ -18,16 +18,22 @@ package io.micronaut.el;
 import io.micronaut.el.runtime.ObjectValueExpression;
 import jakarta.el.ELException;
 import jakarta.el.ExpressionFactory;
+import jakarta.el.MethodExpression;
 import jakarta.el.ValueExpression;
 import org.junit.jupiter.api.Test;
 
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -132,6 +138,31 @@ class CompiledExpressionFactoryTest {
     @Test
     void theFactoryOfTheServiceIsTheCompiledOne() {
         assertSame(CompiledExpressionFactory.class, ExpressionFactory.newInstance().getClass());
+    }
+
+    @Test
+    void objectValueExpressionsPreserveSerializableValues() throws Exception {
+        ValueExpression expression = new CompiledExpressionFactory().createValueExpression("value", String.class);
+
+        assertEquals("value", roundTrip(expression).getValue(context));
+    }
+
+    @Test
+    void literalMethodExpressionsHaveNoMethodReference() {
+        MethodExpression expression = new CompiledExpressionFactory().createMethodExpression(context, "literal",
+            String.class, new Class<?>[0]);
+
+        assertNull(expression.getMethodReference(context));
+    }
+
+    private static ValueExpression roundTrip(ValueExpression expression) throws Exception {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        try (ObjectOutputStream output = new ObjectOutputStream(bytes)) {
+            output.writeObject(expression);
+        }
+        try (ObjectInputStream input = new ObjectInputStream(new ByteArrayInputStream(bytes.toByteArray()))) {
+            return (ValueExpression) input.readObject();
+        }
     }
 
     private URL childLoaderRoot() throws Exception {

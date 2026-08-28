@@ -4,12 +4,18 @@ import io.micronaut.el.CompiledELContext;
 import io.micronaut.el.resolver.ELResolvers;
 import io.micronaut.el.resolver.IntrospectionELResolver;
 import jakarta.el.ELResolver;
+import jakarta.el.MapELResolver;
 import jakarta.el.PropertyNotWritableException;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -71,5 +77,31 @@ class IntrospectionResolverTest {
         context.setPropertyResolved(false);
         assertEquals("history", chain.getValue(context, book, "category"));
         assertTrue(context.isPropertyResolved());
+    }
+
+    @Test
+    void customResolversRemainAheadOfTheIntrospectionResolver() {
+        ELResolver custom = new MapELResolver();
+
+        List<ELResolver> resolvers = ELResolvers.standardResolvers(custom);
+
+        assertSame(custom, resolvers.get(0));
+        assertInstanceOf(IntrospectionELResolver.class, resolvers.get(1));
+
+        CompiledELContext customContext = new CompiledELContext(custom);
+        customContext.setPropertyResolved(false);
+        assertEquals("history", customContext.getELResolver().getValue(customContext, book, "category"));
+        assertTrue(customContext.isPropertyResolved());
+    }
+
+    @Test
+    void eachStandardResolverChainIsIsolated() {
+        assertNotSame(ELResolvers.standard(), ELResolvers.standard());
+
+        List<ELResolver> first = ELResolvers.standardResolvers();
+        List<ELResolver> second = ELResolvers.standardResolvers();
+        assertInstanceOf(IntrospectionELResolver.class, first.get(0));
+        assertInstanceOf(IntrospectionELResolver.class, second.get(0));
+        assertNotSame(first.get(0), second.get(0));
     }
 }

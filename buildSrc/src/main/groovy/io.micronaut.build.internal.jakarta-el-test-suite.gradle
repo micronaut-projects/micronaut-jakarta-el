@@ -1,6 +1,9 @@
 plugins {
     id 'io.micronaut.build.internal.jakarta-el-base'
     id 'java'
+    // the runtime of the modules is exercised from here, so this is where most of its coverage is recorded:
+    // the root project aggregates these results into the report the static analysis reads
+    id 'jacoco'
 }
 
 tasks.withType(Test).configureEach {

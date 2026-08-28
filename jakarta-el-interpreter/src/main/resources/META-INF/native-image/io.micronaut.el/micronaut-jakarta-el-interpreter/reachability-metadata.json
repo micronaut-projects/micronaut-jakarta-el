@@ -1,0 +1,31 @@
+{
+  "reflection": [
+    {
+      "comment": "An expression parsed at runtime is serializable like a compiled one, section 1.14 of the specification.",
+      "type": "io.micronaut.el.interpreter.InterpretedValueExpression",
+      "serializable": true
+    },
+    {
+      "type": "io.micronaut.el.interpreter.InterpretedMethodExpression",
+      "serializable": true
+    },
+    {
+      "comment": "The functions the expression was parsed with travel with it.",
+      "type": "io.micronaut.el.interpreter.ELInterpreter$BoundFunction",
+      "serializable": true
+    },
+    {
+      "comment": "The map the functions are held in, and the form an immutable collection is written as.",
+      "type": "java.util.ImmutableCollections$MapN",
+      "serializable": true
+    },
+    {
+      "type": "java.util.ImmutableCollections$Map1",
+      "serializable": true
+    },
+    {
+      "type": "java.util.CollSer",
+      "serializable": true
+    }
+  ]
+}

@@ -61,6 +61,7 @@ import io.micronaut.sourcegen.model.ClassDef;
 import java.lang.annotation.Annotation;
 import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -218,6 +219,7 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
             }
             context.visitServiceDescriptor(ELExpressionSource.class.getName(), sourceClassName, element);
             visitNativeImageProperties(sourceClassName, generated, element, context);
+            visitNativeImageMetadata(sourceClassName, compiledValues, compiledMethods, element, context);
         } catch (ELParsingException | ELCompilationException | ProcessingException e) {
             processed.remove(element.getName());
             throw new ProcessingException(element, reportable(e), e);
@@ -255,6 +257,41 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
     }
 
     /**
+     * Registers the generated expressions for deserialization in a GraalVM native image.
+     *
+     * <p>An expression is serializable, section 1.14 of the specification. GraalVM builds the constructor an
+     * {@code ObjectInputStream} needs only for the classes declared as serializable, so every generated class
+     * is declared here, next to the registry it belongs to; the runtime declares its own hierarchy.</p>
+     */
+    private static void visitNativeImageMetadata(String sourceClassName,
+                                                 List<ExpressionSourceWriter.CompiledValue> compiledValues,
+                                                 List<ExpressionSourceWriter.CompiledMethod> compiledMethods,
+                                                 ClassElement element,
+                                                 VisitorContext context) {
+        List<String> serializable = new ArrayList<>(compiledValues.size() + compiledMethods.size());
+        for (ExpressionSourceWriter.CompiledValue value : compiledValues) {
+            serializable.add(value.className());
+        }
+        for (ExpressionSourceWriter.CompiledMethod method : compiledMethods) {
+            serializable.add(method.className());
+        }
+        if (serializable.isEmpty()) {
+            return;
+        }
+        String types = serializable.stream()
+            .map(name -> "    {\n      \"type\": \"" + name + "\",\n      \"serializable\": true\n    }")
+            .collect(java.util.stream.Collectors.joining(",\n"));
+        context.visitMetaInfFile("native-image/io.micronaut.el.generated/" + sourceClassName + "/reachability-metadata.json", element)
+            .ifPresent(file -> {
+                try (Writer writer = file.openWriter()) {
+                    writer.write("{\n  \"reflection\": [\n" + types + "\n  ]\n}\n");
+                } catch (IOException e) {
+                    throw new ProcessingException(element, "Failed to write the native image metadata: " + e.getMessage(), e);
+                }
+            });
+    }
+
+    /**
      * The message of a failure, reported through {@link VisitorContext#fail} which prints it as it is: an
      * expression may well contain a {@code %}, as in {@code formatter.format('%1$.2f', value)}, and the
      * processors of the languages would format it otherwise.
@@ -279,12 +316,17 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
                 collect(parameter, annotation, declared);
             }
         }
-        Map<String, Declared<A>> distinct = new LinkedHashMap<>();
+        Map<DeclarationKey, Declared<A>> distinct = new LinkedHashMap<>();
         for (Declared<A> value : declared) {
-            String key = expressionOf(value.annotation()).orElse("") + "|"
+            String signature = expressionOf(value.annotation()).orElse("") + "|"
                 + value.annotation().annotationClassValue("expectedType").map(AnnotationClassValue::getName).orElse("")
-                + "|" + value.annotation().annotationClassValue("expectedReturnType").map(AnnotationClassValue::getName).orElse("");
-            distinct.putIfAbsent(key, value);
+                + "|" + value.annotation().annotationClassValue("expectedReturnType").map(AnnotationClassValue::getName).orElse("")
+                + "|" + Arrays.stream(value.annotation().annotationClassValues("expectedParamTypes"))
+                    .map(AnnotationClassValue::getName)
+                    .collect(java.util.stream.Collectors.joining(","));
+            // The owner contributes method parameters and member-level @ELEnvironment declarations. Identical
+            // text and result types on different owners can therefore compile to different expressions.
+            distinct.putIfAbsent(new DeclarationKey(value.owner(), signature), value);
         }
         return new ArrayList<>(distinct.values());
     }
@@ -342,14 +384,15 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
                 variables.put(parameter.getName(), parameter.getGenericType());
             }
         }
-        declare(element.getAnnotation(ELEnvironment.class), context, variables, importedClasses, importedPackages, staticImports, functions);
+        declare(element.getAnnotation(ELEnvironment.class), element, context, variables, importedClasses, importedPackages, staticImports, functions);
         if (owner != element) {
-            declare(owner.getAnnotation(ELEnvironment.class), context, variables, importedClasses, importedPackages, staticImports, functions);
+            declare(owner.getAnnotation(ELEnvironment.class), owner, context, variables, importedClasses, importedPackages, staticImports, functions);
         }
         return new CompilationContext(context, owner, ELFunctionDiscovery.current(), variables, importedClasses, importedPackages, staticImports, functions);
     }
 
     private void declare(@Nullable AnnotationValue<ELEnvironment> environment,
+                         Element owner,
                          VisitorContext context,
                          Map<String, ClassElement> variables,
                          Map<String, ClassElement> importedClasses,
@@ -359,10 +402,18 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
         if (environment == null) {
             return;
         }
-        for (AnnotationValue<ELVariable> variable : ELTypes.nested(environment, "variables", ELVariable.class)) {
+        List<AnnotationValue<ELVariable>> declaredVariables = ELTypes.nested(environment, "variables", ELVariable.class);
+        for (int i = 0; i < declaredVariables.size(); i++) {
+            int variableIndex = i;
+            AnnotationValue<ELVariable> variable = declaredVariables.get(i);
             String name = variable.stringValue("name").orElseThrow(() ->
                 new ELCompilationException("The name of @ELVariable is required"));
-            ClassElement type = ELTypes.resolveMember(variable, "type", context).orElseThrow(() ->
+            ClassElement type = ELTypes.resolveMember(variable, "type", context)
+                .or(() -> context.getLanguage() == VisitorContext.Language.JAVA
+                    ? JavaAnnotationTypes.resolveNestedMember(owner.getNativeType(), ELEnvironment.class.getName(),
+                        "variables", variableIndex, "type", context)
+                    : Optional.empty())
+                .orElseThrow(() ->
                 new ELCompilationException("The type of the variable '" + name + "' is required"));
             variables.put(name, type);
         }
@@ -449,5 +500,8 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
      * @param <A>        The annotation type
      */
     private record Declared<A extends Annotation>(AnnotationValue<A> annotation, Element owner) {
+    }
+
+    private record DeclarationKey(Element owner, String signature) {
     }
 }

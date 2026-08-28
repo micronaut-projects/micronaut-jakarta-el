@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
     api mn.micronaut.core.processor
+    compileOnly mn.micronaut.inject.java
     api mnSourcegen.micronaut.sourcegen.generator
     api projects.micronautJakartaEl
     api projects.micronautJakartaElParser

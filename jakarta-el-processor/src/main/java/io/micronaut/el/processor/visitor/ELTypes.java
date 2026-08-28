@@ -52,6 +52,32 @@ public final class ELTypes {
      * @return The resolved type
      */
     static ClassElement resolve(String name, VisitorContext context) {
+        if (name.startsWith("[")) {
+            int dimensions = 0;
+            while (name.charAt(dimensions) == '[') {
+                dimensions++;
+            }
+            String component = switch (name.charAt(dimensions)) {
+                case 'Z' -> "boolean";
+                case 'B' -> "byte";
+                case 'S' -> "short";
+                case 'I' -> "int";
+                case 'J' -> "long";
+                case 'C' -> "char";
+                case 'F' -> "float";
+                case 'D' -> "double";
+                case 'L' -> name.substring(dimensions + 1, name.length() - 1).replace('/', '.');
+                default -> throw new IllegalStateException("Cannot resolve the type " + name);
+            };
+            ClassElement type = resolve(component, context);
+            for (int i = 0; i < dimensions; i++) {
+                type = type.toArray();
+            }
+            return type;
+        }
+        if (name.endsWith("[]")) {
+            return resolve(name.substring(0, name.length() - 2), context).toArray();
+        }
         return switch (name) {
             case "void" -> PrimitiveElement.VOID;
             case "boolean" -> PrimitiveElement.BOOLEAN;
@@ -143,6 +169,19 @@ public final class ELTypes {
      */
     public static boolean isCompanion(ClassElement type) {
         return type.getName().endsWith(COMPANION);
+    }
+
+    /**
+     * Whether an interface can be the target of a generated Java lambda. Sealed Java interfaces cannot be
+     * implemented by the synthetic lambda class, even when they declare a single abstract method.
+     *
+     * @param type The interface
+     * @param context The visitor context
+     * @return True when generated code may use the interface as a lambda target
+     */
+    public static boolean isFunctionalInterfaceCandidate(ClassElement type, VisitorContext context) {
+        return type.isInterface() && (context.getLanguage() != VisitorContext.Language.JAVA
+            || JavaAnnotationTypes.isFunctionalInterfaceCandidate(type.getNativeType()));
     }
 
     /**

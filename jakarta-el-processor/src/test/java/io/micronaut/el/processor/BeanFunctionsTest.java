@@ -81,6 +81,31 @@ class BeanFunctionsTest {
     }
 
     @Test
+    void theInterpretedZeroArgumentVarargsFunctionCallAlsoFailsCompilation() {
+        String source = """
+            package io.micronaut.el.test.functions;
+
+            import io.micronaut.el.annotation.*;
+
+            @ELEnvironment(functions = @ELFunctions(prefix = "fn", value = Functions.class))
+            @ELExpression(value = "${fn:combine()}", expectedType = String.class)
+            public class Expressions {
+            }
+
+            class Functions {
+                public static String combine(String first, String... remaining) { return first; }
+            }
+            """;
+        try (JavaParser parser = new JavaParser()) {
+            RuntimeException failure = assertThrows(RuntimeException.class,
+                () -> parser.generate(PACKAGE + ".Expressions", source));
+            String error = failure.getMessage();
+            assertTrue(error.contains("The function 'fn:combine' expects at least 1 argument(s) but 0 were given"),
+                error);
+        }
+    }
+
+    @Test
     void aCallToAFunctionTheBeanDoesNotDeclareFails() {
         String error = failure("${pricing:discount(book)}");
         assertTrue(error.contains("The function 'pricing:discount' is not declared"), error);
@@ -96,5 +121,24 @@ class BeanFunctionsTest {
     void aCallWithAnUnknownPrefixFails() {
         String error = failure("${sales:quote(book, 3)}");
         assertTrue(error.contains("The function 'sales:quote' is not declared"), error);
+    }
+
+    @Test
+    void theExactInterpretedMissingPrefixRegressionFailsCompilation() {
+        String source = """
+            package io.micronaut.el.test.functions;
+
+            import io.micronaut.el.annotation.*;
+
+            @ELExpression(value = "${missing:call()}", expectedType = Object.class)
+            public class Expressions {
+            }
+            """;
+        try (JavaParser parser = new JavaParser()) {
+            RuntimeException failure = assertThrows(RuntimeException.class,
+                () -> parser.generate(PACKAGE + ".Expressions", source));
+            assertTrue(failure.getMessage().contains("The function 'missing:call' is not declared"),
+                failure.getMessage());
+        }
     }
 }

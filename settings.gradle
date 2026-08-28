@@ -34,6 +34,7 @@ include 'test-suite-groovy'
 include 'test-suite-java'
 include 'test-suite-kotlin'
 include 'tests:jakarta-el-tck'
+include 'tests:jakarta-el-fuzz'
 
 micronautBuild {
     useStandardizedProjectNames.set(true)

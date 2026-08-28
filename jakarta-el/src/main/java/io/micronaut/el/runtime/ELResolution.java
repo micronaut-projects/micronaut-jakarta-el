@@ -34,7 +34,6 @@ import jakarta.el.VariableMapper;
 import java.util.List;
 import java.util.Map;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
@@ -257,6 +256,54 @@ public final class ELResolution {
     }
 
     /**
+     * Evaluates a property or method continuation only when its base is non-null. Section 1.6 evaluates the
+     * base first and returns {@code null} without evaluating the property or parameters when the base is null.
+     * Generated expressions use this helper so statically resolved, direct member accesses retain that order
+     * without falling back to reflective resolution.
+     *
+     * @param context The context
+     * @param base    The evaluated base
+     * @param access  The compiled continuation, receiving the non-null base
+     * @return The result, or {@code null} for a null base
+     */
+    @Nullable
+    public static Object access(ELContext context,
+                                @Nullable Object base,
+                                ELLambdaBody.Unary access) {
+        return base == null ? null : access.evaluate(context, base);
+    }
+
+    /**
+     * Evaluates an lvalue continuation after requiring its base. Assigning an lvalue with a null base fails
+     * before its property or assigned value is evaluated.
+     *
+     * @param context The context
+     * @param base    The evaluated base
+     * @param access  The compiled continuation
+     * @return The continuation result
+     */
+    @Nullable
+    public static Object accessRequired(ELContext context,
+                                        @Nullable Object base,
+                                        ELLambdaBody.Unary access) {
+        if (base == null) {
+            throw propertyNotFound(null, null);
+        }
+        return access.evaluate(context, base);
+    }
+
+    /**
+     * Requires the evaluated base of an lvalue to be non-null before its property or value is evaluated.
+     *
+     * @param base The evaluated base
+     */
+    public static void requireBase(@Nullable Object base) {
+        if (base == null) {
+            throw propertyNotFound(null, null);
+        }
+    }
+
+    /**
      * Resolves a property of a base object, failing when the base or the property is {@code null}.
      *
      * @param context  The context
@@ -382,7 +429,7 @@ public final class ELResolution {
     @Nullable
     public static Object invokeMethodExpression(ELContext context,
                                                 @Nullable Object target,
-                                                @Nullable Object[] arguments) {
+                                                Object @Nullable [] arguments) {
         if (target instanceof MethodExpression methodExpression) {
             return methodExpression.invoke(context, arguments);
         }
@@ -437,7 +484,7 @@ public final class ELResolution {
     public static Object invokeWithParams(ELContext context,
                                           @Nullable Object base,
                                           @Nullable Object method,
-                                          @Nullable Object[] params) {
+                                          Object @Nullable [] params) {
         return invoke(context, base, method, params == null ? new Object[0] : params);
     }
 
@@ -457,12 +504,12 @@ public final class ELResolution {
                                               @Nullable Object base,
                                               @Nullable Object method,
                                               Class<?> @Nullable [] paramTypes,
-                                              @Nullable Object[] params) {
+                                              Object @Nullable [] params) {
         if (base == null || method == null) {
             throw propertyNotFound(base, method);
         }
         Object[] arguments = params == null ? new Object[0] : params;
-        if (base instanceof LambdaExpression lambda) {
+        if (base instanceof LambdaExpression lambda && "invoke".equals(method)) {
             lambda.setELContext(context);
             return lambda.invoke(context, arguments);
         }
@@ -471,8 +518,10 @@ public final class ELResolution {
         if (context.isPropertyResolved()) {
             return result;
         }
-        throw new MethodNotFoundException("Cannot find the method '" + method + "' of "
-            + base.getClass().getName());
+        Method fallback = base instanceof ELClass elClass
+            ? ELMethods.findStaticMethod(elClass.getKlass(), method.toString(), paramTypes, arguments)
+            : ELMethods.findMethod(base.getClass(), method.toString(), paramTypes, arguments);
+        return ELMethods.invoke(context, fallback, base instanceof ELClass ? null : base, arguments);
     }
 
     /**
@@ -490,27 +539,7 @@ public final class ELResolution {
                                       Object base,
                                       Method method,
                                       Object @Nullable [] arguments) {
-        Class<?>[] parameterTypes = method.getParameterTypes();
-        Object[] provided = arguments == null ? new Object[0] : arguments;
-        if (provided.length != parameterTypes.length) {
-            throw new IllegalArgumentException("The method '" + method.getName() + "' expects "
-                + parameterTypes.length + " argument(s) but " + provided.length + " were provided");
-        }
-        Object[] coerced = new Object[parameterTypes.length];
-        for (int i = 0; i < parameterTypes.length; i++) {
-            coerced[i] = ELSupport.coerceToType(context, provided[i], parameterTypes[i]);
-        }
-        try {
-            return method.invoke(base, coerced);
-        } catch (IllegalAccessException e) {
-            throw new ELException("Cannot invoke the method '" + method.getName() + "'", e);
-        } catch (InvocationTargetException e) {
-            Throwable cause = e.getCause();
-            if (cause instanceof ELException elException) {
-                throw elException;
-            }
-            throw new ELException("The method '" + method.getName() + "' failed", cause);
-        }
+        return ELMethods.invoke(context, method, base, arguments);
     }
 
     /**
@@ -534,6 +563,22 @@ public final class ELResolution {
             return newInstance(context, elClass, arguments);
         }
         throw new MethodNotFoundException("The expression does not evaluate to an invocable value: " + target);
+    }
+
+    /**
+     * Resolves an identifier used as a function, reporting a missing identifier as a missing function.
+     *
+     * @param context The context
+     * @param name    The identifier
+     * @return The callable value
+     */
+    @Nullable
+    public static Object resolveCallableIdentifier(ELContext context, String name) {
+        try {
+            return resolveIdentifier(context, name);
+        } catch (PropertyNotFoundException e) {
+            throw new MethodNotFoundException("Cannot resolve the function '" + name + "'", e);
+        }
     }
 
     /**

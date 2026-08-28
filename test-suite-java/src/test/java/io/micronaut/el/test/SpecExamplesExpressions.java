@@ -65,7 +65,7 @@ import java.util.Map;
 @ELExpression(value = "${Suit.SPADE}", name = "staticField")
 @ELExpression(value = "${Suit.valueOf('CLUB')}", name = "staticMethod")
 @ELExpression(value = "${Integer.MAX_VALUE}", name = "javaLangStaticField")
-@ELExpression(value = "${Math.max(item.quantity, 7)}", name = "javaLangStaticMethod")
+@ELExpression(value = "${Math.max(item.quantity, Integer.valueOf(7))}", name = "javaLangStaticMethod")
 // 2.3 streams and optionals
 @ELExpression(value = "${item.tags.stream().sorted().toList()}", name = "streamSorted")
 @ELExpression(value = "${item.tags.stream().map(t -> t.length()).sum()}", name = "streamSum")

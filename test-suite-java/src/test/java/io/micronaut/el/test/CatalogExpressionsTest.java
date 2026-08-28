@@ -19,6 +19,7 @@ class CatalogExpressionsTest {
     private final CompiledELContext context = new CompiledELContext()
         .setBean("author", author)
         .setBean("books", books)
+        .setBean("strings", new String[]{"a", "b"})
         .setBean("customer", author);
 
     @Test
@@ -38,6 +39,9 @@ class CatalogExpressionsTest {
     void functions() {
         assertEquals(5, value(CatalogExpressions$ELExpressions.NAME_LENGTH));
         assertEquals("DENIS", value(CatalogExpressions$ELExpressions.UPPER_NAME));
+        assertEquals("a,b", value(CatalogExpressions$ELExpressions.FUNCTION_JOIN));
+        assertEquals("a,b", value(CatalogExpressions$ELExpressions.FUNCTION_ARRAY_JOIN));
+        assertEquals("a,b", value(CatalogExpressions$ELExpressions.STATIC_JOIN));
     }
 
     @Test
@@ -47,6 +51,8 @@ class CatalogExpressionsTest {
         assertEquals(Boolean.TRUE, value(CatalogExpressions$ELExpressions.BOOLEAN_CONSTANT));
         assertEquals(42, value(CatalogExpressions$ELExpressions.STATIC_METHOD));
         assertEquals("EL", ((Book) value(CatalogExpressions$ELExpressions.NEW_BOOK)).getTitle());
+        assertEquals("a,b", value(CatalogExpressions$ELExpressions.VARARGS_CONSTRUCTOR));
+        assertEquals("a,b", value(CatalogExpressions$ELExpressions.VARARGS));
     }
 
     @Test

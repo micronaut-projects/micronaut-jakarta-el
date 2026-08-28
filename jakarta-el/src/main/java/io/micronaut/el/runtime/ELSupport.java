@@ -25,12 +25,18 @@ import jakarta.el.LambdaExpression;
 
 import java.beans.PropertyEditor;
 import java.beans.PropertyEditorManager;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Array;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * The type conversion, comparison and emptiness rules of the Jakarta Expression Language specification.
@@ -43,6 +49,22 @@ import java.util.Map;
  */
 @Internal
 public final class ELSupport {
+
+    private static final ClassValue<Boolean> FUNCTIONAL_INTERFACES = new ClassValue<>() {
+        @Override
+        protected Boolean computeValue(Class<?> type) {
+            if (!type.isInterface() || type.isAnnotation() || type.isSealed()) {
+                return false;
+            }
+            Set<String> abstractMethods = new HashSet<>();
+            for (Method method : type.getMethods()) {
+                if (Modifier.isAbstract(method.getModifiers()) && !isObjectMethod(method)) {
+                    abstractMethods.add(method.getName() + java.util.Arrays.toString(method.getParameterTypes()));
+                }
+            }
+            return abstractMethods.size() == 1;
+        }
+    };
 
     private ELSupport() {
     }
@@ -62,8 +84,8 @@ public final class ELSupport {
         if (type == null) {
             return coerce(value, null);
         }
-        if (value instanceof LambdaExpression && type.isAnnotationPresent(FunctionalInterface.class)) {
-            return coerceToFunctionalInterface(context, value, type);
+        if (value instanceof LambdaExpression lambda && isFunctionalInterface(type)) {
+            return functionalInterface(context, lambda, type);
         }
         if (context != null) {
             ELResolver resolver = context.getELResolver();
@@ -102,8 +124,8 @@ public final class ELSupport {
     @SuppressWarnings({"unchecked", "java:S3776"})
     @Nullable
     public static <T> T coerce(@Nullable Object value, @Nullable Class<T> type) {
-        if (type != null && value instanceof LambdaExpression && type.isAnnotationPresent(FunctionalInterface.class)) {
-            return coerceToFunctionalInterface(null, value, type);
+        if (type != null && value instanceof LambdaExpression lambda && isFunctionalInterface(type)) {
+            return functionalInterface(null, lambda, type);
         }
         if (type == null || type == Object.class) {
             return (T) value;
@@ -167,24 +189,69 @@ public final class ELSupport {
     public static <T> T coerceToFunctionalInterface(@Nullable ELContext context,
                                                     @Nullable Object value,
                                                     @Nullable Class<T> type) {
-        if (type != null && value instanceof LambdaExpression lambda && type.isAnnotationPresent(FunctionalInterface.class)) {
-            if (context != null) {
-                lambda.setELContext(context);
-            }
-            return (T) Proxy.newProxyInstance(
-                type.getClassLoader(),
-                new Class<?>[]{type},
-                (proxy, method, args) -> {
-                    if (method.getDeclaringClass() == Object.class) {
-                        return method.invoke(lambda, args);
-                    }
-                    Object result = lambda.invoke(args == null ? new Object[0] : args);
-                    Class<?> returnType = method.getReturnType();
-                    return returnType == void.class ? null : coerceToType(context, result, returnType);
-                }
-            );
+        if (type != null && value instanceof LambdaExpression lambda && isFunctionalInterface(type)) {
+            return functionalInterface(context, lambda, type);
         }
         return coerceToType(context, value, type);
+    }
+
+    private static boolean isFunctionalInterface(@Nullable Class<?> type) {
+        return type != null && FUNCTIONAL_INTERFACES.get(type);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> T functionalInterface(@Nullable ELContext context, LambdaExpression lambda, Class<T> type) {
+        return (T) Proxy.newProxyInstance(
+            type.getClassLoader(),
+            new Class<?>[]{type},
+            (proxy, method, args) -> {
+                if (isObjectMethod(method)) {
+                    return switch (method.getName()) {
+                        case "equals" -> proxy == args[0];
+                        case "hashCode" -> System.identityHashCode(proxy);
+                        case "toString" -> lambda.toString();
+                        default -> throw new IllegalStateException("Unexpected Object method: " + method);
+                    };
+                }
+                if (method.isDefault()) {
+                    return invokeDefault(proxy, method, args == null ? new Object[0] : args);
+                }
+                Object[] arguments = args == null ? new Object[0] : args;
+                Object result = context == null ? lambda.invoke(arguments) : lambda.invoke(context, arguments);
+                Class<?> returnType = method.getReturnType();
+                return returnType == void.class ? null : coerceToType(context, result, returnType);
+            }
+        );
+    }
+
+    /**
+     * Invokes a default method of the coerced interface on the proxy.
+     *
+     * <p>The lookup in the interface itself is what a GraalVM native image can do:
+     * {@link InvocationHandler#invokeDefault} goes through the module the proxy was defined in, which cannot
+     * read the interface of an application there. An interface of a module that does not open its package
+     * keeps the standard call, which is the one that reaches it.</p>
+     */
+    private static Object invokeDefault(Object proxy, Method method, Object[] arguments) throws Throwable {
+        Class<?> declaringClass = method.getDeclaringClass();
+        MethodHandles.Lookup lookup;
+        try {
+            lookup = MethodHandles.privateLookupIn(declaringClass, MethodHandles.lookup());
+        } catch (IllegalAccessException e) {
+            return InvocationHandler.invokeDefault(proxy, method, arguments);
+        }
+        return lookup.unreflectSpecial(method, declaringClass)
+            .bindTo(proxy)
+            .invokeWithArguments(arguments);
+    }
+
+    private static boolean isObjectMethod(Method method) {
+        try {
+            Object.class.getMethod(method.getName(), method.getParameterTypes());
+            return true;
+        } catch (NoSuchMethodException e) {
+            return false;
+        }
     }
 
     /**
@@ -501,6 +568,18 @@ public final class ELSupport {
     }
 
     /**
+     * Evaluates the right operand and applies {@code <} only when the left operand is not {@code null}.
+     *
+     * @param left    The already evaluated left operand
+     * @param context The context for the compiled right operand
+     * @param right   The compiled right operand
+     * @return The result of the comparison
+     */
+    public static boolean lessThanLazy(@Nullable Object left, ELContext context, ELLambdaBody.Nullary right) {
+        return left != null && lessThan(left, right.evaluate(context));
+    }
+
+    /**
      * The {@code >} operator described in the section 1.9.1 of the specification.
      *
      * @param left  The left operand
@@ -512,6 +591,18 @@ public final class ELSupport {
             return false;
         }
         return compare(left, right) > 0;
+    }
+
+    /**
+     * Evaluates the right operand and applies {@code >} only when the left operand is not {@code null}.
+     *
+     * @param left    The already evaluated left operand
+     * @param context The context for the compiled right operand
+     * @param right   The compiled right operand
+     * @return The result of the comparison
+     */
+    public static boolean greaterThanLazy(@Nullable Object left, ELContext context, ELLambdaBody.Nullary right) {
+        return left != null && greaterThan(left, right.evaluate(context));
     }
 
     /**
@@ -723,6 +814,9 @@ public final class ELSupport {
         if (type == BigDecimal.class) {
             if (value instanceof BigInteger bigInteger) {
                 return new BigDecimal(bigInteger);
+            }
+            if (value instanceof Byte || value instanceof Short || value instanceof Integer || value instanceof Long) {
+                return BigDecimal.valueOf(value.longValue());
             }
             return new BigDecimal(value.doubleValue());
         }

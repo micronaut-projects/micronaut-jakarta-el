@@ -17,6 +17,7 @@ package io.micronaut.el.runtime;
 
 import io.micronaut.core.annotation.Experimental;
 import org.jspecify.annotations.Nullable;
+import jakarta.el.ELClass;
 import jakarta.el.ELContext;
 import jakarta.el.MethodExpression;
 import jakarta.el.MethodInfo;
@@ -35,26 +36,26 @@ import java.util.Objects;
  * @since 1.0
  */
 @Experimental
-public abstract class CompiledMethodExpression extends MethodExpression implements CompiledExpression {
+public abstract class CompiledMethodExpression extends MethodExpression implements CompiledExpression, ELExpressionIdentity {
 
     private static final long serialVersionUID = 1L;
     private static final Class<?>[] NO_PARAM_TYPES = new Class<?>[0];
 
     private final String expressionString;
     private final String canonicalForm;
-    private final Class<?> expectedReturnType;
+    private final @Nullable Class<?> expectedReturnType;
     private final Class<?> @Nullable [] expectedParamTypes;
     private final boolean parametersProvided;
 
     /**
      * @param expressionString    The original expression
-     * @param expectedReturnType  The expected return type
+     * @param expectedReturnType  The expected return type, or {@code null} to return the result without coercion
      * @param expectedParamTypes  The expected parameter types
      * @param parametersProvided  Whether the parameters are provided by the expression itself
      */
     protected CompiledMethodExpression(String expressionString,
-                                       Class<?> expectedReturnType,
-                                       @Nullable Class<?>[] expectedParamTypes,
+                                       @Nullable Class<?> expectedReturnType,
+                                       Class<?> @Nullable [] expectedParamTypes,
                                        boolean parametersProvided) {
         this(expressionString, expressionString, expectedReturnType, expectedParamTypes, parametersProvided);
     }
@@ -62,25 +63,25 @@ public abstract class CompiledMethodExpression extends MethodExpression implemen
     /**
      * @param expressionString   The original expression
      * @param canonicalForm      The canonical form of the expression, which is what equality compares
-     * @param expectedReturnType The expected return type
+     * @param expectedReturnType The expected return type, or {@code null} to return the result without coercion
      * @param expectedParamTypes The expected parameter types
      * @param parametersProvided Whether the parameters are provided by the expression itself
      */
     protected CompiledMethodExpression(String expressionString,
                                        String canonicalForm,
-                                       Class<?> expectedReturnType,
-                                       @Nullable Class<?>[] expectedParamTypes,
+                                       @Nullable Class<?> expectedReturnType,
+                                       Class<?> @Nullable [] expectedParamTypes,
                                        boolean parametersProvided) {
         this.expressionString = Objects.requireNonNull(expressionString, "expressionString");
         this.canonicalForm = Objects.requireNonNull(canonicalForm, "canonicalForm");
-        this.expectedReturnType = Objects.requireNonNull(expectedReturnType, "expectedReturnType");
-        this.expectedParamTypes = expectedParamTypes;
+        this.expectedReturnType = expectedReturnType;
+        this.expectedParamTypes = expectedParamTypes == null ? null : expectedParamTypes.clone();
         this.parametersProvided = parametersProvided;
     }
 
     /**
-     * Evaluates the base object the method is invoked on, {@code null} for a method expression consisting
-     * of a single identifier.
+     * Evaluates the base object the method is invoked on, or the resolved method expression for an expression
+     * consisting of a single identifier.
      *
      * @param context The context
      * @return The base object
@@ -103,7 +104,7 @@ public abstract class CompiledMethodExpression extends MethodExpression implemen
      * @return The result of the invocation, before the coercion to the expected return type
      */
     @Nullable
-    protected abstract Object doInvoke(ELContext context, @Nullable Object[] arguments);
+    protected abstract Object doInvoke(ELContext context, Object @Nullable [] arguments);
 
     /**
      * Evaluates the parameters an expression such as {@code ${bean.method(a, b)}} provides itself.
@@ -117,26 +118,43 @@ public abstract class CompiledMethodExpression extends MethodExpression implemen
 
     @Override
     @Nullable
-    public Object invoke(ELContext context, @Nullable Object[] params) {
+    public Object invoke(ELContext context, Object @Nullable [] params) {
         context.notifyBeforeEvaluation(expressionString);
         Object result = doInvoke(context, params);
+        Object coerced = expectedReturnType == null ? result
+            : expectedReturnType == void.class ? null : ELSupport.coerceToType(context, result, expectedReturnType);
         context.notifyAfterEvaluation(expressionString);
-        return expectedReturnType == void.class ? null : ELSupport.coerceToType(context, result, expectedReturnType);
+        return coerced;
     }
 
     @Override
     public MethodInfo getMethodInfo(ELContext context) {
-        Method method = findMethod(evaluateBase(context), evaluateProperty(context), evaluateArguments(context));
+        Object base = evaluateBase(context);
+        Object property = evaluateProperty(context);
+        if (property == null && base instanceof MethodExpression expression) {
+            return expression.getMethodInfo(context);
+        }
+        Method method = findMethod(base, property, evaluateArguments(context));
         return new MethodInfo(method.getName(), method.getReturnType(), method.getParameterTypes());
     }
 
     @Override
+    @Nullable
     public MethodReference getMethodReference(ELContext context) {
+        context.notifyBeforeEvaluation(expressionString);
         Object base = evaluateBase(context);
+        Object property = evaluateProperty(context);
+        if (property == null && base instanceof MethodExpression expression) {
+            MethodReference reference = expression.getMethodReference(context);
+            context.notifyAfterEvaluation(expressionString);
+            return reference;
+        }
         Object[] arguments = evaluateArguments(context);
-        Method method = findMethod(base, evaluateProperty(context), arguments);
+        Method method = findMethod(base, property, arguments);
         MethodInfo methodInfo = new MethodInfo(method.getName(), method.getReturnType(), method.getParameterTypes());
-        return new MethodReference(base, methodInfo, method.getAnnotations(), arguments);
+        MethodReference reference = new MethodReference(base, methodInfo, method.getAnnotations(), arguments);
+        context.notifyAfterEvaluation(expressionString);
+        return reference;
     }
 
     @Override
@@ -145,17 +163,29 @@ public abstract class CompiledMethodExpression extends MethodExpression implemen
     }
 
     /**
+     * Returns an equivalent expression that does not coerce its invocation result. Generated expression
+     * registries use this when a caller supplies no expected return type.
+     *
+     * @return This expression when it is already uncoerced, or an uncoerced view
+     * @since 1.0.1
+     */
+    public final MethodExpression withoutExpectedReturnType() {
+        return expectedReturnType == null ? this : new UncoercedMethodExpression(this);
+    }
+
+    /**
      * @return The expected return type
      */
     protected Class<?> getExpectedReturnType() {
-        return expectedReturnType;
+        return Objects.requireNonNull(expectedReturnType, "The expression has no expected return type");
     }
 
     /**
      * @return The expected parameter types
      */
     protected Class<?>[] getExpectedParamTypes() {
-        return expectedParamTypes == null ? NO_PARAM_TYPES : expectedParamTypes;
+        return expectedParamTypes == null ? NO_PARAM_TYPES
+            : Arrays.copyOf(expectedParamTypes, expectedParamTypes.length);
     }
 
     @Override
@@ -170,15 +200,20 @@ public abstract class CompiledMethodExpression extends MethodExpression implemen
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof CompiledMethodExpression other
-            && other.canonicalForm.equals(canonicalForm)
-            && other.expectedReturnType.equals(expectedReturnType)
-            && Arrays.equals(other.expectedParamTypes, expectedParamTypes);
+        Object unwrapped = obj instanceof MethodExpression expression ? ELVariableBindings.unwrap(expression) : obj;
+        return unwrapped instanceof MethodExpression
+            && unwrapped instanceof ELExpressionIdentity identity
+            && identity.equalityForm().equals(canonicalForm);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(canonicalForm, expectedReturnType, Arrays.hashCode(expectedParamTypes));
+        return canonicalForm.hashCode();
+    }
+
+    @Override
+    public final String equalityForm() {
+        return canonicalForm;
     }
 
     @Override
@@ -196,6 +231,45 @@ public abstract class CompiledMethodExpression extends MethodExpression implemen
         }
         // the parameters provided by the expression select the method, the declared types otherwise
         Class<?>[] paramTypes = arguments == null ? getExpectedParamTypes() : null;
-        return ELMethods.findMethod(base.getClass(), ELSupport.coerceToString(property), paramTypes, arguments);
+        String name = ELSupport.coerceToString(property);
+        return base instanceof ELClass elClass
+            ? ELMethods.findStaticMethod(elClass.getKlass(), name, paramTypes, arguments)
+            : ELMethods.findMethod(base.getClass(), name, paramTypes, arguments);
+    }
+
+    private static final class UncoercedMethodExpression extends CompiledMethodExpression {
+
+        private static final long serialVersionUID = 1L;
+
+        private final CompiledMethodExpression delegate;
+
+        private UncoercedMethodExpression(CompiledMethodExpression delegate) {
+            super(delegate.expressionString, delegate.canonicalForm, null, delegate.expectedParamTypes,
+                delegate.parametersProvided);
+            this.delegate = delegate;
+        }
+
+        @Override
+        @Nullable
+        protected Object evaluateBase(ELContext context) {
+            return delegate.evaluateBase(context);
+        }
+
+        @Override
+        @Nullable
+        protected Object evaluateProperty(ELContext context) {
+            return delegate.evaluateProperty(context);
+        }
+
+        @Override
+        @Nullable
+        protected Object doInvoke(ELContext context, Object @Nullable [] arguments) {
+            return delegate.doInvoke(context, arguments);
+        }
+
+        @Override
+        protected Object @Nullable [] evaluateArguments(ELContext context) {
+            return delegate.evaluateArguments(context);
+        }
     }
 }

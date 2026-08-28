@@ -48,7 +48,8 @@ public Dashboard newDashboard(Customer customer) { ... }
 
 When the expression itself is data — a discount rule from a database, a condition an operator edits — add the
 <<runtimeParsing,interpreter module>> and create the expression from its string with the standard
-`jakarta.el.ExpressionFactory`; everything an application declares in source stays compiled.
+`jakarta.el.ExpressionFactory`; everything an application declares in source stays compiled. The rule source
+must be fully trusted because runtime expressions are executable application code, not sandboxed data.
 
 === Building your own annotation
 

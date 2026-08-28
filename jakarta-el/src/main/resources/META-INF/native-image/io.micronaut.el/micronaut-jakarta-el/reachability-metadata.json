@@ -1,0 +1,96 @@
+{
+  "reflection": [
+    {
+      "comment": "An expression is serializable, section 1.14 of the specification. Deserialization needs the constructor of the first non-serializable superclass of every class in the hierarchy, so the hierarchy of the runtime is declared here; the classes generated for the declared expressions are declared by the annotation processor, next to their registry.",
+      "type": "jakarta.el.Expression",
+      "serializable": true
+    },
+    {
+      "type": "jakarta.el.ValueExpression",
+      "serializable": true
+    },
+    {
+      "type": "jakarta.el.MethodExpression",
+      "serializable": true
+    },
+    {
+      "type": "io.micronaut.el.runtime.CompiledValueExpression",
+      "serializable": true
+    },
+    {
+      "type": "io.micronaut.el.runtime.CompiledMethodExpression",
+      "serializable": true
+    },
+    {
+      "type": "io.micronaut.el.runtime.LiteralValueExpression",
+      "serializable": true
+    },
+    {
+      "type": "io.micronaut.el.runtime.LiteralMethodExpression",
+      "serializable": true
+    },
+    {
+      "type": "io.micronaut.el.runtime.ObjectValueExpression",
+      "serializable": true
+    },
+    {
+      "comment": "The variables an expression is bound to at creation time travel with it.",
+      "type": "io.micronaut.el.runtime.ELVariableBindings$Bindings",
+      "serializable": true
+    },
+    {
+      "type": "io.micronaut.el.runtime.ELVariableBindings$BoundValueExpression",
+      "serializable": true
+    },
+    {
+      "type": "io.micronaut.el.runtime.ELVariableBindings$BoundCompiledValueExpression",
+      "serializable": true
+    },
+    {
+      "type": "io.micronaut.el.runtime.ELVariableBindings$BoundMethodExpression",
+      "serializable": true
+    },
+    {
+      "type": "io.micronaut.el.runtime.ELVariableBindings$BoundCompiledMethodExpression",
+      "serializable": true
+    },
+    {
+      "comment": "The state an expression writes: its text, and the expected types it was created with.",
+      "type": "java.lang.String",
+      "serializable": true
+    },
+    {
+      "type": "java.lang.Class",
+      "serializable": true
+    },
+    {
+      "type": "java.lang.Class[]",
+      "serializable": true
+    },
+    {
+      "comment": "The literal types an expression carries as the parameters it provides itself, section 1.19 of the specification.",
+      "type": "java.lang.Number",
+      "serializable": true
+    },
+    {
+      "type": "java.lang.Long",
+      "serializable": true
+    },
+    {
+      "type": "java.lang.Double",
+      "serializable": true
+    },
+    {
+      "type": "java.lang.Boolean",
+      "serializable": true
+    },
+    {
+      "type": "java.math.BigInteger",
+      "serializable": true
+    },
+    {
+      "type": "java.math.BigDecimal",
+      "serializable": true
+    }
+  ]
+}
