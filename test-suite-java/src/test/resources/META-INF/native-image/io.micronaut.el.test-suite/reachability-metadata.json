@@ -1,0 +1,116 @@
+{
+  "reflection": [
+    {
+      "comment": "The intentionally dynamic examples: methods without @Executable are invoked through the reflective resolvers of the specification, and MethodExpression.getMethodInfo has a java.lang.reflect contract.",
+      "type": "io.micronaut.el.test.Book",
+      "allPublicMethods": true
+    },
+    {
+      "type": "io.micronaut.el.test.Inventory",
+      "allPublicMethods": true
+    },
+    {
+      "type": "io.micronaut.el.test.Author",
+      "allPublicMethods": true
+    },
+    {
+      "comment": "A bean without an introspection: every one of its methods resolves through jakarta.el.BeanELResolver.",
+      "type": "io.micronaut.el.test.Varargs",
+      "allPublicMethods": true
+    },
+    {
+      "comment": "An expanded variable arity call is left to the reflective resolver, because BeanMethod does not carry the variable arity flag; the fixed arity executables of the type still go through the introspection.",
+      "type": "io.micronaut.el.test.Formatting",
+      "methods": [
+        {
+          "name": "format",
+          "parameterTypes": [
+            "java.lang.String",
+            "java.lang.Object[]"
+          ]
+        },
+        {
+          "name": "join",
+          "parameterTypes": [
+            "java.lang.String",
+            "java.lang.Object[]"
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "Invoked statically through an imported class, jakarta.el.StaticFieldELResolver.",
+      "type": "java.lang.Integer",
+      "methods": [
+        {
+          "name": "valueOf",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.lang.Math",
+      "methods": [
+        {
+          "name": "max",
+          "parameterTypes": [
+            "int",
+            "int"
+          ]
+        },
+        {
+          "name": "max",
+          "parameterTypes": [
+            "double",
+            "double"
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "Invoked inside a stored lambda, where the method of the java.lang.String argument resolves reflectively.",
+      "type": "java.lang.String",
+      "methods": [
+        {
+          "name": "length",
+          "parameterTypes": []
+        },
+        {
+          "name": "toUpperCase",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "comment": "A method expression over a list: the method is found on the interface, and the immutable implementation is the class the resolver reflects on.",
+      "type": "java.util.List",
+      "methods": [
+        {
+          "name": "size",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.util.ImmutableCollections$ListN"
+    },
+    {
+      "comment": "A LambdaExpression is coerced to a functional interface with a dynamic proxy, section 1.25.8 of the specification: one stored in a variable, and one passed as the argument of a method.",
+      "type": {
+        "proxy": [
+          "java.util.function.Predicate"
+        ]
+      }
+    },
+    {
+      "comment": "A lambda passed as the argument of a method is coerced to the functional interface it declares, and a default method of that interface is called on the proxy.",
+      "type": {
+        "proxy": [
+          "io.micronaut.el.test.Formatting$TextMapper"
+        ]
+      }
+    }
+  ]
+}

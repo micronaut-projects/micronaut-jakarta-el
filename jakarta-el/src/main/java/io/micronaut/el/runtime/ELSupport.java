@@ -25,6 +25,7 @@ import jakarta.el.LambdaExpression;
 
 import java.beans.PropertyEditor;
 import java.beans.PropertyEditorManager;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -213,7 +214,7 @@ public final class ELSupport {
                     };
                 }
                 if (method.isDefault()) {
-                    return InvocationHandler.invokeDefault(proxy, method, args == null ? new Object[0] : args);
+                    return invokeDefault(proxy, method, args == null ? new Object[0] : args);
                 }
                 Object[] arguments = args == null ? new Object[0] : args;
                 Object result = context == null ? lambda.invoke(arguments) : lambda.invoke(context, arguments);
@@ -221,6 +222,27 @@ public final class ELSupport {
                 return returnType == void.class ? null : coerceToType(context, result, returnType);
             }
         );
+    }
+
+    /**
+     * Invokes a default method of the coerced interface on the proxy.
+     *
+     * <p>The lookup in the interface itself is what a GraalVM native image can do:
+     * {@link InvocationHandler#invokeDefault} goes through the module the proxy was defined in, which cannot
+     * read the interface of an application there. An interface of a module that does not open its package
+     * keeps the standard call, which is the one that reaches it.</p>
+     */
+    private static Object invokeDefault(Object proxy, Method method, Object[] arguments) throws Throwable {
+        Class<?> declaringClass = method.getDeclaringClass();
+        MethodHandles.Lookup lookup;
+        try {
+            lookup = MethodHandles.privateLookupIn(declaringClass, MethodHandles.lookup());
+        } catch (IllegalAccessException e) {
+            return InvocationHandler.invokeDefault(proxy, method, arguments);
+        }
+        return lookup.unreflectSpecial(method, declaringClass)
+            .bindTo(proxy)
+            .invokeWithArguments(arguments);
     }
 
     private static boolean isObjectMethod(Method method) {

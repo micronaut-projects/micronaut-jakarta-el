@@ -1,6 +1,0 @@
-[
-  {
-    "comment": "A LambdaExpression stored in a variable is coerced to a functional interface with a dynamic proxy, section 1.25.8 of the specification.",
-    "interfaces": ["java.util.function.Predicate"]
-  }
-]

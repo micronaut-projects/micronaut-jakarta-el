@@ -219,6 +219,7 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
             }
             context.visitServiceDescriptor(ELExpressionSource.class.getName(), sourceClassName, element);
             visitNativeImageProperties(sourceClassName, generated, element, context);
+            visitNativeImageMetadata(sourceClassName, compiledValues, compiledMethods, element, context);
         } catch (ELParsingException | ELCompilationException | ProcessingException e) {
             processed.remove(element.getName());
             throw new ProcessingException(element, reportable(e), e);
@@ -251,6 +252,41 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
                     writer.write("Args = --initialize-at-build-time=" + classes + "\n");
                 } catch (IOException e) {
                     throw new ProcessingException(element, "Failed to write the native-image properties: " + e.getMessage(), e);
+                }
+            });
+    }
+
+    /**
+     * Registers the generated expressions for deserialization in a GraalVM native image.
+     *
+     * <p>An expression is serializable, section 1.14 of the specification. GraalVM builds the constructor an
+     * {@code ObjectInputStream} needs only for the classes declared as serializable, so every generated class
+     * is declared here, next to the registry it belongs to; the runtime declares its own hierarchy.</p>
+     */
+    private static void visitNativeImageMetadata(String sourceClassName,
+                                                 List<ExpressionSourceWriter.CompiledValue> compiledValues,
+                                                 List<ExpressionSourceWriter.CompiledMethod> compiledMethods,
+                                                 ClassElement element,
+                                                 VisitorContext context) {
+        List<String> serializable = new ArrayList<>(compiledValues.size() + compiledMethods.size());
+        for (ExpressionSourceWriter.CompiledValue value : compiledValues) {
+            serializable.add(value.className());
+        }
+        for (ExpressionSourceWriter.CompiledMethod method : compiledMethods) {
+            serializable.add(method.className());
+        }
+        if (serializable.isEmpty()) {
+            return;
+        }
+        String types = serializable.stream()
+            .map(name -> "    {\n      \"type\": \"" + name + "\",\n      \"serializable\": true\n    }")
+            .collect(java.util.stream.Collectors.joining(",\n"));
+        context.visitMetaInfFile("native-image/io.micronaut.el.generated/" + sourceClassName + "/reachability-metadata.json", element)
+            .ifPresent(file -> {
+                try (Writer writer = file.openWriter()) {
+                    writer.write("{\n  \"reflection\": [\n" + types + "\n  ]\n}\n");
+                } catch (IOException e) {
+                    throw new ProcessingException(element, "Failed to write the native image metadata: " + e.getMessage(), e);
                 }
             });
     }
