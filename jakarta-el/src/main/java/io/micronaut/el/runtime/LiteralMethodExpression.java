@@ -72,7 +72,7 @@ public final class LiteralMethodExpression extends CompiledMethodExpression {
     }
 
     @Override
-    @SuppressWarnings("NullAway")
+    @Nullable
     public MethodReference getMethodReference(ELContext context) {
         context.notifyBeforeEvaluation(getExpressionString());
         context.notifyAfterEvaluation(getExpressionString());

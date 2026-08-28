@@ -96,20 +96,7 @@ public final class ELNodes {
             case ELNode.FloatingPointLiteral literal -> out.append(literal.image());
             case ELNode.StringLiteral literal -> appendString(out, literal.value());
             case ELNode.Identifier identifier -> out.append(identifier.name());
-            case ELNode.Function function -> {
-                String mapped = functionName.apply(function.prefix(), function.localName());
-                if (mapped != null) {
-                    out.append(mapped);
-                } else {
-                    if (!function.prefix().isEmpty()) {
-                        out.append(function.prefix()).append(':');
-                    }
-                    out.append(function.localName());
-                }
-                for (List<ELNode> invocation : function.invocations()) {
-                    appendArguments(out, invocation, functionName);
-                }
-            }
+            case ELNode.Function function -> appendFunction(out, function, functionName);
             case ELNode.Property property -> {
                 append(out, property.base(), functionName);
                 out.append('[');
@@ -226,6 +213,27 @@ public final class ELNodes {
             out.append(c);
         }
         out.append('"');
+    }
+
+    /**
+     * Appends a function call: the name the mapping gives it, so that two expressions calling the same method
+     * under different prefixes have the same form, or its own prefixed name when the mapping has none.
+     */
+    private static void appendFunction(StringBuilder out,
+                                       ELNode.Function function,
+                                       BiFunction<String, String, @Nullable String> functionName) {
+        String mapped = functionName.apply(function.prefix(), function.localName());
+        if (mapped == null) {
+            if (!function.prefix().isEmpty()) {
+                out.append(function.prefix()).append(':');
+            }
+            out.append(function.localName());
+        } else {
+            out.append(mapped);
+        }
+        for (List<ELNode> invocation : function.invocations()) {
+            appendArguments(out, invocation, functionName);
+        }
     }
 
     private static void appendLiteralText(StringBuilder out, String text) {

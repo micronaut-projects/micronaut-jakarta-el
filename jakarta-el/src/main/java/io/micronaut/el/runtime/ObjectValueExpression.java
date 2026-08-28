@@ -36,6 +36,12 @@ public final class ObjectValueExpression extends ValueExpression {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * The value the caller wrapped. Whether it can be written is the caller's: an expression is serializable,
+     * section 1.14 of the specification, and this one is only as serializable as the value it was given, just
+     * like the {@code ValueExpression} the reference implementation creates for a value.
+     */
+    @SuppressWarnings("java:S1948")
     private final @Nullable Object value;
     private final Class<?> expectedType;
 

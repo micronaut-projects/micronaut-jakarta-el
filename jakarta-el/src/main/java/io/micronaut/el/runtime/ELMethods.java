@@ -294,8 +294,20 @@ public final class ELMethods {
         if (varArgs ? matchingTypes.length < parameterTypes.length - 1 : matchingTypes.length != parameterTypes.length) {
             return Match.NONE;
         }
-        Match match = Match.EXACT;
         int fixed = varArgs ? parameterTypes.length - 1 : parameterTypes.length;
+        Match match = matchFixed(parameterTypes, matchingTypes, arguments, fixed);
+        if (match == Match.NONE || !varArgs) {
+            return match;
+        }
+        return matchVarArgs(parameterTypes[fixed], matchingTypes, arguments, fixed);
+    }
+
+    /**
+     * The match of the arguments the parameters take one by one: the weakest of their matches, as the section
+     * 1.6 of the specification prefers a method whose parameters all take their argument as it is.
+     */
+    private static Match matchFixed(Class<?>[] parameterTypes, Class<?>[] matchingTypes, Object[] arguments, int fixed) {
+        Match match = Match.EXACT;
         for (int i = 0; i < fixed; i++) {
             Match argument = match(parameterTypes[i], matchingTypes[i], argument(arguments, i));
             if (argument == Match.NONE) {
@@ -305,20 +317,24 @@ public final class ELMethods {
                 match = argument;
             }
         }
-        if (varArgs) {
-            Class<?> arrayType = parameterTypes[parameterTypes.length - 1];
-            if (matchingTypes.length == parameterTypes.length && arrayType == matchingTypes[fixed]) {
-                return Match.VARARGS;
-            }
-            Class<?> componentType = arrayType.getComponentType();
-            for (int i = fixed; i < matchingTypes.length; i++) {
-                if (match(componentType, matchingTypes[i], argument(arguments, i)) == Match.NONE) {
-                    return Match.NONE;
-                }
-            }
+        return match;
+    }
+
+    /**
+     * The match of the trailing arguments of a variable arity call: the array given directly, or the arguments
+     * the call packs into one.
+     */
+    private static Match matchVarArgs(Class<?> arrayType, Class<?>[] matchingTypes, Object[] arguments, int fixed) {
+        if (matchingTypes.length == fixed + 1 && arrayType == matchingTypes[fixed]) {
             return Match.VARARGS;
         }
-        return match;
+        Class<?> componentType = arrayType.getComponentType();
+        for (int i = fixed; i < matchingTypes.length; i++) {
+            if (match(componentType, matchingTypes[i], argument(arguments, i)) == Match.NONE) {
+                return Match.NONE;
+            }
+        }
+        return Match.VARARGS;
     }
 
     private static Match match(Class<?> parameterType,
@@ -390,19 +406,43 @@ public final class ELMethods {
             if (firstType == secondType) {
                 continue;
             }
-            int comparison = secondType.isAssignableFrom(firstType) ? 1
-                : firstType.isAssignableFrom(secondType) ? -1
-                : numericSpecificity(firstType, secondType,
-                    i < argumentTypes.length ? argumentTypes[i] : null, elSpecific);
+            int comparison = compareParameter(firstType, secondType,
+                i < argumentTypes.length ? argumentTypes[i] : null, elSpecific);
+            // neither parameter is the more specific one, or the methods each win a parameter
             if (comparison == 0 || (result != 0 && result != comparison)) {
                 return 0;
             }
             result = comparison;
         }
-        if (result == 0 && first.method().isBridge() != second.method().isBridge()) {
-            return first.method().isBridge() ? -1 : 1;
+        return result == 0 ? compareBridge(first, second) : result;
+    }
+
+    /**
+     * Which of two parameters of the same position is the more specific one: the one the other is assignable
+     * to, or, when neither is, the numeric one for a numeric argument of an EL-specific call.
+     */
+    private static int compareParameter(Class<?> firstType,
+                                        Class<?> secondType,
+                                        @Nullable Class<?> argumentType,
+                                        boolean elSpecific) {
+        if (secondType.isAssignableFrom(firstType)) {
+            return 1;
         }
-        return result;
+        if (firstType.isAssignableFrom(secondType)) {
+            return -1;
+        }
+        return numericSpecificity(firstType, secondType, argumentType, elSpecific);
+    }
+
+    /**
+     * The declaration a bridge method was generated for wins over the bridge itself, whose erased parameters
+     * are equally specific.
+     */
+    private static int compareBridge(Candidate first, Candidate second) {
+        if (first.method().isBridge() == second.method().isBridge()) {
+            return 0;
+        }
+        return first.method().isBridge() ? -1 : 1;
     }
 
     private static Class<?>[] comparisonTypes(Candidate candidate, int length) {

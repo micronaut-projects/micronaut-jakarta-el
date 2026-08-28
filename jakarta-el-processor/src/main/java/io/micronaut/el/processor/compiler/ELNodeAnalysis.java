@@ -53,26 +53,40 @@ final class ELNodeAnalysis {
                                          Map<String, Integer> lambdas,
                                          boolean inLambda,
                                          Set<String> parameters) {
-        if (node instanceof ELNode.Identifier identifier) {
-            if (!parameters.contains(identifier.name())) {
-                (inLambda ? lambdas : direct).merge(identifier.name(), 1, Integer::sum);
-            }
-        } else if (node instanceof ELNode.Lambda lambda) {
-            if (inLambda) {
-                countIdentifiers(lambda.body(), direct, lambdas, true, bound(parameters, lambda));
-            }
-        } else if (node instanceof ELNode.Method method) {
-            countIdentifiers(method.base(), direct, lambdas, inLambda, parameters);
-            countIdentifiers(method.property(), direct, lambdas, inLambda, parameters);
-            for (ELNode argument : method.arguments()) {
-                if (argument instanceof ELNode.Lambda lambda) {
-                    countIdentifiers(lambda.body(), direct, lambdas, true, bound(parameters, lambda));
-                } else {
-                    countIdentifiers(argument, direct, lambdas, inLambda, parameters);
+        switch (node) {
+            case ELNode.Identifier identifier -> {
+                if (!parameters.contains(identifier.name())) {
+                    (inLambda ? lambdas : direct).merge(identifier.name(), 1, Integer::sum);
                 }
             }
-        } else {
-            children(node).forEach(child -> countIdentifiers(child, direct, lambdas, inLambda, parameters));
+            // a lambda outside one is counted where it is invoked, with its arguments bound
+            case ELNode.Lambda lambda -> {
+                if (inLambda) {
+                    countIdentifiers(lambda.body(), direct, lambdas, true, bound(parameters, lambda));
+                }
+            }
+            case ELNode.Method method -> countMethodIdentifiers(method, direct, lambdas, inLambda, parameters);
+            default -> children(node).forEach(child -> countIdentifiers(child, direct, lambdas, inLambda, parameters));
+        }
+    }
+
+    /**
+     * Counts the identifiers of an invocation, whose lambda arguments are invoked by the method it calls and
+     * are therefore counted as a lambda body rather than as part of the expression around them.
+     */
+    private static void countMethodIdentifiers(ELNode.Method method,
+                                               Map<String, Integer> direct,
+                                               Map<String, Integer> lambdas,
+                                               boolean inLambda,
+                                               Set<String> parameters) {
+        countIdentifiers(method.base(), direct, lambdas, inLambda, parameters);
+        countIdentifiers(method.property(), direct, lambdas, inLambda, parameters);
+        for (ELNode argument : method.arguments()) {
+            if (argument instanceof ELNode.Lambda lambda) {
+                countIdentifiers(lambda.body(), direct, lambdas, true, bound(parameters, lambda));
+            } else {
+                countIdentifiers(argument, direct, lambdas, inLambda, parameters);
+            }
         }
     }
 

@@ -26,6 +26,7 @@ import jakarta.el.MethodReference;
 import jakarta.el.PropertyNotFoundException;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -138,6 +139,7 @@ public abstract class CompiledMethodExpression extends MethodExpression implemen
     }
 
     @Override
+    @Nullable
     public MethodReference getMethodReference(ELContext context) {
         context.notifyBeforeEvaluation(expressionString);
         Object base = evaluateBase(context);
@@ -182,7 +184,8 @@ public abstract class CompiledMethodExpression extends MethodExpression implemen
      * @return The expected parameter types
      */
     protected Class<?>[] getExpectedParamTypes() {
-        return expectedParamTypes == null ? NO_PARAM_TYPES : expectedParamTypes.clone();
+        return expectedParamTypes == null ? NO_PARAM_TYPES
+            : Arrays.copyOf(expectedParamTypes, expectedParamTypes.length);
     }
 
     @Override

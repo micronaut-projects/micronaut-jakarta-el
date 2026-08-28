@@ -93,6 +93,7 @@ final class InterpretedMethodExpression extends MethodExpression implements ELEx
     }
 
     @Override
+    @Nullable
     public MethodReference getMethodReference(ELContext context) {
         context.notifyBeforeEvaluation(expressionString);
         MethodExpression identifier = identifierMethodExpression(context);

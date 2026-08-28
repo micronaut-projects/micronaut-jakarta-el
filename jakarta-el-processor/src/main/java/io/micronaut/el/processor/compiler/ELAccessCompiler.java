@@ -232,26 +232,16 @@ final class ELAccessCompiler {
                     scope.put(capture.getKey(), new ELCompiler.Typed(parameters.get(parameterIndex++),
                         capture.getValue().type()));
                 }
-                ClassElement baseType = base.type();
-                ELCompiler.Typed nonNullBase = baseType == null || baseType.isPrimitive()
-                    || ELCompiler.isUnknown(baseType) ? ELCompiler.dynamic(parameter)
-                    : new ELCompiler.Typed(parameter, baseType);
                 context.enterLambdaScope(scope, true);
                 try {
-                    ELCompiler.Typed result = continuation.apply(nonNullBase, accessContext);
+                    ELCompiler.Typed result = continuation.apply(accessBase(base, parameter), accessContext);
                     resultType[0] = result.type();
                     ExpressionDef expression = primitiveReturn == null ? result.expression()
                         : Objects.requireNonNull(result.primitiveExpression());
-                    returnType[0] = primitiveReturn == null
-                        ? expression.type() instanceof TypeDef.Primitive primitive ? primitive.wrapperType()
-                        : expression.type().equals(TypeDef.VOID) ? TypeDef.OBJECT : expression.type()
-                        : primitiveReturn;
+                    returnType[0] = accessReturnType(primitiveReturn, expression);
                     StatementDef whenNull = (primitiveReturn == null
                         ? ExpressionDef.nullValue().cast(returnType[0]) : primitiveDefault(primitiveReturn)).returning();
-                    StatementDef whenPresent = expression.type().equals(TypeDef.VOID)
-                        ? StatementDef.multi((StatementDef) expression, ExpressionDef.nullValue().returning())
-                        : (expression.type() instanceof TypeDef.Primitive && primitiveReturn == null
-                            ? ELCompiler.boxed(expression).cast(returnType[0]) : expression).returning();
+                    StatementDef whenPresent = whenBasePresent(expression, returnType[0], primitiveReturn);
                     if (required) {
                         return StatementDef.multi(
                             (StatementDef) compiler.runtime(EL_RESOLUTION, "requireBase", TypeDef.VOID, parameter),
@@ -274,6 +264,47 @@ final class ELAccessCompiler {
         return new AccessHelper(Objects.requireNonNull(generatedType), typedMethod, resultType[0]);
     }
 
+    /**
+     * The base the continuation compiles against inside the access method: the parameter of the method, typed
+     * as the base was, unless the base has no reference type to give it.
+     */
+    private static ELCompiler.Typed accessBase(ELCompiler.Typed base, ExpressionDef parameter) {
+        ClassElement baseType = base.type();
+        if (baseType == null || baseType.isPrimitive() || ELCompiler.isUnknown(baseType)) {
+            return ELCompiler.dynamic(parameter);
+        }
+        return new ELCompiler.Typed(parameter, baseType);
+    }
+
+    /**
+     * The type the access method returns: the primitive it was asked for, or the type of the compiled access,
+     * boxed, with a void access returning {@code null} as an {@link Object}.
+     */
+    private static TypeDef accessReturnType(TypeDef.@Nullable Primitive primitiveReturn, ExpressionDef expression) {
+        if (primitiveReturn != null) {
+            return primitiveReturn;
+        }
+        if (expression.type() instanceof TypeDef.Primitive primitive) {
+            return primitive.wrapperType();
+        }
+        return expression.type().equals(TypeDef.VOID) ? TypeDef.OBJECT : expression.type();
+    }
+
+    /**
+     * The statement the access method runs when the base is there: the access, returning its value.
+     */
+    private static StatementDef whenBasePresent(ExpressionDef expression,
+                                                TypeDef returnType,
+                                                TypeDef.@Nullable Primitive primitiveReturn) {
+        if (expression.type().equals(TypeDef.VOID)) {
+            return StatementDef.multi((StatementDef) expression, ExpressionDef.nullValue().returning());
+        }
+        if (expression.type() instanceof TypeDef.Primitive && primitiveReturn == null) {
+            return ELCompiler.boxed(expression).cast(returnType).returning();
+        }
+        return expression.returning();
+    }
+
     private ELCompiler.Typed guardedAccess(
         ELCompiler.Typed base,
         ExpressionDef ctx,
@@ -287,24 +318,14 @@ final class ELAccessCompiler {
             () -> continuation.apply(new ELCompiler.Typed(baseLocal, base.type(), base.primitiveExpression()), ctx));
         ClassElement resultType = result.type();
         TypeDef.Primitive primitive = result.expression().type() instanceof TypeDef.Primitive value ? value : null;
-        TypeDef localType = primitive != null ? primitive.wrapperType()
-            : result.expression().type().equals(TypeDef.VOID) ? TypeDef.OBJECT : result.expression().type();
+        TypeDef localType = accessLocalType(result.expression(), primitive);
         VariableDef.Local resultLocal = new VariableDef.Local("accessResult" + locals++, localType);
         if (!required && accessStatements.isEmpty() && !result.expression().type().equals(TypeDef.VOID)) {
-            ExpressionDef value = primitive == null ? result.expression()
-                : ELCompiler.boxed(result.expression()).cast(localType);
+            // the access is a single expression, so the guard is a conditional rather than a branch
             statements.add(new StatementDef.DefineAndAssign(resultLocal, new ExpressionDef.IfElse(
-                baseLocal.isNull(), ExpressionDef.nullValue().cast(localType), value)));
-            if (resultType == null) {
-                return ELCompiler.dynamic(resultLocal);
-            }
-            if (primitive == null) {
-                return new ELCompiler.Typed(resultLocal, resultType);
-            }
-            ExpressionDef primitiveValue = new ExpressionDef.IfElse(
-                resultLocal.isNull(), primitiveDefault(primitive), resultLocal.cast(primitive));
-            return new ELCompiler.Typed(resultLocal,
-                ClassElement.of(ELCompiler.wrapperClass(resultType.getName())), primitiveValue);
+                baseLocal.isNull(), ExpressionDef.nullValue().cast(localType),
+                boxedValue(result.expression(), primitive, localType))));
+            return guardedResult(resultLocal, resultType, primitive);
         }
         statements.add(new StatementDef.DefineAndAssign(resultLocal, ExpressionDef.nullValue().cast(localType)));
         if (required) {
@@ -313,13 +334,42 @@ final class ELAccessCompiler {
         if (result.expression().type().equals(TypeDef.VOID)) {
             accessStatements.add((StatementDef) result.expression());
         } else {
-            ExpressionDef value = primitive == null ? result.expression()
-                : ELCompiler.boxed(result.expression()).cast(localType);
-            accessStatements.add(resultLocal.assign(value));
+            accessStatements.add(resultLocal.assign(boxedValue(result.expression(), primitive, localType)));
         }
         StatementDef access = StatementDef.multi(accessStatements);
         statements.add(required ? access : new StatementDef.If(new ExpressionDef.IsNotNull(baseLocal), access));
-        if (resultType == null || resultType.getName().equals("void")) {
+        return guardedResult(resultLocal,
+            resultType != null && resultType.getName().equals("void") ? null : resultType, primitive);
+    }
+
+    /**
+     * The type of the local holding the result of a guarded access: the wrapper of a primitive result, so that
+     * a missing base leaves it {@code null}, and {@link Object} for an access evaluated for its effect only.
+     */
+    private static TypeDef accessLocalType(ExpressionDef expression, TypeDef.@Nullable Primitive primitive) {
+        if (primitive != null) {
+            return primitive.wrapperType();
+        }
+        return expression.type().equals(TypeDef.VOID) ? TypeDef.OBJECT : expression.type();
+    }
+
+    /**
+     * The value assigned to that local: a primitive result is boxed into it.
+     */
+    private static ExpressionDef boxedValue(ExpressionDef expression,
+                                            TypeDef.@Nullable Primitive primitive,
+                                            TypeDef localType) {
+        return primitive == null ? expression : ELCompiler.boxed(expression).cast(localType);
+    }
+
+    /**
+     * The result of a guarded access as the compiler reads it: the local, typed as the access was, and, for a
+     * primitive access, with the expression unboxing it back with the default of a missing base.
+     */
+    private static ELCompiler.Typed guardedResult(VariableDef.Local resultLocal,
+                                                  @Nullable ClassElement resultType,
+                                                  TypeDef.@Nullable Primitive primitive) {
+        if (resultType == null) {
             return ELCompiler.dynamic(resultLocal);
         }
         if (primitive == null) {

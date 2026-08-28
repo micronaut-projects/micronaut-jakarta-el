@@ -619,6 +619,7 @@ class ELInterpreterTest {
 
             @Override
             public void setValue(ELContext context, Object base, Object property, Object value) {
+                // read only: the resolver leaves the assignment to the rest of the chain
             }
 
             @Override
@@ -695,6 +696,7 @@ class ELInterpreterTest {
 
         @Override
         public void setValue(ELContext context, Object base, Object property, Object value) {
+            // read only: the resolver leaves the assignment to the rest of the chain
         }
 
         @Override

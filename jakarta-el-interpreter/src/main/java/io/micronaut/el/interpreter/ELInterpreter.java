@@ -472,25 +472,38 @@ final class ELInterpreter {
                                       ELNode node,
                                       Map<String, BoundFunction> bindings) {
         if (node instanceof ELNode.Function function) {
-            Method method = functionMapper == null ? null
-                : functionMapper.resolveFunction(function.prefix(), function.localName());
-            if (method != null) {
-                int count = function.invocations().get(0).size();
-                int parameters = method.getParameterCount();
-                if (method.isVarArgs() ? count < parameters - 1 : count != parameters) {
-                    throw new ELException("The function '" + qualifiedName(function.prefix(), function.localName())
-                        + "' expects " + (method.isVarArgs() ? "at least " + (parameters - 1) : parameters)
-                        + " argument(s) but " + count + " were provided");
-                }
-                bindings.put(qualifiedName(function.prefix(), function.localName()), BoundFunction.of(method));
-            } else if (!function.prefix().isEmpty()) {
-                throw new ELException("Cannot resolve the function '"
-                    + qualifiedName(function.prefix(), function.localName()) + "'");
-            }
+            bindFunction(functionMapper, function, bindings);
         }
         for (ELNode child : children(node)) {
             bindFunctions(functionMapper, child, bindings);
         }
+    }
+
+    /**
+     * Binds one function of the expression to the method the function mapper resolves it to, rejecting a
+     * function the mapper does not know and one the invocation gives the wrong number of arguments.
+     */
+    private static void bindFunction(@Nullable FunctionMapper functionMapper,
+                                     ELNode.Function function,
+                                     Map<String, BoundFunction> bindings) {
+        String name = qualifiedName(function.prefix(), function.localName());
+        Method method = functionMapper == null ? null
+            : functionMapper.resolveFunction(function.prefix(), function.localName());
+        if (method == null) {
+            // an unprefixed name is an identifier the resolvers get their chance at, not a function
+            if (!function.prefix().isEmpty()) {
+                throw new ELException("Cannot resolve the function '" + name + "'");
+            }
+            return;
+        }
+        int count = function.invocations().get(0).size();
+        int parameters = method.getParameterCount();
+        if (method.isVarArgs() ? count < parameters - 1 : count != parameters) {
+            throw new ELException("The function '" + name + "' expects "
+                + (method.isVarArgs() ? "at least " + (parameters - 1) : parameters)
+                + " argument(s) but " + count + " were provided");
+        }
+        bindings.put(name, BoundFunction.of(method));
     }
 
     @SuppressWarnings("java:S1541")
@@ -758,32 +771,8 @@ final class ELInterpreter {
 
     @Nullable
     private Object invokeStatic(ELContext context, Method method, Object[] arguments) {
-        Class<?>[] parameterTypes = method.getParameterTypes();
-        Object[] coerced = new Object[parameterTypes.length];
-        int fixed = method.isVarArgs() ? parameterTypes.length - 1 : parameterTypes.length;
-        if (method.isVarArgs() ? arguments.length < fixed : arguments.length != fixed) {
-            throw new IllegalArgumentException("The function '" + method.getName() + "' expects "
-                + (method.isVarArgs() ? "at least " + fixed : fixed) + " argument(s) but "
-                + arguments.length + " were provided");
-        }
-        for (int i = 0; i < fixed; i++) {
-            coerced[i] = ELSupport.coerceToType(context, arguments[i], parameterTypes[i]);
-        }
-        if (method.isVarArgs()) {
-            if (arguments.length == parameterTypes.length && arguments[fixed] != null
-                && parameterTypes[fixed].isInstance(arguments[fixed])) {
-                coerced[fixed] = arguments[fixed];
-            } else {
-                Class<?> component = parameterTypes[fixed].getComponentType();
-                Object varargs = Array.newInstance(component, arguments.length - fixed);
-                for (int i = fixed; i < arguments.length; i++) {
-                    Array.set(varargs, i - fixed, ELSupport.coerceToType(context, arguments[i], component));
-                }
-                coerced[fixed] = varargs;
-            }
-        }
         try {
-            return method.invoke(null, coerced);
+            return method.invoke(null, coerceFunctionArguments(context, method, arguments));
         } catch (IllegalAccessException e) {
             throw new ELException("Cannot invoke the function '" + method.getName() + "'", e);
         } catch (InvocationTargetException e) {
@@ -793,6 +782,44 @@ final class ELInterpreter {
             }
             throw new ELException("The function '" + method.getName() + "' failed", cause);
         }
+    }
+
+    /**
+     * The arguments of a function call coerced to the parameters the mapped method declares, with the trailing
+     * ones packed into an array for a variable arity function.
+     */
+    private static Object[] coerceFunctionArguments(ELContext context, Method method, Object[] arguments) {
+        Class<?>[] parameterTypes = method.getParameterTypes();
+        int fixed = method.isVarArgs() ? parameterTypes.length - 1 : parameterTypes.length;
+        if (method.isVarArgs() ? arguments.length < fixed : arguments.length != fixed) {
+            throw new IllegalArgumentException("The function '" + method.getName() + "' expects "
+                + (method.isVarArgs() ? "at least " + fixed : fixed) + " argument(s) but "
+                + arguments.length + " were provided");
+        }
+        Object[] coerced = new Object[parameterTypes.length];
+        for (int i = 0; i < fixed; i++) {
+            coerced[i] = ELSupport.coerceToType(context, arguments[i], parameterTypes[i]);
+        }
+        if (method.isVarArgs()) {
+            coerced[fixed] = varargsArgument(context, parameterTypes[fixed], arguments, fixed);
+        }
+        return coerced;
+    }
+
+    /**
+     * The trailing argument of a variable arity function: the array given directly, or the array the call packs
+     * the remaining arguments into.
+     */
+    private static Object varargsArgument(ELContext context, Class<?> arrayType, Object[] arguments, int fixed) {
+        if (arguments.length == fixed + 1 && arguments[fixed] != null && arrayType.isInstance(arguments[fixed])) {
+            return arguments[fixed];
+        }
+        Class<?> component = arrayType.getComponentType();
+        Object varargs = Array.newInstance(component, arguments.length - fixed);
+        for (int i = fixed; i < arguments.length; i++) {
+            Array.set(varargs, i - fixed, ELSupport.coerceToType(context, arguments[i], component));
+        }
+        return varargs;
     }
 
     @Nullable
