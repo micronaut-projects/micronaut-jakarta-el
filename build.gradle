@@ -2,3 +2,15 @@ plugins {
     id "io.micronaut.build.internal.jakarta-el-base"
     id "io.micronaut.build.internal.parent"
 }
+
+// The test suites are not modules, so the aggregating plugin does not pick them up on its own. They run the
+// generated expressions of every supported language against the runtime, and the TCK runs the specification
+// against it, which is the coverage of the runtime that the aggregated report would otherwise miss.
+dependencies {
+    jacocoAggregation projects.testSuiteJava
+    jacocoAggregation projects.testSuiteGroovy
+    jacocoAggregation projects.testSuiteKotlin
+    jacocoAggregation projects.testSuiteCustomAnnotation
+    jacocoAggregation projects.micronautTests.micronautJakartaElTck
+    jacocoAggregation projects.micronautTests.micronautJakartaElFuzz
+}
