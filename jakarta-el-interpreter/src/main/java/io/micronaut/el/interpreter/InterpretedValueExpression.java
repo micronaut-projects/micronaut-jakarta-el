@@ -60,7 +60,7 @@ final class InterpretedValueExpression extends ValueExpression {
         context.notifyBeforeEvaluation(expressionString);
         Object value = interpreter().evaluateRoot(context, node());
         context.notifyAfterEvaluation(expressionString);
-        return (T) ELSupport.coerceToType(context, value, expectedType);
+        return (T) ELSandboxGuard.checkResult(context, ELSupport.coerceToType(context, value, expectedType));
     }
 
     @Override

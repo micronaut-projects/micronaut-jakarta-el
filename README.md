@@ -158,14 +158,34 @@ through the sandbox at all. Register another one, `ELSandbox.UNRESTRICTED` inclu
 context.putContext(ELSandbox.class, ELSandbox.UNRESTRICTED);
 ```
 
-The sandbox bounds what an expression reaches, not what the beans it reaches then do. It keeps a runtime
-expression from escaping the object graph it was given; it is not a licence to evaluate expressions written by
-an attacker.
+An expression only reaches a denied type through a bean of the application that exposes one, since the members
+that lead to one from any object are denied. Reaching one is not the same as returning it, so the value an
+expression hands back is checked too, as coerced to the expected type: `${bean.type}` requested as `Object`
+fails, while requested as `String` it yields the coercion, through which nothing of the denied type escapes.
+Only the value itself is examined; a denied object the application put inside a collection it exposes is not
+searched for.
+
+The sandbox bounds what an expression reaches, not what the beans it reaches then do, and an argument the
+application's own method chose to accept is its own business. It keeps a runtime expression from escaping the
+object graph it was given; it is not a licence to evaluate expressions written by an attacker.
 
 The parser is bounded for the same reason. It is a recursive descent implementation and the tree it produces is
 walked recursively, so an expression nested deeply enough would exhaust the call stack. An expression nested
 more than `ELParser.DEFAULT_MAX_DEPTH` levels deep is rejected with an `ELParsingException`; parse with
 `ELParser.parse(expression, maxDepth)` to raise the limit for an expression a tool generated.
+
+### Deliberate divergences
+
+Four behaviours differ from Expressly, from Tomcat Jasper EL, or from both. Each is a place the specification
+leaves open, and the TCK passes either way, so this implementation keeps the reading that is the least
+surprising:
+
+| Behaviour | Here | Elsewhere |
+|-----------|------|-----------|
+| The right operand of a relational operator whose left operand is null | Evaluated, so `${null gt x}` reports that `x` cannot be resolved and `${null gt (y=1)}` performs the assignment | Both references skip it and return `false`. Only `&&`, `\|\|` and `?:` are specified to short-circuit |
+| The iteration order of a set or map construction | Insertion order, so `${{'b','a'}}` is `[b, a]` and a map keeps the order its entries were written in | Both references use a hash set and a hash map, so the order is neither insertion nor sorted |
+| The index of `${null[expr]}` | Evaluated | Expressly skips it; Tomcat rejects a null base outright |
+| A backslash in literal text | `\'` stays `\'` and `\\` becomes `\` | Expressly drops every backslash; Tomcat keeps `\\` as `\\` |
 
 ## Declaring beans
 

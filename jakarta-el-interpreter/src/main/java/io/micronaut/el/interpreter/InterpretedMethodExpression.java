@@ -70,7 +70,9 @@ final class InterpretedMethodExpression extends MethodExpression {
         context.notifyBeforeEvaluation(expressionString);
         Object result = doInvoke(context, params);
         context.notifyAfterEvaluation(expressionString);
-        return expectedReturnType == void.class ? null : ELSupport.coerceToType(context, result, expectedReturnType);
+        return expectedReturnType == void.class
+            ? null
+            : ELSandboxGuard.checkResult(context, ELSupport.coerceToType(context, result, expectedReturnType));
     }
 
     @Override

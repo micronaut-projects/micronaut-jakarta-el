@@ -119,13 +119,45 @@ final class ELSandboxGuard {
     }
 
     /**
+     * Fails when the value an expression is about to hand back is of a type the sandbox denies.
+     *
+     * <p>An expression reaches a denied type only through a bean of the application that exposes one, since
+     * the members that lead to one from any object are denied. It is still not the expression's to return: a
+     * caller asking for {@code Object} would receive the {@code Runtime} itself. A caller asking for a
+     * {@link String} receives the coercion of it, which is why the check is on the value as coerced.</p>
+     *
+     * <p>Only the value itself is examined. A denied object the application put inside a collection it
+     * exposes is not searched for.</p>
+     *
+     * @param context The context
+     * @param value   The value
+     * @param <T>     The type of the value
+     * @return The value
+     */
+    @Nullable
+    static <T> T checkResult(ELContext context, @Nullable T value) {
+        if (value == null) {
+            return null;
+        }
+        ELSandbox sandbox = ELSandbox.of(context);
+        if (sandbox == ELSandbox.UNRESTRICTED) {
+            return value;
+        }
+        Class<?> type = value instanceof ELClass elClass ? elClass.getKlass() : value.getClass();
+        if (!sandbox.allowsType(type)) {
+            throw new ELSandboxException(type, null);
+        }
+        return value;
+    }
+
+    /**
      * Fails when the sandbox of the context denies the base object, or the member of it the expression names.
      *
      * <p>The check is on the base rather than on the resolved value, so a value of a denied type is only
      * reached, never used: {@code ${bean.getClass()}} fails on the member, and an expression that obtains a
      * {@link Class} some other way fails on the next property it reads from it.</p>
      */
-    private static void check(ELContext context, @Nullable Object base, @Nullable Object property) {
+    static void check(ELContext context, @Nullable Object base, @Nullable Object property) {
         if (base == null) {
             return;
         }

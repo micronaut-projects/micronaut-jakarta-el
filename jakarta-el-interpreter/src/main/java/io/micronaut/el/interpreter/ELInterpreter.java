@@ -593,7 +593,13 @@ final class ELInterpreter {
     @Nullable
     ValueReference valueReference(ELContext context, ELNode node) {
         Target target = resolveTarget(context, node);
-        return target == null ? null : new ValueReference(target.base(), target.property());
+        if (target == null) {
+            return null;
+        }
+        // the reference names the base and the property of an lvalue, so it is the same access as getType and
+        // isReadOnly and the sandbox has the same say over it
+        ELSandboxGuard.check(context, target.base(), target.property());
+        return new ValueReference(target.base(), target.property());
     }
 
     private Object evaluateComposite(ELContext context, ELNode.Composite composite) {

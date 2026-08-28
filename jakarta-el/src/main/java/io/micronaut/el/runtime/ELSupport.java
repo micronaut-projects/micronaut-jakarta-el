@@ -572,6 +572,12 @@ public final class ELSupport {
         if (isWholeNumberOperand(left, right)) {
             return Long.compare(longValue(left), longValue(right));
         }
+        // the same rule, and the same place in the order, as the equality of the section 1.9.2: a boolean
+        // operand decides the comparison, so that 'false gt "9"' is the false the equality of the two implies
+        // rather than the lexical comparison of "false" with "9"
+        if (left instanceof Boolean || right instanceof Boolean) {
+            return Boolean.compare(toBoolean(left), toBoolean(right));
+        }
         if (left instanceof String || right instanceof String) {
             return coerceToString(left).compareTo(coerceToString(right));
         }

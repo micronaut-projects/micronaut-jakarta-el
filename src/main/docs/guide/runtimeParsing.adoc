@@ -65,9 +65,17 @@ To widen, narrow or remove the sandbox, register one on the context the expressi
 context.putContext(ELSandbox.class, ELSandbox.UNRESTRICTED);
 ----
 
-The sandbox bounds what an expression reaches; it does not bound what the beans it reaches then do. It is a
-way to keep a runtime expression from escaping the object graph it was given, not a licence to evaluate
-expressions written by an attacker.
+An expression only reaches a denied type through a bean of the application that exposes one, since the
+members that lead to one from any object are denied. Reaching one is not the same as returning it, so the
+value an expression hands back is checked as well, as coerced to the expected type: `${bean.type}` requested
+as `Object` fails, and requested as `String` yields the coercion of it, through which nothing of the denied
+type escapes. Only the value itself is examined; a denied object the application put inside a collection it
+exposes is not searched for.
+
+The sandbox bounds what an expression reaches; it does not bound what the beans it reaches then do, and an
+argument the application's own method chose to accept is its own business. It is a way to keep a runtime
+expression from escaping the object graph it was given, not a licence to evaluate expressions written by an
+attacker.
 
 == Bounded Parsing
 
@@ -79,3 +87,18 @@ way it reports any other syntax error. No expression a person writes comes close
 
 The interpreter keeps the trees it parsed in a bounded cache, so a stream of distinct expression strings
 cannot grow the heap.
+
+== Deliberate Divergences
+
+Four behaviours differ from Expressly, from Tomcat Jasper EL, or from both. Each is a place the specification
+leaves open, and the Technology Compatibility Kit passes either way, so the reading kept here is the one that
+is the least surprising.
+
+* The right operand of a relational operator whose left operand is null is evaluated, so `${null gt x}`
+  reports that `x` cannot be resolved and `${null gt (y=1)}` performs the assignment. Both references skip it
+  and answer `false`; only `&&`, `||` and `?:` are specified to short-circuit.
+* A set or map construction iterates in the order it was written in, so `${{'b','a'}}` is `[b, a]`. Both
+  references use a hash set and a hash map, whose order is neither the one written nor sorted.
+* The index of `${null[expr]}` is evaluated. Expressly skips it, and Tomcat rejects a null base outright.
+* A backslash in literal text follows the escapes of the section 1.2.2 and no others, so `\'` stays `\'` and
+  `\\` becomes `\`. Expressly drops every backslash, and Tomcat keeps `\\` as `\\`.

@@ -50,6 +50,29 @@ class ELInterpreterTest {
     }
 
     @Test
+    void aBooleanOperandDecidesARelationalComparison() {
+        // the section 1.9.1 orders its rules the way the equality of the section 1.9.2 does, so a boolean
+        // operand is coerced with the other rather than the two being compared as strings
+        assertEquals((Object) false, processor.eval("false gt '9'"));
+        assertEquals((Object) true, processor.eval("false le '9'"));
+        assertEquals((Object) false, processor.eval("false lt '9'"));
+        assertEquals((Object) true, processor.eval("false ge '9'"));
+        assertEquals((Object) false, processor.eval("'9' gt false"));
+        assertEquals((Object) true, processor.eval("true gt '9'"));
+        assertEquals((Object) true, processor.eval("true gt false"));
+        assertEquals((Object) false, processor.eval("true lt false"));
+        assertEquals((Object) true, processor.eval("true ge true"));
+    }
+
+    @Test
+    void aCharacterIsANumberForTheUnaryMinus() {
+        // the section 1.25.3 coerces a character to its numeric value, which the binary operators already do
+        assertEquals((Object) (short) -49, processor.eval("-Character.valueOf(49)"));
+        assertEquals((Object) 49L, processor.eval("Character.valueOf(49) + 0"));
+        assertEquals((Object) (-49L), processor.eval("-Character.valueOf(49) + 0"));
+    }
+
+    @Test
     void conditionalAndSemicolonOperators() {
         assertEquals("yes", processor.eval("true ? 'yes' : 'no'"));
         assertEquals((Object) 2L, processor.eval("1; 2"));
@@ -89,6 +112,34 @@ class ELInterpreterTest {
         // language, not the ClassCastException the comparison happened to raise
         assertThrows(ELException.class, () -> processor.eval("[true, []].stream().min()"));
         assertThrows(ELException.class, () -> processor.eval("[[], null].stream().sorted().toList()"));
+    }
+
+    @Test
+    void theOperandsOfARelationalOperatorAreBothEvaluated() {
+        // only the section 1.10 and the section 1.11 specify a short circuit, for the logical operators and
+        // for the conditional. A relational operator whose left operand is null answers false whatever the
+        // right one is, but skipping it would drop whatever it does on the way
+        assertThrows(ELException.class, () -> processor.eval("null gt undefinedIdentifier"));
+        assertThrows(ELException.class, () -> processor.eval("null lt undefinedIdentifier"));
+        assertEquals((Object) false, processor.eval("y = 1; null gt (y = 2)"));
+        assertEquals((Object) 2L, processor.eval("y = 1; null gt (y = 2); y"));
+    }
+
+    @Test
+    void aSetOrMapConstructionKeepsTheOrderItWasWrittenIn() {
+        // the section 2.2 leaves the iteration order of a construction open, and an order that is the order
+        // of the expression is the one that does not surprise
+        assertEquals("[b, a]", processor.eval("{'b','a'}").toString());
+        assertEquals("[3, 1, 2]", processor.eval("{3,1,2}").toString());
+        assertEquals("{b=1, a=2}", processor.eval("{'b':1,'a':2}").toString());
+    }
+
+    @Test
+    void theIndexOfANullBaseIsEvaluated() {
+        // the section 1.6 makes the value of a null base null, and says nothing of the index, which is an
+        // expression like any other
+        assertThrows(ELException.class, () -> processor.eval("null[undefinedIdentifier]"));
+        assertEquals((Object) 2L, processor.eval("y = 1; null[y = 2]; y"));
     }
 
     @Test

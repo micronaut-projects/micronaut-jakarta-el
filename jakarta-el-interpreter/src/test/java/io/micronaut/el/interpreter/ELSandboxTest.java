@@ -87,6 +87,33 @@ class ELSandboxTest {
     }
 
     @Test
+    void everyOperationOfAnExpressionThatReachesADeniedTypeIsDenied() {
+        // getValueReference names the base and the property of an lvalue, the same access getType and
+        // isReadOnly make, so it must not be the one operation that hands the base back
+        ELContext context = context().setBean("holder", new Holder());
+        ValueExpression expression =
+            factory.createValueExpression(context, "${holder.type.name}", Object.class);
+        assertThrows(ELSandboxException.class, () -> expression.getValue(context));
+        assertThrows(ELSandboxException.class, () -> expression.getValueReference(context));
+        assertThrows(ELSandboxException.class, () -> expression.getType(context));
+        assertThrows(ELSandboxException.class, () -> expression.isReadOnly(context));
+    }
+
+    @Test
+    void aDeniedTypeIsNotHandedBackAsTheValueOfTheExpression() {
+        // a bean of the application can expose one, and reaching it is not the same as returning it
+        ELContext context = context().setBean("holder", new Holder());
+        ValueExpression asObject = factory.createValueExpression(context, "${holder.type}", Object.class);
+        assertThrows(ELSandboxException.class, () -> asObject.getValue(context));
+        MethodExpression method =
+            factory.createMethodExpression(context, "${holder.getType}", Object.class, new Class<?>[0]);
+        assertThrows(ELSandboxException.class, () -> method.invoke(context, new Object[0]));
+        // coerced to a string nothing of the denied type escapes, so the coercion is what is checked
+        assertEquals("class java.lang.String",
+            factory.createValueExpression(context, "${holder.type}", String.class).getValue(context));
+    }
+
+    @Test
     void aSubclassOfADeniedTypeIsDenied() {
         assertFalse(ELSandbox.standard().allowsType(SecureClassLoaderSubclass.class));
         assertFalse(ELSandbox.standard().allowsType(java.lang.reflect.Method.class));
@@ -169,6 +196,16 @@ class ELSandboxTest {
     }
 
     private static final class SecureClassLoaderSubclass extends ClassLoader {
+    }
+
+    /**
+     * A bean of the application exposing a denied type, which is the only way an expression reaches one.
+     */
+    public static final class Holder {
+
+        public Class<?> getType() {
+            return String.class;
+        }
     }
 
     /**
