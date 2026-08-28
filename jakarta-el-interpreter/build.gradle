@@ -10,3 +10,15 @@ dependencies {
     testImplementation libs.junit.jupiter
     testRuntimeOnly libs.junit.jupiter.engine
 }
+
+// the fuzzing knobs of ELFuzzTest, so that a longer campaign than the build runs can be asked for with
+// ./gradlew :micronaut-jakarta-el-interpreter:test -Dmicronaut.el.fuzz.iterations=1000000
+tasks.named("test") {
+    ["micronaut.el.fuzz.iterations", "micronaut.el.fuzz.seed"].each { name ->
+        def value = providers.systemProperty(name).orNull
+        if (value != null) {
+            systemProperty(name, value)
+            inputs.property(name, value)
+        }
+    }
+}

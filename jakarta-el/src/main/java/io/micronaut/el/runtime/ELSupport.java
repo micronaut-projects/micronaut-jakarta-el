@@ -575,13 +575,28 @@ public final class ELSupport {
         if (left instanceof String || right instanceof String) {
             return coerceToString(left).compareTo(coerceToString(right));
         }
+        // the section 1.9.1 of the specification: when the comparison of two Comparable operands fails, the
+        // failure is an error of the language, not the exception the comparator happens to raise
         if (left instanceof Comparable comparable) {
-            return comparable.compareTo(right);
+            return compareTo(comparable, right, false);
         }
         if (right instanceof Comparable comparable) {
-            return -comparable.compareTo(left);
+            return compareTo(comparable, left, true);
         }
         throw new ELException("Cannot compare " + left + " to " + right);
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private static int compareTo(Comparable comparable, @Nullable Object other, boolean inverted) {
+        int result;
+        try {
+            result = comparable.compareTo(other);
+        } catch (ELException e) {
+            throw e;
+        } catch (RuntimeException e) {
+            throw new ELException("Cannot compare " + comparable + " to " + other, e);
+        }
+        return inverted ? -result : result;
     }
 
     /**

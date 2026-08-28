@@ -155,12 +155,13 @@ final class InterpretedMethodExpression extends MethodExpression {
             throw new MethodNotFoundException("The expression '" + expressionString + "' is not a method expression");
         }
         if (target.base() == null) {
-            Object identifier = ELResolution.resolveIdentifier(context, ELSupport.coerceToString(target.property()));
+            Object identifier = ELSandboxGuard.resolveIdentifier(context, ELSupport.coerceToString(target.property()));
             return ELResolution.invokeMethodExpression(context, identifier, params);
         }
         Object base = target.base();
-        return ELResolution.invokeMethod(context, base,
-            findMethod(context, base, target.property(), null), params);
+        Method method = ELSandboxGuard.findMethod(context, base, target.property(),
+            () -> findMethod(context, base, target.property(), null));
+        return ELResolution.invokeMethod(context, base, method, params);
     }
 
     private ELNode methodTargetNode() {

@@ -124,6 +124,49 @@ The interpreter is not a second implementation of the language: it walks the sam
 consumes and calls the same runtime as the generated code, so both share one definition of the semantics of the
 specification. The compiled path remains the fast one, and the interpreted path is the fallback.
 
+## Expressions built from untrusted input
+
+An expression declared with `@ELExpression` is source of the application. An expression string built at runtime
+is not, and the specification resolves properties, methods, static members and constructors dynamically:
+`${Runtime.getRuntime().exec(...)}` is a valid expression, and so is `${bean.getClass().getClassLoader()}`.
+Adding the interpreter module to the classpath must not turn `ExpressionFactory.createValueExpression` into a
+way to run arbitrary code.
+
+Every expression the interpreter creates is therefore evaluated under an `ELSandbox`, which is consulted for the
+base object of every property access and method invocation, for the class of every static reference and for the
+class of every constructor reference. `ELSandbox.standard()`, the default, denies the types through which an
+expression escapes into arbitrary Java:
+
+| Denied                                                                                                              | Why                                                 |
+|---------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------|
+| `Class`, `ClassLoader`, `Module`, `ModuleLayer`, `Package`, and every subtype                                        | The class of any object leads to every other class  |
+| `Runtime`, `Process`, `ProcessBuilder`, `ProcessHandle`, `System`, `Thread`, `ThreadGroup`                           | The process itself                                  |
+| `java.io.File`, `java.net.URI`, `java.net.URL`, `java.nio.file.Path`, `java.util.ServiceLoader`                      | The file system and the service loading             |
+| `jakarta.el.ELContext`, `jakarta.el.ELResolver`                                                                      | An expression would otherwise widen its own sandbox |
+| `java.lang.reflect`, `java.lang.invoke`, `java.lang.module`, `java.security`, `java.rmi`, `javax.naming`, `javax.script`, `jdk`, `sun` | Reflection and the platform internals |
+| The members `class`, `getClass`, `getClassLoader`, `getModule`, `getProtectionDomain`, `wait`, `notify`, `notifyAll` | The step from an allowed object to a denied one     |
+
+Everything else the language offers is untouched: the operators, the coercions, the collection operations, the
+lambdas, and the properties and methods of the beans of the application. `com.sun` is deliberately **not**
+denied: it is not reserved for the platform, and the TCK publishes its own beans under it. The TCK passes with
+the sandbox in place.
+
+An expression that reaches a denied type fails with an `ELSandboxException`. Compiled expressions do not go
+through the sandbox at all. Register another one, `ELSandbox.UNRESTRICTED` included, on the context:
+
+```java
+context.putContext(ELSandbox.class, ELSandbox.UNRESTRICTED);
+```
+
+The sandbox bounds what an expression reaches, not what the beans it reaches then do. It keeps a runtime
+expression from escaping the object graph it was given; it is not a licence to evaluate expressions written by
+an attacker.
+
+The parser is bounded for the same reason. It is a recursive descent implementation and the tree it produces is
+walked recursively, so an expression nested deeply enough would exhaust the call stack. An expression nested
+more than `ELParser.DEFAULT_MAX_DEPTH` levels deep is rejected with an `ELParsingException`; parse with
+`ELParser.parse(expression, maxDepth)` to raise the limit for an expression a tool generated.
+
 ## Declaring beans
 
 Beans are declared with Micronaut's own `@Introspected`, not with an annotation of this module:
@@ -258,6 +301,20 @@ runtime that the generated code also calls. The signature test is excluded: it v
 `jakarta.el` API jar, which this repository consumes unchanged rather than implements.
 
 The TCK runs as part of `./gradlew build`.
+
+## Fuzzing
+
+`ELFuzzTest` generates expressions from the grammar, mutates them and throws random strings at the parser and
+the interpreter, asserting the invariants that hold for every input: the parser only ever fails with an
+`ELParsingException`, the canonical form of an expression re-parses to itself, and an evaluation only ever
+fails with an `ELException`. A failure is reduced to the shortest expression that still reproduces it before
+it is reported, with the seed and the iteration that produced it.
+
+The build runs 20 000 iterations. To run a longer campaign:
+
+```
+./gradlew :micronaut-jakarta-el-interpreter:test --tests '*ELFuzzTest*' -Dmicronaut.el.fuzz.iterations=1000000 -Dmicronaut.el.fuzz.seed=7
+```
 
 ## Building
 

@@ -28,3 +28,54 @@ remains the fast one and the interpreted path is the fallback.
 
 The parser is a module of its own for the same reason: the compiler is not its only consumer, and any code that
 needs to inspect an expression without generating one can depend on it alone.
+
+== Expressions Built From Untrusted Input
+
+An expression declared with `@ELExpression` is source of the application, as trusted as the code around it.
+An expression string built at runtime is not, and the specification resolves properties, methods, static
+members and constructors dynamically: `${Runtime.getRuntime().exec(...)}` is a valid expression, and so is
+`${bean.getClass().getClassLoader()}`. Adding the interpreter module to the classpath must not turn
+`ExpressionFactory.createValueExpression` into a way to run arbitrary code.
+
+Every expression the interpreter creates is therefore evaluated under an api:el.ELSandbox[], which is
+consulted for the base object of each property access and method invocation, for the class of each static
+reference and for the class of each constructor reference. `ELSandbox.standard()`, the default, denies:
+
+* `java.lang.Class`, `ClassLoader`, `Module`, `ModuleLayer` and `Package`, and every subtype of them;
+* `Runtime`, `Process`, `ProcessBuilder`, `ProcessHandle`, `System`, `Thread` and `ThreadGroup`;
+* `java.io.File`, `java.net.URI`, `java.net.URL`, `java.nio.file.Path` and `java.util.ServiceLoader`;
+* `jakarta.el.ELContext` and `jakarta.el.ELResolver`, through which an expression would widen its own sandbox;
+* everything in `java.lang.reflect`, `java.lang.invoke`, `java.lang.module`, `java.security`, `java.rmi`,
+  `javax.naming`, `javax.script`, `jdk` and `sun`;
+* the members `class`, `getClass`, `getClassLoader`, `getModule`, `getProtectionDomain`, `wait`, `notify` and
+  `notifyAll` of any type.
+
+Everything else the language offers is untouched: the operators, the coercions, the collection operations,
+the lambdas, and the properties and methods of the beans of the application. An expression that reaches a
+denied type fails with an api:el.ELSandboxException[]. The Technology Compatibility Kit passes with the
+sandbox in place.
+
+Expressions compiled at compilation time do not go through it, so a declared expression may use whatever its
+author wrote.
+
+To widen, narrow or remove the sandbox, register one on the context the expression is evaluated with:
+
+[source,java]
+----
+context.putContext(ELSandbox.class, ELSandbox.UNRESTRICTED);
+----
+
+The sandbox bounds what an expression reaches; it does not bound what the beans it reaches then do. It is a
+way to keep a runtime expression from escaping the object graph it was given, not a licence to evaluate
+expressions written by an attacker.
+
+== Bounded Parsing
+
+The parser is a recursive descent implementation and the tree it produces is walked recursively, so an
+expression nested deeply enough would exhaust the call stack. `ELParser` rejects an expression nested more
+than `ELParser.DEFAULT_MAX_DEPTH` levels deep with an `ELParsingException`, which the interpreter reports the
+way it reports any other syntax error. No expression a person writes comes close to the limit; parse with
+`ELParser.parse(expression, maxDepth)` to raise it for an expression a tool generated.
+
+The interpreter keeps the trees it parsed in a bounded cache, so a stream of distinct expression strings
+cannot grow the heap.

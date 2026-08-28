@@ -15,6 +15,7 @@
  */
 package io.micronaut.el.interpreter;
 
+import jakarta.el.ELException;
 import jakarta.el.ELProcessor;
 import org.junit.jupiter.api.Test;
 
@@ -52,6 +53,42 @@ class ELInterpreterTest {
     void conditionalAndSemicolonOperators() {
         assertEquals("yes", processor.eval("true ? 'yes' : 'no'"));
         assertEquals((Object) 2L, processor.eval("1; 2"));
+    }
+
+    @Test
+    void anOverloadIsSelectedTheWayTheSpecificationSelectsIt() {
+        // the coercions of the section 1.25 make several overloads applicable, and the section 1.6 reduces
+        // them to the most specific one rather than calling the reference ambiguous
+        assertEquals((Object) 1, processor.eval("Integer.valueOf(1)"));
+        assertEquals((Object) 1L, processor.eval("Long.valueOf(1)"));
+        assertEquals((Object) 1.0d, processor.eval("Double.valueOf(1)"));
+        assertEquals("1", processor.eval("String.valueOf(1)"));
+        assertEquals((Object) 'A', processor.eval("Character.valueOf(65)"));
+        // a number is not coercible to a boolean, so valueOf(boolean) is not a candidate at all and
+        // valueOf(String) is the only one left
+        assertEquals((Object) false, processor.eval("Boolean.valueOf(1)"));
+        assertEquals((Object) true, processor.eval("Boolean.valueOf('true')"));
+    }
+
+    @Test
+    void aStreamHoldingANullElementDoesNotFail() {
+        // Stream.reduce, Stream.max, Stream.min and Stream.findFirst of the platform wrap their result in an
+        // Optional, which cannot hold a null, where the optional of the section 2.3 is empty for one
+        assertEquals("", processor.eval("[null].stream().reduce((x,y)->x).orElse('')"));
+        assertEquals("", processor.eval("[null].stream().max().orElse('')"));
+        assertEquals("", processor.eval("[null].stream().min().orElse('')"));
+        assertEquals("", processor.eval("[null].stream().findFirst().orElse('')"));
+        assertEquals((Object) 3L, processor.eval("[3,1,2].stream().max().get()"));
+        assertEquals((Object) 1L, processor.eval("[3,1,2].stream().min().get()"));
+        assertEquals((Object) 3L, processor.eval("[3,1,2].stream().findFirst().get()"));
+    }
+
+    @Test
+    void aComparisonThatTheOperandsCannotAnswerIsAnExpressionLanguageError() {
+        // the section 1.9.1 of the specification: when compareTo fails, the failure is an error of the
+        // language, not the ClassCastException the comparison happened to raise
+        assertThrows(ELException.class, () -> processor.eval("[true, []].stream().min()"));
+        assertThrows(ELException.class, () -> processor.eval("[[], null].stream().sorted().toList()"));
     }
 
     @Test
