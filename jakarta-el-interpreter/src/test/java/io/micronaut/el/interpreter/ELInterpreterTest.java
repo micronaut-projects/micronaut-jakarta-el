@@ -33,11 +33,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -94,6 +96,21 @@ class ELInterpreterTest {
         assertEquals((Object) 4L, processor.eval("[1,2,3,4].stream().count()"));
         assertEquals(List.of(1L, 2L, 3L), processor.eval("[3,1,2].stream().sorted().toList()"));
         assertEquals((Object) 3L, processor.eval("[1,2,3].stream().max().get()"));
+    }
+
+    @Test
+    void streamAndOptionalOperationsEnforceTheirContracts() {
+        assertThrows(jakarta.el.MethodNotFoundException.class,
+            () -> processor.eval("[1].stream().count(1)"));
+        assertThrows(jakarta.el.MethodNotFoundException.class,
+            () -> processor.eval("[1].stream().filter(x -> true, 2).count()"));
+        assertThrows(jakarta.el.MethodNotFoundException.class,
+            () -> processor.eval("[1].stream().findFirst().get(1)"));
+        assertThrows(ELException.class,
+            () -> processor.eval("[1,2].stream().limit(-1).toList()"));
+        assertThrows(ELException.class,
+            () -> processor.eval("[1,2].stream().substream(2, 1).toList()"));
+        assertNull(processor.eval("[1].stream().findFirst().ifPresent(x -> x)"));
     }
 
     @Test
@@ -169,9 +186,18 @@ class ELInterpreterTest {
     void functionsRejectTooFewFixedArguments() throws NoSuchMethodException {
         processor.defineFunction("fn", "combine", Varargs.class.getMethod("combine", String.class, String[].class));
 
-        IllegalArgumentException failure = assertThrows(IllegalArgumentException.class,
+        ELException failure = assertThrows(ELException.class,
             () -> processor.eval("fn:combine()"));
         assertTrue(failure.getMessage().contains("at least 1 argument"), failure.getMessage());
+    }
+
+    @Test
+    void aMissingPrefixedFunctionIsRejectedWhenTheExpressionIsCreated() {
+        ELContext context = processor.getELManager().getELContext();
+
+        // The exact generated expression cannot exist: its undeclared prefix must fail annotation processing too.
+        assertThrows(ELException.class, () -> ExpressionFactory.newInstance()
+            .createValueExpression(context, "${missing:call()}", Object.class));
     }
 
     @Test
@@ -192,6 +218,28 @@ class ELInterpreterTest {
         assertEquals("1:int[]", processor.eval("varargs.argumentType(varargs.numbers)"));
         assertEquals("a,b", processor.eval("varargs.join(strings)"));
         assertEquals("a", processor.eval("strings[0]"));
+    }
+
+    @Test
+    void bigDecimalComparisonPreservesLargeIntegralValues() {
+        processor.defineBean("decimal", new BigDecimal("9007199254740993"));
+        processor.defineBean("large", 9007199254740993L);
+
+        assertEquals(true, processor.eval("decimal == large"));
+    }
+
+    @Test
+    void aCreationTimeVariableBindingShadowsAnImportedClass() {
+        ELContext context = processor.getELManager().getELContext();
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        context.getVariableMapper().setVariable("Integer",
+            factory.createValueExpression(new ImportShadow(), ImportShadow.class));
+
+        ValueExpression field = factory.createValueExpression(context, "${Integer.MAX_VALUE}", String.class);
+        ValueExpression method = factory.createValueExpression(context, "${Integer.valueOf('1')}", String.class);
+
+        assertEquals("variable", field.getValue(context));
+        assertEquals("variable:1", method.getValue(context));
     }
 
     @Test

@@ -122,4 +122,23 @@ class BeanFunctionsTest {
         String error = failure("${sales:quote(book, 3)}");
         assertTrue(error.contains("The function 'sales:quote' is not declared"), error);
     }
+
+    @Test
+    void theExactInterpretedMissingPrefixRegressionFailsCompilation() {
+        String source = """
+            package io.micronaut.el.test.functions;
+
+            import io.micronaut.el.annotation.*;
+
+            @ELExpression(value = "${missing:call()}", expectedType = Object.class)
+            public class Expressions {
+            }
+            """;
+        try (JavaParser parser = new JavaParser()) {
+            RuntimeException failure = assertThrows(RuntimeException.class,
+                () -> parser.generate(PACKAGE + ".Expressions", source));
+            assertTrue(failure.getMessage().contains("The function 'missing:call' is not declared"),
+                failure.getMessage());
+        }
+    }
 }

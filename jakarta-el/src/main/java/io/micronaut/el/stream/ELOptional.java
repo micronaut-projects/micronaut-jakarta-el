@@ -83,18 +83,23 @@ public final class ELOptional<T> {
 
     /**
      * @param consumer The consumer invoked with the value when it is present
+     * @return Always {@code null}
      */
-    public void ifPresent(LambdaExpression consumer) {
-        ifPresent(consumer::invoke);
+    @Nullable
+    public Object ifPresent(LambdaExpression consumer) {
+        return ifPresent(consumer::invoke);
     }
 
     /**
      * @param consumer The consumer invoked with the value when it is present, as compiled from a lambda expression
+     * @return Always {@code null}
      */
-    public void ifPresent(Consumer<? super T> consumer) {
+    @Nullable
+    public Object ifPresent(Consumer<? super T> consumer) {
         if (value != null) {
             consumer.accept(value);
         }
+        return null;
     }
 
     /**
@@ -135,6 +140,7 @@ public final class ELOptional<T> {
      */
     @Nullable
     public Object invokeOperation(ELContext context, String name, Object[] arguments) {
+        requireArity(name, arguments.length);
         return switch (name) {
             case "get" -> get();
             case "isPresent" -> isPresent();
@@ -146,6 +152,18 @@ public final class ELOptional<T> {
             case "orElseGet" -> orElseGet(ELStream.lambda(context, arguments, 0, name));
             default -> throw new MethodNotFoundException("Unknown optional operation '" + name + "'");
         };
+    }
+
+    private static void requireArity(String operation, int count) {
+        boolean valid = switch (operation) {
+            case "get", "isPresent" -> count == 0;
+            case "ifPresent", "orElse", "orElseGet" -> count == 1;
+            default -> true;
+        };
+        if (!valid) {
+            throw new MethodNotFoundException("The optional operation '" + operation + "' does not accept "
+                + count + " argument(s)");
+        }
     }
 
     @Override
