@@ -64,6 +64,8 @@ class ELInterpreterTest {
         assertEquals((Object) true, processor.eval("1 lt 2"));
         assertEquals((Object) true, processor.eval("'a' == 'a'"));
         assertEquals((Object) false, processor.eval("null == 1"));
+        assertEquals((Object) false, processor.eval("null < (-1 < '1.5')"));
+        assertEquals((Object) false, processor.eval("null > (-1 < '1.5')"));
         assertEquals((Object) true, processor.eval("true and not false"));
         assertEquals((Object) true, processor.eval("empty null"));
         assertEquals((Object) true, processor.eval("empty []"));

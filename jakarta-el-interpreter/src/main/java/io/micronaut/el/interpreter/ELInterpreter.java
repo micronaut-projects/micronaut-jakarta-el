@@ -334,13 +334,15 @@ final class ELInterpreter {
             case LESS_THAN -> new Evaluator() {
                 @Override
                 Object evaluate(ELContext context) {
-                    return ELSupport.lessThan(left.evaluate(context), right.evaluate(context));
+                    Object leftValue = left.evaluate(context);
+                    return leftValue != null && ELSupport.lessThan(leftValue, right.evaluate(context));
                 }
             };
             case GREATER_THAN -> new Evaluator() {
                 @Override
                 Object evaluate(ELContext context) {
-                    return ELSupport.greaterThan(left.evaluate(context), right.evaluate(context));
+                    Object leftValue = left.evaluate(context);
+                    return leftValue != null && ELSupport.greaterThan(leftValue, right.evaluate(context));
                 }
             };
             case LESS_THAN_OR_EQUAL -> new Evaluator() {

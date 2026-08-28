@@ -937,12 +937,32 @@ public final class ELCompiler {
             case MODULO -> dynamic(runtime(EL_ARITHMETIC, "mod", TypeDef.OBJECT, left, right));
             case EQUAL -> bool(runtime(EL_SUPPORT, "equals", BOOLEAN, left, right));
             case NOT_EQUAL -> bool(runtime(EL_SUPPORT, "notEquals", BOOLEAN, left, right));
-            case LESS_THAN -> bool(runtime(EL_SUPPORT, "lessThan", BOOLEAN, left, right));
-            case GREATER_THAN -> bool(runtime(EL_SUPPORT, "greaterThan", BOOLEAN, left, right));
+            case LESS_THAN -> bool(shortCircuitNullLeft(binary, ctx, leftOperand, right, "lessThan"));
+            case GREATER_THAN -> bool(shortCircuitNullLeft(binary, ctx, leftOperand, right, "greaterThan"));
             case LESS_THAN_OR_EQUAL -> bool(runtime(EL_SUPPORT, "lessThanOrEqual", BOOLEAN, left, right));
             case GREATER_THAN_OR_EQUAL -> bool(runtime(EL_SUPPORT, "greaterThanOrEqual", BOOLEAN, left, right));
             case AND, OR, CONCAT -> throw new IllegalStateException("The operator is compiled separately");
         };
+    }
+
+    /**
+     * The strict relational operators return false as soon as their left operand is {@code null}. Keep the
+     * right operand inside that branch so a generated expression preserves the evaluation order and side
+     * effects of the runtime interpreter. A primitive cannot be {@code null}; dynamic references use the
+     * project's compiled lambda body to defer the right operand without reflection.
+     */
+    private ExpressionDef shortCircuitNullLeft(ELNode.Binary binary,
+                                               ExpressionDef ctx,
+                                               Typed left,
+                                               ExpressionDef right,
+                                               String operation) {
+        if (left.expression().type() instanceof TypeDef.Primitive) {
+            return runtime(EL_SUPPORT, operation, BOOLEAN, left.expression(), right);
+        }
+        ClassElement bodyType = elementOf(ELLambdaBody.Nullary.class);
+        MethodElement evaluate = Objects.requireNonNull(functionalMethod(bodyType));
+        ExpressionDef lazyRight = javaLambda(null, bodyType, evaluate, List.of(), binary.right(), ctx, false);
+        return runtime(EL_SUPPORT, operation + "Lazy", BOOLEAN, left.expression(), ctx, lazyRight);
     }
 
     /**

@@ -1,0 +1,45 @@
+plugins {
+    id "io.micronaut.build.internal.jakarta-el-test-suite"
+}
+
+description = """
+Deterministic differential fuzz tests comparing the runtime interpreter with independent Jakarta EL implementations.
+
+The regular test task runs a small smoke corpus. Run a deeper campaign with:
+
+    ./gradlew :micronaut-tests:micronaut-jakarta-el-fuzz:fuzzTest
+
+Use -PelFuzzSeed=<long> and -PelFuzzCases=<count> to reproduce or resize a campaign.
+"""
+
+dependencies {
+    testImplementation projects.micronautJakartaEl
+    testImplementation projects.micronautJakartaElInterpreter
+    testImplementation libs.expressly
+    testImplementation libs.tomcat.jasper.el
+    testImplementation platform(libs.junit.bom)
+    testImplementation libs.junit.jupiter
+    testRuntimeOnly libs.junit.jupiter.engine
+}
+
+def fuzzSeed = providers.gradleProperty("elFuzzSeed").orElse("7640891576956012809")
+def smokeCases = providers.gradleProperty("elFuzzCases").orElse("2000")
+
+tasks.named("test", Test) {
+    systemProperty "el.fuzz.seed", fuzzSeed.get()
+    systemProperty "el.fuzz.cases", smokeCases.get()
+}
+
+tasks.register("fuzzTest", Test) {
+    group = "verification"
+    description = "Runs the deep, reproducible Jakarta EL differential fuzz campaign"
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    useJUnitPlatform()
+    filter {
+        includeTestsMatching "io.micronaut.el.fuzz.*"
+    }
+    systemProperty "el.fuzz.seed", fuzzSeed.get()
+    systemProperty "el.fuzz.cases", providers.gradleProperty("elFuzzCases").orElse("100000").get()
+    shouldRunAfter tasks.named("test")
+}

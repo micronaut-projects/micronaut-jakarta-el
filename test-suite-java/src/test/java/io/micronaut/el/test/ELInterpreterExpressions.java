@@ -39,6 +39,8 @@ import java.util.List;
 @ELExpression(value = "${1 lt 2}", name = "lessThan")
 @ELExpression(value = "${'a' == 'a'}", name = "equality")
 @ELExpression(value = "${null == 1}", name = "nullEquality")
+@ELExpression(value = "${null < (-1 < '1.5')}", name = "nullRelationalShortCircuit")
+@ELExpression(value = "${null > (-1 < '1.5')}", name = "nullGreaterThanShortCircuit")
 @ELExpression(value = "${true and not false}", name = "logical")
 @ELExpression(value = "${empty null}", name = "emptyNull")
 @ELExpression(value = "${empty []}", name = "emptyList")
