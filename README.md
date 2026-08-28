@@ -305,9 +305,10 @@ and 1.6 of the specification, which still goes through the generated resolvers w
 
 Functions are bound when the expression is created, as required by the section 1.18: the compiler binds them from
 `@ELFunctions`, and the interpreter binds them from the `jakarta.el.FunctionMapper` of the context, so a later change
-of the mapper does not affect an expression that already exists. The `jakarta.el.VariableMapper` and the
-`jakarta.el.ImportHandler` of the context are consulted at evaluation time, as described in the sections 1.19
-and 1.24.
+of the mapper does not affect an expression that already exists. The `jakarta.el.VariableMapper` bindings are likewise
+captured when the expression is created, as required by the section 1.19. Runtime-parsed expressions consult the
+`jakarta.el.ImportHandler` during evaluation; generated expressions bind the imports declared by `@ELEnvironment`
+at compilation time.
 
 ## Technology Compatibility Kit
 

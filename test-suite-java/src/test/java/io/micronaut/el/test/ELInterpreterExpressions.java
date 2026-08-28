@@ -8,6 +8,7 @@ import io.micronaut.el.annotation.ELVariable;
 import jakarta.el.MethodExpression;
 import jakarta.el.LambdaExpression;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -22,14 +23,20 @@ import java.util.List;
         @ELVariable(name = "varargs", type = Varargs.class),
         @ELVariable(name = "strings", type = String[].class),
         @ELVariable(name = "functions", type = Formatting.class),
+        @ELVariable(name = "f", type = Formatting.class),
+        @ELVariable(name = "formatting", type = Formatting.class),
         @ELVariable(name = "integer", type = Integer.class),
         @ELVariable(name = "number", type = Number.class),
+        @ELVariable(name = "item", type = Inventory.class),
+        @ELVariable(name = "book", type = Book.class),
+        @ELVariable(name = "decimal", type = BigDecimal.class),
+        @ELVariable(name = "large", type = Long.class),
         @ELVariable(name = "counter", type = EvaluationCounter.class),
         @ELVariable(name = "shadow", type = LambdaExpression.class),
         @ELVariable(name = "twice", type = Long.class),
         @ELVariable(name = "target", type = MethodExpression.class)
     },
-    imports = Varargs.class,
+    imports = {Varargs.class, VarargsConstructor.class},
     functions = {
         @ELFunctions(prefix = "fn", value = InterpreterParityFunctions.class),
         @ELFunctions(value = InterpreterParityFunctions.class)
@@ -62,6 +69,17 @@ import java.util.List;
 @ELExpression(value = "${[1,2,3,4].stream().count()}", name = "streamCount")
 @ELExpression(value = "${[3,1,2].stream().sorted().toList()}", name = "sortedStream")
 @ELExpression(value = "${[1,2,3].stream().max().get()}", name = "streamMaximum")
+@ELExpression(value = "${[1].stream().count(1)}", expectedType = Object.class, name = "streamCountWrongArity")
+@ELExpression(value = "${[1].stream().filter(x -> true, 2).count()}", expectedType = Object.class,
+    name = "streamFilterWrongArity")
+@ELExpression(value = "${[1].stream().findFirst().get(1)}", expectedType = Object.class,
+    name = "optionalGetWrongArity")
+@ELExpression(value = "${[1,2].stream().limit(-1).toList()}", expectedType = Object.class,
+    name = "negativeStreamLimit")
+@ELExpression(value = "${[1,2].stream().substream(2, 1).toList()}", expectedType = Object.class,
+    name = "reversedSubstream")
+@ELExpression(value = "${[1].stream().findFirst().ifPresent(x -> x)}", expectedType = Object.class,
+    name = "optionalIfPresent")
 @ELExpression(value = "${greeting}", name = "greeting")
 @ELExpression(value = "${greeting.length()}", name = "greetingLength")
 @ELExpression(value = "${greeting.toUpperCase()}", name = "uppercaseGreeting")
@@ -70,11 +88,20 @@ import java.util.List;
 @ELExpression(value = "${String('x')}", name = "stringConstructor")
 @ELExpression(value = "${fn:join('a', 'b')}", name = "functionJoin")
 @ELExpression(value = "${fn:join(sequences)}", name = "functionArrayJoin")
+@ELExpression(value = "${fn:join(strings)}", name = "functionSubtypeArrayJoin")
+@ELExpression(value = "${join('a', 'b')}", name = "unqualifiedFunctionJoin")
 @ELExpression(value = "${Varargs('a', 'b').value}", name = "varargsConstructor")
+@ELExpression(value = "${VarargsConstructor('a', 'b').value}", name = "namedVarargsConstructor")
 @ELExpression(value = "${varargs.argumentType(varargs.numbers)}", name = "primitiveVarargsArray")
 @ELExpression(value = "${varargs.join(strings)}", name = "referenceVarargsArray")
 @ELExpression(value = "${strings[0]}", name = "arrayElement")
 @ELExpression(value = "${functions.map(value -> value.toUpperCase(), 'el')}", name = "functionalInterface")
+@ELExpression(value = "${f.map(value -> value.toUpperCase(), 'el')}", name = "aliasedFunctionalInterface")
+@ELExpression(value = "${formatting.argumentType(formatting.numbers)}", name = "formattingPrimitiveArray")
+@ELExpression(value = "${formatting.argumentType(strings)}", name = "formattingReferenceArray")
+@ELExpression(value = "${Math.max(item.quantity, Integer.valueOf(7))}", name = "staticIntegerMaximum")
+@ELExpression(value = "${Math.max(book.unitPrice, 25.0)}", name = "staticDoubleMaximum")
+@ELExpression(value = "${decimal == large}", name = "largeIntegralBigDecimalEquality")
 @ELExpression(value = "${twice(3)}", name = "mappedFunctionFallback")
 @ELExpression(value = "${twice2(3)}", expectedType = Object.class, name = "missingFunction")
 @ELExpression(value = "${varargs.choose(1, 1)}", name = "assignableOverCoercible")

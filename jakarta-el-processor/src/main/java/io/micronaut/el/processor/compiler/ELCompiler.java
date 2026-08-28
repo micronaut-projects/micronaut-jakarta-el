@@ -629,7 +629,9 @@ public final class ELCompiler {
     private Typed compileProperty(ELNode.Property property, ExpressionDef ctx) {
         String propertyName = constantName(property.property());
         if (propertyName != null && property.base() instanceof ELNode.Identifier identifier) {
-            ClassElement importedClass = context.resolveClass(identifier.name());
+            String name = identifier.name();
+            ClassElement importedClass = context.isLambdaParameter(name) || context.variableType(name) != null
+                ? null : context.resolveClass(name);
             if (importedClass != null) {
                 FieldElement field = findStaticField(importedClass, propertyName);
                 if (field != null) {
@@ -694,7 +696,9 @@ public final class ELCompiler {
     private Typed compileMethod(ELNode.Method method, ExpressionDef ctx) {
         String methodName = constantName(method.property());
         if (methodName != null && method.base() instanceof ELNode.Identifier identifier) {
-            ClassElement importedClass = context.resolveClass(identifier.name());
+            String name = identifier.name();
+            ClassElement importedClass = context.isLambdaParameter(name) || context.variableType(name) != null
+                ? null : context.resolveClass(name);
             if (importedClass != null) {
                 MethodElement staticMethod = selectMethod(importedClass, methodName, method.arguments(), true, ctx);
                 if (staticMethod != null) {
@@ -1388,7 +1392,8 @@ public final class ELCompiler {
                 && !(argument instanceof ELNode.Lambda)) {
                 directValue = compileTyped(argument, ctx);
                 ClassElement arrayParameter = parameters[parameters.length - 1].getType();
-                if (directValue.type() != null && directValue.type().getName().equals(arrayParameter.getName())) {
+                if (directValue.type() != null && (directValue.type().getName().equals(arrayParameter.getName())
+                    || receiver == null && isAssignable(directValue.type(), arrayParameter))) {
                     directVarargsArray = true;
                 } else {
                     parameter = parameters[parameters.length - 1].getType().fromArray();
@@ -1492,7 +1497,8 @@ public final class ELCompiler {
             return literal;
         }
         // the section 1.25.8 of the specification coerces a lambda expression to a functional interface
-        boolean functionalInterface = target.isInterface() && !target.isAssignable(LambdaExpression.class);
+        boolean functionalInterface = !target.isArray() && target.isInterface()
+            && !target.isAssignable(LambdaExpression.class);
         return runtime(EL_SUPPORT, 
             functionalInterface ? "coerceToFunctionalInterface" : "coerceToType",
             targetType,

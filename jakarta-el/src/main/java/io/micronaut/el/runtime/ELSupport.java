@@ -814,6 +814,9 @@ public final class ELSupport {
             if (value instanceof BigInteger bigInteger) {
                 return new BigDecimal(bigInteger);
             }
+            if (value instanceof Byte || value instanceof Short || value instanceof Integer || value instanceof Long) {
+                return BigDecimal.valueOf(value.longValue());
+            }
             return new BigDecimal(value.doubleValue());
         }
         if (type == Byte.class) {

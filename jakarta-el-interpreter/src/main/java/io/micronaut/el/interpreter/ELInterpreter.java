@@ -448,28 +448,33 @@ final class ELInterpreter {
      * @return The bound functions
      */
     static Map<String, BoundFunction> bindFunctions(@Nullable ELContext context, ELNode node) {
-        if (context == null) {
-            return Map.of();
-        }
-        FunctionMapper functionMapper = context.getFunctionMapper();
-        if (functionMapper == null) {
-            return Map.of();
-        }
         if (!containsFunction(node)) {
             return Map.of();
         }
+        FunctionMapper functionMapper = context == null ? null : context.getFunctionMapper();
         Map<String, BoundFunction> bindings = new LinkedHashMap<>();
         bindFunctions(functionMapper, node, bindings);
         return Map.copyOf(bindings);
     }
 
-    private static void bindFunctions(FunctionMapper functionMapper,
+    private static void bindFunctions(@Nullable FunctionMapper functionMapper,
                                       ELNode node,
                                       Map<String, BoundFunction> bindings) {
         if (node instanceof ELNode.Function function) {
-            Method method = functionMapper.resolveFunction(function.prefix(), function.localName());
+            Method method = functionMapper == null ? null
+                : functionMapper.resolveFunction(function.prefix(), function.localName());
             if (method != null) {
+                int count = function.invocations().get(0).size();
+                int parameters = method.getParameterCount();
+                if (method.isVarArgs() ? count < parameters - 1 : count != parameters) {
+                    throw new ELException("The function '" + qualifiedName(function.prefix(), function.localName())
+                        + "' expects " + (method.isVarArgs() ? "at least " + (parameters - 1) : parameters)
+                        + " argument(s) but " + count + " were provided");
+                }
                 bindings.put(qualifiedName(function.prefix(), function.localName()), BoundFunction.of(method));
+            } else if (!function.prefix().isEmpty()) {
+                throw new ELException("Cannot resolve the function '"
+                    + qualifiedName(function.prefix(), function.localName()) + "'");
             }
         }
         for (ELNode child : children(node)) {
@@ -706,7 +711,7 @@ final class ELInterpreter {
         if (identifier instanceof LambdaExpression || identifier instanceof ELClass) {
             return ELSandboxGuard.invokeCallable(context, identifier, evaluateAll(context, firstArguments));
         }
-        Method method = resolveMappedFunction(context, function);
+        Method method = resolveMappedFunction(function);
         if (method != null) {
             return invokeStatic(context, method, evaluateAll(context, firstArguments));
         }
@@ -732,16 +737,9 @@ final class ELInterpreter {
     }
 
     @Nullable
-    private Method resolveMappedFunction(ELContext context, ELNode.Function function) {
+    private Method resolveMappedFunction(ELNode.Function function) {
         BoundFunction bound = functions.get(qualifiedName(function.prefix(), function.localName()));
-        if (bound != null) {
-            return bound.method();
-        }
-        FunctionMapper functionMapper = context.getFunctionMapper();
-        if (functionMapper == null) {
-            return null;
-        }
-        return functionMapper.resolveFunction(function.prefix(), function.localName());
+        return bound == null ? null : bound.method();
     }
 
     @Nullable

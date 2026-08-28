@@ -17,12 +17,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -36,8 +38,14 @@ class ELInterpreterExpressionsTest {
         .setBean("varargs", new Varargs())
         .setBean("strings", new String[]{"a", "b"})
         .setBean("functions", new Formatting())
+        .setBean("f", new Formatting())
+        .setBean("formatting", new Formatting())
         .setBean("integer", 1)
         .setBean("number", 1)
+        .setBean("item", new Inventory("A-1", 5, 10L, 9.99d, 1.5f, true, Suit.HEART))
+        .setBean("book", new Book("EL", "history", 20d))
+        .setBean("decimal", new BigDecimal("9007199254740993"))
+        .setBean("large", 9007199254740993L)
         .setBean("counter", new EvaluationCounter())
         .setBean("twice", 42L)
         .setBean("target", ELInterpreterExpressions$ELExpressions.LIST_SIZE_METHOD);
@@ -84,6 +92,17 @@ class ELInterpreterExpressionsTest {
         assertEquals(4L, value(ELInterpreterExpressions$ELExpressions.STREAM_COUNT));
         assertEquals(List.of(1L, 2L, 3L), value(ELInterpreterExpressions$ELExpressions.SORTED_STREAM));
         assertEquals(3L, value(ELInterpreterExpressions$ELExpressions.STREAM_MAXIMUM));
+        assertThrows(MethodNotFoundException.class,
+            () -> value(ELInterpreterExpressions$ELExpressions.STREAM_COUNT_WRONG_ARITY));
+        assertThrows(MethodNotFoundException.class,
+            () -> value(ELInterpreterExpressions$ELExpressions.STREAM_FILTER_WRONG_ARITY));
+        assertThrows(MethodNotFoundException.class,
+            () -> value(ELInterpreterExpressions$ELExpressions.OPTIONAL_GET_WRONG_ARITY));
+        assertThrows(ELException.class,
+            () -> value(ELInterpreterExpressions$ELExpressions.NEGATIVE_STREAM_LIMIT));
+        assertThrows(ELException.class,
+            () -> value(ELInterpreterExpressions$ELExpressions.REVERSED_SUBSTREAM));
+        assertNull(value(ELInterpreterExpressions$ELExpressions.OPTIONAL_IF_PRESENT));
     }
 
     @Test
@@ -101,10 +120,19 @@ class ELInterpreterExpressionsTest {
     void functionsVarargsArraysAndFunctionalInterfaces() {
         assertEquals("a,b", value(ELInterpreterExpressions$ELExpressions.FUNCTION_JOIN));
         assertEquals("a,b", value(ELInterpreterExpressions$ELExpressions.FUNCTION_ARRAY_JOIN));
+        assertEquals("a,b", value(ELInterpreterExpressions$ELExpressions.FUNCTION_SUBTYPE_ARRAY_JOIN));
+        assertEquals("a,b", value(ELInterpreterExpressions$ELExpressions.UNQUALIFIED_FUNCTION_JOIN));
+        assertEquals("a,b", value(ELInterpreterExpressions$ELExpressions.NAMED_VARARGS_CONSTRUCTOR));
         assertEquals("1:int[]", value(ELInterpreterExpressions$ELExpressions.PRIMITIVE_VARARGS_ARRAY));
         assertEquals("a,b", value(ELInterpreterExpressions$ELExpressions.REFERENCE_VARARGS_ARRAY));
         assertEquals("a", value(ELInterpreterExpressions$ELExpressions.ARRAY_ELEMENT));
         assertEquals("default:EL", value(ELInterpreterExpressions$ELExpressions.FUNCTIONAL_INTERFACE));
+        assertEquals("default:EL", value(ELInterpreterExpressions$ELExpressions.ALIASED_FUNCTIONAL_INTERFACE));
+        assertEquals("1:int[]", value(ELInterpreterExpressions$ELExpressions.FORMATTING_PRIMITIVE_ARRAY));
+        assertEquals("1:java.lang.String[]", value(ELInterpreterExpressions$ELExpressions.FORMATTING_REFERENCE_ARRAY));
+        assertEquals(7, value(ELInterpreterExpressions$ELExpressions.STATIC_INTEGER_MAXIMUM));
+        assertEquals(25d, value(ELInterpreterExpressions$ELExpressions.STATIC_DOUBLE_MAXIMUM));
+        assertEquals(true, value(ELInterpreterExpressions$ELExpressions.LARGE_INTEGRAL_BIG_DECIMAL_EQUALITY));
         assertEquals(6L, value(ELInterpreterExpressions$ELExpressions.MAPPED_FUNCTION_FALLBACK));
         assertThrows(MethodNotFoundException.class,
             () -> value(ELInterpreterExpressions$ELExpressions.MISSING_FUNCTION));

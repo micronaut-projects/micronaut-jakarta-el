@@ -213,7 +213,11 @@ public final class ELStream<T> {
      * @return A stream of at most {@code count} elements
      */
     public ELStream<T> limit(Object count) {
-        return next(stream.limit(Math.max(0, longValue(count))));
+        long limit = longValue(count);
+        if (limit < 0) {
+            throw new ELException(new IllegalArgumentException("limit must be non-negative"));
+        }
+        return next(stream.limit(limit));
     }
 
     /**
@@ -221,7 +225,11 @@ public final class ELStream<T> {
      * @return A stream skipping the first elements
      */
     public ELStream<T> substream(Object start) {
-        return next(stream.skip(Math.max(0, longValue(start))));
+        long from = longValue(start);
+        if (from < 0) {
+            throw new ELException(new IllegalArgumentException("substream index must be non-negative"));
+        }
+        return next(stream.skip(from));
     }
 
     /**
@@ -230,8 +238,14 @@ public final class ELStream<T> {
      * @return A stream of the elements between the two positions
      */
     public ELStream<T> substream(Object start, Object end) {
-        long from = Math.max(0, longValue(start));
-        long to = Math.max(from, longValue(end));
+        long from = longValue(start);
+        long to = longValue(end);
+        if (from < 0 || to < 0) {
+            throw new ELException(new IllegalArgumentException("substream index must be non-negative"));
+        }
+        if (to < from) {
+            throw new ELException(new IllegalArgumentException("substream end must not precede its start"));
+        }
         return next(stream.skip(from).limit(to - from));
     }
 
@@ -469,6 +483,7 @@ public final class ELStream<T> {
     @Nullable
     @SuppressWarnings("java:S1479")
     public Object invokeOperation(String name, Object[] arguments) {
+        requireArity(name, arguments.length);
         return switch (name) {
             case "filter" -> filter(lambda(context, arguments, 0, name));
             case "map" -> map(lambda(context, arguments, 0, name));
@@ -498,6 +513,20 @@ public final class ELStream<T> {
             case "findFirst" -> findFirst();
             default -> throw new MethodNotFoundException("Unknown stream operation '" + name + "'");
         };
+    }
+
+    private static void requireArity(String operation, int count) {
+        boolean valid = switch (operation) {
+            case "distinct", "iterator", "toArray", "toList", "average", "sum", "count", "findFirst" -> count == 0;
+            case "filter", "map", "flatMap", "forEach", "peek", "limit", "anyMatch", "allMatch", "noneMatch" -> count == 1;
+            case "sorted", "max", "min" -> count <= 1;
+            case "substream", "reduce" -> count == 1 || count == 2;
+            default -> true;
+        };
+        if (!valid) {
+            throw new MethodNotFoundException("The stream operation '" + operation + "' does not accept "
+                + count + " argument(s)");
+        }
     }
 
     static LambdaExpression lambda(ELContext context, Object[] arguments, int index, String operation) {
