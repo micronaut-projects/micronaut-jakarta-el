@@ -18,6 +18,7 @@ package io.micronaut.el.runtime;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.annotation.UsedByGeneratedCode;
 import jakarta.el.ELContext;
+import jakarta.el.Expression;
 import jakarta.el.ELResolver;
 import jakarta.el.EvaluationListener;
 import jakarta.el.FunctionMapper;
@@ -41,6 +42,23 @@ import java.util.Objects;
 public final class ELVariableBindings {
 
     private ELVariableBindings() {
+    }
+
+    /**
+     * Returns the parsed expression behind a creation-time variable-binding view. Equality is defined by the
+     * parsed representation, and the bindings do not change it.
+     *
+     * @param expression The expression or binding view
+     * @return The underlying expression
+     */
+    public static Expression unwrap(Expression expression) {
+        if (expression instanceof BoundValueExpression bound) {
+            return unwrap(bound.delegate);
+        }
+        if (expression instanceof BoundMethodExpression bound) {
+            return unwrap(bound.delegate);
+        }
+        return expression;
     }
 
     /**
@@ -205,7 +223,8 @@ public final class ELVariableBindings {
 
         @Override
         public boolean equals(@Nullable Object obj) {
-            return obj instanceof BoundValueExpression other && delegate.equals(other.delegate);
+            return obj instanceof ValueExpression expression
+                && delegate.equals(ELVariableBindings.unwrap(expression));
         }
 
         @Override
@@ -269,7 +288,8 @@ public final class ELVariableBindings {
 
         @Override
         public boolean equals(@Nullable Object obj) {
-            return obj instanceof BoundMethodExpression other && delegate.equals(other.delegate);
+            return obj instanceof MethodExpression expression
+                && delegate.equals(ELVariableBindings.unwrap(expression));
         }
 
         @Override

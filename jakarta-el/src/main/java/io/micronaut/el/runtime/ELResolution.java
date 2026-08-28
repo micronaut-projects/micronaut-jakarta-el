@@ -256,6 +256,54 @@ public final class ELResolution {
     }
 
     /**
+     * Evaluates a property or method continuation only when its base is non-null. Section 1.6 evaluates the
+     * base first and returns {@code null} without evaluating the property or parameters when the base is null.
+     * Generated expressions use this helper so statically resolved, direct member accesses retain that order
+     * without falling back to reflective resolution.
+     *
+     * @param context The context
+     * @param base    The evaluated base
+     * @param access  The compiled continuation, receiving the non-null base
+     * @return The result, or {@code null} for a null base
+     */
+    @Nullable
+    public static Object access(ELContext context,
+                                @Nullable Object base,
+                                ELLambdaBody.Unary access) {
+        return base == null ? null : access.evaluate(context, base);
+    }
+
+    /**
+     * Evaluates an lvalue continuation after requiring its base. Assigning an lvalue with a null base fails
+     * before its property or assigned value is evaluated.
+     *
+     * @param context The context
+     * @param base    The evaluated base
+     * @param access  The compiled continuation
+     * @return The continuation result
+     */
+    @Nullable
+    public static Object accessRequired(ELContext context,
+                                        @Nullable Object base,
+                                        ELLambdaBody.Unary access) {
+        if (base == null) {
+            throw propertyNotFound(null, null);
+        }
+        return access.evaluate(context, base);
+    }
+
+    /**
+     * Requires the evaluated base of an lvalue to be non-null before its property or value is evaluated.
+     *
+     * @param base The evaluated base
+     */
+    public static void requireBase(@Nullable Object base) {
+        if (base == null) {
+            throw propertyNotFound(null, null);
+        }
+    }
+
+    /**
      * Resolves a property of a base object, failing when the base or the property is {@code null}.
      *
      * @param context  The context

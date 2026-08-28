@@ -39,10 +39,13 @@ import java.util.List;
     imports = {Varargs.class, VarargsConstructor.class},
     functions = {
         @ELFunctions(prefix = "fn", value = InterpreterParityFunctions.class),
+        @ELFunctions(prefix = "alias", value = InterpreterParityFunctions.class),
+        @ELFunctions(prefix = "other", value = InterpreterParityFunctions.class),
         @ELFunctions(value = InterpreterParityFunctions.class)
     }
 )
 @ELExpression(value = "${1 + 2}", name = "addition")
+@ELExpression(value = "${1 + 2}", expectedType = String.class, name = "additionAsString")
 @ELExpression(value = "${5 / 2}", name = "division")
 @ELExpression(value = "${7 mod 3}", name = "modulo")
 @ELExpression(value = "${-(1 + 2)}", name = "negation")
@@ -64,6 +67,7 @@ import java.util.List;
 @ELExpression(value = "${v = (x,y)->x+y; v(3,4)}", name = "assignedLambda")
 @ELExpression(value = "${fact = n -> n==0? 1: n*fact(n-1); fact(5)}", name = "factorial")
 @ELExpression(value = "${(x->y->x+y)(1)(2)}", name = "nestedLambda")
+@ELExpression(value = "${ignored -> book.title}", expectedType = LambdaExpression.class, name = "deferredBookTitle")
 @ELExpression(value = "${[1,2,3,4].stream().filter(i->i mod 2 == 0).toList()}", name = "filteredStream")
 @ELExpression(value = "${[1,2,3,4].stream().sum()}", name = "streamSum")
 @ELExpression(value = "${[1,2,3,4].stream().count()}", name = "streamCount")
@@ -80,6 +84,27 @@ import java.util.List;
     name = "reversedSubstream")
 @ELExpression(value = "${[1].stream().findFirst().ifPresent(x -> x)}", expectedType = Object.class,
     name = "optionalIfPresent")
+@ELExpression(value = "${[].stream().findFirst().orElse(null)}", expectedType = Object.class,
+    name = "optionalNullFallback")
+@ELExpression(value = "${[1].stream().limit(null).toList()}", expectedType = Object.class,
+    name = "nullStreamLimit")
+@ELExpression(value = "${[1].stream().substream(null).toList()}", expectedType = Object.class,
+    name = "nullStreamStart")
+@ELExpression(value = "${[1].stream().reduce(null,(a,b)->b)}", expectedType = Object.class,
+    name = "nullReductionSeed")
+@ELExpression(value = "${null[counter.bump()]}", expectedType = Object.class,
+    name = "nullBasePropertyShortCircuit")
+@ELExpression(value = "${null.foo(counter.bump())}", expectedType = Object.class,
+    name = "nullBaseMethodShortCircuit")
+@ELExpression(value = "${book.title}", expectedType = Object.class, name = "nullTypedProperty")
+@ELExpression(value = "${book.discounted(counter.bump())}", expectedType = Object.class,
+    name = "nullTypedMethod")
+@ELExpression(value = "${xs[counter.bump()]}", expectedType = Object.class,
+    name = "nullTypedCollection")
+@ELExpression(value = "${xs.stream().count()}", expectedType = Object.class,
+    name = "nullTypedStream")
+@ELExpression(value = "${null[counter.bump()] = counter.bump()}", expectedType = Object.class,
+    name = "nullBaseAssignment")
 @ELExpression(value = "${greeting}", name = "greeting")
 @ELExpression(value = "${greeting.length()}", name = "greetingLength")
 @ELExpression(value = "${greeting.toUpperCase()}", name = "uppercaseGreeting")
@@ -87,6 +112,9 @@ import java.util.List;
 @ELExpression(value = "${Integer.valueOf(3)}", name = "integerValueOf")
 @ELExpression(value = "${String('x')}", name = "stringConstructor")
 @ELExpression(value = "${fn:join('a', 'b')}", name = "functionJoin")
+@ELExpression(value = "${alias:join('a', 'b')}", expectedType = Object.class, name = "aliasedFunctionJoin")
+@ELExpression(value = "${other:joinDifferently('a', 'b')}", expectedType = Object.class,
+    name = "differentFunctionJoin")
 @ELExpression(value = "${fn:join(sequences)}", name = "functionArrayJoin")
 @ELExpression(value = "${fn:join(strings)}", name = "functionSubtypeArrayJoin")
 @ELExpression(value = "${join('a', 'b')}", name = "unqualifiedFunctionJoin")
@@ -116,6 +144,7 @@ import java.util.List;
 @ELExpression(value = "${varargs.rejectSealed(value -> value)}", expectedType = Object.class, name = "sealedInterface")
 @ELExpression(value = "${'1'}", expectedType = Integer.class, name = "coercionListenerValue")
 @ELMethodExpression(value = "#{xs.size}", expectedReturnType = Object.class, name = "listSizeMethod")
+@ELMethodExpression(value = "#{xs.size}", expectedReturnType = String.class, name = "listSizeStringMethod")
 @ELMethodExpression(value = "#{Integer.valueOf}", expectedReturnType = Integer.class,
     expectedParamTypes = String.class, name = "integerValueOfMethod")
 @ELMethodExpression(value = "#{bean.join}", expectedReturnType = String.class,

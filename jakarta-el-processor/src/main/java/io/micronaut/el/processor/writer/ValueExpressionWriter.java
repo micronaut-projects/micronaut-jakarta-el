@@ -20,7 +20,6 @@ import io.micronaut.core.annotation.Internal;
 import io.micronaut.el.processor.compiler.ELCompilationException;
 import io.micronaut.el.processor.compiler.ELCompiler;
 import io.micronaut.el.processor.compiler.ELExpressionDefinition;
-import io.micronaut.el.parser.ELNodes;
 import io.micronaut.el.parser.ast.ELNode;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.el.runtime.CompiledValueExpression;
@@ -64,6 +63,7 @@ public final class ValueExpressionWriter {
     public static Written write(String className,
                                 ELExpressionDefinition definition,
                                 ELCompiler compiler) {
+        compiler.beginClass(className);
         // the evaluation is compiled first: an omitted expected type is inferred from its static type, and the
         // constructor tells the runtime whether the result already has the expected type
         MethodDef evaluate = evaluate(definition, compiler);
@@ -79,7 +79,7 @@ public final class ValueExpressionWriter {
             .superclass(ClassTypeDef.of(CompiledValueExpression.class))
             // the source writer interprets a '$' in the javadoc
             .addJavadoc("The compiled form of the expression <code>" + definition.expression().replace("$", "$$") + "</code>.")
-            .addMethod(constructor(definition, coerced))
+            .addMethod(constructor(definition, compiler, coerced))
             .addMethod(evaluate);
 
         ELNode node = unwrap(definition.node());
@@ -89,6 +89,7 @@ public final class ValueExpressionWriter {
             builder.addMethod(getType(node, compiler));
             builder.addMethod(getValueReference(node, compiler));
         }
+        builder.addMethods(compiler.accessMethods());
         return new Written(builder.build(), definition);
     }
 
@@ -109,12 +110,12 @@ public final class ValueExpressionWriter {
             + " @ELEnvironment, or declare " + member + " (Object.class accepts any result).");
     }
 
-    private static MethodDef constructor(ELExpressionDefinition definition, boolean coerced) {
+    private static MethodDef constructor(ELExpressionDefinition definition, ELCompiler compiler, boolean coerced) {
         return MethodDef.constructor()
             .addModifiers(Modifier.PUBLIC)
             .build((aThis, parameters) -> aThis.superRef().invokeSuperConstructor(
                 ExpressionDef.constant(definition.expression()),
-                ExpressionDef.constant(ELNodes.canonical(definition.node())),
+                ExpressionDef.constant(compiler.canonical(definition.node())),
                 ExpressionDef.constant(TypeDef.erasure(definition.requireExpectedType())),
                 ExpressionDef.constant(coerced)
             ));

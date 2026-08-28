@@ -12,6 +12,10 @@ public final class InterpreterParityFunctions {
         return Arrays.stream(values).map(CharSequence::toString).collect(Collectors.joining(","));
     }
 
+    public static String joinDifferently(CharSequence... values) {
+        return Arrays.stream(values).map(CharSequence::toString).collect(Collectors.joining(";"));
+    }
+
     public static long twice(long value) {
         return value * 2;
     }
