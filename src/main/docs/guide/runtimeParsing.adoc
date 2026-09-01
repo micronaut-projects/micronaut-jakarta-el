@@ -7,10 +7,17 @@ It registers an `ELExpressionParser` service, which `CompiledExpressionFactory` 
 no generated source provides. Such an expression is parsed once, when it is created, and its tree is then
 evaluated by the interpreter.
 
-WARNING: Runtime expressions are executable application code, not sandboxed data. The standard Jakarta EL
-context can construct imported classes and invoke their public static and instance methods. Only parse strings
-from a fully trusted source; an operator or database field that an untrusted user can modify must not be passed
-directly to the expression factory.
+The interpreter resolves methods through `io.micronaut.el.ELMethodExecutor` services. The interpreter module includes
+direct executors for common String, collection, map, array, stream and optional operations, and for Micronaut bean
+introspections. To make arbitrary public Java methods, constructors and `FunctionMapper` functions available, also
+add the optional reflection executor:
+
+dependency:micronaut-jakarta-el-interpreter-reflection[scope="runtimeOnly", groupId="io.micronaut.el"]
+
+WARNING: Runtime expressions are executable application code, not sandboxed data. When the reflection executor is
+present, the standard Jakarta EL context can construct imported classes and invoke their public static and instance
+methods. Only parse strings from a fully trusted source; an operator or database field that an untrusted user can
+modify must not be passed directly to the expression factory.
 
 To bound CPU, memory and stack use, the parser rejects an expression longer than 16,384 characters, containing
 more than 1,024 tokens or nested more than 128 levels.

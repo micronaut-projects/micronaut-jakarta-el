@@ -22,10 +22,13 @@ import io.micronaut.core.beans.BeanMethod;
 import io.micronaut.core.beans.BeanProperty;
 import io.micronaut.core.reflect.ReflectionUtils;
 import io.micronaut.core.type.Argument;
+import io.micronaut.el.ELMethod;
+import io.micronaut.el.ELMethodExecutor;
 import io.micronaut.el.runtime.ELSupport;
 import jakarta.el.ELContext;
 import jakarta.el.ELException;
 import jakarta.el.ELResolver;
+import jakarta.el.MethodInfo;
 import jakarta.el.PropertyNotWritableException;
 import org.jspecify.annotations.Nullable;
 
@@ -47,10 +50,7 @@ import java.util.Map;
  * @since 1.0
  */
 @Internal
-public final class IntrospectionELResolver extends ELResolver {
-
-    private final BeanIntrospector introspector;
-    private final boolean readOnly;
+public final class IntrospectionELResolver extends ELResolver implements ELMethodExecutor {
 
     /**
      * What the resolver needs of a class, read once: the introspection, its properties by name and its methods
@@ -63,6 +63,9 @@ public final class IntrospectionELResolver extends ELResolver {
             return Introspected.of(findIntrospection(type));
         }
     };
+
+    private final BeanIntrospector introspector;
+    private final boolean readOnly;
 
     /**
      * Creates a resolver using the shared introspector.
@@ -85,6 +88,11 @@ public final class IntrospectionELResolver extends ELResolver {
     public IntrospectionELResolver(BeanIntrospector introspector, boolean readOnly) {
         this.introspector = introspector;
         this.readOnly = readOnly;
+    }
+
+    @Override
+    public int getPriority() {
+        return 100;
     }
 
     @Override
@@ -141,6 +149,21 @@ public final class IntrospectionELResolver extends ELResolver {
                          @Nullable Object method,
                          Class<?> @Nullable [] paramTypes,
                          Object @Nullable [] params) {
+        ELMethod resolved = resolve(context, base, method, paramTypes, params);
+        if (resolved == null) {
+            return null;
+        }
+        context.setPropertyResolved(base, method);
+        return resolved.invoke(context, base, params);
+    }
+
+    @Override
+    @Nullable
+    public ELMethod resolve(ELContext context,
+                            @Nullable Object base,
+                            @Nullable Object method,
+                            Class<?> @Nullable [] paramTypes,
+                            Object @Nullable [] arguments) {
         if (base == null || !(method instanceof String name)) {
             return null;
         }
@@ -148,16 +171,12 @@ public final class IntrospectionELResolver extends ELResolver {
         if (named == null) {
             return null;
         }
-        Object[] arguments = params == null ? new Object[0] : params;
+        Object[] values = arguments == null ? new Object[0] : arguments;
         if (paramTypes != null) {
             for (BeanMethod<Object, Object> candidate : named) {
-                if (sameTypes(candidate.getArguments(), paramTypes)) {
-                    Object[] coerced = coerce(context, candidate.getArguments(), arguments);
-                    if (coerced != null) {
-                        context.setPropertyResolved(base, method);
-                        return candidate.invoke(base, coerced);
-                    }
-                    return null;
+                if (sameTypes(candidate.getArguments(), paramTypes)
+                    && coerce(context, candidate.getArguments(), values) != null) {
+                    return new IntrospectionMethod(candidate);
                 }
             }
             return null;
@@ -166,26 +185,18 @@ public final class IntrospectionELResolver extends ELResolver {
         // an overload the arguments do not fit is skipped, and when none fits the resolver declines and the
         // standard resolvers get their chance.
         BeanMethod<Object, Object> selected = null;
-        Object[] selectedArguments = arguments;
-        for (BeanMethod<Object, Object> candidate : named.length == 1 ? List.of(named[0]) : candidates(named, arguments)) {
-            Object[] coerced = coerce(context, candidate.getArguments(), arguments);
-            if (coerced == null) {
+        for (BeanMethod<Object, Object> candidate : named.length == 1 ? List.of(named[0]) : candidates(named, values)) {
+            if (coerce(context, candidate.getArguments(), values) == null) {
                 continue;
             }
-            if (selected == null) {
-                selected = candidate;
-                selectedArguments = coerced;
-            } else {
+            if (selected != null) {
                 // The candidates have equal method-selection priority. Let the reflective resolver report
                 // the ambiguity instead of depending on the order of the generated introspection methods.
                 return null;
             }
+            selected = candidate;
         }
-        if (selected != null) {
-            context.setPropertyResolved(base, method);
-            return selected.invoke(base, selectedArguments);
-        }
-        return null;
+        return selected == null ? null : new IntrospectionMethod(selected);
     }
 
     @Override
@@ -320,6 +331,57 @@ public final class IntrospectionELResolver extends ELResolver {
 
     private boolean isReadOnly(BeanProperty<Object, Object> beanProperty) {
         return readOnly || beanProperty.isReadOnly();
+    }
+
+    private static final class IntrospectionMethod implements ELMethod {
+        private final BeanMethod<Object, Object> method;
+        private final MethodInfo methodInfo;
+
+        private IntrospectionMethod(BeanMethod<Object, Object> method) {
+            this.method = method;
+            this.methodInfo = new MethodInfo(method.getName(), method.getReturnType().getType(),
+                Argument.toClassArray(method.getArguments()));
+        }
+
+        @Override
+        public String getName() {
+            return methodInfo.getName();
+        }
+
+        @Override
+        public Class<?> getReturnType() {
+            return methodInfo.getReturnType();
+        }
+
+        @Override
+        public Class<?>[] getParameterTypes() {
+            return methodInfo.getParamTypes();
+        }
+
+        @Override
+        public boolean isVarArgs() {
+            return false;
+        }
+
+        @Override
+        @Nullable
+        public Object invoke(ELContext context, @Nullable Object base, Object @Nullable [] arguments) {
+            if (base == null) {
+                throw new IllegalArgumentException("An introspected method requires a base object");
+            }
+            Object[] values = arguments == null ? new Object[0] : arguments;
+            Object[] coerced = coerce(context, method.getArguments(), values);
+            if (coerced == null) {
+                throw new ELException("The arguments do not match the method '" + method.getName() + "'");
+            }
+            return method.invoke(base, coerced);
+        }
+
+        @Override
+        public String identity() {
+            return method.getDeclaringType().getName() + '#' + method.getName()
+                + java.util.Arrays.toString(methodInfo.getParamTypes());
+        }
     }
 
     /**

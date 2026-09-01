@@ -38,6 +38,7 @@ dependencies {
 
     testImplementation projects.micronautJakartaEl
     testImplementation projects.micronautJakartaElInterpreter
+    testImplementation projects.micronautJakartaElInterpreterReflection
     testImplementation platform(libs.junit.bom)
     testImplementation libs.junit.jupiter
     testRuntimeOnly libs.junit.jupiter.engine

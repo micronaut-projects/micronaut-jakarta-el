@@ -403,13 +403,13 @@ public final class ELSupport {
         if (arrayType.isInstance(value)) {
             return value;
         }
-        if (!value.getClass().isArray()) {
+        if (!ELArray.isArray(value)) {
             throw cannotCoerce(value, arrayType);
         }
-        int length = Array.getLength(value);
+        int length = ELArray.length(value);
         Object result = Array.newInstance(componentType, length);
         for (int i = 0; i < length; i++) {
-            Array.set(result, i, coerce(Array.get(value, i), componentType));
+            ELArray.set(result, i, coerce(ELArray.get(value, i), componentType));
         }
         return result;
     }
@@ -424,8 +424,8 @@ public final class ELSupport {
         if (value == null || "".equals(value)) {
             return true;
         }
-        if (value.getClass().isArray()) {
-            return Array.getLength(value) == 0;
+        if (ELArray.isArray(value)) {
+            return ELArray.length(value) == 0;
         }
         if (value instanceof Map<?, ?> map) {
             return map.isEmpty();

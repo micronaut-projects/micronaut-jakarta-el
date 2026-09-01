@@ -261,9 +261,16 @@ class ELInterpreterTest {
     @Test
     void assignmentAndBeans() {
         processor.defineBean("greeting", "hello");
+        processor.defineBean("strings", new String[]{"a", "b"});
+        processor.defineBean("numbers", new int[]{1, 2, 3});
         assertEquals("hello", processor.eval("greeting"));
         assertEquals((Object) 5, processor.eval("greeting.length()"));
         assertEquals("HELLO", processor.eval("greeting.toUpperCase()"));
+        assertEquals("HEL", processor.eval("greeting.toUpperCase().substring(0, 3)"));
+        assertEquals((Object) 2, processor.eval("strings.length"));
+        assertEquals((Object) 2, processor.eval("numbers[1]"));
+        assertEquals((Object) 6L, processor.eval("numbers.stream().sum()"));
+        assertEquals((Object) 4, processor.eval("numbers[1] = Integer.valueOf(4)"));
     }
 
     @Test

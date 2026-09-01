@@ -16,9 +16,11 @@
 package io.micronaut.el.interpreter;
 
 import io.micronaut.core.annotation.Internal;
+import io.micronaut.core.io.service.SoftServiceLoader;
+import io.micronaut.el.ELMethod;
+import io.micronaut.el.ELMethodExecutor;
 import io.micronaut.el.parser.ast.BinaryOperator;
 import io.micronaut.el.parser.ast.ELNode;
-import io.micronaut.el.parser.ELNodes;
 import io.micronaut.el.runtime.ELArithmetic;
 import io.micronaut.el.runtime.ELCollections;
 import io.micronaut.el.runtime.ELLambdas;
@@ -27,7 +29,6 @@ import io.micronaut.el.runtime.ELSupport;
 import jakarta.el.ELClass;
 import jakarta.el.ELContext;
 import jakarta.el.ELException;
-import jakarta.el.FunctionMapper;
 import jakarta.el.ImportHandler;
 import jakarta.el.LambdaExpression;
 import jakarta.el.MethodNotFoundException;
@@ -36,13 +37,8 @@ import jakarta.el.PropertyNotFoundException;
 import jakarta.el.ValueReference;
 import org.jspecify.annotations.Nullable;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.io.Serial;
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,11 +57,13 @@ final class ELInterpreter {
 
     private static final Object[] NO_ARGUMENTS = new Object[0];
 
-    private final Map<String, BoundFunction> functions;
+    private final List<ELMethodExecutor> executors;
+    private final Map<String, ELMethod> functions;
     @Nullable
     private Evaluator root;
 
-    private ELInterpreter(Map<String, BoundFunction> functions) {
+    private ELInterpreter(List<ELMethodExecutor> executors, Map<String, ELMethod> functions) {
+        this.executors = orderExecutors(executors);
         this.functions = functions;
     }
 
@@ -158,7 +156,7 @@ final class ELInterpreter {
                         }
                         Object evaluatedName = name.evaluate(context);
                         return evaluatedName == null ? null
-                            : ELSandboxGuard.invokeWithParams(context, evaluatedBase, evaluatedName,
+                            : invokeWithParams(context, evaluatedBase, evaluatedName,
                                 evaluateAll(context, arguments));
                     }
                 };
@@ -171,7 +169,7 @@ final class ELInterpreter {
                     @Override
                     @Nullable
                     Object evaluate(ELContext context) {
-                        return ELSandboxGuard.invokeCallable(context, target.evaluate(context), evaluateAll(context, arguments));
+                        return invokeCallable(context, target.evaluate(context), evaluateAll(context, arguments));
                     }
                 };
             }
@@ -411,11 +409,29 @@ final class ELInterpreter {
      * @return The interpreter
      */
     static ELInterpreter of(@Nullable ELContext context, ELNode node) {
-        return new ELInterpreter(bindFunctions(context, node));
+        return of(context, node, loadExecutors());
     }
 
-    static ELInterpreter of(Map<String, BoundFunction> functions) {
-        return new ELInterpreter(functions);
+    static ELInterpreter of(@Nullable ELContext context, ELNode node, List<ELMethodExecutor> executors) {
+        return new ELInterpreter(executors, bindFunctions(context, node, executors));
+    }
+
+    static ELInterpreter of(List<ELMethodExecutor> executors, Map<String, ELMethod> functions) {
+        return new ELInterpreter(executors, functions);
+    }
+
+    static ELInterpreter of(Map<String, ELMethod> functions) {
+        return of(loadExecutors(), functions);
+    }
+
+    List<ELMethodExecutor> executors() {
+        return executors;
+    }
+
+    static List<ELMethodExecutor> orderExecutors(List<ELMethodExecutor> executors) {
+        return executors.stream()
+            .sorted(Comparator.comparingInt(ELMethodExecutor::getPriority).reversed())
+            .toList();
     }
 
     /**
@@ -426,7 +442,11 @@ final class ELInterpreter {
      * @return The interpreter
      */
     static ELInterpreter sharing(Evaluator root) {
-        ELInterpreter interpreter = new ELInterpreter(Map.of());
+        return sharing(root, loadExecutors());
+    }
+
+    static ELInterpreter sharing(Evaluator root, List<ELMethodExecutor> executors) {
+        ELInterpreter interpreter = new ELInterpreter(executors, Map.of());
         interpreter.root = root;
         return interpreter;
     }
@@ -458,38 +478,44 @@ final class ELInterpreter {
      * @param node    The parsed expression
      * @return The bound functions
      */
-    static Map<String, BoundFunction> bindFunctions(@Nullable ELContext context, ELNode node) {
+    static Map<String, ELMethod> bindFunctions(@Nullable ELContext context, ELNode node) {
+        return bindFunctions(context, node, loadExecutors());
+    }
+
+    static Map<String, ELMethod> bindFunctions(@Nullable ELContext context,
+                                               ELNode node,
+                                               List<ELMethodExecutor> executors) {
         if (!containsFunction(node)) {
             return Map.of();
         }
-        FunctionMapper functionMapper = context == null ? null : context.getFunctionMapper();
-        Map<String, BoundFunction> bindings = new LinkedHashMap<>();
-        bindFunctions(functionMapper, node, bindings);
+        Map<String, ELMethod> bindings = new LinkedHashMap<>();
+        bindFunctions(context, executors, node, bindings);
         return Map.copyOf(bindings);
     }
 
-    private static void bindFunctions(@Nullable FunctionMapper functionMapper,
+    private static void bindFunctions(@Nullable ELContext context,
+                                      List<ELMethodExecutor> executors,
                                       ELNode node,
-                                      Map<String, BoundFunction> bindings) {
+                                      Map<String, ELMethod> bindings) {
         if (node instanceof ELNode.Function function) {
-            Method method = functionMapper == null ? null
-                : functionMapper.resolveFunction(function.prefix(), function.localName());
+            ELMethod method = context == null ? null : resolveFunction(context, executors,
+                function.prefix(), function.localName());
             if (method != null) {
                 int count = function.invocations().get(0).size();
-                int parameters = method.getParameterCount();
+                int parameters = method.getParameterTypes().length;
                 if (method.isVarArgs() ? count < parameters - 1 : count != parameters) {
                     throw new ELException("The function '" + qualifiedName(function.prefix(), function.localName())
                         + "' expects " + (method.isVarArgs() ? "at least " + (parameters - 1) : parameters)
                         + " argument(s) but " + count + " were provided");
                 }
-                bindings.put(qualifiedName(function.prefix(), function.localName()), BoundFunction.of(method));
+                bindings.put(qualifiedName(function.prefix(), function.localName()), method);
             } else if (!function.prefix().isEmpty()) {
                 throw new ELException("Cannot resolve the function '"
                     + qualifiedName(function.prefix(), function.localName()) + "'");
             }
         }
         for (ELNode child : children(node)) {
-            bindFunctions(functionMapper, child, bindings);
+            bindFunctions(context, executors, child, bindings);
         }
     }
 
@@ -561,12 +587,12 @@ final class ELInterpreter {
                     yield null;
                 }
                 Object property = evaluate(context, method.property());
-                yield property == null ? null : ELSandboxGuard.invokeWithParams(
+                yield property == null ? null : invokeWithParams(
                     context, base, property, evaluateAll(context, method.arguments()));
             }
             case CALL -> {
                 ELNode.Call call = (ELNode.Call) node;
-                yield ELSandboxGuard.invokeCallable(context, evaluate(context, call.target()), evaluateAll(context, call.arguments()));
+                yield invokeCallable(context, evaluate(context, call.target()), evaluateAll(context, call.arguments()));
             }
             case UNARY -> evaluateUnary(context, (ELNode.Unary) node);
             case BINARY -> evaluateBinary(context, (ELNode.Binary) node);
@@ -717,7 +743,7 @@ final class ELInterpreter {
         List<List<ELNode>> invocations = function.invocations();
         // the first invocation is consumed by the resolution of the function itself
         for (int i = 1; i < invocations.size(); i++) {
-            result = ELSandboxGuard.invokeCallable(context, result, evaluateAll(context, invocations.get(i)));
+            result = invokeCallable(context, result, evaluateAll(context, invocations.get(i)));
         }
         return result;
     }
@@ -729,22 +755,22 @@ final class ELInterpreter {
         String localName = function.localName();
         Object identifier = prefix.isEmpty() ? resolveIdentifierOrNull(context, localName) : null;
         if (identifier instanceof LambdaExpression || identifier instanceof ELClass) {
-            return ELSandboxGuard.invokeCallable(context, identifier, evaluateAll(context, firstArguments));
+            return invokeCallable(context, identifier, evaluateAll(context, firstArguments));
         }
-        Method method = resolveMappedFunction(function);
+        ELMethod method = resolveMappedFunction(function);
         if (method != null) {
-            return invokeStatic(context, method, evaluateAll(context, firstArguments));
+            return method.invoke(context, null, evaluateAll(context, firstArguments));
         }
         if (prefix.isEmpty()) {
             ImportHandler importHandler = context.getImportHandler();
             if (importHandler != null) {
                 Class<?> resolvedClass = importHandler.resolveClass(localName);
                 if (resolvedClass != null) {
-                    return ELSandboxGuard.newInstance(context, new ELClass(resolvedClass), evaluateAll(context, firstArguments));
+                    return invokeCallable(context, new ELClass(resolvedClass), evaluateAll(context, firstArguments));
                 }
                 Class<?> staticClass = importHandler.resolveStatic(localName);
                 if (staticClass != null) {
-                    return ELSandboxGuard.invokeWithParams(context, new ELClass(staticClass), localName,
+                    return invokeWithParams(context, new ELClass(staticClass), localName,
                         evaluateAll(context, firstArguments));
                 }
             }
@@ -757,48 +783,86 @@ final class ELInterpreter {
     }
 
     @Nullable
-    private Method resolveMappedFunction(ELNode.Function function) {
-        BoundFunction bound = functions.get(qualifiedName(function.prefix(), function.localName()));
-        return bound == null ? null : bound.method();
+    private ELMethod resolveMappedFunction(ELNode.Function function) {
+        return functions.get(qualifiedName(function.prefix(), function.localName()));
     }
 
     @Nullable
-    private Object invokeStatic(ELContext context, Method method, Object[] arguments) {
-        Class<?>[] parameterTypes = method.getParameterTypes();
-        Object[] coerced = new Object[parameterTypes.length];
-        int fixed = method.isVarArgs() ? parameterTypes.length - 1 : parameterTypes.length;
-        if (method.isVarArgs() ? arguments.length < fixed : arguments.length != fixed) {
-            throw new IllegalArgumentException("The function '" + method.getName() + "' expects "
-                + (method.isVarArgs() ? "at least " + fixed : fixed) + " argument(s) but "
-                + arguments.length + " were provided");
+    static Object invokeWithParams(ELContext context,
+                                   List<ELMethodExecutor> executors,
+                                   @Nullable Object base,
+                                   @Nullable Object method,
+                                   Class<?> @Nullable [] paramTypes,
+                                   Object @Nullable [] arguments) {
+        if (base == null || method == null) {
+            throw new PropertyNotFoundException("Cannot resolve a method on a null base object");
         }
-        for (int i = 0; i < fixed; i++) {
-            coerced[i] = ELSupport.coerceToType(context, arguments[i], parameterTypes[i]);
+        ELSandboxGuard.check(context, base, method);
+        ELMethod resolved = resolveMethod(context, executors, base, method, paramTypes, arguments);
+        return resolved.invoke(context, base, arguments);
+    }
+
+    @Nullable
+    private Object invokeWithParams(ELContext context,
+                                    @Nullable Object base,
+                                    @Nullable Object method,
+                                    Object @Nullable [] arguments) {
+        return invokeWithParams(context, executors, base, method, null, arguments);
+    }
+
+    @Nullable
+    private Object invokeCallable(ELContext context, @Nullable Object target, Object... arguments) {
+        ELSandboxGuard.check(context, target, null);
+        if (target instanceof LambdaExpression lambda) {
+            lambda.setELContext(context);
+            return lambda.invoke(context, arguments);
         }
-        if (method.isVarArgs()) {
-            if (arguments.length == parameterTypes.length && arguments[fixed] != null
-                && parameterTypes[fixed].isInstance(arguments[fixed])) {
-                coerced[fixed] = arguments[fixed];
-            } else {
-                Class<?> component = parameterTypes[fixed].getComponentType();
-                Object varargs = Array.newInstance(component, arguments.length - fixed);
-                for (int i = fixed; i < arguments.length; i++) {
-                    Array.set(varargs, i - fixed, ELSupport.coerceToType(context, arguments[i], component));
-                }
-                coerced[fixed] = varargs;
+        if (target instanceof ELClass) {
+            return invokeWithParams(context, target, "<init>", arguments);
+        }
+        return ELResolution.invokeCallable(context, target, arguments);
+    }
+
+    static ELMethod resolveMethod(ELContext context,
+                                  List<ELMethodExecutor> executors,
+                                  @Nullable Object base,
+                                  @Nullable Object method,
+                                  Class<?> @Nullable [] paramTypes,
+                                  Object @Nullable [] arguments) {
+        if (base == null || method == null) {
+            throw new PropertyNotFoundException("Cannot resolve a method on a null base object");
+        }
+        for (ELMethodExecutor executor : executors) {
+            ELMethod resolved = executor.resolve(context, base, method, paramTypes, arguments);
+            if (resolved != null) {
+                return resolved;
             }
         }
-        try {
-            return method.invoke(null, coerced);
-        } catch (IllegalAccessException e) {
-            throw new ELException("Cannot invoke the function '" + method.getName() + "'", e);
-        } catch (InvocationTargetException e) {
-            Throwable cause = e.getCause();
-            if (cause instanceof ELException elException) {
-                throw elException;
+        throw new MethodNotFoundException("Cannot find the method '" + method + "' of "
+            + base.getClass().getName());
+    }
+
+    @Nullable
+    private static ELMethod resolveFunction(ELContext context,
+                                            List<ELMethodExecutor> executors,
+                                            String prefix,
+                                            String localName) {
+        for (ELMethodExecutor executor : executors) {
+            ELMethod resolved = executor.resolveFunction(context, prefix, localName);
+            if (resolved != null) {
+                return resolved;
             }
-            throw new ELException("The function '" + method.getName() + "' failed", cause);
         }
+        return null;
+    }
+
+    private static List<ELMethodExecutor> loadExecutors() {
+        return SoftServiceLoader.load(ELMethodExecutor.class, contextClassLoader()).collectAll();
+    }
+
+    private static ClassLoader contextClassLoader() {
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        return classLoader == null ? ELInterpreter.class.getClassLoader() : classLoader;
     }
 
     @Nullable
@@ -843,43 +907,6 @@ final class ELInterpreter {
      * @param property The property
      */
     record Target(@Nullable Object base, @Nullable Object property) {
-    }
-
-    /**
-     * A serializable description of a function bound when the expression is created.
-     */
-    static final class BoundFunction implements Serializable {
-
-        @Serial
-        private static final long serialVersionUID = 1L;
-
-        private final Class<?> owner;
-        private final String name;
-        private final Class<?>[] parameterTypes;
-
-        private BoundFunction(Class<?> owner, String name, Class<?>[] parameterTypes) {
-            this.owner = owner;
-            this.name = name;
-            this.parameterTypes = parameterTypes.clone();
-        }
-
-        private static BoundFunction of(Method method) {
-            return new BoundFunction(method.getDeclaringClass(), method.getName(), method.getParameterTypes());
-        }
-
-        private Method method() {
-            try {
-                return owner.getMethod(name, parameterTypes);
-            } catch (NoSuchMethodException e) {
-                throw new ELException("Cannot restore the bound function '" + owner.getName() + "." + name + "'", e);
-            }
-        }
-
-        String identity() {
-            return ELNodes.functionIdentity(owner.getName(), name,
-                Arrays.stream(parameterTypes).map(Class::getTypeName).toList());
-        }
-
     }
 
     /**

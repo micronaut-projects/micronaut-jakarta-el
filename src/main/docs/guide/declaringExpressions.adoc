@@ -93,8 +93,9 @@ and every bean can declare functions.
 <3> Without a container, the instance is registered under its type with the standard `putContext`.
 <4> With neither, the evaluation fails with an `ELException` saying so.
 
-NOTE: A function on a bean is a compiled construct: the interpreter resolves functions through the
-`jakarta.el.FunctionMapper` of the context, which the specification defines over static methods only.
+NOTE: A function on a bean is a compiled construct. Runtime-parsed functions are resolved through
+`io.micronaut.el.ELMethodExecutor` services; the optional reflection executor adapts the
+`jakarta.el.FunctionMapper` contract, which the specification defines over static methods only.
 
 `@ELEnvironment` is the compilation time counterpart of the `jakarta.el.ELContext`. It is declared on the class,
 or on the member holding the expressions, in which case it applies to those on top of the environment of the
@@ -182,4 +183,3 @@ composite expression is a `String`, and an expression whose type the compiler do
 same applies to `expectedReturnType` of an `@ELMethodExpression`, inferred from the invocation. The generated
 `ExpressionFactory` serves an expression with an inferred type for that type, its primitive counterpart and
 `Object.class`.
-

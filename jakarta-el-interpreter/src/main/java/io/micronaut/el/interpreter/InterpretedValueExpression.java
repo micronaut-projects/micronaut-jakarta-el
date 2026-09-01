@@ -16,6 +16,7 @@
 package io.micronaut.el.interpreter;
 
 import io.micronaut.core.annotation.Internal;
+import io.micronaut.el.ELMethod;
 import io.micronaut.el.ELSandbox;
 import io.micronaut.el.parser.ELParser;
 import io.micronaut.el.parser.ELNodes;
@@ -50,7 +51,7 @@ final class InterpretedValueExpression extends ValueExpression implements ELExpr
      * character, a number or an enum answers on its own.
      */
     private final boolean checkedResult;
-    private final Map<String, ELInterpreter.BoundFunction> functions;
+    private final Map<String, ELMethod> functions;
     private transient @Nullable ELNode node;
     private transient @Nullable ELInterpreter interpreter;
     private transient @Nullable String equalityForm;
@@ -58,7 +59,7 @@ final class InterpretedValueExpression extends ValueExpression implements ELExpr
     InterpretedValueExpression(String expressionString,
                                Class<?> expectedType,
                                ELNode node,
-                               Map<String, ELInterpreter.BoundFunction> functions,
+                               Map<String, ELMethod> functions,
                                ELInterpreter interpreter) {
         this.expressionString = Objects.requireNonNull(expressionString, "expressionString");
         this.expectedType = Objects.requireNonNull(expectedType, "expectedType");
@@ -166,7 +167,7 @@ final class InterpretedValueExpression extends ValueExpression implements ELExpr
         String resolved = equalityForm;
         if (resolved == null) {
             resolved = ELNodes.canonical(node(), (prefix, localName) -> {
-                ELInterpreter.BoundFunction function = functions.get(
+                ELMethod function = functions.get(
                     prefix.isEmpty() ? localName : prefix + ":" + localName);
                 return function == null ? null : function.identity();
             });

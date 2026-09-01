@@ -37,6 +37,7 @@ class ELInterpreterExpressionsTest {
         .setBean("sequences", new CharSequence[]{"a", "b"})
         .setBean("varargs", new Varargs())
         .setBean("strings", new String[]{"a", "b"})
+        .setBean("numbers", new int[]{1, 2, 3})
         .setBean("functions", new Formatting())
         .setBean("f", new Formatting())
         .setBean("formatting", new Formatting())
@@ -143,6 +144,11 @@ class ELInterpreterExpressionsTest {
         assertEquals("hello", value(ELInterpreterExpressions$ELExpressions.GREETING));
         assertEquals(5, value(ELInterpreterExpressions$ELExpressions.GREETING_LENGTH));
         assertEquals("HELLO", value(ELInterpreterExpressions$ELExpressions.UPPERCASE_GREETING));
+        assertEquals("HEL", value(ELInterpreterExpressions$ELExpressions.SHORT_UPPERCASE_GREETING));
+        assertEquals(2, value(ELInterpreterExpressions$ELExpressions.STRINGS_LENGTH));
+        assertEquals(2, value(ELInterpreterExpressions$ELExpressions.PRIMITIVE_ARRAY_ELEMENT));
+        assertEquals(6L, value(ELInterpreterExpressions$ELExpressions.PRIMITIVE_ARRAY_STREAM_SUM));
+        assertEquals(4, value(ELInterpreterExpressions$ELExpressions.PRIMITIVE_ARRAY_ASSIGNMENT));
         assertEquals(Boolean.TRUE, value(ELInterpreterExpressions$ELExpressions.BOOLEAN_CONSTANT));
         assertEquals(3, value(ELInterpreterExpressions$ELExpressions.INTEGER_VALUE_OF));
         assertEquals("x", value(ELInterpreterExpressions$ELExpressions.STRING_CONSTRUCTOR));

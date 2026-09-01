@@ -139,7 +139,7 @@ public final class ELMethods {
             } else {
                 Object varargs = Array.newInstance(componentType, Math.max(0, count - fixed));
                 for (int i = fixed; i < count; i++) {
-                    Array.set(varargs, i - fixed, ELSupport.coerceToType(context, arguments[i], componentType));
+                    ELArray.set(varargs, i - fixed, ELSupport.coerceToType(context, arguments[i], componentType));
                 }
                 parameters[fixed] = varargs;
             }

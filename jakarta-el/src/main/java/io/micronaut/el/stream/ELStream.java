@@ -15,16 +15,16 @@
  */
 package io.micronaut.el.stream;
 
-import org.jspecify.annotations.Nullable;
 import io.micronaut.core.annotation.Internal;
+import io.micronaut.el.runtime.ELArray;
 import io.micronaut.el.runtime.ELArithmetic;
 import io.micronaut.el.runtime.ELSupport;
 import jakarta.el.ELContext;
 import jakarta.el.ELException;
 import jakarta.el.LambdaExpression;
 import jakarta.el.MethodNotFoundException;
+import org.jspecify.annotations.Nullable;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -68,11 +68,11 @@ public final class ELStream<T> {
             Stream<Object> stream = (Stream<Object>) collection.stream();
             return new ELStream<>(context, stream);
         }
-        if (source.getClass().isArray()) {
-            int length = Array.getLength(source);
+        if (ELArray.isArray(source)) {
+            int length = ELArray.length(source);
             List<Object> elements = new ArrayList<>(length);
             for (int i = 0; i < length; i++) {
-                elements.add(Array.get(source, i));
+                elements.add(ELArray.get(source, i));
             }
             return new ELStream<>(context, elements.stream());
         }

@@ -43,6 +43,7 @@ public final class ELResolvers {
      * every chain.
      */
     private static final List<ELResolver> SPECIFICATION = List.of(
+        new CommonELResolver(),
         new StreamELResolver(),
         new ReflectiveMethodELResolver(),
         new StaticFieldELResolver(),

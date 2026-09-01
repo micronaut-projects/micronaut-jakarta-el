@@ -9,6 +9,7 @@ dependencies {
     testImplementation platform(libs.junit.bom)
     testImplementation libs.junit.jupiter
     testRuntimeOnly libs.junit.jupiter.engine
+    testRuntimeOnly projects.micronautJakartaElInterpreterReflection
 }
 
 // the fuzzing knobs of ELFuzzTest, so that a longer campaign than the build runs can be asked for with

@@ -1,0 +1,11 @@
+plugins {
+    id "io.micronaut.build.internal.jakarta-el-module"
+}
+
+dependencies {
+    api projects.micronautJakartaElInterpreter
+
+    testImplementation platform(libs.junit.bom)
+    testImplementation libs.junit.jupiter
+    testRuntimeOnly libs.junit.jupiter.engine
+}

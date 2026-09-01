@@ -15,6 +15,7 @@ Use -PelFuzzSeed=<long> and -PelFuzzCases=<count> to reproduce or resize a campa
 dependencies {
     testImplementation projects.micronautJakartaEl
     testImplementation projects.micronautJakartaElInterpreter
+    testImplementation projects.micronautJakartaElInterpreterReflection
     testImplementation libs.expressly
     testImplementation libs.tomcat.jasper.el
     testImplementation platform(libs.junit.bom)

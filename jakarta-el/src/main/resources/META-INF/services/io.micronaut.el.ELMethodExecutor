@@ -1,0 +1,3 @@
+io.micronaut.el.resolver.CommonELResolver
+io.micronaut.el.resolver.IntrospectionELResolver
+io.micronaut.el.resolver.StreamELResolver
