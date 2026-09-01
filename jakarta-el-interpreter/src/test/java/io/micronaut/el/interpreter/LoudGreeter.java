@@ -16,34 +16,17 @@
 package io.micronaut.el.interpreter;
 
 /**
- * A plain type: no bean introspection, no annotation, nothing the built-in executors know about, so an
- * expression can only reach its methods through a contributed executor or through reflection.
+ * A subtype of {@link Greeter}: it inherits the methods registered for its supertype, but not the constructor,
+ * which would otherwise construct a {@link Greeter} where a {@code LoudGreeter} was asked for.
  */
-public class Greeter {
+public class LoudGreeter extends Greeter {
 
-    private final String name;
-
-    public Greeter(String name) {
-        this.name = name;
+    public LoudGreeter(String name) {
+        super(name);
     }
 
-    public String getName() {
-        return name;
-    }
-
+    @Override
     public String greet(String whom) {
-        return "hello " + whom + ", " + name;
-    }
-
-    public String greet(Integer times) {
-        return "hello ".repeat(times);
-    }
-
-    public int count() {
-        return name.length();
-    }
-
-    public String join(String separator, String... parts) {
-        return String.join(separator, parts);
+        return super.greet(whom).toUpperCase();
     }
 }
