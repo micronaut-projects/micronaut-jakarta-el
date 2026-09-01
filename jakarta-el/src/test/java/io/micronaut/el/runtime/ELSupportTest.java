@@ -39,6 +39,16 @@ class ELSupportTest {
         }
     }
 
+    static final class Overloads {
+        public String target(Long first, Long second) {
+            return "longs";
+        }
+
+        public String target(String first, String... rest) {
+            return "strings";
+        }
+    }
+
     @Test
     void coerceToString() {
         assertEquals("", ELSupport.coerceToString(null));
@@ -187,5 +197,14 @@ class ELSupportTest {
 
         assertEquals("a,b", ELMethods.invoke(new CompiledELContext(), join, new Varargs(),
             new Object[]{values}));
+    }
+
+    @Test
+    void overloadSelectionChecksWhetherTheActualValueCanBeCoerced() {
+        Method numeric = ELMethods.findMethod(Overloads.class, "target", null, new Object[]{"1", "1"});
+        Method text = ELMethods.findMethod(Overloads.class, "target", null, new Object[]{"aaa", "bbb"});
+
+        assertEquals(Long.class, numeric.getParameterTypes()[0]);
+        assertEquals(String[].class, text.getParameterTypes()[1]);
     }
 }

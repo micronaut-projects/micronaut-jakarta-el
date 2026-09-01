@@ -25,4 +25,5 @@ dependencies {
     testImplementation mn.micronaut.inject.java.test
     // CompiledVersusInterpretedTest evaluates the same expression both ways and compares the two
     testImplementation projects.micronautJakartaElInterpreter
+    testRuntimeOnly projects.micronautJakartaElInterpreterReflection
 }

@@ -31,7 +31,8 @@ class ELParserTest {
 
     @Test
     void anExpressionNestedDeeperThanTheLimitIsRejected() {
-        String nested = "${" + "(".repeat(5000) + "1" + ")".repeat(5000) + "}";
+        int depth = ELParser.DEFAULT_MAX_DEPTH + 1;
+        String nested = "${" + "(".repeat(depth) + "1" + ")".repeat(depth) + "}";
         ELParsingException e = assertThrows(ELParsingException.class, () -> ELParser.parse(nested));
         assertTrue(e.getMessage().contains("nests more than " + ELParser.DEFAULT_MAX_DEPTH + " levels deep"));
     }

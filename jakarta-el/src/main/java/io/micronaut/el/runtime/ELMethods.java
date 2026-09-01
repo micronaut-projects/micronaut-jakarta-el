@@ -19,7 +19,6 @@ import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.reflect.ReflectionUtils;
 import jakarta.el.ELContext;
 import jakarta.el.ELException;
-import jakarta.el.LambdaExpression;
 import jakarta.el.MethodNotFoundException;
 import org.jspecify.annotations.Nullable;
 
@@ -429,31 +428,14 @@ public final class ELMethods {
         if (argument == null) {
             return true;
         }
-        if (argument instanceof LambdaExpression && parameterType.isInterface()) {
-            // the section 1.25.8 of the specification coerces a lambda expression to a functional interface
+        try {
+            ELSupport.coerce(argument, parameterType);
             return true;
+        } catch (ELException | IllegalArgumentException e) {
+            return false;
         }
-        Class<?> target = ReflectionUtils.getWrapperType(parameterType);
-        if (target == String.class) {
-            return true;
-        }
-        if (target == Boolean.class) {
-            return argument instanceof String;
-        }
-        if (target == Character.class) {
-            return argument instanceof String || argument instanceof Number;
-        }
-        if (Number.class.isAssignableFrom(target)) {
-            return argument instanceof Number || argument instanceof Character || argument instanceof String;
-        }
-        return target.isEnum() && argument instanceof String;
     }
 
-    /**
-     * Compares declared parameter types with the ones provided at parse time, treating a primitive and its
-     * wrapper as the same type: a class literal such as {@code double.class} cannot reach an annotation member
-     * of a Micronaut annotation, so the wrapper is what a declaration can provide.
-     */
     /**
      * Compares parameter types, treating a primitive and its wrapper as the same type.
      *
