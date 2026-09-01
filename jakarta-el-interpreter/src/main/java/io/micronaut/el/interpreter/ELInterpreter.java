@@ -22,6 +22,7 @@ import io.micronaut.el.ELMethodExecutor;
 import io.micronaut.el.parser.ast.BinaryOperator;
 import io.micronaut.el.parser.ast.ELNode;
 import io.micronaut.el.runtime.ELArithmetic;
+import io.micronaut.el.runtime.ELArguments;
 import io.micronaut.el.runtime.ELCollections;
 import io.micronaut.el.runtime.ELLambdas;
 import io.micronaut.el.runtime.ELResolution;
@@ -430,7 +431,7 @@ final class ELInterpreter {
 
     static List<ELMethodExecutor> orderExecutors(List<ELMethodExecutor> executors) {
         return executors.stream()
-            .sorted(Comparator.comparingInt(ELMethodExecutor::getPriority).reversed())
+            .sorted(Comparator.comparingInt(ELMethodExecutor::getOrder))
             .toList();
     }
 
@@ -502,7 +503,7 @@ final class ELInterpreter {
                 function.prefix(), function.localName());
             if (method != null) {
                 int count = function.invocations().get(0).size();
-                int parameters = method.getParameterTypes().length;
+                int parameters = method.getArguments().length;
                 if (method.isVarArgs() ? count < parameters - 1 : count != parameters) {
                     throw new ELException("The function '" + qualifiedName(function.prefix(), function.localName())
                         + "' expects " + (method.isVarArgs() ? "at least " + (parameters - 1) : parameters)
@@ -833,7 +834,7 @@ final class ELInterpreter {
             throw new PropertyNotFoundException("Cannot resolve a method on a null base object");
         }
         for (ELMethodExecutor executor : executors) {
-            ELMethod resolved = executor.resolve(context, base, method, paramTypes, arguments);
+            ELMethod resolved = executor.resolve(context, base, method, ELArguments.of(paramTypes), arguments);
             if (resolved != null) {
                 return resolved;
             }

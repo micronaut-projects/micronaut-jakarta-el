@@ -99,8 +99,9 @@ ValueExpression expression = factory.createValueExpression(context, "${book.titl
 ```
 
 An expression that was not compiled and that is not a literal-expression is rejected, unless the interpreter
-module is on the classpath. The lookup matches the expected type exactly: an expression declared with
-`String.class` is only returned for a request with `String.class`.
+module is on the classpath. An explicitly declared expected type is matched exactly. An inferred expression is
+also available as `Object.class`; when its static type cannot be determined beyond `Object`, it adopts the type
+requested by the caller and applies the standard EL coercion rules.
 
 Two behaviours of Micronaut's annotation metadata affect how an expression is declared. Any annotation string
 containing `#{...}` is treated by Micronaut as one of its own evaluated expressions; the processor reads the
@@ -266,7 +267,7 @@ members must be available.
 
 To keep a method invocation off the reflective path, annotate the method with `@Executable` so that it enters the bean
 introspection, or provide an `ELMethodExecutor` with a generated/direct implementation. The executor services are
-ordered by priority, so direct contributors run before the general reflection fallback.
+ordered with Micronaut's `Ordered` contract, so direct contributors run before the general reflection fallback.
 
 ## Language support
 
@@ -323,23 +324,28 @@ at compilation time.
 
 ## Technology Compatibility Kit
 
-The `tests/jakarta-el-tck` module runs the Jakarta Expression Language 6.0 TCK against the runtime of this
-repository:
+Three projects run the Jakarta Expression Language 6.0 TCK against the runtime of this repository:
 
 ```
 ./gradlew :micronaut-tests:micronaut-jakarta-el-tck:test
+./gradlew :micronaut-tests:micronaut-jakarta-el-tck-interpreter:test
+./gradlew :micronaut-tests:micronaut-jakarta-el-tck-interpreter-reflection:test
 ```
 
-**360 tests, 0 failures, 0 skipped.**
+Each task runs **360 tests, 0 failures, 0 skipped**. The first project declares every TCK expression as a
+compile-time expression. The second parses the expressions with the reflection-free interpreter and contributes
+the TCK-specific direct method executor through `ServiceLoader`. The third uses the interpreter with its optional
+reflection executor.
 
 The TCK bundle is not published to Maven Central, so it is resolved from the Eclipse download site as a plain
-dependency, unpacked, and its test classes are handed to the test task. The version is set by `elTckBranch` and
-`elTckVersion` in `gradle.properties`.
+dependency. Its test jar is extracted from the upstream zip and placed on the test classpath; an ordinary checked-in
+JUnit Platform suite class selects its tests, following the same pattern as the Micronaut JAX-RS TCK. The version is
+set by `elTckBranch` and `elTckVersion` in `gradle.properties`.
 
-The TCK creates its expressions from strings at runtime through `ExpressionFactory.newInstance()`, so it exercises
-the parser and the interpreter, and through them the coercion, arithmetic, comparison, resolution and collection
-runtime that the generated code also calls. The signature test is excluded: it verifies the signatures of the
-`jakarta.el` API jar, which this repository consumes unchanged rather than implements.
+The interpreted runs create expressions from strings through `ExpressionFactory.newInstance()`. The compiled run
+contains matching annotation declarations for those expression strings, so it exercises generated expressions
+without putting the interpreter on its classpath. The signature test is outside the selected EL test package: it
+verifies the signatures of the `jakarta.el` API jar, which this repository consumes unchanged rather than implements.
 
 The TCK runs as part of `./gradlew build`.
 

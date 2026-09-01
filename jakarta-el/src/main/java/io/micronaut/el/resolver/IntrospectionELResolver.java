@@ -15,20 +15,20 @@
  */
 package io.micronaut.el.resolver;
 
+import io.micronaut.core.annotation.AnnotationMetadata;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.beans.BeanIntrospection;
 import io.micronaut.core.beans.BeanIntrospector;
 import io.micronaut.core.beans.BeanMethod;
 import io.micronaut.core.beans.BeanProperty;
-import io.micronaut.core.reflect.ReflectionUtils;
 import io.micronaut.core.type.Argument;
 import io.micronaut.el.ELMethod;
 import io.micronaut.el.ELMethodExecutor;
+import io.micronaut.el.runtime.ELArguments;
 import io.micronaut.el.runtime.ELSupport;
 import jakarta.el.ELContext;
 import jakarta.el.ELException;
 import jakarta.el.ELResolver;
-import jakarta.el.MethodInfo;
 import jakarta.el.PropertyNotWritableException;
 import org.jspecify.annotations.Nullable;
 
@@ -91,7 +91,7 @@ public final class IntrospectionELResolver extends ELResolver implements ELMetho
     }
 
     @Override
-    public int getPriority() {
+    public int getOrder() {
         return 100;
     }
 
@@ -149,7 +149,7 @@ public final class IntrospectionELResolver extends ELResolver implements ELMetho
                          @Nullable Object method,
                          Class<?> @Nullable [] paramTypes,
                          Object @Nullable [] params) {
-        ELMethod resolved = resolve(context, base, method, paramTypes, params);
+        ELMethod resolved = resolve(context, base, method, ELArguments.of(paramTypes), params);
         if (resolved == null) {
             return null;
         }
@@ -162,7 +162,7 @@ public final class IntrospectionELResolver extends ELResolver implements ELMetho
     public ELMethod resolve(ELContext context,
                             @Nullable Object base,
                             @Nullable Object method,
-                            Class<?> @Nullable [] paramTypes,
+                            Argument<?> @Nullable [] argumentTypes,
                             Object @Nullable [] arguments) {
         if (base == null || !(method instanceof String name)) {
             return null;
@@ -172,9 +172,9 @@ public final class IntrospectionELResolver extends ELResolver implements ELMetho
             return null;
         }
         Object[] values = arguments == null ? new Object[0] : arguments;
-        if (paramTypes != null) {
+        if (argumentTypes != null) {
             for (BeanMethod<Object, Object> candidate : named) {
-                if (sameTypes(candidate.getArguments(), paramTypes)
+                if (sameTypes(candidate.getArguments(), argumentTypes)
                     && coerce(context, candidate.getArguments(), values) != null) {
                     return new IntrospectionMethod(candidate);
                 }
@@ -273,12 +273,12 @@ public final class IntrospectionELResolver extends ELResolver implements ELMetho
         return true;
     }
 
-    private static boolean sameTypes(Argument<?>[] parameters, Class<?>[] paramTypes) {
-        if (parameters.length != paramTypes.length) {
+    private static boolean sameTypes(Argument<?>[] parameters, Argument<?>[] argumentTypes) {
+        if (parameters.length != argumentTypes.length) {
             return false;
         }
         for (int i = 0; i < parameters.length; i++) {
-            if (parameters[i].getWrapperType() != ReflectionUtils.getWrapperType(paramTypes[i])) {
+            if (parameters[i].getWrapperType() != argumentTypes[i].getWrapperType()) {
                 return false;
             }
         }
@@ -335,32 +335,34 @@ public final class IntrospectionELResolver extends ELResolver implements ELMetho
 
     private static final class IntrospectionMethod implements ELMethod {
         private final BeanMethod<Object, Object> method;
-        private final MethodInfo methodInfo;
 
         private IntrospectionMethod(BeanMethod<Object, Object> method) {
             this.method = method;
-            this.methodInfo = new MethodInfo(method.getName(), method.getReturnType().getType(),
-                Argument.toClassArray(method.getArguments()));
         }
 
         @Override
         public String getName() {
-            return methodInfo.getName();
+            return method.getName();
         }
 
         @Override
-        public Class<?> getReturnType() {
-            return methodInfo.getReturnType();
+        public Argument<?> getReturnType() {
+            return method.getReturnType().asArgument();
         }
 
         @Override
-        public Class<?>[] getParameterTypes() {
-            return methodInfo.getParamTypes();
+        public Argument<?>[] getArguments() {
+            return method.getArguments().clone();
         }
 
         @Override
         public boolean isVarArgs() {
             return false;
+        }
+
+        @Override
+        public AnnotationMetadata getAnnotationMetadata() {
+            return method.getAnnotationMetadata();
         }
 
         @Override
@@ -380,7 +382,7 @@ public final class IntrospectionELResolver extends ELResolver implements ELMetho
         @Override
         public String identity() {
             return method.getDeclaringType().getName() + '#' + method.getName()
-                + java.util.Arrays.toString(methodInfo.getParamTypes());
+                + java.util.Arrays.toString(Argument.toClassArray(method.getArguments()));
         }
     }
 

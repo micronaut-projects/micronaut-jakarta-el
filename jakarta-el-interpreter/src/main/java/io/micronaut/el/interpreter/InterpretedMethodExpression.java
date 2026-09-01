@@ -16,6 +16,7 @@
 package io.micronaut.el.interpreter;
 
 import io.micronaut.core.annotation.Internal;
+import io.micronaut.core.type.Argument;
 import io.micronaut.el.ELMethod;
 import io.micronaut.el.ELSandbox;
 import io.micronaut.el.parser.ELParser;
@@ -94,7 +95,7 @@ final class InterpretedMethodExpression extends MethodExpression implements ELEx
             ? null
             : interpreter().evaluateArguments(context, providedInvocation.arguments());
         ELMethod method = findMethod(context, target, arguments);
-        return new MethodInfo(method.getName(), method.getReturnType(), method.getParameterTypes());
+        return methodInfo(method);
     }
 
     @Override
@@ -114,8 +115,8 @@ final class InterpretedMethodExpression extends MethodExpression implements ELEx
             ? null
             : interpreter().evaluateArguments(context, providedInvocation.arguments());
         ELMethod method = findMethod(context, target, arguments);
-        MethodInfo methodInfo = new MethodInfo(method.getName(), method.getReturnType(), method.getParameterTypes());
-        MethodReference reference = new MethodReference(base, methodInfo, method.getAnnotations(), arguments);
+        MethodInfo methodInfo = methodInfo(method);
+        MethodReference reference = new MethodReference(base, methodInfo, method.synthesizeAnnotations(), arguments);
         context.notifyAfterEvaluation(expressionString);
         return reference;
     }
@@ -256,5 +257,10 @@ final class InterpretedMethodExpression extends MethodExpression implements ELEx
 
     private static ELNode unwrap(ELNode node) {
         return node instanceof ELNode.Eval eval ? unwrap(eval.expression()) : node;
+    }
+
+    private static MethodInfo methodInfo(ELMethod method) {
+        return new MethodInfo(method.getName(), method.getReturnType().getType(),
+            Argument.toClassArray(method.getArguments()));
     }
 }

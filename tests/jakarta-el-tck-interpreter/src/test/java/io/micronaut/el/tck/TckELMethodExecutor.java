@@ -16,6 +16,8 @@
 package io.micronaut.el.tck;
 
 import com.sun.ts.tests.el.common.util.MethodsBean;
+import io.micronaut.core.order.Ordered;
+import io.micronaut.core.type.Argument;
 import io.micronaut.el.ELMethod;
 import io.micronaut.el.ELMethodExecutor;
 import io.micronaut.el.runtime.ELSupport;
@@ -75,22 +77,22 @@ public final class TckELMethodExecutor implements ELMethodExecutor {
     );
 
     @Override
-    public int getPriority() {
-        return 100;
+    public int getOrder() {
+        return Ordered.HIGHEST_PRECEDENCE;
     }
 
     @Override
     public @Nullable ELMethod resolve(ELContext context,
                                       @Nullable Object base,
                                       @Nullable Object method,
-                                      Class<?> @Nullable [] paramTypes,
+                                      Argument<?> @Nullable [] argumentTypes,
                                       Object @Nullable [] arguments) {
         if (base == null || method == null) {
             return null;
         }
         String name = method.toString();
         if (base instanceof Vector<?> && name.equals("add")) {
-            return select(context, VECTOR_ADD, paramTypes, arguments);
+            return select(context, VECTOR_ADD, argumentTypes, arguments);
         }
         if (base instanceof ArrayList<?> && name.equals("add")) {
             return method("add", boolean.class, new Class<?>[]{Object.class}, false,
@@ -116,7 +118,7 @@ public final class TckELMethodExecutor implements ELMethodExecutor {
         }
         if (base instanceof MethodsBean) {
             return select(context, METHODS_BEAN.stream().filter(candidate -> candidate.getName().equals(name)).toList(),
-                paramTypes, arguments);
+                argumentTypes, arguments);
         }
         return null;
     }
@@ -149,12 +151,12 @@ public final class TckELMethodExecutor implements ELMethodExecutor {
 
     private static @Nullable DirectMethod select(ELContext context,
                                                   List<DirectMethod> candidates,
-                                                  Class<?> @Nullable [] paramTypes,
+                                                  Argument<?> @Nullable [] argumentTypes,
                                                   Object @Nullable [] arguments) {
         DirectMethod selected = null;
         int selectedScore = Integer.MAX_VALUE;
         for (DirectMethod candidate : candidates) {
-            int score = candidate.score(context, paramTypes, arguments);
+            int score = candidate.score(context, argumentTypes, arguments);
             if (score < selectedScore) {
                 selected = candidate;
                 selectedScore = score;
@@ -225,13 +227,13 @@ public final class TckELMethodExecutor implements ELMethodExecutor {
         }
 
         @Override
-        public Class<?> getReturnType() {
-            return returnType;
+        public Argument<?> getReturnType() {
+            return Argument.of(returnType);
         }
 
         @Override
-        public Class<?>[] getParameterTypes() {
-            return parameterTypes.clone();
+        public Argument<?>[] getArguments() {
+            return Arrays.stream(parameterTypes).map(Argument::of).toArray(Argument<?>[]::new);
         }
 
         @Override
@@ -240,7 +242,7 @@ public final class TckELMethodExecutor implements ELMethodExecutor {
         }
 
         @Override
-        public Annotation[] getAnnotations() {
+        public Annotation[] synthesizeAnnotations() {
             return annotations.clone();
         }
 
@@ -258,12 +260,12 @@ public final class TckELMethodExecutor implements ELMethodExecutor {
         }
 
         private int score(ELContext context,
-                          Class<?> @Nullable [] providedTypes,
+                          Argument<?> @Nullable [] providedArguments,
                           Object @Nullable [] arguments) {
             Object[] values = arguments == null ? new Object[0] : arguments;
-            Class<?>[] types = providedTypes == null ? Arrays.stream(values)
+            Class<?>[] types = providedArguments == null ? Arrays.stream(values)
                 .map(value -> value == null ? null : value.getClass())
-                .toArray(Class<?>[]::new) : providedTypes;
+                .toArray(Class<?>[]::new) : Argument.toClassArray(providedArguments);
             int fixed = varArgs ? parameterTypes.length - 1 : parameterTypes.length;
             if (varArgs ? types.length < fixed : types.length != fixed) {
                 return Integer.MAX_VALUE;

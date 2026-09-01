@@ -1,0 +1,64 @@
+plugins {
+    id 'io.micronaut.build.internal.jakarta-el-test-suite'
+}
+
+configurations {
+    tckBundle {
+        canBeConsumed = false
+        canBeResolved = true
+    }
+}
+
+repositories {
+    ivy {
+        url = uri("https://download.eclipse.org/jakartaee/expression-language/$elTckBranch/")
+        patternLayout {
+            artifact "[module]-[revision].[ext]"
+        }
+        metadataSources {
+            artifact()
+        }
+        content {
+            includeModule("jakarta.el", "jakarta-expression-language-tck")
+        }
+    }
+}
+
+dependencies {
+    tckBundle "jakarta.el:jakarta-expression-language-tck:$elTckVersion@zip"
+    testImplementation project(":micronaut-jakarta-el")
+    testImplementation platform(libs.junit.bom)
+    testImplementation libs.junit.jupiter
+    testImplementation libs.junit.platform.suite.engine
+    testRuntimeOnly libs.junit.jupiter.engine
+}
+
+def extractTckJar = tasks.register("extractTckJar", Sync) {
+    description = "Extracts the Jakarta Expression Language TCK jar from its upstream distribution"
+    from({ zipTree(configurations.tckBundle.singleFile) }) {
+        include "el-tck/artifacts/jakarta-expression-language-tck-*.jar"
+        exclude "**/*-sources.jar"
+        eachFile { it.relativePath = new RelativePath(true, "jakarta-expression-language-tck.jar") }
+        includeEmptyDirs = false
+    }
+    into layout.buildDirectory.dir("tck-bundle")
+}
+
+def tckJar = files(layout.buildDirectory.file("tck-bundle/jakarta-expression-language-tck.jar"))
+    .builtBy(extractTckJar)
+
+dependencies {
+    testImplementation tckJar
+}
+
+tasks.named("test", Test) {
+    // The TCK requests a VariableMapper to verify the variable-binding requirements of section 1.19.
+    systemProperty "variable.mapper", "io.micronaut.el.runtime.MapVariableMapper"
+}
+
+pluginManager.withPlugin("org.graalvm.buildtools.native") {
+    // The native test binary does not inherit the system properties of the JVM test task.
+    tasks.named("nativeTest") {
+        runtimeArgs.add("-Dvariable.mapper=io.micronaut.el.runtime.MapVariableMapper")
+    }
+}

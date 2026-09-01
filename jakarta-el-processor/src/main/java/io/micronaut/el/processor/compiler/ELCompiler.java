@@ -403,8 +403,7 @@ public final class ELCompiler {
             case ELNode.Binary binary -> compileBinary(binary, ctx);
             case ELNode.Ternary ternary -> compileTernary(ternary, ctx);
             case ELNode.Assign assign -> dynamic(compileAssign(assign, ctx));
-            case ELNode.Semicolon semicolon -> dynamic(runtime(EL_SUPPORT, "sequence", TypeDef.OBJECT,
-                compile(semicolon.left(), ctx), compile(semicolon.right(), ctx)));
+            case ELNode.Semicolon semicolon -> compileSemicolon(semicolon, ctx);
             case ELNode.Lambda lambda -> new Typed(compileLambda(lambda, ctx), elementOf(LambdaExpression.class));
             case ELNode.ListData list -> dynamic(runtime(EL_COLLECTIONS, "list", TypeDef.OBJECT,
                 compileAll(list.elements(), ctx)));
@@ -434,9 +433,15 @@ public final class ELCompiler {
         return new Typed(result, ClassElement.of(String.class));
     }
 
-    /**
-     * Concatenates two strings, two literals into one.
-     */
+    private Typed compileSemicolon(ELNode.Semicolon semicolon, ExpressionDef ctx) {
+        ClassElement bodyType = elementOf(ELLambdaBody.Nullary.class);
+        MethodElement evaluate = Objects.requireNonNull(functionalMethod(bodyType));
+        ExpressionDef lazyRight = javaLambda(null, bodyType, evaluate, List.of(), semicolon.right(), null, false);
+        return dynamic(runtime(EL_SUPPORT, "sequenceLazy", TypeDef.OBJECT,
+            compile(semicolon.left(), ctx), ctx, lazyRight));
+    }
+
+    /** Concatenates two strings, two literals into one. */
     private static ExpressionDef concat(ExpressionDef left, ExpressionDef right) {
         if (left instanceof ExpressionDef.Constant first && first.value() instanceof String a
             && right instanceof ExpressionDef.Constant second && second.value() instanceof String b) {
@@ -616,9 +621,7 @@ public final class ELCompiler {
         return null;
     }
 
-    /**
-     * @return The value as the given type when it is known, cast to it, the value untyped otherwise
-     */
+    /** Returns the value as the given type when it is known, cast to it, and the value untyped otherwise. */
     private static Typed typed(ExpressionDef value, @Nullable ClassElement type) {
         if (type == null || type.isPrimitive() || isUnknown(type)) {
             return dynamic(value);
@@ -662,12 +665,17 @@ public final class ELCompiler {
         if (methodName != null && baseType != null) {
             MethodElement target = selectMethod(baseType, methodName, method.arguments(), false, ctx);
             if (target != null) {
-                return new Typed(
-                    base.expression().invoke(target, coercedArguments(baseType, target, method.arguments(), ctx)),
-                    returnType(baseType, target)
-                );
+                ClassElement argumentType = method.arguments().size() == 1
+                    ? compileTyped(method.arguments().get(0), ctx).type() : null;
+                if (!ELBridgeMethods.requiresRuntimeSelection(baseType, target, argumentType)) {
+                    return new Typed(
+                        base.expression().invoke(target, coercedArguments(baseType, target, method.arguments(), ctx)),
+                        returnType(baseType, target)
+                    );
+                }
+            } else {
+                warnUnknownMember(baseType, "method", methodName + "(" + method.arguments().size() + " argument(s))");
             }
-            warnUnknownMember(baseType, "method", methodName + "(" + method.arguments().size() + " argument(s))");
         }
         return dynamic(runtime(EL_RESOLUTION, "invoke", TypeDef.OBJECT,
             arguments(ctx, base.expression(), compile(method.property(), ctx), method.arguments())));
@@ -1165,7 +1173,8 @@ public final class ELCompiler {
                     ExpressionDef array = captured(javaParameters.get(javaParameters.size() - 1));
                     scope.put(parameters.get(i), dynamic(runtime(EL_LAMBDAS, "argument", TypeDef.OBJECT, array, ExpressionDef.constant(i))));
                 } else {
-                    scope.put(parameters.get(i), typedParameter(captured(javaParameters.get(i + offset)), receiver, functionalInterface, methodParameters[i + offset].getType()));
+                    scope.put(parameters.get(i), typedParameter(captured(javaParameters.get(i + offset)),
+                        receiver, functionalInterface, methodParameters[i + offset].getType()));
                 }
             }
             context.enterLambdaScope(scope, enclosingContext != null);
@@ -1209,10 +1218,9 @@ public final class ELCompiler {
         return variable;
     }
 
-    /**
-     * @return The Java parameter as the type the functional interface declares for it, when the type is known
-     */
-    private static Typed typedParameter(ExpressionDef parameter, @Nullable ClassElement receiver, ClassElement functionalInterface, ClassElement declared) {
+    /** Returns the Java parameter as the type the functional interface declares for it, when known. */
+    private static Typed typedParameter(ExpressionDef parameter, @Nullable ClassElement receiver,
+                                        ClassElement functionalInterface, ClassElement declared) {
         ClassElement type = functionalType(receiver, functionalInterface, declared);
         if (type == null || type.isPrimitive() || isUnknown(type)) {
             return new Typed(parameter, declared.isPrimitive() ? declared : null);

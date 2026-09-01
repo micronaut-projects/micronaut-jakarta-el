@@ -16,15 +16,16 @@
 package io.micronaut.el.resolver;
 
 import io.micronaut.core.annotation.Internal;
+import io.micronaut.core.type.Argument;
 import io.micronaut.el.ELMethod;
 import io.micronaut.el.ELMethodExecutor;
 import io.micronaut.el.runtime.ELArray;
+import io.micronaut.el.runtime.ELArguments;
 import io.micronaut.el.runtime.ELSupport;
 import jakarta.el.ELContext;
 import jakarta.el.ELClass;
 import jakarta.el.ELException;
 import jakarta.el.ELResolver;
-import jakarta.el.MethodInfo;
 import jakarta.el.PropertyNotFoundException;
 import jakarta.el.PropertyNotWritableException;
 import org.jspecify.annotations.Nullable;
@@ -51,7 +52,7 @@ public final class CommonELResolver extends ELResolver implements ELMethodExecut
     private static final Object[] NO_ARGUMENTS = new Object[0];
 
     @Override
-    public int getPriority() {
+    public int getOrder() {
         return 100;
     }
 
@@ -90,7 +91,7 @@ public final class CommonELResolver extends ELResolver implements ELMethodExecut
                          @Nullable Object method,
                          Class<?> @Nullable [] paramTypes,
                          @Nullable Object[] params) {
-        ELMethod resolved = resolve(context, base, method, paramTypes, params);
+        ELMethod resolved = resolve(context, base, method, ELArguments.of(paramTypes), params);
         if (resolved == null) {
             return null;
         }
@@ -103,7 +104,7 @@ public final class CommonELResolver extends ELResolver implements ELMethodExecut
     public ELMethod resolve(ELContext context,
                             @Nullable Object base,
                             @Nullable Object method,
-                            Class<?> @Nullable [] paramTypes,
+                            Argument<?> @Nullable [] argumentTypes,
                             Object @Nullable [] arguments) {
         if (base == null || method == null) {
             return null;
@@ -111,10 +112,10 @@ public final class CommonELResolver extends ELResolver implements ELMethodExecut
         Object[] values = arguments == null ? NO_ARGUMENTS : arguments;
         String name = method.toString();
         return switch (base) {
-            case String ignored -> resolveString(name, paramTypes, values);
-            case Collection<?> collection -> resolveCollection(collection, name, paramTypes, values);
-            case Map<?, ?> ignored -> resolveMap(name, paramTypes, values);
-            case ELClass elClass -> resolveStatic(elClass.getKlass(), name, paramTypes, values);
+            case String ignored -> resolveString(name, argumentTypes, values);
+            case Collection<?> collection -> resolveCollection(collection, name, argumentTypes, values);
+            case Map<?, ?> ignored -> resolveMap(name, argumentTypes, values);
+            case ELClass elClass -> resolveStatic(elClass.getKlass(), name, argumentTypes, values);
             default -> null;
         };
     }
@@ -162,9 +163,9 @@ public final class CommonELResolver extends ELResolver implements ELMethodExecut
 
     @Nullable
     private static ELMethod resolveString(String method,
-                                          Class<?> @Nullable [] paramTypes,
+                                          Argument<?> @Nullable [] argumentTypes,
                                           Object[] arguments) {
-        int arity = arity(paramTypes, arguments);
+        int arity = arity(argumentTypes, arguments);
         return switch (method) {
             case "length" -> arity == 0 ? CommonMethod.STRING_LENGTH : null;
             case "isEmpty" -> arity == 0 ? CommonMethod.STRING_IS_EMPTY : null;
@@ -193,9 +194,9 @@ public final class CommonELResolver extends ELResolver implements ELMethodExecut
     @Nullable
     private static ELMethod resolveCollection(Collection<?> collection,
                                               String method,
-                                              Class<?> @Nullable [] paramTypes,
+                                              Argument<?> @Nullable [] argumentTypes,
                                               Object[] arguments) {
-        int arity = arity(paramTypes, arguments);
+        int arity = arity(argumentTypes, arguments);
         return switch (method) {
             case "size" -> arity == 0 ? CommonMethod.COLLECTION_SIZE : null;
             case "isEmpty" -> arity == 0 ? CommonMethod.COLLECTION_IS_EMPTY : null;
@@ -213,9 +214,9 @@ public final class CommonELResolver extends ELResolver implements ELMethodExecut
 
     @Nullable
     private static ELMethod resolveMap(String method,
-                                       Class<?> @Nullable [] paramTypes,
+                                       Argument<?> @Nullable [] argumentTypes,
                                        Object[] arguments) {
-        int arity = arity(paramTypes, arguments);
+        int arity = arity(argumentTypes, arguments);
         return switch (method) {
             case "size" -> arity == 0 ? CommonMethod.MAP_SIZE : null;
             case "isEmpty" -> arity == 0 ? CommonMethod.MAP_IS_EMPTY : null;
@@ -232,12 +233,12 @@ public final class CommonELResolver extends ELResolver implements ELMethodExecut
     @Nullable
     private static ELMethod resolveStatic(Class<?> type,
                                           String method,
-                                          Class<?> @Nullable [] paramTypes,
+                                          Argument<?> @Nullable [] argumentTypes,
                                           Object[] arguments) {
-        int arity = arity(paramTypes, arguments);
+        int arity = arity(argumentTypes, arguments);
         if (type == Integer.class) {
             return switch (method) {
-                case "valueOf" -> arity == 1 && isString(paramTypes, arguments)
+                case "valueOf" -> arity == 1 && isString(argumentTypes, arguments)
                     ? CommonMethod.INTEGER_VALUE_OF_STRING
                     : arity == 1 ? CommonMethod.INTEGER_VALUE_OF_INT : null;
                 case "toHexString" -> arity == 1 ? CommonMethod.INTEGER_TO_HEX_STRING : null;
@@ -273,9 +274,9 @@ public final class CommonELResolver extends ELResolver implements ELMethodExecut
                     default -> null;
                 };
             }
-            if (paramTypes != null) {
-                Class<?> type0 = paramTypes[0];
-                Class<?> type1 = paramTypes[1];
+            if (argumentTypes != null) {
+                Class<?> type0 = argumentTypes[0].getType();
+                Class<?> type1 = argumentTypes[1].getType();
                 if (isType(type0, int.class) && isType(type1, int.class)) {
                     return "max".equals(method) ? CommonMethod.MATH_MAX_INT
                         : "min".equals(method) ? CommonMethod.MATH_MIN_INT : null;
@@ -297,13 +298,13 @@ public final class CommonELResolver extends ELResolver implements ELMethodExecut
         return null;
     }
 
-    private static int arity(Class<?> @Nullable [] paramTypes, Object[] arguments) {
-        return arguments.length == 0 && paramTypes != null ? paramTypes.length : arguments.length;
+    private static int arity(Argument<?> @Nullable [] argumentTypes, Object[] arguments) {
+        return arguments.length == 0 && argumentTypes != null ? argumentTypes.length : arguments.length;
     }
 
-    private static boolean isString(Class<?> @Nullable [] paramTypes, Object[] arguments) {
+    private static boolean isString(Argument<?> @Nullable [] argumentTypes, Object[] arguments) {
         return arguments.length == 1 ? arguments[0] instanceof String
-            : paramTypes != null && paramTypes.length == 1 && paramTypes[0] == String.class;
+            : argumentTypes != null && argumentTypes.length == 1 && argumentTypes[0].getType() == String.class;
     }
 
     private static boolean isType(Class<?> type, Class<?> expected) {
@@ -382,25 +383,41 @@ public final class CommonELResolver extends ELResolver implements ELMethodExecut
         MATH_MAX_FLOAT("max", float.class, float.class, float.class),
         MATH_MIN_FLOAT("min", float.class, float.class, float.class);
 
-        private final MethodInfo methodInfo;
+        private final String methodName;
+        private final Class<?> returnType;
+        private final int argumentCount;
+        private final Class<?> firstArgument;
+        private final Class<?> secondArgument;
 
         CommonMethod(String name, Class<?> returnType, Class<?>... parameterTypes) {
-            this.methodInfo = new MethodInfo(name, returnType, parameterTypes);
+            if (parameterTypes.length > 2) {
+                throw new IllegalArgumentException("Common methods support at most two arguments");
+            }
+            this.methodName = name;
+            this.returnType = returnType;
+            this.argumentCount = parameterTypes.length;
+            this.firstArgument = parameterTypes.length > 0 ? parameterTypes[0] : void.class;
+            this.secondArgument = parameterTypes.length > 1 ? parameterTypes[1] : void.class;
         }
 
         @Override
         public String getName() {
-            return methodInfo.getName();
+            return methodName;
         }
 
         @Override
-        public Class<?> getReturnType() {
-            return methodInfo.getReturnType();
+        public Argument<?> getReturnType() {
+            return Argument.of(returnType);
         }
 
         @Override
-        public Class<?>[] getParameterTypes() {
-            return methodInfo.getParamTypes();
+        public Argument<?>[] getArguments() {
+            return switch (argumentCount) {
+                case 0 -> new Argument<?>[0];
+                case 1 -> new Argument<?>[]{Argument.of(firstArgument)};
+                case 2 -> new Argument<?>[]{Argument.of(firstArgument), Argument.of(secondArgument)};
+                default -> throw new IllegalStateException("Unexpected argument count: " + argumentCount);
+            };
         }
 
         @Override
@@ -481,8 +498,8 @@ public final class CommonELResolver extends ELResolver implements ELMethodExecut
 
         @Override
         public String identity() {
-            return CommonELResolver.class.getName() + '#' + methodInfo.getName()
-                + java.util.Arrays.toString(methodInfo.getParamTypes());
+            return CommonELResolver.class.getName() + '#' + methodName
+                + java.util.Arrays.toString(Argument.toClassArray(getArguments()));
         }
     }
 }

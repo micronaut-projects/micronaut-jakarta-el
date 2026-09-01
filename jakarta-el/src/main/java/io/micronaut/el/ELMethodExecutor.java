@@ -16,6 +16,8 @@
 package io.micronaut.el;
 
 import io.micronaut.core.annotation.Experimental;
+import io.micronaut.core.order.Ordered;
+import io.micronaut.core.type.Argument;
 import jakarta.el.ELClass;
 import jakarta.el.ELContext;
 import org.jspecify.annotations.Nullable;
@@ -31,33 +33,34 @@ import org.jspecify.annotations.Nullable;
  * @since 1.0.1
  */
 @Experimental
-public interface ELMethodExecutor {
+public interface ELMethodExecutor extends Ordered {
 
     /**
-     * Returns the resolution priority. Higher-priority executors run first, which lets direct/generated
-     * implementations take precedence over a general fallback such as reflection.
+     * Returns the executor order. Lower values run first, following the Micronaut {@link Ordered} contract, so
+     * direct/generated implementations can take precedence over a general fallback such as reflection.
      *
-     * @return The priority, zero by default
+     * @return The order, zero by default
      */
-    default int getPriority() {
+    @Override
+    default int getOrder() {
         return 0;
     }
 
     /**
      * Resolves an instance or static method, or a constructor represented by {@code <init>}.
      *
-     * @param context     The EL context
-     * @param base        The instance, or an {@link ELClass} for a static method or constructor
-     * @param method      The method name
-     * @param paramTypes  The parameter types supplied when the method expression was created, or {@code null}
-     * @param arguments   The evaluated arguments, or {@code null}
+     * @param context       The EL context
+     * @param base          The instance, or an {@link ELClass} for a static method or constructor
+     * @param method        The method name
+     * @param argumentTypes The parameter types supplied when the method expression was created, or {@code null}
+     * @param arguments     The evaluated arguments, or {@code null}
      * @return The resolved method, or {@code null} when this executor does not handle it
      */
     @Nullable
     ELMethod resolve(ELContext context,
                      @Nullable Object base,
                      @Nullable Object method,
-                     Class<?> @Nullable [] paramTypes,
+                     Argument<?> @Nullable [] argumentTypes,
                      Object @Nullable [] arguments);
 
     /**

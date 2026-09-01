@@ -83,6 +83,9 @@ public final class ValueExpressionWriter {
             .addJavadoc("The compiled form of the expression <code>" + definition.expression().replace("$", "$$") + "</code>.")
             .addMethod(constructor(definition, compiler, coerced))
             .addMethod(evaluate);
+        if (definition.inferred() && definition.requireExpectedType().getName().equals(Object.class.getName())) {
+            builder.addMethod(constructor(definition, compiler));
+        }
 
         ELNode node = unwrap(definition.node());
         if (isLValue(node)) {
@@ -120,6 +123,18 @@ public final class ValueExpressionWriter {
                 ExpressionDef.constant(compiler.canonical(definition.node())),
                 ExpressionDef.constant(TypeDef.erasure(definition.requireExpectedType())),
                 ExpressionDef.constant(coerced)
+            ));
+    }
+
+    private static MethodDef constructor(ELExpressionDefinition definition, ELCompiler compiler) {
+        return MethodDef.constructor()
+            .addModifiers(Modifier.PUBLIC)
+            .addParameter("expectedType", CLASS_TYPE)
+            .build((aThis, parameters) -> aThis.superRef().invokeSuperConstructor(
+                ExpressionDef.constant(definition.expression()),
+                ExpressionDef.constant(compiler.canonical(definition.node())),
+                parameters.get(0),
+                ExpressionDef.trueValue()
             ));
     }
 

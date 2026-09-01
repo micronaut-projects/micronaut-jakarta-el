@@ -16,6 +16,8 @@
 package io.micronaut.el.interpreter.reflection;
 
 import io.micronaut.core.annotation.Internal;
+import io.micronaut.core.order.Ordered;
+import io.micronaut.core.type.Argument;
 import io.micronaut.el.ELMethod;
 import io.micronaut.el.ELMethodExecutor;
 import io.micronaut.el.runtime.ELSupport;
@@ -47,8 +49,8 @@ import java.util.Arrays;
 public final class ReflectiveELMethodExecutor implements ELMethodExecutor {
 
     @Override
-    public int getPriority() {
-        return -100;
+    public int getOrder() {
+        return Ordered.LOWEST_PRECEDENCE;
     }
 
     @Override
@@ -56,7 +58,7 @@ public final class ReflectiveELMethodExecutor implements ELMethodExecutor {
     public ELMethod resolve(ELContext context,
                             @Nullable Object base,
                             @Nullable Object method,
-                            Class<?> @Nullable [] paramTypes,
+                            Argument<?> @Nullable [] argumentTypes,
                             Object @Nullable [] arguments) {
         if (base == null || method == null) {
             return null;
@@ -64,13 +66,15 @@ public final class ReflectiveELMethodExecutor implements ELMethodExecutor {
         String name = method.toString();
         if (base instanceof ELClass elClass) {
             if ("<init>".equals(name)) {
-                Constructor<?> constructor = findConstructor(elClass.getKlass(), paramTypes, arguments);
+                Constructor<?> constructor = findConstructor(elClass.getKlass(), argumentTypes, arguments);
                 return constructor == null ? null : new ConstructorMethod(constructor);
             }
-            Method resolved = ELMethods.findMethodOrNull(elClass.getKlass(), name, paramTypes, arguments, true);
+            Method resolved = ELMethods.findMethodOrNull(elClass.getKlass(), name,
+                argumentTypes == null ? null : Argument.toClassArray(argumentTypes), arguments, true);
             return resolved == null ? null : new ReflectiveMethod(ELMethods.accessible(resolved), true, false);
         }
-        Method resolved = ELMethods.findMethodOrNull(base.getClass(), name, paramTypes, arguments, false);
+        Method resolved = ELMethods.findMethodOrNull(base.getClass(), name,
+            argumentTypes == null ? null : Argument.toClassArray(argumentTypes), arguments, false);
         return resolved == null ? null : new ReflectiveMethod(ELMethods.accessible(resolved), false, false);
     }
 
@@ -90,12 +94,12 @@ public final class ReflectiveELMethodExecutor implements ELMethodExecutor {
 
     @Nullable
     private static Constructor<?> findConstructor(Class<?> type,
-                                                  Class<?> @Nullable [] paramTypes,
+                                                  Argument<?> @Nullable [] argumentTypes,
                                                   Object @Nullable [] arguments) {
         Constructor<?>[] constructors = type.getConstructors();
-        if (paramTypes != null) {
+        if (argumentTypes != null) {
             for (Constructor<?> constructor : constructors) {
-                if (sameTypes(constructor.getParameterTypes(), paramTypes)) {
+                if (sameTypes(constructor.getParameterTypes(), argumentTypes)) {
                     return constructor;
                 }
             }
@@ -168,12 +172,12 @@ public final class ReflectiveELMethodExecutor implements ELMethodExecutor {
         }
     }
 
-    private static boolean sameTypes(Class<?>[] declared, Class<?>[] provided) {
+    private static boolean sameTypes(Class<?>[] declared, Argument<?>[] provided) {
         if (declared.length != provided.length) {
             return false;
         }
         for (int i = 0; i < declared.length; i++) {
-            if (wrap(declared[i]) != wrap(provided[i])) {
+            if (wrap(declared[i]) != provided[i].getWrapperType()) {
                 return false;
             }
         }
@@ -222,13 +226,13 @@ public final class ReflectiveELMethodExecutor implements ELMethodExecutor {
         }
 
         @Override
-        public Class<?> getReturnType() {
-            return method().getReturnType();
+        public Argument<?> getReturnType() {
+            return Argument.of(method().getReturnType());
         }
 
         @Override
-        public Class<?>[] getParameterTypes() {
-            return parameterTypes.clone();
+        public Argument<?>[] getArguments() {
+            return Arrays.stream(parameterTypes).map(Argument::of).toArray(Argument<?>[]::new);
         }
 
         @Override
@@ -237,7 +241,7 @@ public final class ReflectiveELMethodExecutor implements ELMethodExecutor {
         }
 
         @Override
-        public java.lang.annotation.Annotation[] getAnnotations() {
+        public java.lang.annotation.Annotation[] synthesizeAnnotations() {
             return method().getAnnotations();
         }
 
@@ -336,13 +340,13 @@ public final class ReflectiveELMethodExecutor implements ELMethodExecutor {
         }
 
         @Override
-        public Class<?> getReturnType() {
-            return owner;
+        public Argument<?> getReturnType() {
+            return Argument.of(owner);
         }
 
         @Override
-        public Class<?>[] getParameterTypes() {
-            return parameterTypes.clone();
+        public Argument<?>[] getArguments() {
+            return Arrays.stream(parameterTypes).map(Argument::of).toArray(Argument<?>[]::new);
         }
 
         @Override

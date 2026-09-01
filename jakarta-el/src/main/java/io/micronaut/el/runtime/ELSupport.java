@@ -478,6 +478,21 @@ public final class ELSupport {
     }
 
     /**
+     * Evaluates the right operand of a generated semicolon expression after the left operand.
+     *
+     * @param discarded The value of the left operand
+     * @param context   The evaluation context
+     * @param value     The compiled right operand
+     * @return The value of the right operand
+     */
+    @Nullable
+    public static Object sequenceLazy(@Nullable Object discarded,
+                                      ELContext context,
+                                      ELLambdaBody.Nullary value) {
+        return value.evaluate(context);
+    }
+
+    /**
      * The {@code ==} operator described in the section 1.9.2 of the specification.
      *
      * @param left  The left operand

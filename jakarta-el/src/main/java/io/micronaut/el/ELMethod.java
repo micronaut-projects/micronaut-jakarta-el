@@ -15,7 +15,9 @@
  */
 package io.micronaut.el;
 
+import io.micronaut.core.annotation.AnnotationMetadata;
 import io.micronaut.core.annotation.Experimental;
+import io.micronaut.core.type.Argument;
 import jakarta.el.ELContext;
 import org.jspecify.annotations.Nullable;
 
@@ -36,30 +38,49 @@ import java.lang.annotation.Annotation;
 public interface ELMethod extends Serializable {
 
     /**
+     * Returns the method name.
+     *
      * @return The method name
      */
     String getName();
 
     /**
+     * Returns the return type.
+     *
      * @return The return type
      */
-    Class<?> getReturnType();
+    Argument<?> getReturnType();
 
     /**
+     * Returns the declared parameter types.
+     *
      * @return The declared parameter types
      */
-    Class<?>[] getParameterTypes();
+    Argument<?>[] getArguments();
 
     /**
+     * Returns whether the method has a variable arity parameter.
+     *
      * @return Whether the method has a variable arity parameter
      */
     boolean isVarArgs();
 
     /**
-     * @return The method annotations, or an empty array when there are none
+     * Returns the method annotation metadata.
+     *
+     * @return The method annotation metadata, or empty metadata when there is none
      */
-    default Annotation[] getAnnotations() {
-        return new Annotation[0];
+    default AnnotationMetadata getAnnotationMetadata() {
+        return AnnotationMetadata.EMPTY_METADATA;
+    }
+
+    /**
+     * Synthesizes the annotations required by the Jakarta EL method-reference API.
+     *
+     * @return The method annotations
+     */
+    default Annotation[] synthesizeAnnotations() {
+        return getAnnotationMetadata().synthesizeAll();
     }
 
     /**
@@ -80,6 +101,7 @@ public interface ELMethod extends Serializable {
      * @return The method identity
      */
     default String identity() {
-        return getClass().getName() + '#' + getName() + java.util.Arrays.toString(getParameterTypes());
+        return getClass().getName() + '#' + getName()
+            + java.util.Arrays.toString(Argument.toClassArray(getArguments()));
     }
 }

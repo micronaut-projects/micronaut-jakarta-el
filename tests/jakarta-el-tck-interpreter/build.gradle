@@ -1,0 +1,9 @@
+plugins {
+    id "io.micronaut.build.internal.jakarta-el-tck-test-suite"
+}
+
+description = "Runs the Jakarta Expression Language TCK using the reflection-free interpreter."
+
+dependencies {
+    testImplementation projects.micronautJakartaElInterpreter
+}

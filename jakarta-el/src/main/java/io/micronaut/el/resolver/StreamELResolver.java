@@ -16,17 +16,18 @@
 package io.micronaut.el.resolver;
 
 import io.micronaut.core.annotation.Internal;
+import io.micronaut.core.type.Argument;
 import io.micronaut.el.ELMethod;
 import io.micronaut.el.ELMethodExecutor;
 import io.micronaut.el.runtime.ELArray;
+import io.micronaut.el.runtime.ELArguments;
 import io.micronaut.el.runtime.ELSupport;
-import org.jspecify.annotations.Nullable;
 import io.micronaut.el.stream.ELOptional;
 import io.micronaut.el.stream.ELStream;
 import jakarta.el.ELContext;
 import jakarta.el.ELResolver;
 import jakarta.el.LambdaExpression;
-import jakarta.el.MethodInfo;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
@@ -45,7 +46,7 @@ public final class StreamELResolver extends ELResolver implements ELMethodExecut
     private static final String STREAM = "stream";
 
     @Override
-    public int getPriority() {
+    public int getOrder() {
         return 100;
     }
 
@@ -74,7 +75,7 @@ public final class StreamELResolver extends ELResolver implements ELMethodExecut
     @Override
     @Nullable
     public Object invoke(ELContext context, Object base, Object method, Class<?>[] paramTypes, Object[] params) {
-        ELMethod resolved = resolve(context, base, method, paramTypes, params);
+        ELMethod resolved = resolve(context, base, method, ELArguments.of(paramTypes), params);
         if (resolved == null) {
             return null;
         }
@@ -85,12 +86,12 @@ public final class StreamELResolver extends ELResolver implements ELMethodExecut
     @Override
     @Nullable
     public ELMethod resolve(ELContext context, @Nullable Object base, @Nullable Object method,
-                            Class<?> @Nullable [] paramTypes, Object @Nullable [] params) {
+                            Argument<?> @Nullable [] argumentTypes, Object @Nullable [] params) {
         if (base == null || method == null) {
             return null;
         }
         String name = ELSupport.coerceToString(method);
-        int arity = params == null ? paramTypes == null ? 0 : paramTypes.length : params.length;
+        int arity = params == null ? argumentTypes == null ? 0 : argumentTypes.length : params.length;
         if (base instanceof ELStream<?>) {
             return StreamMethod.forName(name, arity);
         }
@@ -141,10 +142,21 @@ public final class StreamELResolver extends ELResolver implements ELMethodExecut
         NONE_MATCH("noneMatch", ELOptional.class, LambdaExpression.class),
         FIND_FIRST("findFirst", ELOptional.class);
 
-        private final MethodInfo methodInfo;
+        private final String methodName;
+        private final Class<?> returnType;
+        private final int argumentCount;
+        private final Class<?> firstArgument;
+        private final Class<?> secondArgument;
 
         StreamMethod(String name, Class<?> returnType, Class<?>... parameterTypes) {
-            this.methodInfo = new MethodInfo(name, returnType, parameterTypes);
+            if (parameterTypes.length > 2) {
+                throw new IllegalArgumentException("Stream methods support at most two arguments");
+            }
+            this.methodName = name;
+            this.returnType = returnType;
+            this.argumentCount = parameterTypes.length;
+            this.firstArgument = parameterTypes.length > 0 ? parameterTypes[0] : void.class;
+            this.secondArgument = parameterTypes.length > 1 ? parameterTypes[1] : void.class;
         }
 
         @Nullable
@@ -179,17 +191,17 @@ public final class StreamELResolver extends ELResolver implements ELMethodExecut
 
         @Override
         public String getName() {
-            return methodInfo.getName();
+            return methodName;
         }
 
         @Override
-        public Class<?> getReturnType() {
-            return methodInfo.getReturnType();
+        public Argument<?> getReturnType() {
+            return Argument.of(returnType);
         }
 
         @Override
-        public Class<?>[] getParameterTypes() {
-            return methodInfo.getParamTypes();
+        public Argument<?>[] getArguments() {
+            return arguments(argumentCount, firstArgument, secondArgument);
         }
 
         @Override
@@ -217,10 +229,21 @@ public final class StreamELResolver extends ELResolver implements ELMethodExecut
         OR_ELSE("orElse", Object.class, Object.class),
         OR_ELSE_GET("orElseGet", Object.class, LambdaExpression.class);
 
-        private final MethodInfo methodInfo;
+        private final String methodName;
+        private final Class<?> returnType;
+        private final int argumentCount;
+        private final Class<?> firstArgument;
+        private final Class<?> secondArgument;
 
         OptionalMethod(String name, Class<?> returnType, Class<?>... parameterTypes) {
-            this.methodInfo = new MethodInfo(name, returnType, parameterTypes);
+            if (parameterTypes.length > 2) {
+                throw new IllegalArgumentException("Optional methods support at most two arguments");
+            }
+            this.methodName = name;
+            this.returnType = returnType;
+            this.argumentCount = parameterTypes.length;
+            this.firstArgument = parameterTypes.length > 0 ? parameterTypes[0] : void.class;
+            this.secondArgument = parameterTypes.length > 1 ? parameterTypes[1] : void.class;
         }
 
         @Nullable
@@ -237,17 +260,17 @@ public final class StreamELResolver extends ELResolver implements ELMethodExecut
 
         @Override
         public String getName() {
-            return methodInfo.getName();
+            return methodName;
         }
 
         @Override
-        public Class<?> getReturnType() {
-            return methodInfo.getReturnType();
+        public Argument<?> getReturnType() {
+            return Argument.of(returnType);
         }
 
         @Override
-        public Class<?>[] getParameterTypes() {
-            return methodInfo.getParamTypes();
+        public Argument<?>[] getArguments() {
+            return arguments(argumentCount, firstArgument, secondArgument);
         }
 
         @Override
@@ -263,5 +286,14 @@ public final class StreamELResolver extends ELResolver implements ELMethodExecut
             }
             throw new IllegalArgumentException("The method '" + getName() + "' requires an optional");
         }
+    }
+
+    private static Argument<?>[] arguments(int count, Class<?> first, Class<?> second) {
+        return switch (count) {
+            case 0 -> new Argument<?>[0];
+            case 1 -> new Argument<?>[]{Argument.of(first)};
+            case 2 -> new Argument<?>[]{Argument.of(first), Argument.of(second)};
+            default -> throw new IllegalStateException("Unexpected argument count: " + count);
+        };
     }
 }

@@ -102,11 +102,11 @@ or on the member holding the expressions, in which case it applies to those on t
 class. The expressions declared on a method, or on one of its parameters, additionally see the parameters of the
 method as variables, under their names and with their declared types.
 
-NOTE: The generated registry matches the expected type of a request: an expression declared with
+NOTE: The generated registry matches an explicitly declared expected type exactly: an expression declared with
 `expectedType = String.class` is only returned for a request with `String.class`. A primitive and its wrapper
-are the same expectation, so `double.class` and `Double.class` match each other. A request for the same string
-with another type, `Object.class` included, is treated as a different expression, and is rejected as not compiled
-unless the interpreter module is present.
+are the same expectation, so `double.class` and `Double.class` match each other. Inferred expressions are also
+served for `Object.class`. When the compiler cannot infer a type more specific than `Object`, the generated
+expression adopts the caller's requested type and applies the standard EL coercion rules.
 
 WARNING: Any annotation string containing `+#{...}+` is treated by Micronaut as one of its own evaluated
 expressions. The processor reads the original text back out, so `+#{...}+` works in a plain holder class, but on a
