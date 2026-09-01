@@ -141,6 +141,39 @@ the arguments, where the interpreter has only their runtime types: `${Math.max(b
 Tomcat Jasper EL report it ambiguous too. Declaring an expression therefore resolves overloads a runtime string
 cannot.
 
+### Executable methods of beans
+
+A bean introspection is not the only description of a type the compiler emits. Every method annotated
+`@Executable` — directly, or through an annotation meta-annotated with it — is compiled into the `BeanDefinition`
+of its bean, and a great many beans carry that metadata without carrying an introspection: anything AOP-advised,
+anything a framework marks executable for its own dispatch. `ExecutableMethodELExecutor` is registered as an
+`io.micronaut.el.ELMethodExecutor` service, so `${greeter.greet('world')}` invokes such a method directly, with no
+reflection and without the reflection module on the classpath.
+
+An executable method is reached through a bean context, and an application may run more than one, so the executor
+reads the context of each call rather than a static holder. **Register it on the `ELContext` the expression is
+evaluated with**, or the executor declines and the method does not resolve:
+
+```java
+context.putContext(BeanDefinitionRegistry.class, beanContext);
+```
+
+`BeanContext.class` works as the key as well, and `new CompiledELContext(beanContext)` does it for you.
+
+A method that no executor and no resolver answers for reports which of the descriptions it could have been
+reached through did not carry it, and what to do about each — a context carrying no bean context is named as
+such, separately from a registered one whose bean definition has no executable method of that name or arity:
+
+```
+jakarta.el.MethodNotFoundException: Cannot find the method 'greet' of com.example.Greeter accepting 1
+argument(s). No bean context is registered in this ELContext, so the executable methods of the bean definitions
+were not consulted: register one with context.putContext(BeanDefinitionRegistry.class, beanContext), or evaluate
+the expression with new CompiledELContext(beanContext). The type carries no bean introspection either: annotate
+it with @Introspected, and the method with @Executable, to have the method dispatched from generated metadata.
+No reflective executor is registered either, so the method was not looked up reflectively: add the
+micronaut-jakarta-el-interpreter-reflection module to resolve any public method.
+```
+
 ## Expressions built from untrusted input
 
 An expression declared with `@ELExpression` is source of the application. An expression string built at runtime

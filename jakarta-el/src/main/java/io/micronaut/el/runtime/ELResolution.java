@@ -18,6 +18,7 @@ package io.micronaut.el.runtime;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.el.CompiledELContext;
 import io.micronaut.el.ELBeanProvider;
+import io.micronaut.el.resolver.ELMethodDiagnostics;
 import org.jspecify.annotations.Nullable;
 import jakarta.el.ELClass;
 import jakarta.el.ELContext;
@@ -466,8 +467,7 @@ public final class ELResolution {
         if (context.isPropertyResolved()) {
             return result;
         }
-        throw new MethodNotFoundException("Cannot find the method '" + method + "' of "
-            + base.getClass().getName());
+        throw ELMethodDiagnostics.notFound(context, base, method, arguments);
     }
 
     /**

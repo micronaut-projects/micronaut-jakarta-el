@@ -223,8 +223,11 @@ public final class ExecutableMethodELExecutor extends ELResolver implements ELMe
     /**
      * The bases the specification, or this module, gives a resolver of their own for invocation: a static
      * reference, the streams and the optionals, and a lambda expression.
+     *
+     * <p>Read by {@link ELMethodDiagnostics} as well, so that a base this executor was never going to answer
+     * for is not reported as one whose bean definition was missing something.</p>
      */
-    private static boolean declined(Object base) {
+    static boolean declined(Object base) {
         return base instanceof ELClass
             || base instanceof ELStream<?>
             || base instanceof ELOptional<?>
@@ -248,15 +251,32 @@ public final class ExecutableMethodELExecutor extends ELResolver implements ELMe
     /**
      * The registry registered in the context, under the type this executor needs or under the wider
      * {@code BeanContext} an application is more likely to have at hand.
+     *
+     * <p>{@link ELMethodDiagnostics} reads it through this method too, so that what a failed resolution
+     * reports about the context is what this executor actually saw of it.</p>
      */
     @Nullable
-    private static BeanDefinitionRegistry registryOf(ELContext context) {
+    static BeanDefinitionRegistry registryOf(ELContext context) {
         Object registered = context.getContext(BeanDefinitionRegistry.class);
         if (registered instanceof BeanDefinitionRegistry registry) {
             return registry;
         }
         Object beanContext = context.getContext(BeanContext.class);
         return beanContext instanceof BeanDefinitionRegistry registry ? registry : null;
+    }
+
+    /**
+     * The definition a class resolves to, for {@link ELMethodDiagnostics}: the same lookup this executor makes,
+     * proxies resolved to their target, so that a failed resolution reports the executable methods that were
+     * actually searched.
+     *
+     * @param registry The registry to read
+     * @param type     The runtime class of the base object
+     * @return The definition, or {@code null} when the class is not a bean of the registry
+     */
+    @Nullable
+    static BeanDefinition<Object> definitionOf(BeanDefinitionRegistry registry, Class<?> type) {
+        return Executables.definitionOf(registry, type);
     }
 
     /**
@@ -380,7 +400,7 @@ public final class ExecutableMethodELExecutor extends ELResolver implements ELMe
          * proxy, so that the executable methods of the class the author wrote are the ones that are read.
          */
         @Nullable
-        private static BeanDefinition<Object> definitionOf(BeanDefinitionRegistry registry, Class<?> type) {
+        static BeanDefinition<Object> definitionOf(BeanDefinitionRegistry registry, Class<?> type) {
             @SuppressWarnings("unchecked")
             Class<Object> beanType = (Class<Object>) type;
             BeanDefinition<Object> definition = findDefinition(registry, beanType);

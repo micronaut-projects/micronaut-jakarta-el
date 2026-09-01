@@ -23,6 +23,7 @@ import io.micronaut.el.CompiledELContext;
 import io.micronaut.el.CompiledExpressionFactory;
 import io.micronaut.el.ELMethodExecutor;
 import io.micronaut.el.interpreter.InterpretingELExpressionParser;
+import io.micronaut.el.resolver.ELMethodDiagnostics;
 import io.micronaut.el.resolver.ExecutableMethodELExecutor;
 import io.micronaut.el.resolver.IntrospectionELResolver;
 import io.micronaut.inject.ProxyBeanDefinition;
@@ -35,6 +36,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -155,12 +157,95 @@ class ExecutableMethodInterpreterTest {
         assertEquals("hello world", unreflected("${greeter.greet('world')}"));
     }
 
+    /**
+     * The failure that costs the most to diagnose: the method exists, is public and is executable, and the only
+     * thing missing is the bean context the executor reads from the {@link ELContext}. Reporting the name of
+     * the method alone reads as a method that plainly exists not being found, so the message has to say that
+     * the executable methods were never consulted, and to name the two ways out.
+     */
     @Test
     void withoutAContextCarryingARegistryTheExecutorDeclines() {
         CompiledELContext unregistered = beans(new CompiledELContext());
-        assertThrows(MethodNotFoundException.class, () -> unreflectedFactory
+        String message = assertThrows(MethodNotFoundException.class, () -> unreflectedFactory
             .createValueExpression(unregistered, "${greeter.greet('world')}", Object.class)
-            .getValue(unregistered));
+            .getValue(unregistered)).getMessage();
+        assertTrue(message.startsWith("Cannot find the method 'greet' of " + Greeter.class.getName()
+            + " accepting 1 argument(s)."), message);
+        assertTrue(message.contains("No bean context is registered in this ELContext"), message);
+        assertTrue(message.contains("context.putContext(BeanDefinitionRegistry.class, beanContext)"), message);
+        assertTrue(message.contains("new CompiledELContext(beanContext)"), message);
+        assertTrue(message.contains("add the micronaut-jakarta-el-interpreter-reflection module"), message);
+        // the context is the cause, so the definition must not be blamed for a method it does carry
+        assertFalse(message.contains("carries no executable method named 'greet'"), message);
+    }
+
+    /**
+     * The other side of the same distinction: the bean context is registered, so the executable methods of the
+     * definition were read, and what is missing is {@code @Executable} on the method itself.
+     */
+    @Test
+    void withARegisteredContextADefinitionLackingTheMethodIsReportedAsSuch() {
+        String message = assertThrows(MethodNotFoundException.class,
+            () -> unreflected("${greeter.hidden('world')}")).getMessage();
+        assertTrue(message.contains(Greeter.class.getName()
+            + " is a bean of the bean context registered in this ELContext"), message);
+        assertTrue(message.contains("carries no executable method named 'hidden'"), message);
+        assertTrue(message.contains("annotate the method with @Executable"), message);
+        assertTrue(message.contains("annotate it with @Introspected"), message);
+        assertTrue(message.contains("add the micronaut-jakarta-el-interpreter-reflection module"), message);
+        assertFalse(message.contains("No bean context is registered in this ELContext"), message);
+    }
+
+    /**
+     * A type that is not a bean of the registered context at all is reported as such, rather than as a bean
+     * whose method is missing an annotation.
+     */
+    @Test
+    void withARegisteredContextATypeThatIsNotABeanOfItIsReportedAsSuch() {
+        String message = assertThrows(MethodNotFoundException.class,
+            () -> unreflected("${plain.shout('world')}")).getMessage();
+        assertTrue(message.contains("has no bean definition for " + Plain.class.getName()), message);
+        assertTrue(message.contains("annotate it with @Introspected"), message);
+        assertTrue(message.contains("add the micronaut-jakarta-el-interpreter-reflection module"), message);
+    }
+
+    /**
+     * The arity, which the name alone does not distinguish: the definition carries the method, so the
+     * signatures it carries are reported next to the number of arguments that selected none of them.
+     */
+    @Test
+    void aNameThatIsCarriedButNotWithThatArityReportsTheSignatures() {
+        String message = ELMethodDiagnostics.notFound(serviceContext, beanContext.getBean(Greeter.class),
+            "greet", new Object[]{"a", "b"}, unreflectedExecutors()).getMessage();
+        assertTrue(message.contains("accepting 2 argument(s)"), message);
+        assertTrue(message.contains("The bean definition of " + Greeter.class.getName()
+            + " carries greet(java.lang.String), but the 2 argument(s) given select none of them"), message);
+        assertFalse(message.contains("carries no executable method named 'greet'"), message);
+    }
+
+    /**
+     * An introspected type is described through its introspection as well, so that the remedy named is the one
+     * of the description the method would have been dispatched from.
+     */
+    @Test
+    void anIntrospectedTypeIsDescribedThroughItsIntrospectionToo() {
+        String message = ELMethodDiagnostics.notFound(serviceContext, introspected, "missing",
+            new Object[]{"world"}, unreflectedExecutors()).getMessage();
+        assertTrue(message.contains("Its bean introspection carries no method named 'missing'"), message);
+        assertTrue(message.contains("so that it enters the introspection"), message);
+    }
+
+    /**
+     * With the reflective executor present the module is not named as a remedy: it was consulted, so no public
+     * method of that name accepts the arguments, and pointing at the module would send the reader nowhere.
+     */
+    @Test
+    void withTheReflectiveExecutorPresentTheModuleIsNotNamedAsARemedy() {
+        List<ELMethodExecutor> all = SoftServiceLoader.load(ELMethodExecutor.class).collectAll();
+        String message = ELMethodDiagnostics.notFound(serviceContext, beanContext.getBean(Greeter.class),
+            "missing", new Object[]{"world"}, all).getMessage();
+        assertTrue(message.contains("The reflective executor was consulted as well"), message);
+        assertFalse(message.contains("add the micronaut-jakarta-el-interpreter-reflection module"), message);
     }
 
     @Test
