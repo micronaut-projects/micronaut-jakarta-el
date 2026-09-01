@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.sun.ts.tests.el.api.jakarta_el.staticfieldelresolver.ELClientIT" tests="5" skipped="0" failures="0" errors="0" timestamp="SANITIZED" hostname="SANITIZED" time="0">
+  <properties/>
+  <testcase name="staticFieldELResolverNPETest()" classname="com.sun.ts.tests.el.api.jakarta_el.staticfieldelresolver.ELClientIT" time="0"/>
+  <testcase name="staticFieldELResolverTest()" classname="com.sun.ts.tests.el.api.jakarta_el.staticfieldelresolver.ELClientIT" time="0"/>
+  <testcase name="staticFieldELResolverInvokeTest()" classname="com.sun.ts.tests.el.api.jakarta_el.staticfieldelresolver.ELClientIT" time="0"/>
+  <testcase name="staticFieldResolverInvokeMNFETest()" classname="com.sun.ts.tests.el.api.jakarta_el.staticfieldelresolver.ELClientIT" time="0"/>
+  <testcase name="staticFieldResolverInvokePNFETest()" classname="com.sun.ts.tests.el.api.jakarta_el.staticfieldelresolver.ELClientIT" time="0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.staticfieldelresolver.ELClientIT logStartTest
+INFO: STARTING TEST : staticFieldELResolverNPETest()
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.staticfieldelresolver.ELClientIT logFinishTest
+INFO: FINISHED TEST : staticFieldELResolverNPETest()
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.staticfieldelresolver.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.staticfieldelresolver.ELClientIT logStartTest
+INFO: STARTING TEST : staticFieldELResolverTest()
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.staticfieldelresolver.ELClientIT logFinishTest
+INFO: FINISHED TEST : staticFieldELResolverTest()
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.staticfieldelresolver.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.staticfieldelresolver.ELClientIT logStartTest
+INFO: STARTING TEST : staticFieldELResolverInvokeTest()
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.staticfieldelresolver.ELClientIT staticFieldELResolverInvokeTest
+INFO: 
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.staticfieldelresolver.ELClientIT logFinishTest
+INFO: FINISHED TEST : staticFieldELResolverInvokeTest()
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.staticfieldelresolver.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.staticfieldelresolver.ELClientIT logStartTest
+INFO: STARTING TEST : staticFieldResolverInvokeMNFETest()
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.staticfieldelresolver.ELClientIT staticFieldResolverInvokeMNFETest
+INFO: Test Passed  invoke() threw MethodNotFoundException
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.staticfieldelresolver.ELClientIT logFinishTest
+INFO: FINISHED TEST : staticFieldResolverInvokeMNFETest()
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.staticfieldelresolver.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.staticfieldelresolver.ELClientIT logStartTest
+INFO: STARTING TEST : staticFieldResolverInvokePNFETest()
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.staticfieldelresolver.ELClientIT logFinishTest
+INFO: FINISHED TEST : staticFieldResolverInvokePNFETest()
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.staticfieldelresolver.ELClientIT cleanup
+INFO: Cleanup method called
+]]></system-err>
+</testsuite>
