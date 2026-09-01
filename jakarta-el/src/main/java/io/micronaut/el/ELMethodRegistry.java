@@ -329,8 +329,10 @@ public final class ELMethodRegistry {
                                      Class<?>[] parameterTypes,
                                      boolean varArgs,
                                      Invocation invocation) {
-        functions.put(qualifiedName(prefix, localName), new Registration(declaringType, methodName, returnType,
-            parameterTypes.clone(), varArgs, true, NO_ANNOTATIONS, invocation));
+        Registration registration = new Registration(declaringType, methodName, returnType,
+            parameterTypes.clone(), varArgs, true, NO_ANNOTATIONS, invocation);
+        validate(declaringType, methodName, registration);
+        functions.put(qualifiedName(prefix, localName), registration);
         return this;
     }
 
@@ -364,7 +366,8 @@ public final class ELMethodRegistry {
      *
      * <p>The registrations are indexed by type and name, and the methods a type inherits from its supertypes
      * and interfaces are merged into it, so a method registered on an interface is callable on every
-     * implementation. The executor is immutable; later registrations do not reach it.</p>
+     * implementation. A constructor is not inherited, since it constructs the type it was registered for. The
+     * executor is immutable; later registrations do not reach it.</p>
      *
      * @param order The order of the executor among the others, see {@link Ordered}
      * @return The executor
@@ -389,16 +392,20 @@ public final class ELMethodRegistry {
     }
 
     private ELMethodRegistry declare(Class<?> type, String name, Registration registration) {
+        validate(type, name, registration);
+        declarations.computeIfAbsent(type, ignored -> new LinkedHashMap<>())
+            .computeIfAbsent(name, ignored -> new ArrayList<>(2))
+            .add(registration);
+        return this;
+    }
+
+    private static void validate(Class<?> type, String name, Registration registration) {
         if (registration.varArgs()
             && (registration.parameterTypes().length == 0
                 || !registration.parameterTypes()[registration.parameterTypes().length - 1].isArray())) {
             throw new IllegalArgumentException("The variable arity method '" + name + "' of " + type.getName()
                 + " must declare an array as its last parameter");
         }
-        declarations.computeIfAbsent(type, ignored -> new LinkedHashMap<>())
-            .computeIfAbsent(name, ignored -> new ArrayList<>(2))
-            .add(registration);
-        return this;
     }
 
     private static String qualifiedName(String prefix, String localName) {
@@ -570,7 +577,9 @@ public final class ELMethodRegistry {
                                 boolean varArgs,
                                 boolean isStatic,
                                 Annotation[] annotations,
-                                Invocation invocation) {
+                                Invocation invocation) implements Serializable {
+
+        private static final long serialVersionUID = 1L;
     }
 
     /**
@@ -690,7 +699,7 @@ public final class ELMethodRegistry {
                 @Override
                 protected Map<String, List<ELMethods.Candidate<RegisteredMethod>>> computeValue(Class<?> type) {
                     Map<String, List<Registration>> inherited = new HashMap<>();
-                    collect(type, inherited);
+                    collect(type, inherited, true);
                     Map<String, List<ELMethods.Candidate<RegisteredMethod>>> byName = new HashMap<>();
                     inherited.forEach((name, list) -> {
                         boolean reusable = list.size() == 1;
@@ -750,18 +759,23 @@ public final class ELMethodRegistry {
             return registration == null ? null : new RegisteredMethod(registration, true);
         }
 
-        private void collect(Class<?> type, Map<String, List<Registration>> into) {
+        private void collect(Class<?> type, Map<String, List<Registration>> into, boolean declaringType) {
             Map<String, List<Registration>> declared = declarations.get(type);
             if (declared != null) {
-                declared.forEach((name, list) ->
-                    into.computeIfAbsent(name, ignored -> new ArrayList<>(list.size())).addAll(list));
+                declared.forEach((name, list) -> {
+                    // a constructor is not inherited: `Child(...)` must not select the constructor registered
+                    // for `Parent`, which would construct a `Parent` instead
+                    if (declaringType || !CONSTRUCTOR.equals(name)) {
+                        into.computeIfAbsent(name, ignored -> new ArrayList<>(list.size())).addAll(list);
+                    }
+                });
             }
             for (Class<?> anInterface : type.getInterfaces()) {
-                collect(anInterface, into);
+                collect(anInterface, into, false);
             }
             Class<?> superclass = type.getSuperclass();
             if (superclass != null) {
-                collect(superclass, into);
+                collect(superclass, into, false);
             }
         }
 

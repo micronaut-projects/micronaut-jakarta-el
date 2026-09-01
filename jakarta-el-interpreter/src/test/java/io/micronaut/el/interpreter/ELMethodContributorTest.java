@@ -30,6 +30,11 @@ import jakarta.el.StandardELContext;
 import jakarta.el.ValueExpression;
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -118,13 +123,14 @@ class ELMethodContributorTest {
     @Test
     void aContributedStaticMethodAndConstructorAreCallable() {
         ExpressionFactory factory = factory(registry -> registry
-            .staticMethod(Math.class, "abs", int.class, int.class, Math::abs)
+            .staticMethod(Math.class, "abs", long.class, long.class, Math::abs)
             .constructor(Greeter.class, String.class, Greeter::new)
             .method(Greeter.class, "getName", String.class, Greeter::getName));
         StandardELContext context = new StandardELContext(factory);
         context.getImportHandler().importClass(Greeter.class.getName());
 
-        assertEquals(7, evaluate(factory, context, "${Math.abs(-7)}"));
+        // the literal is a Long, as it is for the compiler, so both execution modes return the same value
+        assertEquals(7L, evaluate(factory, context, "${Math.abs(-7)}"));
         assertEquals("ada", evaluate(factory, context, "${Greeter('ada').name}"));
     }
 
@@ -265,6 +271,58 @@ class ELMethodContributorTest {
     }
 
     @Test
+    void aConstructorIsNotInheritedBySubtypes() {
+        ExpressionFactory factory = factory(registry -> registry
+            .constructor(Greeter.class, String.class, Greeter::new)
+            .method(Greeter.class, "getName", String.class, Greeter::getName));
+        StandardELContext context = new StandardELContext(factory);
+        context.getImportHandler().importClass(Greeter.class.getName());
+        context.getImportHandler().importClass(LoudGreeter.class.getName());
+
+        assertEquals("ada", evaluate(factory, context, "${Greeter('ada').name}"));
+        // the constructor of the supertype must not construct a Greeter where a LoudGreeter is asked for
+        assertThrows(MethodNotFoundException.class,
+            () -> evaluate(factory, context, "${LoudGreeter('ada')}"));
+    }
+
+    @Test
+    void aMethodIsStillInheritedBySubtypes() {
+        ExpressionFactory factory = factory(registry -> registry
+            .method(Greeter.class, "getName", String.class, Greeter::getName));
+        ELContext context = contextWith(factory, "greeter", new LoudGreeter("ada"));
+
+        assertEquals("ada", evaluate(factory, context, "${greeter.getName()}"));
+    }
+
+    @Test
+    void anExpressionCallingAContributedFunctionIsSerializable() throws Exception {
+        ExpressionFactory factory = factory(registry -> registry
+            .function("greet", "twice", Greeter.class, "twice", String.class, String.class,
+                whom -> whom + whom));
+        StandardELContext context = new StandardELContext(factory);
+
+        ValueExpression expression = factory.createValueExpression(context, "${greet:twice('ab')}",
+            Object.class);
+
+        assertEquals("abab", roundTrip(expression).getValue(context));
+    }
+
+    @Test
+    void aVariableArityFunctionMustDeclareAnArray() {
+        ELMethodRegistry registry = new ELMethodRegistry();
+
+        IllegalArgumentException noParameters = assertThrows(IllegalArgumentException.class,
+            () -> registry.function("greet", "twice", Greeter.class, "twice", String.class,
+                new Class<?>[0], true, (context, base, arguments) -> null));
+        assertTrue(noParameters.getMessage().contains("array"), noParameters.getMessage());
+
+        IllegalArgumentException notAnArray = assertThrows(IllegalArgumentException.class,
+            () -> registry.function("greet", "join", Greeter.class, "join", String.class,
+                new Class<?>[]{String.class}, true, (context, base, arguments) -> null));
+        assertTrue(notAnArray.getMessage().contains("array"), notAnArray.getMessage());
+    }
+
+    @Test
     void anEmptyRegistryResolvesNothing() {
         ELMethodExecutor executor = new ELMethodRegistry().build(0);
         StandardELContext context = new StandardELContext(factory());
@@ -272,6 +330,16 @@ class ELMethodContributorTest {
         assertNull(executor.resolve(context, new Greeter("ada"), "greet", null, new Object[]{"x"}));
         assertNull(executor.resolveFunction(context, "any", "thing"));
         assertTrue(new ELMethodRegistry().isEmpty());
+    }
+
+    private static ValueExpression roundTrip(ValueExpression expression) throws IOException, ClassNotFoundException {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        try (ObjectOutputStream output = new ObjectOutputStream(bytes)) {
+            output.writeObject(expression);
+        }
+        try (ObjectInputStream input = new ObjectInputStream(new ByteArrayInputStream(bytes.toByteArray()))) {
+            return (ValueExpression) input.readObject();
+        }
     }
 
     /**
