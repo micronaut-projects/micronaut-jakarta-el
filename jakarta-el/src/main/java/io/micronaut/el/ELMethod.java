@@ -95,13 +95,52 @@ public interface ELMethod extends Serializable {
     Object invoke(ELContext context, @Nullable Object base, Object @Nullable [] arguments);
 
     /**
+     * Whether this method can be kept by the caller and invoked again.
+     *
+     * <p>A reusable method holds its signature and the code that runs it, and nothing of the call it was
+     * resolved for: the interpreter may then resolve a call site once and invoke the same method on every
+     * later evaluation, instead of resolving it again each time. A method that captured the arguments it was
+     * resolved with, or that only applies to their runtime types, is not reusable.</p>
+     *
+     * <p>The default is {@code false}, so an implementation is resolved again per call until it states
+     * otherwise. A method of an overloaded name is only reusable when the arguments cannot select a different
+     * overload.</p>
+     *
+     * @return Whether the method can be invoked again with other arguments
+     */
+    default boolean isReusable() {
+        return false;
+    }
+
+    /**
      * Returns the identity used when an expression containing a bound function is compared with another one.
      * Implementations with overloads should include the declaring type in the identity.
      *
      * @return The method identity
+     * @see #identity(Class, String, Class[])
      */
     default String identity() {
         return getClass().getName() + '#' + getName()
             + java.util.Arrays.toString(Argument.toClassArray(getArguments()));
+    }
+
+    /**
+     * Builds the identity of a method in the form the compiler gives it, so that an expression parsed at
+     * runtime compares equal to the same expression compiled at build time.
+     *
+     * @param declaringType  The type declaring the method
+     * @param name           The name of the method
+     * @param parameterTypes The declared parameter types
+     * @return The method identity
+     */
+    static String identity(Class<?> declaringType, String name, Class<?>[] parameterTypes) {
+        StringBuilder identity = new StringBuilder(declaringType.getName()).append('#').append(name).append('(');
+        for (int i = 0; i < parameterTypes.length; i++) {
+            if (i > 0) {
+                identity.append(',');
+            }
+            identity.append(parameterTypes[i].getName());
+        }
+        return identity.append(')').toString();
     }
 }

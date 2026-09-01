@@ -14,6 +14,49 @@ add the optional reflection executor:
 
 dependency:micronaut-jakarta-el-interpreter-reflection[scope="runtimeOnly", groupId="io.micronaut.el"]
 
+== Contributing Methods Without Reflection
+
+The reflection executor is not the only way to make a type callable. An application can declare the methods,
+constructors and functions its expressions use, and the interpreter dispatches them directly. Implement
+api:el.ELMethodContributor[] and name it in `META-INF/services/io.micronaut.el.ELMethodContributor`:
+
+[source,java]
+----
+public final class BookMethods implements ELMethodContributor {
+
+    @Override
+    public void contribute(ELMethodRegistry registry) {
+        registry.method(Book.class, "discounted", double.class, Integer.class, Book::discounted)
+                .staticMethod(Math.class, "abs", int.class, int.class, Math::abs)
+                .constructor(Book.class, String.class, Book::new);
+    }
+}
+----
+
+A registration carries the declared signature next to the code that runs it, because the signature is what the
+specification needs and what a method reference cannot supply on its own: the overload selection of the section
+1.6, the coercions of the section 1.23 and the metadata a `jakarta.el.MethodExpression` reports are all defined
+in terms of the declared parameter types. api:el.ELMethodRegistry[] does the rest — it selects the overload,
+coerces the arguments, packs the variable arity ones, and builds an identity that compares equal to the same
+expression compiled at build time.
+
+The methods it produces are reusable, so a call site resolves once and invokes the same method on every later
+evaluation; only an overloaded name is resolved again per call, since the arguments then decide which overload
+applies.
+
+A contributor is consulted before the built-in executors, and long before the reflection executor. It runs once,
+when the parser is created, so it cannot see the `jakarta.el.ELContext`: anything that depends on the context
+belongs on the api:el.ELMethodExecutor[] contract instead, which resolves a method per call.
+
+To leave an executor out altogether — a deployment that must not reach a method reflectively, whatever a
+transitive dependency put on the classpath — construct the parser with the executors it may use:
+
+[source,java]
+----
+new CompiledExpressionFactory(List.of(),
+    new InterpretingELExpressionParser(List.of(new ContributedELMethodExecutor(List.of(new BookMethods())))));
+----
+
 WARNING: Runtime expressions are executable application code, not sandboxed data. When the reflection executor is
 present, the standard Jakarta EL context can construct imported classes and invoke their public static and instance
 methods. Only parse strings from a fully trusted source; an operator or database field that an untrusted user can

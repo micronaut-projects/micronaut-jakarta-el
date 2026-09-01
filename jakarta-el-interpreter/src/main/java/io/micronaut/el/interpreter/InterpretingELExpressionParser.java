@@ -68,7 +68,18 @@ public final class InterpretingELExpressionParser implements ELExpressionParser 
         this(loadExecutors());
     }
 
-    InterpretingELExpressionParser(List<ELMethodExecutor> executors) {
+    /**
+     * Creates a parser using the given method executors, instead of the ones the context class loader
+     * declares as services.
+     *
+     * <p>This is how an application registers its own executor programmatically, and the only way it can
+     * leave one out: a deployment that must not reach a method reflectively passes the executors it wants,
+     * rather than relying on the reflective one being absent from the classpath.</p>
+     *
+     * @param executors The executors, in any order; they are consulted following the {@link
+     *                  io.micronaut.core.order.Ordered} contract
+     */
+    public InterpretingELExpressionParser(List<ELMethodExecutor> executors) {
         this.executors = ELInterpreter.orderExecutors(executors);
     }
 

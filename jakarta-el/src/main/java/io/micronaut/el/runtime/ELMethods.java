@@ -64,14 +64,14 @@ public final class ELMethods {
      * once: {@code Class.getMethods()} copies every method on every call, which is what makes the reflective
      * resolvers of the specification slow.
      */
-    private static final ClassValue<Map<String, List<Candidate>>> METHODS = new ClassValue<>() {
+    private static final ClassValue<Map<String, List<Candidate<Method>>>> METHODS = new ClassValue<>() {
         @Override
-        protected Map<String, List<Candidate>> computeValue(Class<?> type) {
-            Map<String, List<Candidate>> byName = new HashMap<>();
+        protected Map<String, List<Candidate<Method>>> computeValue(Class<?> type) {
+            Map<String, List<Candidate<Method>>> byName = new HashMap<>();
             for (Method method : type.getMethods()) {
                 Method declaration = accessible(method);
                 byName.computeIfAbsent(method.getName(), name -> new ArrayList<>(2))
-                    .add(new Candidate(declaration, declaration.getParameterTypes(), declaration.isVarArgs(),
+                    .add(new Candidate<>(declaration, declaration.getParameterTypes(), declaration.isVarArgs(),
                         Modifier.isStatic(declaration.getModifiers()), declaration.isBridge()));
             }
             return byName;
@@ -98,7 +98,7 @@ public final class ELMethods {
                                           Class<?> @Nullable [] paramTypes,
                                           Object @Nullable [] arguments,
                                           boolean isStatic) {
-        List<Candidate> candidates = METHODS.get(type).get(name);
+        List<Candidate<Method>> candidates = METHODS.get(type).get(name);
         if (candidates == null) {
             return null;
         }
@@ -118,19 +118,52 @@ public final class ELMethods {
      */
     @Nullable
     public static Object invoke(ELContext context, Method method, @Nullable Object base, Object @Nullable [] values) {
-        Class<?>[] parameterTypes = method.getParameterTypes();
+        Object[] parameters = coerceArguments(context, method.getName(), method.getParameterTypes(),
+            method.isVarArgs(), values);
+        try {
+            return method.invoke(base, parameters);
+        } catch (IllegalAccessException | IllegalArgumentException e) {
+            throw new ELException(e);
+        } catch (InvocationTargetException e) {
+            Throwable cause = e.getCause();
+            throw cause instanceof ELException elException ? elException : new ELException(cause);
+        }
+    }
+
+    /**
+     * Prepares the arguments of a call for the declared parameters, as described in the section 1.23 of the
+     * specification: every argument is coerced to its parameter type, and the arguments a variable arity
+     * parameter takes are packed into an array of its component type.
+     *
+     * <p>An array already of the parameter type is passed through as the variable arity array itself, rather
+     * than becoming its single element. This is the one implementation of that rule, so a caller that
+     * dispatches directly prepares its arguments exactly as the reflective invocation does.</p>
+     *
+     * @param context        The context
+     * @param name           The name of the method, for the error message
+     * @param parameterTypes The declared parameter types
+     * @param varArgs        Whether the last parameter is of variable arity
+     * @param values         The evaluated arguments, can be {@code null}
+     * @return The arguments to pass, one per declared parameter
+     * @throws IllegalArgumentException when the number of arguments does not fit the parameters
+     */
+    public static Object[] coerceArguments(ELContext context,
+                                           String name,
+                                           Class<?>[] parameterTypes,
+                                           boolean varArgs,
+                                           Object @Nullable [] values) {
         Object[] parameters = new Object[parameterTypes.length];
         Object[] arguments = values == null ? new Object[0] : values;
         int count = arguments.length;
-        int fixed = method.isVarArgs() ? parameterTypes.length - 1 : parameterTypes.length;
-        if (method.isVarArgs() ? count < fixed : count != fixed) {
-            throw new IllegalArgumentException("The method '" + method.getName() + "' expects "
-                + (method.isVarArgs() ? "at least " + fixed : fixed) + " argument(s) but " + count + " were provided");
+        int fixed = varArgs ? parameterTypes.length - 1 : parameterTypes.length;
+        if (varArgs ? count < fixed : count != fixed) {
+            throw new IllegalArgumentException("The method '" + name + "' expects "
+                + (varArgs ? "at least " + fixed : fixed) + " argument(s) but " + count + " were provided");
         }
         for (int i = 0; i < fixed && i < count; i++) {
             parameters[i] = ELSupport.coerceToType(context, arguments[i], parameterTypes[i]);
         }
-        if (method.isVarArgs()) {
+        if (varArgs) {
             Class<?> componentType = parameterTypes[fixed].getComponentType();
             if (count == parameterTypes.length && arguments[fixed] != null
                 && arguments[fixed].getClass() == parameterTypes[fixed]) {
@@ -143,14 +176,7 @@ public final class ELMethods {
                 parameters[fixed] = varargs;
             }
         }
-        try {
-            return method.invoke(base, parameters);
-        } catch (IllegalAccessException | IllegalArgumentException e) {
-            throw new ELException(e);
-        } catch (InvocationTargetException e) {
-            Throwable cause = e.getCause();
-            throw cause instanceof ELException elException ? elException : new ELException(cause);
-        }
+        return parameters;
     }
 
     /**
@@ -166,7 +192,7 @@ public final class ELMethods {
                                     String name,
                                     Class<?> @Nullable [] paramTypes,
                                     Object @Nullable [] arguments) {
-        List<Candidate> candidates = METHODS.get(type).get(name);
+        List<Candidate<Method>> candidates = METHODS.get(type).get(name);
         if (candidates == null) {
             throw notFound(type, name, paramTypes != null ? paramTypes.length : arguments == null ? 0 : arguments.length);
         }
@@ -186,32 +212,48 @@ public final class ELMethods {
                                           String name,
                                           Class<?> @Nullable [] paramTypes,
                                           Object @Nullable [] arguments) {
-        List<Candidate> candidates = METHODS.get(type).get(name);
+        List<Candidate<Method>> candidates = METHODS.get(type).get(name);
         if (candidates == null) {
             throw notFound(type, name, paramTypes != null ? paramTypes.length : arguments == null ? 0 : arguments.length);
         }
         return select(type, name, candidates, paramTypes, arguments, true);
     }
 
-    private static Method select(Class<?> type,
-                                 String name,
-                                 List<Candidate> candidates,
-                                 Class<?> @Nullable [] paramTypes,
-                                 Object @Nullable [] arguments,
-                                 boolean isStatic) {
+    /**
+     * Selects the method the section 1.6 of the specification prefers among the candidates of a name.
+     *
+     * <p>This is the one implementation of the selection rules: a caller that dispatches directly, without
+     * reflection, describes its methods as {@link Candidate candidates} and gets the selected one back.</p>
+     *
+     * @param type       The type of the base object, or the class declaring a static method
+     * @param name       The name of the method, for the error messages
+     * @param candidates The methods of that name
+     * @param paramTypes The parameter types provided at parse time, can be {@code null}
+     * @param arguments  The evaluated arguments, can be {@code null}
+     * @param isStatic   Whether to look for a static method
+     * @param <T>        The type of the method the candidates stand for
+     * @return The selected method
+     * @throws MethodNotFoundException when no candidate accepts the arguments, or several are equally specific
+     */
+    public static <T> T select(Class<?> type,
+                               String name,
+                               List<Candidate<T>> candidates,
+                               Class<?> @Nullable [] paramTypes,
+                               Object @Nullable [] arguments,
+                               boolean isStatic) {
         Object[] values = arguments == null ? new Object[0] : arguments;
         Class<?>[] matchingTypes = paramTypes == null ? typesOf(values) : paramTypes;
-        List<Candidate> assignable = new ArrayList<>(1);
-        List<Candidate> coercible = new ArrayList<>(1);
-        List<Candidate> variableArity = new ArrayList<>(1);
-        for (Candidate candidate : candidates) {
+        List<Candidate<T>> assignable = new ArrayList<>(1);
+        List<Candidate<T>> coercible = new ArrayList<>(1);
+        List<Candidate<T>> variableArity = new ArrayList<>(1);
+        for (Candidate<T> candidate : candidates) {
             if (isStatic && !candidate.isStatic()) {
                 continue;
             }
             switch (match(candidate, matchingTypes, values)) {
                 // a method whose every parameter matches exactly is the method, section 1.6
                 case EXACT -> {
-                    return candidate.method();
+                    return candidate.value();
                 }
                 case ASSIGNABLE -> assignable.add(candidate);
                 case COERCIBLE -> coercible.add(candidate);
@@ -238,7 +280,7 @@ public final class ELMethods {
      * classifies it: the worst of its parameters decides, and a variable arity method is only considered once
      * every fixed arity method has been ruled out.
      */
-    private static int match(Candidate candidate, Class<?>[] argumentTypes, Object[] values) {
+    private static int match(Candidate<?> candidate, Class<?>[] argumentTypes, Object[] values) {
         Class<?>[] parameterTypes = candidate.parameterTypes();
         int parameterCount = parameterTypes.length;
         int argumentCount = argumentTypes.length;
@@ -285,15 +327,15 @@ public final class ELMethods {
      * and the section 15.12.2.5 of the Java Language Specification define it, leaving the reference ambiguous
      * when two candidates are equally specific.
      */
-    private static Method mostSpecific(Class<?> type,
-                                       String name,
-                                       List<Candidate> candidates,
-                                       Class<?>[] argumentTypes,
-                                       boolean elSpecific) {
-        List<Candidate> best = new ArrayList<>(1);
-        for (Candidate candidate : candidates) {
+    private static <T> T mostSpecific(Class<?> type,
+                                      String name,
+                                      List<Candidate<T>> candidates,
+                                      Class<?>[] argumentTypes,
+                                      boolean elSpecific) {
+        List<Candidate<T>> best = new ArrayList<>(1);
+        for (Candidate<T> candidate : candidates) {
             boolean lessSpecific = false;
-            Iterator<Candidate> iterator = best.iterator();
+            Iterator<Candidate<T>> iterator = best.iterator();
             while (iterator.hasNext()) {
                 int comparison = compareSpecificity(candidate, iterator.next(), argumentTypes, elSpecific);
                 if (comparison > 0) {
@@ -310,11 +352,11 @@ public final class ELMethods {
             throw new MethodNotFoundException("The reference to the method '" + name + "' of " + type.getName()
                 + " is ambiguous, " + best.size() + " methods match the arguments");
         }
-        return best.get(0).method();
+        return best.get(0).value();
     }
 
-    private static int compareSpecificity(Candidate left,
-                                          Candidate right,
+    private static int compareSpecificity(Candidate<?> left,
+                                          Candidate<?> right,
                                           Class<?>[] argumentTypes,
                                           boolean elSpecific) {
         Class<?>[] leftTypes = left.parameterTypes();
@@ -509,15 +551,30 @@ public final class ELMethods {
     }
 
     /**
-     * A public method of a class, with what the selection needs read once.
+     * A method the selection of the section 1.6 can choose between, with what the selection needs read once.
      *
-     * @param method         The accessible declaration of the method
+     * <p>The selection is defined by the parameter types alone, so a candidate carries whatever the caller
+     * wants back: the reflective resolvers select a {@code java.lang.reflect.Method}, while a registry of
+     * directly dispatched methods selects its own descriptor.</p>
+     *
+     * @param value          The method this candidate stands for
      * @param parameterTypes Its parameter types
      * @param varArgs        Whether it is of variable arity
      * @param isStatic       Whether it is static
      * @param bridge         Whether it is a bridge method, which loses a tie against the method it bridges to
+     * @param <T>            The type of the method the candidate stands for
      */
-    private record Candidate(Method method, Class<?>[] parameterTypes, boolean varArgs, boolean isStatic,
-                            boolean bridge) {
+    public record Candidate<T>(T value, Class<?>[] parameterTypes, boolean varArgs, boolean isStatic,
+                               boolean bridge) {
+
+        /**
+         * A candidate for a method that is neither of variable arity, nor static, nor a bridge.
+         *
+         * @param value          The method this candidate stands for
+         * @param parameterTypes Its parameter types
+         */
+        public Candidate(T value, Class<?>[] parameterTypes) {
+            this(value, parameterTypes, false, false, false);
+        }
     }
 }

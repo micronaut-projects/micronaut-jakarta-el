@@ -147,6 +147,7 @@ final class ELInterpreter {
                 Evaluator base = compile(method.base());
                 Evaluator name = compile(method.property());
                 Evaluator[] arguments = compileAll(method.arguments());
+                MethodCallSite callSite = new MethodCallSite();
                 yield new Evaluator() {
                     @Override
                     @Nullable
@@ -157,7 +158,7 @@ final class ELInterpreter {
                         }
                         Object evaluatedName = name.evaluate(context);
                         return evaluatedName == null ? null
-                            : invokeWithParams(context, evaluatedBase, evaluatedName,
+                            : callSite.invoke(context, executors, evaluatedBase, evaluatedName,
                                 evaluateAll(context, arguments));
                     }
                 };
@@ -933,6 +934,47 @@ final class ELInterpreter {
         @Nullable
         Object evaluate(ELContext context) {
             return value;
+        }
+    }
+
+    /**
+     * The method a call of the expression resolved to, kept in the compiled evaluator of that call.
+     *
+     * <p>Resolving a method means selecting an overload among the candidates of its name, which is work that
+     * only depends on the type of the base object and on the name. A call site therefore remembers the method
+     * it resolved for the type it last saw, and evaluates straight into it while the type does not change.
+     * Only a method that {@link ELMethod#isReusable() states it can be invoked again} is kept: one selected
+     * from the runtime types of the arguments is resolved anew on every evaluation, because other arguments
+     * could select another overload.</p>
+     *
+     * <p>The cache is a single field read without synchronization: a race recomputes the same answer, and the
+     * sandbox is consulted on every evaluation, before the cache is.</p>
+     */
+    static final class MethodCallSite {
+
+        @Nullable
+        private volatile Resolved resolved;
+
+        @Nullable
+        Object invoke(ELContext context,
+                      List<ELMethodExecutor> executors,
+                      Object base,
+                      Object method,
+                      Object @Nullable [] arguments) {
+            ELSandboxGuard.check(context, base, method);
+            Class<?> type = base instanceof ELClass elClass ? elClass.getKlass() : base.getClass();
+            Resolved cached = resolved;
+            if (cached != null && cached.type() == type && cached.name().equals(method)) {
+                return cached.method().invoke(context, base, arguments);
+            }
+            ELMethod found = resolveMethod(context, executors, base, method, null, arguments);
+            if (found.isReusable()) {
+                resolved = new Resolved(type, method, found);
+            }
+            return found.invoke(context, base, arguments);
+        }
+
+        private record Resolved(Class<?> type, Object name, ELMethod method) {
         }
     }
 }
