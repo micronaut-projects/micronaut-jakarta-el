@@ -130,7 +130,10 @@ specification. The interpreter module itself does not reflectively invoke Java m
 contributors handle common String, collection, map, array, stream and optional operations, as well as Micronaut bean
 introspections. Add `micronaut-jakarta-el-interpreter-reflection` when arbitrary public Java methods, constructors or
 `FunctionMapper` methods must also be executable. The compiled path remains the fast one, and the interpreted path is
-the fallback.
+the fallback. The interpreter caches one parsed and compiled evaluator tree per exact expression string, including
+method and function expressions; creation-time bindings remain on each expression. Serialization also retains the
+original executor allow-list, so deserialization cannot acquire a reflective executor that the expression did not
+have when it was created.
 `CompiledVersusInterpretedTest` compiles expressions with the annotation processor and evaluates each of them
 both ways, comparing the value, the type, the read-only flag, the value reference and the value after a write.
 

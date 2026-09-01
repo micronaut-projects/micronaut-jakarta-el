@@ -30,9 +30,14 @@ import io.micronaut.inject.ProxyBeanDefinition;
 import jakarta.el.ELContext;
 import jakarta.el.ExpressionFactory;
 import jakarta.el.MethodNotFoundException;
+import jakarta.el.ValueExpression;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -303,5 +308,24 @@ class ExecutableMethodInterpreterTest {
     void aTypeThatIsNeitherIntrospectedNorABeanReportsTheSameExceptionWithoutTheReflectiveExecutor() {
         assertThrows(MethodNotFoundException.class, () -> unreflected("${plain.shout('world')}"));
         assertThrows(MethodNotFoundException.class, () -> unreflected("${greeter.hidden('world')}"));
+    }
+
+    @Test
+    void serializationCannotWidenAnExpressionsExecutorPolicy() throws Exception {
+        ValueExpression expression = unreflectedFactory.createValueExpression(null,
+            "${plain.shout('world')}", Object.class);
+
+        assertThrows(MethodNotFoundException.class, () -> expression.getValue(serviceContext));
+        assertThrows(MethodNotFoundException.class, () -> roundTrip(expression).getValue(serviceContext));
+    }
+
+    private static ValueExpression roundTrip(ValueExpression expression) throws Exception {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        try (ObjectOutputStream output = new ObjectOutputStream(bytes)) {
+            output.writeObject(expression);
+        }
+        try (ObjectInputStream input = new ObjectInputStream(new ByteArrayInputStream(bytes.toByteArray()))) {
+            return (ValueExpression) input.readObject();
+        }
     }
 }

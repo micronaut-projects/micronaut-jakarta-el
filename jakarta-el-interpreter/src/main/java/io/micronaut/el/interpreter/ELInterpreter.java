@@ -44,6 +44,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Evaluates the abstract syntax tree produced by the parser.
@@ -58,6 +59,7 @@ import java.util.Map;
 final class ELInterpreter {
 
     private static final Object[] NO_ARGUMENTS = new Object[0];
+    private static final ThreadLocal<ELInterpreter> ACTIVE = new ThreadLocal<>();
 
     private final List<ELMethodExecutor> executors;
     private final Map<String, ELMethod> functions;
@@ -83,7 +85,30 @@ final class ELInterpreter {
             evaluator = compile(node);
             root = evaluator;
         }
-        return evaluator.evaluate(context);
+        return evaluateCompiled(context, evaluator);
+    }
+
+    @Nullable
+    private Object evaluateCompiled(ELContext context, Evaluator evaluator) {
+        ELInterpreter previous = ACTIVE.get();
+        ACTIVE.set(this);
+        try {
+            return evaluator.evaluate(context);
+        } finally {
+            if (previous == null) {
+                ACTIVE.remove();
+            } else {
+                ACTIVE.set(previous);
+            }
+        }
+    }
+
+    private static ELInterpreter active() {
+        ELInterpreter interpreter = ACTIVE.get();
+        if (interpreter == null) {
+            throw new IllegalStateException("An evaluator must run through its bound interpreter");
+        }
+        return interpreter;
     }
 
     @SuppressWarnings("java:S1541")
@@ -121,11 +146,12 @@ final class ELInterpreter {
             }
             case FUNCTION -> {
                 ELNode.Function function = (ELNode.Function) node;
+                Evaluator[][] invocations = compileInvocations(function.invocations());
                 yield new Evaluator() {
                     @Override
                     @Nullable
                     Object evaluate(ELContext context) {
-                        return evaluateFunction(context, function);
+                        return active().evaluateFunction(context, function, invocations);
                     }
                 };
             }
@@ -159,7 +185,7 @@ final class ELInterpreter {
                         }
                         Object evaluatedName = name.evaluate(context);
                         return evaluatedName == null ? null
-                            : callSite.invoke(context, executors, evaluatedBase, evaluatedName,
+                            : callSite.invoke(context, active().executors, evaluatedBase, evaluatedName,
                                 evaluateAll(context, arguments));
                     }
                 };
@@ -172,7 +198,7 @@ final class ELInterpreter {
                     @Override
                     @Nullable
                     Object evaluate(ELContext context) {
-                        return invokeCallable(context, target.evaluate(context), evaluateAll(context, arguments));
+                        return active().invokeCallable(context, target.evaluate(context), evaluateAll(context, arguments));
                     }
                 };
             }
@@ -191,16 +217,7 @@ final class ELInterpreter {
                     }
                 };
             }
-            case ASSIGN -> {
-                ELNode.Assign assign = (ELNode.Assign) node;
-                yield new Evaluator() {
-                    @Override
-                    @Nullable
-                    Object evaluate(ELContext context) {
-                        return evaluateAssign(context, assign);
-                    }
-                };
-            }
+            case ASSIGN -> compileAssign((ELNode.Assign) node);
             case SEMICOLON -> {
                 ELNode.Semicolon semicolon = (ELNode.Semicolon) node;
                 Evaluator left = compile(semicolon.left());
@@ -219,7 +236,9 @@ final class ELInterpreter {
                 yield new Evaluator() {
                     @Override
                     Object evaluate(ELContext context) {
-                        return ELLambdas.create(context, lambda.parameters(), body::evaluate);
+                        ELInterpreter interpreter = active();
+                        return ELLambdas.create(context, lambda.parameters(),
+                            lambdaContext -> interpreter.evaluateCompiled(lambdaContext, body));
                     }
                 };
             }
@@ -393,6 +412,50 @@ final class ELInterpreter {
         return evaluators;
     }
 
+    private Evaluator[][] compileInvocations(List<List<ELNode>> invocations) {
+        Evaluator[][] evaluators = new Evaluator[invocations.size()][];
+        for (int i = 0; i < evaluators.length; i++) {
+            evaluators[i] = compileAll(invocations.get(i));
+        }
+        return evaluators;
+    }
+
+    private Evaluator compileAssign(ELNode.Assign assign) {
+        ELNode target = assign.target() instanceof ELNode.Eval eval ? eval.expression() : assign.target();
+        Evaluator value = compile(assign.value());
+        if (target instanceof ELNode.Identifier identifier) {
+            return new Evaluator() {
+                @Override
+                @Nullable
+                Object evaluate(ELContext context) {
+                    return ELResolution.assignIdentifier(context, identifier.name(), value.evaluate(context));
+                }
+            };
+        }
+        if (target instanceof ELNode.Property property) {
+            Evaluator base = compile(property.base());
+            Evaluator name = compile(property.property());
+            return new Evaluator() {
+                @Override
+                @Nullable
+                Object evaluate(ELContext context) {
+                    Object evaluatedBase = base.evaluate(context);
+                    if (evaluatedBase == null) {
+                        throw new PropertyNotFoundException("Cannot resolve an lvalue with a null base object");
+                    }
+                    return ELSandboxGuard.assignProperty(context, evaluatedBase, name.evaluate(context),
+                        value.evaluate(context));
+                }
+            };
+        }
+        return new Evaluator() {
+            @Override
+            Object evaluate(ELContext context) {
+                throw new PropertyNotWritableException("The left side of the assignment is not an lvalue");
+            }
+        };
+    }
+
     private static Object[] evaluateAll(ELContext context, Evaluator[] evaluators) {
         if (evaluators.length == 0) {
             return NO_ARGUMENTS;
@@ -423,12 +486,22 @@ final class ELInterpreter {
         return new ELInterpreter(executors, functions);
     }
 
-    static ELInterpreter of(Map<String, ELMethod> functions) {
-        return of(loadExecutors(), functions);
+    static ELInterpreter restoring(Map<String, ELMethod> functions,
+                                   @Nullable List<String> allowedExecutorTypes) {
+        // An expression serialized by an older version has no executor list. It must fail closed instead of
+        // acquiring every executor that happens to be on the deserializing classpath.
+        Set<String> allowed = allowedExecutorTypes == null ? Set.of() : Set.copyOf(allowedExecutorTypes);
+        return of(loadExecutors().stream()
+            .filter(executor -> allowed.contains(executor.getClass().getName()))
+            .toList(), functions);
     }
 
     List<ELMethodExecutor> executors() {
         return executors;
+    }
+
+    List<String> executorTypes() {
+        return executors.stream().map(executor -> executor.getClass().getName()).toList();
     }
 
     static List<ELMethodExecutor> orderExecutors(List<ELMethodExecutor> executors) {
@@ -438,18 +511,17 @@ final class ELInterpreter {
     }
 
     /**
-     * Creates an interpreter for a parsed expression holding no function, whose compiled evaluators are
-     * therefore the same for every context and shared through the cache of the parser.
+     * Creates an interpreter bound to one expression around an evaluator tree shared by its expression string.
      *
-     * @param root The evaluators compiled from the expression
+     * @param root      The evaluators compiled from the expression
+     * @param executors The executors this expression may use
+     * @param functions The functions bound when this expression was created
      * @return The interpreter
      */
-    static ELInterpreter sharing(Evaluator root) {
-        return sharing(root, loadExecutors());
-    }
-
-    static ELInterpreter sharing(Evaluator root, List<ELMethodExecutor> executors) {
-        ELInterpreter interpreter = new ELInterpreter(executors, Map.of());
+    static ELInterpreter sharing(Evaluator root,
+                                 List<ELMethodExecutor> executors,
+                                 Map<String, ELMethod> functions) {
+        ELInterpreter interpreter = new ELInterpreter(executors, functions);
         interpreter.root = root;
         return interpreter;
     }
@@ -752,29 +824,48 @@ final class ELInterpreter {
     }
 
     @Nullable
+    private Object evaluateFunction(ELContext context,
+                                    ELNode.Function function,
+                                    Evaluator[][] invocations) {
+        Object[] firstArguments = invocations.length == 0
+            ? NO_ARGUMENTS
+            : evaluateAll(context, invocations[0]);
+        Object result = resolveFunctionTarget(context, function, firstArguments);
+        for (int i = 1; i < invocations.length; i++) {
+            result = invokeCallable(context, result, evaluateAll(context, invocations[i]));
+        }
+        return result;
+    }
+
+    @Nullable
     private Object resolveFunctionTarget(ELContext context, ELNode.Function function) {
         List<ELNode> firstArguments = function.invocations().isEmpty() ? List.of() : function.invocations().get(0);
+        return resolveFunctionTarget(context, function, evaluateAll(context, firstArguments));
+    }
+
+    @Nullable
+    private Object resolveFunctionTarget(ELContext context, ELNode.Function function, Object[] firstArguments) {
         String prefix = function.prefix();
         String localName = function.localName();
         Object identifier = prefix.isEmpty() ? resolveIdentifierOrNull(context, localName) : null;
         if (identifier instanceof LambdaExpression || identifier instanceof ELClass) {
-            return invokeCallable(context, identifier, evaluateAll(context, firstArguments));
+            return invokeCallable(context, identifier, firstArguments);
         }
         ELMethod method = resolveMappedFunction(function);
         if (method != null) {
-            return method.invoke(context, null, evaluateAll(context, firstArguments));
+            return method.invoke(context, null, firstArguments);
         }
         if (prefix.isEmpty()) {
             ImportHandler importHandler = context.getImportHandler();
             if (importHandler != null) {
                 Class<?> resolvedClass = importHandler.resolveClass(localName);
                 if (resolvedClass != null) {
-                    return invokeCallable(context, new ELClass(resolvedClass), evaluateAll(context, firstArguments));
+                    return invokeCallable(context, new ELClass(resolvedClass), firstArguments);
                 }
                 Class<?> staticClass = importHandler.resolveStatic(localName);
                 if (staticClass != null) {
                     return invokeWithParams(context, new ELClass(staticClass), localName,
-                        evaluateAll(context, firstArguments));
+                        firstArguments);
                 }
             }
         }
@@ -964,19 +1055,21 @@ final class ELInterpreter {
                       Object method,
                       Object @Nullable [] arguments) {
             ELSandboxGuard.check(context, base, method);
-            Class<?> type = base instanceof ELClass elClass ? elClass.getKlass() : base.getClass();
+            boolean classBase = base instanceof ELClass;
+            Class<?> type = classBase ? ((ELClass) base).getKlass() : base.getClass();
             Resolved cached = resolved;
-            if (cached != null && cached.type() == type && cached.name().equals(method)) {
+            if (cached != null && cached.type() == type && cached.classBase() == classBase
+                && cached.name().equals(method)) {
                 return cached.method().invoke(context, base, arguments);
             }
             ELMethod found = resolveMethod(context, executors, base, method, null, arguments);
             if (found.isReusable()) {
-                resolved = new Resolved(type, method, found);
+                resolved = new Resolved(type, classBase, method, found);
             }
             return found.invoke(context, base, arguments);
         }
 
-        private record Resolved(Class<?> type, Object name, ELMethod method) {
+        private record Resolved(Class<?> type, boolean classBase, Object name, ELMethod method) {
         }
     }
 }

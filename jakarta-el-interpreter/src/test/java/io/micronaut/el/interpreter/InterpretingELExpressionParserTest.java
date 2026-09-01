@@ -15,10 +15,15 @@
  */
 package io.micronaut.el.interpreter;
 
+import io.micronaut.el.CompiledExpressionFactory;
+import jakarta.el.StandardELContext;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class InterpretingELExpressionParserTest {
@@ -36,5 +41,26 @@ class InterpretingELExpressionParserTest {
         assertEquals(InterpretingELExpressionParser.CACHE_SIZE, parser.cachedExpressions());
         assertTrue(parser.isCached("${0}"));
         assertFalse(parser.isCached("${1}"));
+    }
+
+    @Test
+    void functionBindingsAreOutsideTheEvaluatorTreeSharedByAnExpressionString() throws Exception {
+        InterpretingELExpressionParser parser = new InterpretingELExpressionParser();
+        CompiledExpressionFactory factory = new CompiledExpressionFactory(List.of(), parser);
+        StandardELContext commas = new StandardELContext(factory);
+        StandardELContext semicolons = new StandardELContext(factory);
+        commas.getFunctionMapper().mapFunction("fn", "join",
+            Varargs.class.getMethod("join", CharSequence[].class));
+        semicolons.getFunctionMapper().mapFunction("fn", "join",
+            ELInterpreterTest.class.getMethod("joinDifferently", CharSequence[].class));
+        String expression = "${fn:join('a', 'b')}";
+
+        var first = parser.createValueExpression(commas, expression, Object.class);
+        Object evaluator = parser.cachedEvaluator(expression);
+        var second = parser.createValueExpression(semicolons, expression, Object.class);
+
+        assertSame(evaluator, parser.cachedEvaluator(expression));
+        assertEquals("a,b", first.getValue(commas));
+        assertEquals("a;b", second.getValue(semicolons));
     }
 }

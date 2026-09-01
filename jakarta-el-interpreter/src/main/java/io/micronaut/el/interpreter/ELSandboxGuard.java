@@ -23,9 +23,6 @@ import jakarta.el.ELClass;
 import jakarta.el.ELContext;
 import org.jspecify.annotations.Nullable;
 
-import java.lang.reflect.Method;
-import java.util.function.Supplier;
-
 /**
  * The resolution of the interpreted expressions, under the {@link ELSandbox} of the context.
  *
@@ -99,23 +96,6 @@ final class ELSandboxGuard {
     static Class<?> getType(ELContext context, @Nullable Object base, @Nullable Object property) {
         check(context, base, property);
         return ELResolution.getType(context, base, property);
-    }
-
-    /**
-     * Selects the method a method expression refers to, once the sandbox allows the base object and the name.
-     *
-     * @param context  The context
-     * @param base     The base object
-     * @param property The name of the method
-     * @param lookup   The selection of the method itself
-     * @return The method
-     */
-    static Method findMethod(ELContext context,
-                             @Nullable Object base,
-                             @Nullable Object property,
-                             Supplier<Method> lookup) {
-        check(context, base, property);
-        return lookup.get();
     }
 
     /**

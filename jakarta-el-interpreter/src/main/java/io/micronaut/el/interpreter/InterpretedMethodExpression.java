@@ -35,6 +35,7 @@ import jakarta.el.PropertyNotFoundException;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Map;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -52,6 +53,7 @@ final class InterpretedMethodExpression extends MethodExpression implements ELEx
     private final Class<?> expectedReturnType;
     private final Class<?> @Nullable [] expectedParamTypes;
     private final Map<String, ELMethod> functions;
+    private final List<String> executorTypes;
     private transient @Nullable ELNode node;
     private transient ELNode.@Nullable Method invocation;
     private transient @Nullable ELInterpreter interpreter;
@@ -67,6 +69,7 @@ final class InterpretedMethodExpression extends MethodExpression implements ELEx
         this.expectedReturnType = Objects.requireNonNull(expectedReturnType, "expectedReturnType");
         this.expectedParamTypes = expectedParamTypes == null ? null : expectedParamTypes.clone();
         this.functions = Map.copyOf(functions);
+        this.executorTypes = interpreter.executorTypes();
         this.node = Objects.requireNonNull(node, "node");
         this.invocation = unwrap(node) instanceof ELNode.Method method ? method : null;
         this.interpreter = Objects.requireNonNull(interpreter, "interpreter");
@@ -148,7 +151,7 @@ final class InterpretedMethodExpression extends MethodExpression implements ELEx
     private ELInterpreter interpreter() {
         ELInterpreter resolved = interpreter;
         if (resolved == null) {
-            resolved = ELInterpreter.of(functions);
+            resolved = ELInterpreter.restoring(functions, executorTypes);
             interpreter = resolved;
         }
         return resolved;
@@ -190,7 +193,7 @@ final class InterpretedMethodExpression extends MethodExpression implements ELEx
     private Object doInvoke(ELContext context, Object @Nullable [] params) {
         if (invocation() != null) {
             // the expression provides its own parameters, the ones passed to invoke are ignored
-            return interpreter().evaluate(context, node());
+            return interpreter().evaluateRoot(context, node());
         }
         ELInterpreter.Target target = interpreter().resolveTarget(context, node());
         if (target == null) {
@@ -239,6 +242,7 @@ final class InterpretedMethodExpression extends MethodExpression implements ELEx
                 + expressionString + "'");
         }
         Class<?>[] paramTypes = arguments == null ? expectedParamTypes : null;
+        ELSandboxGuard.check(context, target.base(), target.property());
         return ELInterpreter.resolveMethod(context, executors(), target.base(), target.property(), paramTypes, arguments);
     }
 

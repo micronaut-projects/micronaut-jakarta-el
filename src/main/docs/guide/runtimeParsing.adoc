@@ -217,7 +217,17 @@ way it reports any other syntax error. No expression a person writes comes close
 `ELParser.parse(expression, maxDepth)` to raise it for an expression a tool generated.
 
 The interpreter keeps the trees it parsed in a bounded cache, so a stream of distinct expression strings
-cannot grow the heap.
+cannot grow the heap. Each exact expression string has one immutable syntax tree and one evaluator tree in that
+cache. Value expressions, method expressions and expressions containing functions all reuse those trees. State
+that belongs to one created expression -- its creation-time function bindings and its allowed method executors --
+stays outside the shared tree, so reusing the tree cannot leak a binding or a reflection capability between
+expressions.
+
+Serialization preserves that executor boundary. A deserialized expression reloads only service executors whose
+types were allowed when the expression was created. Adding the reflection companion to the classpath later cannot
+make an expression created without its executor reflective. A programmatic executor that is not also registered as
+a service is deliberately unavailable after deserialization; restoration fails closed instead of widening the
+executor set.
 
 == Deliberate Divergences
 

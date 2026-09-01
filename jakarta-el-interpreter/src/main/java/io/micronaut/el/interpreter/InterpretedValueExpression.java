@@ -31,6 +31,7 @@ import jakarta.el.ValueReference;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -52,6 +53,7 @@ final class InterpretedValueExpression extends ValueExpression implements ELExpr
      */
     private final boolean checkedResult;
     private final Map<String, ELMethod> functions;
+    private final List<String> executorTypes;
     private transient @Nullable ELNode node;
     private transient @Nullable ELInterpreter interpreter;
     private transient @Nullable String equalityForm;
@@ -65,6 +67,7 @@ final class InterpretedValueExpression extends ValueExpression implements ELExpr
         this.expectedType = Objects.requireNonNull(expectedType, "expectedType");
         this.checkedResult = ELSandbox.checksResultOf(expectedType);
         this.functions = Map.copyOf(functions);
+        this.executorTypes = interpreter.executorTypes();
         this.node = Objects.requireNonNull(node, "node");
         this.interpreter = Objects.requireNonNull(interpreter, "interpreter");
     }
@@ -142,7 +145,7 @@ final class InterpretedValueExpression extends ValueExpression implements ELExpr
     private ELInterpreter interpreter() {
         ELInterpreter resolved = interpreter;
         if (resolved == null) {
-            resolved = ELInterpreter.of(functions);
+            resolved = ELInterpreter.restoring(functions, executorTypes);
             interpreter = resolved;
         }
         return resolved;

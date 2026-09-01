@@ -89,9 +89,7 @@ public final class InterpretingELExpressionParser implements ELExpressionParser 
                                                  Class<?> expectedType) {
         Parsed entry = parse(expression);
         Map<String, ELMethod> functions = ELInterpreter.bindFunctions(context, entry.node(), executors);
-        ELInterpreter interpreter = entry.root() == null
-            ? ELInterpreter.of(executors, functions)
-            : ELInterpreter.sharing(entry.root(), executors);
+        ELInterpreter interpreter = ELInterpreter.sharing(entry.root(), executors, functions);
         ValueExpression interpreted = new InterpretedValueExpression(expression, expectedType, entry.node(),
             functions, interpreter);
         return ELVariableBindings.bind(context, interpreted,
@@ -103,14 +101,15 @@ public final class InterpretingELExpressionParser implements ELExpressionParser 
                                                    String expression,
                                                    Class<?> expectedReturnType,
                                                    Class<?> @Nullable [] expectedParamTypes) {
-        ELNode node = parse(expression).node();
+        Parsed entry = parse(expression);
+        ELNode node = entry.node();
         if (node instanceof ELNode.Composite) {
             throw new ELException("A method expression must consist of a single eval-expression: " + expression);
         }
         requireMethodReference(expression, node);
         Map<String, ELMethod> functions = ELInterpreter.bindFunctions(context, node, executors);
         MethodExpression interpreted = new InterpretedMethodExpression(expression, expectedReturnType,
-            expectedParamTypes, node, functions, ELInterpreter.of(executors, functions));
+            expectedParamTypes, node, functions, ELInterpreter.sharing(entry.root(), executors, functions));
         return ELVariableBindings.bind(context, interpreted, ELIdentifiers.free(node).toArray(String[]::new));
     }
 
@@ -118,10 +117,9 @@ public final class InterpretingELExpressionParser implements ELExpressionParser 
         Parsed entry = parsed.get(expression);
         if (entry == null) {
             ELNode node = ELParser.parse(expression);
-            // an expression without functions evaluates the same way under every context, so its evaluators
-            // are compiled once and shared by the expressions created from the string
-            entry = new Parsed(node, ELInterpreter.containsFunction(node) ? null
-                : ELInterpreter.of(null, node, executors).compile(node));
+            // The evaluator tree contains no context-bound state. Functions and executors are supplied by the
+            // expression that runs it, so every expression created from this string shares the same tree.
+            entry = new Parsed(node, ELInterpreter.of(executors, Map.of()).compile(node));
             parsed.put(expression, entry);
         }
         return entry;
@@ -133,6 +131,11 @@ public final class InterpretingELExpressionParser implements ELExpressionParser 
 
     synchronized boolean isCached(String expression) {
         return parsed.containsKey(expression);
+    }
+
+    synchronized @Nullable Object cachedEvaluator(String expression) {
+        Parsed entry = parsed.get(expression);
+        return entry == null ? null : entry.root();
     }
 
     private static List<ELMethodExecutor> loadExecutors() {
@@ -161,8 +164,8 @@ public final class InterpretingELExpressionParser implements ELExpressionParser 
      * A parsed expression, with its evaluators when they can be shared.
      *
      * @param node The syntax tree
-     * @param root The evaluators compiled from it, {@code null} when the expression binds functions
+     * @param root The evaluators compiled from it
      */
-    private record Parsed(ELNode node, ELInterpreter.@Nullable Evaluator root) {
+    private record Parsed(ELNode node, ELInterpreter.Evaluator root) {
     }
 }
