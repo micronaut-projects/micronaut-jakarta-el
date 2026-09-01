@@ -78,7 +78,8 @@ public final class ELResolverChain extends CompositeELResolver {
      * identifiers, resolved with a null base, are not offered to them.
      */
     private static final Set<Class<?>> BASE_REQUIRED = Set.of(
-        CommonELResolver.class, IntrospectionELResolver.class, StreamELResolver.class, ReflectiveMethodELResolver.class,
+        CommonELResolver.class, IntrospectionELResolver.class, StreamELResolver.class,
+        ExecutableMethodELExecutor.class, ReflectiveMethodELResolver.class,
         StaticFieldELResolver.class, MapELResolver.class, ResourceBundleELResolver.class, ListELResolver.class,
         ArrayELResolver.class, RecordELResolver.class, OptionalELResolver.class, BeanELResolver.class);
 

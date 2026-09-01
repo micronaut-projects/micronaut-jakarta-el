@@ -5,6 +5,8 @@ plugins {
 dependencies {
     api libs.managed.jakarta.el
     api mn.micronaut.core
+    // BeanContext and the executable methods of a BeanDefinition, read by ExecutableMethodELExecutor
+    api mn.micronaut.inject
     api projects.micronautJakartaElAnnotations
 
     testImplementation platform(libs.junit.bom)

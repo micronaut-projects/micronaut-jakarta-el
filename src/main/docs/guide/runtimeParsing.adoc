@@ -94,6 +94,38 @@ of the arguments, where the interpreter has only their runtime types: `${Math.ma
 both reference implementations. Declaring an expression therefore resolves overloads that a string built at
 runtime cannot.
 
+== Executable Methods Of Beans
+
+A bean introspection is not the only description of a type the compiler emits. Every method annotated
+`@Executable` — directly, or through an annotation that is itself meta-annotated with it — is compiled into the
+`BeanDefinition` of its bean, and a great many beans carry that metadata without carrying an introspection:
+anything AOP-advised, anything a framework marks executable for its own dispatch, scheduled methods, message
+listeners. `micronaut-jakarta-el` registers api:el.resolver.ExecutableMethodELExecutor[] as an
+`io.micronaut.el.ELMethodExecutor` service, so `${greeter.greet('world')}` invokes such a method directly, with
+no reflection and therefore no reflection registration in a GraalVM native image, and without the reflection
+executor being on the classpath at all.
+
+It is consulted after the bean introspections, which are the more precise description where they exist, and
+before the reflective executor, which stays the last resort. A type that is neither introspected nor a bean of
+the context is left exactly where it was.
+
+Unlike an introspection, an executable method is reached through a bean context, and an application may run
+more than one, so the executor reads the context of each call rather than a static holder. Register it on the
+`ELContext` the expression is evaluated with:
+
+[source,java]
+----
+context.putContext(BeanDefinitionRegistry.class, beanContext); // <1>
+----
+
+<1> `BeanContext.class` works as the key as well; `BeanContext` is a `BeanDefinitionRegistry`, which is all the
+executor needs — it reads definitions and never looks a bean up or creates one.
+
+`new CompiledELContext(beanContext)` does this for you, and additionally puts the executor into the resolver
+chain, so expressions compiled at compilation time resolve the same methods the same way. A context that
+carries no registry is not one the executor can read, so it declines and the chain resolves the method as it
+did before.
+
 == Expressions Built From Untrusted Input
 
 An expression declared with `@ELExpression` is source of the application, as trusted as the code around it.

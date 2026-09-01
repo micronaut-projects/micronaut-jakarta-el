@@ -6,6 +6,14 @@ dependencies {
     api projects.micronautJakartaEl
     api projects.micronautJakartaElParser
 
+    // the beans of the executable method regressions: their definitions carry the executable metadata the
+    // interpreter reads, and one of them is AOP-advised so that it is resolved through a proxy definition
+    testAnnotationProcessor mn.micronaut.inject.java
+    testAnnotationProcessor platform(libs.micronaut.core)
+    testImplementation platform(libs.micronaut.core)
+    testImplementation mn.micronaut.inject
+    testImplementation mn.micronaut.aop
+
     testImplementation platform(libs.junit.bom)
     testImplementation libs.junit.jupiter
     testRuntimeOnly libs.junit.jupiter.engine

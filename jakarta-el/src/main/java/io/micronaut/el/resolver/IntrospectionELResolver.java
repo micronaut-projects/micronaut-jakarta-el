@@ -172,30 +172,10 @@ public final class IntrospectionELResolver extends ELResolver implements ELMetho
             return null;
         }
         Object[] values = arguments == null ? new Object[0] : arguments;
-        if (argumentTypes != null) {
-            for (BeanMethod<Object, Object> candidate : named) {
-                if (sameTypes(candidate.getArguments(), argumentTypes)
-                    && coerce(context, candidate.getArguments(), values) != null) {
-                    return new IntrospectionMethod(candidate);
-                }
-            }
-            return null;
-        }
-        // Coercing the arguments is part of selecting the overload, so it happens before the resolver commits:
-        // an overload the arguments do not fit is skipped, and when none fits the resolver declines and the
-        // standard resolvers get their chance.
-        BeanMethod<Object, Object> selected = null;
-        for (BeanMethod<Object, Object> candidate : named.length == 1 ? List.of(named[0]) : candidates(named, values)) {
-            if (coerce(context, candidate.getArguments(), values) == null) {
-                continue;
-            }
-            if (selected != null) {
-                // The candidates have equal method-selection priority. Let the reflective resolver report
-                // the ambiguity instead of depending on the order of the generated introspection methods.
-                return null;
-            }
-            selected = candidate;
-        }
+        List<BeanMethod<Object, Object>> overloads = List.of(named);
+        BeanMethod<Object, Object> selected = argumentTypes == null
+            ? ELOverloads.select(context, overloads, BeanMethod::getArguments, values)
+            : ELOverloads.declaring(context, overloads, BeanMethod::getArguments, argumentTypes, values);
         return selected == null ? null : new IntrospectionMethod(selected);
     }
 
@@ -203,112 +183,6 @@ public final class IntrospectionELResolver extends ELResolver implements ELMetho
     @Nullable
     public Class<?> getCommonPropertyType(ELContext context, @Nullable Object base) {
         return base == null ? null : Object.class;
-    }
-
-    /**
-     * The overloads of the given name that can take the arguments, in the order the section 1.6 of the
-     * specification prefers them: an overload whose parameters accept the arguments as they are, then the
-     * other overloads of the same arity. Expanded variable arity calls are left to the reflective resolver,
-     * because {@link BeanMethod} does not carry the variable arity flag.
-     */
-    private static List<BeanMethod<Object, Object>> candidates(BeanMethod<Object, Object>[] named, Object[] arguments) {
-        List<BeanMethod<Object, Object>> exact = new ArrayList<>(2);
-        List<BeanMethod<Object, Object>> fixedArity = new ArrayList<>(2);
-        for (BeanMethod<Object, Object> beanMethod : named) {
-            Argument<?>[] parameters = beanMethod.getArguments();
-            if (parameters.length == arguments.length) {
-                (accepts(parameters, arguments) ? exact : fixedArity).add(beanMethod);
-            }
-        }
-        if (!exact.isEmpty()) {
-            return mostSpecific(exact);
-        }
-        return fixedArity;
-    }
-
-    /**
-     * Returns the uniquely most specific method from the candidates that already accept every argument, or no
-     * method when the candidates are ambiguous. Returning no method lets the reflective resolver report the
-     * ambiguity according to the EL method-selection rules.
-     */
-    private static List<BeanMethod<Object, Object>> mostSpecific(List<BeanMethod<Object, Object>> candidates) {
-        BeanMethod<Object, Object> result = null;
-        for (int candidateIndex = 0; candidateIndex < candidates.size(); candidateIndex++) {
-            BeanMethod<Object, Object> candidate = candidates.get(candidateIndex);
-            boolean mostSpecific = true;
-            for (int otherIndex = 0; otherIndex < candidates.size(); otherIndex++) {
-                if (candidateIndex != otherIndex && !moreSpecific(candidate.getArguments(), candidates.get(otherIndex).getArguments())) {
-                    mostSpecific = false;
-                    break;
-                }
-            }
-            if (!mostSpecific) {
-                continue;
-            }
-            if (result != null) {
-                return List.of();
-            }
-            result = candidate;
-        }
-        return result == null ? List.of() : List.of(result);
-    }
-
-    private static boolean moreSpecific(Argument<?>[] first, Argument<?>[] second) {
-        for (int i = 0; i < first.length; i++) {
-            if (!second[i].getWrapperType().isAssignableFrom(first[i].getWrapperType())) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private static boolean accepts(Argument<?>[] parameters, Object[] arguments) {
-        for (int i = 0; i < parameters.length; i++) {
-            Object argument = arguments[i];
-            Class<?> type = parameters[i].getWrapperType();
-            if (argument == null ? parameters[i].getType().isPrimitive() : !type.isInstance(argument)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private static boolean sameTypes(Argument<?>[] parameters, Argument<?>[] argumentTypes) {
-        if (parameters.length != argumentTypes.length) {
-            return false;
-        }
-        for (int i = 0; i < parameters.length; i++) {
-            if (parameters[i].getWrapperType() != argumentTypes[i].getWrapperType()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Coerces arguments of the same arity to the declared parameters.
-     *
-     * <p>{@link BeanMethod} does not expose whether a trailing array parameter was declared with varargs.
-     * Expanded calls are therefore left to the reflective resolver later in the chain, which has that flag;
-     * otherwise a fixed array parameter would incorrectly accept a scalar.</p>
-     *
-     * @return The coerced arguments, or {@code null} when the arguments do not fit the parameters, so that the
-     * overload is not selected
-     */
-    private static Object @Nullable [] coerce(ELContext context, Argument<?>[] parameters, Object[] arguments) {
-        if (arguments.length != parameters.length) {
-            return null;
-        }
-        try {
-            Object[] coerced = new Object[parameters.length];
-            for (int i = 0; i < parameters.length; i++) {
-                coerced[i] = ELSupport.coerceToType(context, arguments[i], parameters[i].getType());
-            }
-            return coerced;
-        } catch (ELException e) {
-            // this overload does not accept these arguments
-            return null;
-        }
     }
 
     @Nullable
@@ -372,7 +246,7 @@ public final class IntrospectionELResolver extends ELResolver implements ELMetho
                 throw new IllegalArgumentException("An introspected method requires a base object");
             }
             Object[] values = arguments == null ? new Object[0] : arguments;
-            Object[] coerced = coerce(context, method.getArguments(), values);
+            Object[] coerced = ELOverloads.coerce(context, method.getArguments(), values);
             if (coerced == null) {
                 throw new ELException("The arguments do not match the method '" + method.getName() + "'");
             }
