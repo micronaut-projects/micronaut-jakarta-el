@@ -1,17 +1,24 @@
 package io.micronaut.el.test.executable;
 
 import io.micronaut.context.ApplicationContext;
+import io.micronaut.context.BeanDefinitionRegistry;
 import io.micronaut.core.beans.BeanIntrospector;
 import io.micronaut.el.CompiledELContext;
 import io.micronaut.el.ELMethod;
+import io.micronaut.el.resolver.ELResolverChain;
 import io.micronaut.el.resolver.ELResolvers;
 import io.micronaut.el.resolver.ExecutableMethodELExecutor;
 import io.micronaut.el.resolver.IntrospectionELResolver;
 import io.micronaut.el.resolver.ReflectiveMethodELResolver;
+import io.micronaut.el.runtime.ELResolution;
 import io.micronaut.inject.ProxyBeanDefinition;
+import jakarta.el.ELContext;
+import jakarta.el.ELResolver;
 import jakarta.el.ExpressionFactory;
+import jakarta.el.FunctionMapper;
 import jakarta.el.MethodExpression;
 import jakarta.el.MethodNotFoundException;
+import jakarta.el.VariableMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
@@ -129,5 +136,68 @@ class ExecutableMethodExpressionsTest {
         // a context carrying no registry is one the service form declines
         assertNull(new ExecutableMethodELExecutor()
             .resolve(new CompiledELContext(), greeter, "greet", null, new Object[]{"world"}));
+    }
+
+    /**
+     * The compiled counterpart of the diagnostics the interpreted path reports. A compiled expression dispatches
+     * through {@code ELResolution.invoke}, which reports the failure of a chain that resolved nothing, so the
+     * same distinction has to be made there: a context carrying no bean context is one where the executable
+     * methods were never read, and a registered one that has the type but not the method is a missing
+     * {@code @Executable}.
+     *
+     * <p>The chain here is a narrow one, an application that wired the introspections alone. The standard chain
+     * ends in the reflective resolvers of the specification, and {@code BeanELResolver} reports a method of its
+     * own that it did not find, so it is a chain that stops short of them that reaches this message.</p>
+     */
+    @Test
+    void aMethodThatTheChainDoesNotResolveSaysWhy() {
+        Greeter greeter = beanContext.getBean(Greeter.class);
+        ELContext narrow = introspectionsOnly();
+
+        String unregistered = assertThrows(MethodNotFoundException.class,
+            () -> ELResolution.invoke(narrow, greeter, "greet", "world")).getMessage();
+        assertTrue(unregistered.startsWith("Cannot find the method 'greet' of " + Greeter.class.getName()
+            + " accepting 1 argument(s)."), unregistered);
+        assertTrue(unregistered.contains("No bean context is registered in this ELContext"), unregistered);
+        assertTrue(unregistered.contains("context.putContext(BeanDefinitionRegistry.class, beanContext)"),
+            unregistered);
+        // the remedy of the interpreted path is the executors, not a chain, so it is not named here
+        assertFalse(unregistered.contains("add the micronaut-jakarta-el-interpreter-reflection module"),
+            unregistered);
+
+        narrow.putContext(BeanDefinitionRegistry.class, beanContext);
+        String registered = assertThrows(MethodNotFoundException.class,
+            () -> ELResolution.invoke(narrow, greeter, "missing", "world")).getMessage();
+        assertTrue(registered.contains(Greeter.class.getName()
+            + " is a bean of the bean context registered in this ELContext"), registered);
+        assertTrue(registered.contains("carries no executable method named 'missing'"), registered);
+        assertTrue(registered.contains("annotate it with @Introspected"), registered);
+        assertFalse(registered.contains("No bean context is registered in this ELContext"), registered);
+    }
+
+    /**
+     * A context whose chain is the bean introspections alone, which declines a type that carries none instead
+     * of throwing a method of its own the way the reflective resolvers of the specification do.
+     */
+    private static ELContext introspectionsOnly() {
+        return new ELContext() {
+
+            private final ELResolver resolver = new ELResolverChain(new IntrospectionELResolver());
+
+            @Override
+            public ELResolver getELResolver() {
+                return resolver;
+            }
+
+            @Override
+            public FunctionMapper getFunctionMapper() {
+                return null;
+            }
+
+            @Override
+            public VariableMapper getVariableMapper() {
+                return null;
+            }
+        };
     }
 }

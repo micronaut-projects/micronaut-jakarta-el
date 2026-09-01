@@ -21,6 +21,7 @@ import io.micronaut.el.ELMethod;
 import io.micronaut.el.ELMethodExecutor;
 import io.micronaut.el.parser.ast.BinaryOperator;
 import io.micronaut.el.parser.ast.ELNode;
+import io.micronaut.el.resolver.ELMethodDiagnostics;
 import io.micronaut.el.runtime.ELArithmetic;
 import io.micronaut.el.runtime.ELArguments;
 import io.micronaut.el.runtime.ELCollections;
@@ -840,8 +841,9 @@ final class ELInterpreter {
                 return resolved;
             }
         }
-        throw new MethodNotFoundException("Cannot find the method '" + method + "' of "
-            + base.getClass().getName());
+        // the executors that were consulted are what says which of the remedies applies: the reflective one is
+        // in the list only when the optional module is on the classpath
+        throw ELMethodDiagnostics.notFound(context, base, method, arguments, executors);
     }
 
     @Nullable

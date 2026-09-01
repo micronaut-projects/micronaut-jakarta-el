@@ -126,6 +126,40 @@ chain, so expressions compiled at compilation time resolve the same methods the 
 carries no registry is not one the executor can read, so it declines and the chain resolves the method as it
 did before.
 
+=== When A Method Does Not Resolve
+
+Registering the bean context is easy to forget, and forgetting it used to read as a method that plainly exists
+not being found. A method that no executor and no resolver answers for therefore reports which of the
+descriptions it could have been reached through did not carry it, and what to do about each. A context carrying
+no bean context, with the reflection module absent:
+
+[source]
+----
+jakarta.el.MethodNotFoundException: Cannot find the method 'greet' of com.example.Greeter accepting 1
+argument(s). No bean context is registered in this ELContext, so the executable methods of the bean definitions
+were not consulted: register one with context.putContext(BeanDefinitionRegistry.class, beanContext), or
+evaluate the expression with new CompiledELContext(beanContext). The type carries no bean introspection either:
+annotate it with @Introspected, and the method with @Executable, to have the method dispatched from generated
+metadata. No reflective executor is registered either, so the method was not looked up reflectively: add the
+micronaut-jakarta-el-interpreter-reflection module to resolve any public method.
+----
+
+A bean context that *is* registered says so instead, and the remedy it names is the annotation the method is
+missing rather than the context:
+
+[source]
+----
+jakarta.el.MethodNotFoundException: Cannot find the method 'hidden' of com.example.Greeter accepting 1
+argument(s). com.example.Greeter is a bean of the bean context registered in this ELContext, but its definition
+carries no executable method named 'hidden': annotate the method with @Executable, directly or through an
+annotation meta-annotated with it, so that it is compiled into the bean definition. [...]
+----
+
+A name that is carried, but not with that arity, reports the signatures that were found next to the number of
+arguments that selected none of them, so an overload that does not match is not mistaken for a method that is
+absent. None of this runs while an expression evaluates: every check is made once, on the path that is about to
+throw, and which executor resolves a method is unchanged.
+
 == Expressions Built From Untrusted Input
 
 An expression declared with `@ELExpression` is source of the application, as trusted as the code around it.
