@@ -83,7 +83,7 @@ class SpecExamplesExpressionsTest {
         assertEquals(Suit.SPADE, value(STATIC_FIELD));
         assertEquals(Suit.CLUB, value(STATIC_METHOD));
         assertEquals(Integer.MAX_VALUE, value(JAVA_LANG_STATIC_FIELD));
-        assertEquals(7L, value(JAVA_LANG_STATIC_METHOD));
+        assertEquals(7, value(JAVA_LANG_STATIC_METHOD));
     }
 
     @Test

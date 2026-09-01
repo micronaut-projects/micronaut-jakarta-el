@@ -36,7 +36,7 @@ public final class ObjectValueExpression extends ValueExpression {
 
     private static final long serialVersionUID = 1L;
 
-    private final transient @Nullable Object value;
+    private final @Nullable Object value;
     private final Class<?> expectedType;
 
     /**
@@ -79,23 +79,22 @@ public final class ObjectValueExpression extends ValueExpression {
     @Override
     @Nullable
     public String getExpressionString() {
-        return null;
+        return value == null ? null : value.toString();
     }
 
     @Override
     public boolean isLiteralText() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean equals(@Nullable Object obj) {
         return obj instanceof ObjectValueExpression other
-            && Objects.equals(other.value, value)
-            && other.expectedType.equals(expectedType);
+            && Objects.equals(other.value, value);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(value, expectedType);
+        return Objects.hashCode(value);
     }
 }

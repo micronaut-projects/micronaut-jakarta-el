@@ -17,6 +17,7 @@ dependencies {
     jmh platform(libs.micronaut.core)
     jmh projects.micronautJakartaEl
     jmh projects.micronautJakartaElInterpreter
+    jmh projects.micronautJakartaElInterpreterReflection
     jmh mn.micronaut.core
     jmh mn.micronaut.inject
     jmh mn.micronaut.context

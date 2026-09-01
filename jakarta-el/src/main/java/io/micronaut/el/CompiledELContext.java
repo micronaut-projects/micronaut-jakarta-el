@@ -15,6 +15,7 @@
  */
 package io.micronaut.el;
 
+import io.micronaut.context.BeanDefinitionRegistry;
 import io.micronaut.core.annotation.Experimental;
 import org.jspecify.annotations.Nullable;
 import io.micronaut.el.runtime.MapVariableMapper;
@@ -63,9 +64,29 @@ public class CompiledELContext extends ELContext {
      * @param first The resolvers consulted before the standard ones
      */
     public CompiledELContext(ELResolver... first) {
-        // the standard chain is shared, a chain nested in a chain is flattened for the coercions
+        // a chain nested in a chain is flattened for the coercions
         this.resolver = new ELResolverChain(new BeanNameELResolver(new LocalBeanNameResolver()),
             first.length == 0 ? ELResolvers.standard() : ELResolvers.standard(first));
+    }
+
+    /**
+     * Creates a context using the standard chain of resolvers of an application that has a bean context, which
+     * also invokes the executable methods the beans of that context carry, without the types they are declared
+     * on having to be annotated {@code @Introspected}.
+     *
+     * <p>The registry is also registered on the context itself, under {@code BeanDefinitionRegistry.class},
+     * which is where {@code io.micronaut.el.resolver.ExecutableMethodELExecutor} reads it from when it was
+     * loaded as a service: an expression parsed at runtime and evaluated with this context reaches the same
+     * executable methods as a compiled one.</p>
+     *
+     * @param registry The registry whose definitions carry the executable methods, which a
+     *                 {@code io.micronaut.context.BeanContext} is
+     * @param first    The resolvers consulted before the standard ones
+     */
+    public CompiledELContext(BeanDefinitionRegistry registry, ELResolver... first) {
+        this.resolver = new ELResolverChain(new BeanNameELResolver(new LocalBeanNameResolver()),
+            ELResolvers.standard(registry, first));
+        putContext(BeanDefinitionRegistry.class, registry);
     }
 
     /**

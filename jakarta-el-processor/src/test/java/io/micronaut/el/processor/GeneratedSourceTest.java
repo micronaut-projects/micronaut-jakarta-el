@@ -30,7 +30,10 @@ class GeneratedSourceTest {
 
             import io.micronaut.el.annotation.*;
 
-            @ELEnvironment(variables = @ELVariable(name = "book", type = Book.class))
+            @ELEnvironment(variables = {
+                @ELVariable(name = "book", type = Book.class),
+                @ELVariable(name = "varargs", type = Book.class)
+            })
             @ELExpression(value = "%s", expectedType = String.class)
             public class Expressions {
             }
@@ -42,6 +45,8 @@ class GeneratedSourceTest {
                 public Object apply(jakarta.el.LambdaExpression lambda) { return lambda.invoke("title"); }
                 public double discount(double percent) { return percent; }
                 public long count(java.util.function.Predicate<String> predicate) { return getTags().stream().filter(predicate).count(); }
+                public String choose(Number first, Number second) { return "assignable"; }
+                public String choose(Long first, String second) { return "coercible"; }
             }
             """.formatted(expression.replace("\"", "\\\""));
     }
@@ -59,7 +64,7 @@ class GeneratedSourceTest {
                         new ClassReader(input.readAllBytes()).accept(new ClassVisitor(Opcodes.ASM9) {
                             @Override
                             public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
-                                if (!name.equals("evaluate") && !name.startsWith("lambda$")) {
+                                if (!name.equals("evaluate") && !name.startsWith("lambda$") && !name.startsWith("access")) {
                                     return null;
                                 }
                                 return new MethodVisitor(Opcodes.ASM9) {
@@ -110,7 +115,14 @@ class GeneratedSourceTest {
     void theOperatorsOnUnknownTypesUseTheRuntime() throws IOException {
         Map<String, Integer> calls = runtimeCalls("${book.tags[0] + 1 > 10}");
         assertEquals(1, calls.getOrDefault("add", 0), calls.toString());
-        assertEquals(1, calls.getOrDefault("greaterThan", 0), calls.toString());
+        assertEquals(1, calls.getOrDefault("greaterThanLazy", 0), calls.toString());
+    }
+
+    @Test
+    void theDeferredRelationalOperandIsGeneratedOnce() throws IOException {
+        Map<String, Integer> calls = runtimeCalls("${book.tags[0] < book.tags[1]}");
+        assertEquals(1, calls.getOrDefault("lessThanLazy", 0), calls.toString());
+        assertEquals(2, calls.getOrDefault("resolveVariable", 0), calls.toString());
     }
 
     @Test
@@ -129,7 +141,7 @@ class GeneratedSourceTest {
     @Test
     void theElementsOfAStreamAreTyped() throws IOException {
         Map<String, Integer> calls = runtimeCalls("${book.tags.stream().filter(t -> t.length() > 1).sorted((a, b) -> b.length() - a.length()).toList()}");
-        assertEquals(Map.of("resolveVariable", 1, "coerceToType", 1), calls);
+        assertEquals(Map.of("coerceToType", 1, "resolveVariable", 1), calls);
     }
 
     @Test
@@ -140,8 +152,9 @@ class GeneratedSourceTest {
     }
 
     @Test
-    void aLambdaValueResolvesItsFreeIdentifiersWhenInvoked() throws IOException {
-        // the lambda is a value invoked later, possibly with another context: its body resolves the variable
+    void aLambdaValueResolvesItsFreeIdentifierWhenInvoked() throws IOException {
+        // one resolution is the immediate receiver and the other belongs to the generated lambda body; the
+        // runtime re-binding behavior is covered by ELInterpreterExpressionsTest
         Map<String, Integer> calls = runtimeCalls("${book.apply(t -> t += book.title)}");
         assertEquals(2, calls.getOrDefault("resolveVariable", 0), calls.toString());
     }
@@ -191,6 +204,13 @@ class GeneratedSourceTest {
     void aLiteralArgumentIsCoercedAtCompilationTime() throws IOException {
         Map<String, Integer> calls = runtimeCalls("${book.discount(10)}");
         assertEquals(Map.of("resolveVariable", 1), calls);
+    }
+
+    @Test
+    void anAssignableOverloadIsCalledDirectlyBeforeACoercibleOne() throws IOException {
+        Map<String, Integer> calls = runtimeCalls("${varargs.choose(1, 1)}");
+        assertEquals(0, calls.getOrDefault("invoke", 0), calls.toString());
+        assertEquals(1, calls.getOrDefault("resolveVariable", 0), calls.toString());
     }
 
     @Test

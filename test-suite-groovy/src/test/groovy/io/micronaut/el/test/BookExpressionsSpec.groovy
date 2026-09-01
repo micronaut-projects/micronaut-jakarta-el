@@ -52,6 +52,8 @@ class BookExpressionsSpec {
         assertEquals(3L, factory.createValueExpression(context, '${(x -> y -> x + y)(1)(2)}', Object).getValue(context))
         assertEquals(10L, factory.createValueExpression(context, '${((a, b, c, d) -> a + b + c + d)(1, 2, 3, 4)}', Object).getValue(context))
         assertEquals(null, factory.createValueExpression(context, '${book.tags.stream().forEach(t -> t.length())}', Object).getValue(context))
+        assertEquals(3L, factory.createValueExpression(context,
+            '${book.count(t -> [t].stream().allMatch(x -> x.length() > 0).get())}', Object).getValue(context))
     }
 
     @Test

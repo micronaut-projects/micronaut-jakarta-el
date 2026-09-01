@@ -61,6 +61,7 @@ import io.micronaut.sourcegen.model.ClassDef;
 import java.lang.annotation.Annotation;
 import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -279,12 +280,17 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
                 collect(parameter, annotation, declared);
             }
         }
-        Map<String, Declared<A>> distinct = new LinkedHashMap<>();
+        Map<DeclarationKey, Declared<A>> distinct = new LinkedHashMap<>();
         for (Declared<A> value : declared) {
-            String key = expressionOf(value.annotation()).orElse("") + "|"
+            String signature = expressionOf(value.annotation()).orElse("") + "|"
                 + value.annotation().annotationClassValue("expectedType").map(AnnotationClassValue::getName).orElse("")
-                + "|" + value.annotation().annotationClassValue("expectedReturnType").map(AnnotationClassValue::getName).orElse("");
-            distinct.putIfAbsent(key, value);
+                + "|" + value.annotation().annotationClassValue("expectedReturnType").map(AnnotationClassValue::getName).orElse("")
+                + "|" + Arrays.stream(value.annotation().annotationClassValues("expectedParamTypes"))
+                    .map(AnnotationClassValue::getName)
+                    .collect(java.util.stream.Collectors.joining(","));
+            // The owner contributes method parameters and member-level @ELEnvironment declarations. Identical
+            // text and result types on different owners can therefore compile to different expressions.
+            distinct.putIfAbsent(new DeclarationKey(value.owner(), signature), value);
         }
         return new ArrayList<>(distinct.values());
     }
@@ -342,14 +348,15 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
                 variables.put(parameter.getName(), parameter.getGenericType());
             }
         }
-        declare(element.getAnnotation(ELEnvironment.class), context, variables, importedClasses, importedPackages, staticImports, functions);
+        declare(element.getAnnotation(ELEnvironment.class), element, context, variables, importedClasses, importedPackages, staticImports, functions);
         if (owner != element) {
-            declare(owner.getAnnotation(ELEnvironment.class), context, variables, importedClasses, importedPackages, staticImports, functions);
+            declare(owner.getAnnotation(ELEnvironment.class), owner, context, variables, importedClasses, importedPackages, staticImports, functions);
         }
         return new CompilationContext(context, owner, ELFunctionDiscovery.current(), variables, importedClasses, importedPackages, staticImports, functions);
     }
 
     private void declare(@Nullable AnnotationValue<ELEnvironment> environment,
+                         Element owner,
                          VisitorContext context,
                          Map<String, ClassElement> variables,
                          Map<String, ClassElement> importedClasses,
@@ -359,10 +366,18 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
         if (environment == null) {
             return;
         }
-        for (AnnotationValue<ELVariable> variable : ELTypes.nested(environment, "variables", ELVariable.class)) {
+        List<AnnotationValue<ELVariable>> declaredVariables = ELTypes.nested(environment, "variables", ELVariable.class);
+        for (int i = 0; i < declaredVariables.size(); i++) {
+            int variableIndex = i;
+            AnnotationValue<ELVariable> variable = declaredVariables.get(i);
             String name = variable.stringValue("name").orElseThrow(() ->
                 new ELCompilationException("The name of @ELVariable is required"));
-            ClassElement type = ELTypes.resolveMember(variable, "type", context).orElseThrow(() ->
+            ClassElement type = ELTypes.resolveMember(variable, "type", context)
+                .or(() -> context.getLanguage() == VisitorContext.Language.JAVA
+                    ? JavaAnnotationTypes.resolveNestedMember(owner.getNativeType(), ELEnvironment.class.getName(),
+                        "variables", variableIndex, "type", context)
+                    : Optional.empty())
+                .orElseThrow(() ->
                 new ELCompilationException("The type of the variable '" + name + "' is required"));
             variables.put(name, type);
         }
@@ -449,5 +464,8 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
      * @param <A>        The annotation type
      */
     private record Declared<A extends Annotation>(AnnotationValue<A> annotation, Element owner) {
+    }
+
+    private record DeclarationKey(Element owner, String signature) {
     }
 }

@@ -136,6 +136,18 @@ public final class CompilationContext {
     }
 
     /**
+     * Returns the parameters visible in the current lambda body, with an inner declaration shadowing an outer
+     * one.
+     *
+     * @return The visible parameters by EL name
+     */
+    public Map<String, ELCompiler.Typed> lambdaParameters() {
+        Map<String, ELCompiler.Typed> parameters = new LinkedHashMap<>();
+        lambdaScopes.descendingIterator().forEachRemaining(parameters::putAll);
+        return parameters;
+    }
+
+    /**
      * @return Whether the compilation is inside the body of a lambda expression compiled to a value, which may
      * be invoked later, with another context, so that nothing of the evaluation can be shared with it
      */
@@ -213,12 +225,17 @@ public final class CompilationContext {
         for (ClassElement staticImport : staticImports) {
             for (MethodElement method : staticImport
                 .getEnclosedElements(ElementQuery.ALL_METHODS.onlyAccessible().named(name))) {
-                if (method.getParameters().length == arguments && ELTypes.isStatic(method)) {
+                if ((method.getParameters().length == arguments
+                    || method.isVarArgs() && arguments >= method.getParameters().length - 1) && ELTypes.isStatic(method)) {
                     return method;
                 }
             }
         }
         return null;
+    }
+
+    public List<ClassElement> staticImports() {
+        return staticImports;
     }
 
     /**

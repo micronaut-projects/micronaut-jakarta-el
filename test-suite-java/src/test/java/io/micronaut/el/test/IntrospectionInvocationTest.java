@@ -3,6 +3,7 @@ package io.micronaut.el.test;
 import io.micronaut.el.CompiledELContext;
 import jakarta.el.ELContext;
 import jakarta.el.ELResolver;
+import jakarta.el.MethodNotFoundException;
 import io.micronaut.el.resolver.IntrospectionELResolver;
 import jakarta.el.ELException;
 import org.junit.jupiter.api.Test;
@@ -42,16 +43,24 @@ class IntrospectionInvocationTest {
     }
 
     @Test
+    void equallySpecificOverloadsAreAmbiguous() {
+        assertThrows(MethodNotFoundException.class, () -> invoke("ambiguous", 1));
+    }
+
+    @Test
+    void equallyCoercibleOverloadsAreAmbiguous() {
+        assertThrows(MethodNotFoundException.class, () -> invoke("ambiguousCoercion", "1"));
+    }
+
+    @Test
     void anArrayGivenDirectlyIsPassedThroughNotWrapped() {
         assertEquals("a-b", invoke("join", "-", new Object[]{"a", "b"}));
         assertEquals(3, invoke("size", new Object[]{new Object[]{1, 2, 3}}));
     }
 
     @Test
-    void aScalarIsPackedIntoATrailingArrayParameter() {
-        // a BeanMethod does not say whether the array is variadic, so a trailing array parameter is treated as
-        // one: a scalar that would otherwise fail to coerce to the array is packed into it
-        assertEquals(1, invoke("size", "x"));
+    void aFixedArityArrayParameterRejectsAScalar() {
+        assertThrows(ELException.class, () -> invoke("size", "x"));
     }
 
     @Test
@@ -70,5 +79,6 @@ class IntrospectionInvocationTest {
         assertEquals("0.50", FormattingExpressions$ELExpressions.FORMATTED.getValue(context));
         assertEquals("a-b-c", FormattingExpressions$ELExpressions.JOINED.getValue(context));
         assertEquals("only:-", FormattingExpressions$ELExpressions.JOINED_ALONE.getValue(context));
+        assertEquals("default:EL", FormattingExpressions$ELExpressions.MAPPED.getValue(context));
     }
 }

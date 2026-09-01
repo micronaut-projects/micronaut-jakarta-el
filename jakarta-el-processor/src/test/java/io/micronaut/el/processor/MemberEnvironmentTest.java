@@ -4,7 +4,9 @@ import io.micronaut.annotation.processing.test.JavaParser;
 import org.junit.jupiter.api.Test;
 
 import javax.tools.Diagnostic;
+import javax.tools.JavaFileObject;
 import java.util.List;
+import java.util.stream.StreamSupport;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -103,6 +105,32 @@ class MemberEnvironmentTest {
                 }
                 """ + CUSTOMER_AND_RULES));
             assertTrue(failure.getMessage().contains("The function 'fn:adult' is not declared"), failure.getMessage());
+        }
+    }
+
+    @Test
+    void identicalExpressionsOnDifferentMembersKeepTheirOwnParameterEnvironment() {
+        try (JavaParser parser = new JavaParser()) {
+            Iterable<? extends JavaFileObject> generated = parser.generate("io.micronaut.el.test.members.Service", """
+                package io.micronaut.el.test.members;
+
+                import io.micronaut.el.annotation.*;
+
+                public class Service {
+                    @ELExpression(value = "${value}", expectedType = Object.class)
+                    public void text(String value) {
+                    }
+
+                    @ELExpression(value = "${value}", expectedType = Object.class)
+                    public void number(Integer value) {
+                    }
+                }
+                """);
+            List<String> names = StreamSupport.stream(generated.spliterator(), false)
+                .map(JavaFileObject::getName)
+                .filter(name -> name.contains("$Expression"))
+                .toList();
+            assertEquals(2, names.size(), names.toString());
         }
     }
 }

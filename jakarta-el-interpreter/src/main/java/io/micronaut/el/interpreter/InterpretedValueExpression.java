@@ -16,10 +16,14 @@
 package io.micronaut.el.interpreter;
 
 import io.micronaut.core.annotation.Internal;
+import io.micronaut.el.ELMethod;
 import io.micronaut.el.ELSandbox;
 import io.micronaut.el.parser.ELParser;
+import io.micronaut.el.parser.ELNodes;
 import io.micronaut.el.parser.ast.ELNode;
 import io.micronaut.el.runtime.ELSupport;
+import io.micronaut.el.runtime.ELExpressionIdentity;
+import io.micronaut.el.runtime.ELVariableBindings;
 import jakarta.el.ELContext;
 import jakarta.el.PropertyNotWritableException;
 import jakarta.el.ValueExpression;
@@ -27,6 +31,7 @@ import jakarta.el.ValueReference;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
+import java.util.Map;
 
 /**
  * A {@link ValueExpression} evaluating the abstract syntax tree produced by the parser.
@@ -35,7 +40,7 @@ import java.util.Objects;
  * @since 1.0
  */
 @Internal
-final class InterpretedValueExpression extends ValueExpression {
+final class InterpretedValueExpression extends ValueExpression implements ELExpressionIdentity {
 
     private static final long serialVersionUID = 1L;
 
@@ -46,16 +51,20 @@ final class InterpretedValueExpression extends ValueExpression {
      * character, a number or an enum answers on its own.
      */
     private final boolean checkedResult;
+    private final Map<String, ELMethod> functions;
     private transient @Nullable ELNode node;
     private transient @Nullable ELInterpreter interpreter;
+    private transient @Nullable String equalityForm;
 
     InterpretedValueExpression(String expressionString,
                                Class<?> expectedType,
                                ELNode node,
+                               Map<String, ELMethod> functions,
                                ELInterpreter interpreter) {
         this.expressionString = Objects.requireNonNull(expressionString, "expressionString");
         this.expectedType = Objects.requireNonNull(expectedType, "expectedType");
         this.checkedResult = ELSandbox.checksResultOf(expectedType);
+        this.functions = Map.copyOf(functions);
         this.node = Objects.requireNonNull(node, "node");
         this.interpreter = Objects.requireNonNull(interpreter, "interpreter");
     }
@@ -66,9 +75,9 @@ final class InterpretedValueExpression extends ValueExpression {
     public <T> T getValue(ELContext context) {
         context.notifyBeforeEvaluation(expressionString);
         Object value = interpreter().evaluateRoot(context, node());
+        T result = (T) ELSupport.coerceToType(context, value, expectedType);
         context.notifyAfterEvaluation(expressionString);
-        Object coerced = ELSupport.coerceToType(context, value, expectedType);
-        return (T) (checkedResult ? ELSandboxGuard.checkResult(context, coerced) : coerced);
+        return checkedResult ? ELSandboxGuard.checkResult(context, result) : result;
     }
 
     @Override
@@ -133,7 +142,7 @@ final class InterpretedValueExpression extends ValueExpression {
     private ELInterpreter interpreter() {
         ELInterpreter resolved = interpreter;
         if (resolved == null) {
-            resolved = ELInterpreter.of(null, node());
+            resolved = ELInterpreter.of(functions);
             interpreter = resolved;
         }
         return resolved;
@@ -141,14 +150,30 @@ final class InterpretedValueExpression extends ValueExpression {
 
     @Override
     public boolean equals(@Nullable Object obj) {
-        return obj instanceof InterpretedValueExpression other
-            && other.node().equals(node())
-            && other.expectedType.equals(expectedType);
+        Object unwrapped = obj instanceof ValueExpression expression ? ELVariableBindings.unwrap(expression) : obj;
+        return unwrapped instanceof ValueExpression other
+            && !other.isLiteralText()
+            && unwrapped instanceof ELExpressionIdentity identity
+            && identity.equalityForm().equals(equalityForm());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(node(), expectedType);
+        return equalityForm().hashCode();
+    }
+
+    @Override
+    public String equalityForm() {
+        String resolved = equalityForm;
+        if (resolved == null) {
+            resolved = ELNodes.canonical(node(), (prefix, localName) -> {
+                ELMethod function = functions.get(
+                    prefix.isEmpty() ? localName : prefix + ":" + localName);
+                return function == null ? null : function.identity();
+            });
+            equalityForm = resolved;
+        }
+        return resolved;
     }
 
     @Override

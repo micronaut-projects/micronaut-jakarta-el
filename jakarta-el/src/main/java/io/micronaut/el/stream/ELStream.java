@@ -15,16 +15,16 @@
  */
 package io.micronaut.el.stream;
 
-import org.jspecify.annotations.Nullable;
 import io.micronaut.core.annotation.Internal;
+import io.micronaut.el.runtime.ELArray;
 import io.micronaut.el.runtime.ELArithmetic;
 import io.micronaut.el.runtime.ELSupport;
 import jakarta.el.ELContext;
 import jakarta.el.ELException;
 import jakarta.el.LambdaExpression;
 import jakarta.el.MethodNotFoundException;
+import org.jspecify.annotations.Nullable;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -68,11 +68,11 @@ public final class ELStream<T> {
             Stream<Object> stream = (Stream<Object>) collection.stream();
             return new ELStream<>(context, stream);
         }
-        if (source.getClass().isArray()) {
-            int length = Array.getLength(source);
+        if (ELArray.isArray(source)) {
+            int length = ELArray.length(source);
             List<Object> elements = new ArrayList<>(length);
             for (int i = 0; i < length; i++) {
-                elements.add(Array.get(source, i));
+                elements.add(ELArray.get(source, i));
             }
             return new ELStream<>(context, elements.stream());
         }
@@ -212,16 +212,24 @@ public final class ELStream<T> {
      * @param count The maximum number of elements
      * @return A stream of at most {@code count} elements
      */
-    public ELStream<T> limit(Object count) {
-        return next(stream.limit(Math.max(0, longValue(count))));
+    public ELStream<T> limit(@Nullable Object count) {
+        long limit = longValue(count);
+        if (limit < 0) {
+            throw new ELException(new IllegalArgumentException("limit must be non-negative"));
+        }
+        return next(stream.limit(limit));
     }
 
     /**
      * @param start The number of elements to skip
      * @return A stream skipping the first elements
      */
-    public ELStream<T> substream(Object start) {
-        return next(stream.skip(Math.max(0, longValue(start))));
+    public ELStream<T> substream(@Nullable Object start) {
+        long from = longValue(start);
+        if (from < 0) {
+            throw new ELException(new IllegalArgumentException("substream index must be non-negative"));
+        }
+        return next(stream.skip(from));
     }
 
     /**
@@ -229,9 +237,15 @@ public final class ELStream<T> {
      * @param end   The exclusive end position
      * @return A stream of the elements between the two positions
      */
-    public ELStream<T> substream(Object start, Object end) {
-        long from = Math.max(0, longValue(start));
-        long to = Math.max(from, longValue(end));
+    public ELStream<T> substream(@Nullable Object start, @Nullable Object end) {
+        long from = longValue(start);
+        long to = longValue(end);
+        if (from < 0 || to < 0) {
+            throw new ELException(new IllegalArgumentException("substream index must be non-negative"));
+        }
+        if (to < from) {
+            throw new ELException(new IllegalArgumentException("substream end must not precede its start"));
+        }
         return next(stream.skip(from).limit(to - from));
     }
 
@@ -469,6 +483,7 @@ public final class ELStream<T> {
     @Nullable
     @SuppressWarnings("java:S1479")
     public Object invokeOperation(String name, Object[] arguments) {
+        requireArity(name, arguments.length);
         return switch (name) {
             case "filter" -> filter(lambda(context, arguments, 0, name));
             case "map" -> map(lambda(context, arguments, 0, name));
@@ -500,6 +515,20 @@ public final class ELStream<T> {
         };
     }
 
+    private static void requireArity(String operation, int count) {
+        boolean valid = switch (operation) {
+            case "distinct", "iterator", "toArray", "toList", "average", "sum", "count", "findFirst" -> count == 0;
+            case "filter", "map", "flatMap", "forEach", "peek", "limit", "anyMatch", "allMatch", "noneMatch" -> count == 1;
+            case "sorted", "max", "min" -> count <= 1;
+            case "substream", "reduce" -> count == 1 || count == 2;
+            default -> true;
+        };
+        if (!valid) {
+            throw new MethodNotFoundException("The stream operation '" + operation + "' does not accept "
+                + count + " argument(s)");
+        }
+    }
+
     static LambdaExpression lambda(ELContext context, Object[] arguments, int index, String operation) {
         Object argument = argument(arguments, index, operation);
         if (argument instanceof LambdaExpression lambdaExpression) {
@@ -510,17 +539,13 @@ public final class ELStream<T> {
             + (index + 1));
     }
 
+    @Nullable
     static Object argument(Object[] arguments, int index, String operation) {
         if (index >= arguments.length) {
             throw new ELException("The operation '" + operation + "' expects at least " + (index + 1)
                 + " argument(s)");
         }
-        Object argument = arguments[index];
-        if (argument == null) {
-            throw new NullPointerException("The argument " + (index + 1) + " of the operation '" + operation
-                + "' is null");
-        }
-        return argument;
+        return arguments[index];
     }
 
     private ELOptional<Boolean> match(Predicate<? super T> predicate, MatchKind kind) {

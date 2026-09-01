@@ -18,6 +18,7 @@ package io.micronaut.el;
 import io.micronaut.core.annotation.Experimental;
 import org.jspecify.annotations.Nullable;
 import jakarta.el.MethodExpression;
+import jakarta.el.ELContext;
 import jakarta.el.ValueExpression;
 
 import java.util.List;
@@ -60,15 +61,55 @@ public interface ELExpressionSource {
     }
 
     /**
+     * Creates a compiled value expression and binds its variables against the creation context.
+     *
+     * <p>The default delegates to the original context-free method so sources generated before this overload
+     * existed remain compatible.</p>
+     *
+     * @param context      The creation context
+     * @param expression   The expression string
+     * @param expectedType The expected type
+     * @return The compiled value expression or {@code null} when this source does not declare it
+     * @since 1.0.1
+     */
+    @Nullable
+    default ValueExpression createValueExpression(@Nullable ELContext context,
+                                                  String expression,
+                                                  Class<?> expectedType) {
+        return createValueExpression(expression, expectedType);
+    }
+
+    /**
      * @param expression         The expression string
-     * @param expectedReturnType The expected return type
-     * @param expectedParamTypes The expected parameter types
+     * @param expectedReturnType The expected return type, or {@code null} when the caller does not care
+     * @param expectedParamTypes The expected parameter types, or {@code null} when the expression provides them
      * @return The compiled method expression or {@code null} when this source does not declare it
      */
     @Nullable
     default MethodExpression createMethodExpression(String expression,
-                                                    Class<?> expectedReturnType,
-                                                    Class<?>[] expectedParamTypes) {
+                                                    @Nullable Class<?> expectedReturnType,
+                                                    Class<?> @Nullable [] expectedParamTypes) {
         return null;
+    }
+
+    /**
+     * Creates a compiled method expression and binds its variables against the creation context.
+     *
+     * <p>The default delegates to the original context-free method so sources generated before this overload
+     * existed remain compatible.</p>
+     *
+     * @param context            The creation context
+     * @param expression         The expression string
+     * @param expectedReturnType The expected return type, or {@code null} when the caller does not care
+     * @param expectedParamTypes The expected parameter types, or {@code null} when the expression provides them
+     * @return The compiled method expression or {@code null} when this source does not declare it
+     * @since 1.0.1
+     */
+    @Nullable
+    default MethodExpression createMethodExpression(@Nullable ELContext context,
+                                                    String expression,
+                                                    @Nullable Class<?> expectedReturnType,
+                                                    Class<?> @Nullable [] expectedParamTypes) {
+        return createMethodExpression(expression, expectedReturnType, expectedParamTypes);
     }
 }

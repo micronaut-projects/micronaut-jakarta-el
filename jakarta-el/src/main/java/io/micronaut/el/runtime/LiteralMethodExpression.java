@@ -21,6 +21,7 @@ import org.jspecify.annotations.Nullable;
 import jakarta.el.ELContext;
 import jakarta.el.ELException;
 import jakarta.el.MethodInfo;
+import jakarta.el.MethodReference;
 
 /**
  * A literal-expression used as a method expression, as described in the section 1.2.2 of the Jakarta
@@ -41,7 +42,7 @@ public final class LiteralMethodExpression extends CompiledMethodExpression {
      */
     public LiteralMethodExpression(String text,
                                    Class<?> expectedReturnType,
-                                   Class<?>[] expectedParamTypes) {
+                                   Class<?> @Nullable [] expectedParamTypes) {
         super(text, expectedReturnType, expectedParamTypes, false);
     }
 
@@ -58,7 +59,7 @@ public final class LiteralMethodExpression extends CompiledMethodExpression {
     }
 
     @Override
-    protected Object doInvoke(ELContext context, @Nullable Object[] arguments) {
+    protected Object doInvoke(ELContext context, Object @Nullable [] arguments) {
         if (getExpectedReturnType() == void.class) {
             throw new ELException("A literal-expression cannot be used as a method expression returning void");
         }
@@ -68,6 +69,14 @@ public final class LiteralMethodExpression extends CompiledMethodExpression {
     @Override
     public MethodInfo getMethodInfo(ELContext context) {
         return new MethodInfo(getExpressionString(), getExpectedReturnType(), getExpectedParamTypes());
+    }
+
+    @Override
+    @SuppressWarnings("NullAway")
+    public MethodReference getMethodReference(ELContext context) {
+        context.notifyBeforeEvaluation(getExpressionString());
+        context.notifyAfterEvaluation(getExpressionString());
+        return null;
     }
 
     @Override

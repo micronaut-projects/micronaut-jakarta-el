@@ -31,7 +31,8 @@ class ELParserTest {
 
     @Test
     void anExpressionNestedDeeperThanTheLimitIsRejected() {
-        String nested = "${" + "(".repeat(5000) + "1" + ")".repeat(5000) + "}";
+        int depth = ELParser.DEFAULT_MAX_DEPTH + 1;
+        String nested = "${" + "(".repeat(depth) + "1" + ")".repeat(depth) + "}";
         ELParsingException e = assertThrows(ELParsingException.class, () -> ELParser.parse(nested));
         assertTrue(e.getMessage().contains("nests more than " + ELParser.DEFAULT_MAX_DEPTH + " levels deep"));
     }
@@ -190,6 +191,18 @@ class ELParserTest {
         ELNode node = eval("${{'a':{'b':1}}}");
         ELNode.MapData map = assertInstanceOf(ELNode.MapData.class, node);
         assertInstanceOf(ELNode.MapData.class, map.entries().get(0).value());
+    }
+
+    @Test
+    void expressionSizeIsBounded() {
+        ELParsingException tooLong = assertThrows(ELParsingException.class,
+            () -> ELParser.parse("x".repeat(ELParser.MAX_EXPRESSION_LENGTH + 1)));
+        assertTrue(tooLong.getMessage().contains("cannot exceed " + ELParser.MAX_EXPRESSION_LENGTH + " characters"));
+
+        String tooManyTokens = "${" + "1+".repeat(ELParser.MAX_TOKENS / 2) + "1}";
+        ELParsingException tokenFailure = assertThrows(ELParsingException.class,
+            () -> ELParser.parse(tooManyTokens));
+        assertTrue(tokenFailure.getMessage().contains("cannot exceed " + ELParser.MAX_TOKENS + " tokens"));
     }
 
     private static ELNode eval(String expression) {

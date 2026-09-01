@@ -15,6 +15,7 @@
  */
 package io.micronaut.el.resolver;
 
+import io.micronaut.context.BeanDefinitionRegistry;
 import io.micronaut.core.annotation.Experimental;
 import jakarta.el.ArrayELResolver;
 import jakarta.el.BeanELResolver;
@@ -25,9 +26,11 @@ import jakarta.el.OptionalELResolver;
 import jakarta.el.RecordELResolver;
 import jakarta.el.ResourceBundleELResolver;
 import jakarta.el.StaticFieldELResolver;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * The factory of the standard resolver chain of the module.
@@ -39,11 +42,19 @@ import java.util.List;
 public final class ELResolvers {
 
     /**
-     * The resolvers of the specification that follow the introspections, which hold no state and are shared by
-     * every chain.
+     * The resolvers that follow the introspections and precede the reflective invocation, which hold no state
+     * and are shared by every chain.
      */
-    private static final List<ELResolver> SPECIFICATION = List.of(
-        new StreamELResolver(),
+    private static final List<ELResolver> COMPILED = List.of(
+        new CommonELResolver(),
+        new StreamELResolver()
+    );
+
+    /**
+     * The resolvers of the specification, from the reflective invocation on, which hold no state and are shared
+     * by every chain.
+     */
+    private static final List<ELResolver> REFLECTIVE = List.of(
         new ReflectiveMethodELResolver(),
         new StaticFieldELResolver(),
         new MapELResolver(),
@@ -55,13 +66,6 @@ public final class ELResolvers {
         new BeanELResolver()
     );
 
-    private static final IntrospectionELResolver INTROSPECTIONS = new IntrospectionELResolver();
-
-    /**
-     * The standard chain itself, shared: it holds no state.
-     */
-    private static final ELResolverChain STANDARD = new ELResolverChain(standardResolvers(INTROSPECTIONS));
-
     private ELResolvers() {
     }
 
@@ -72,7 +76,7 @@ public final class ELResolvers {
      * @return The resolver chain
      */
     public static ELResolver standard() {
-        return STANDARD;
+        return new ELResolverChain(standardResolvers());
     }
 
     /**
@@ -86,15 +90,56 @@ public final class ELResolvers {
     }
 
     /**
+     * Creates the standard chain of resolvers for an application that has a bean context, which adds, between
+     * the introspections and the reflective invocation, the resolver reading the executable methods the beans
+     * of that context carry.
+     *
+     * <p>The registry is passed in rather than read from a static holder, so that an application running more
+     * than one bean context resolves a method in the context the expression is evaluated for. A
+     * {@code io.micronaut.context.BeanContext} is a registry; the narrower type is what the resolver needs,
+     * since it reads definitions and never looks a bean up.</p>
+     *
+     * @param registry The registry whose definitions carry the executable methods
+     * @param first    The resolvers to consult first
+     * @return The resolver chain
+     */
+    public static ELResolver standard(BeanDefinitionRegistry registry, ELResolver... first) {
+        return new ELResolverChain(standardResolvers(registry, first));
+    }
+
+    /**
      * The resolvers of the standard chain, in order, for a chain that adds resolvers in front of them.
      *
      * @param first The resolvers to consult first
      * @return The resolvers
      */
     public static List<ELResolver> standardResolvers(ELResolver... first) {
-        List<ELResolver> resolvers = new ArrayList<>(first.length + SPECIFICATION.size());
+        return build(null, first);
+    }
+
+    /**
+     * The resolvers of the standard chain of an application that has a bean context, in order, for a chain that
+     * adds resolvers in front of them.
+     *
+     * @param registry The registry whose definitions carry the executable methods
+     * @param first    The resolvers to consult first
+     * @return The resolvers
+     */
+    public static List<ELResolver> standardResolvers(BeanDefinitionRegistry registry, ELResolver... first) {
+        return build(Objects.requireNonNull(registry, "The bean definition registry cannot be null"), first);
+    }
+
+    private static List<ELResolver> build(@Nullable BeanDefinitionRegistry registry, ELResolver... first) {
+        List<ELResolver> resolvers = new ArrayList<>(first.length + COMPILED.size() + REFLECTIVE.size() + 2);
         resolvers.addAll(List.of(first));
-        resolvers.addAll(SPECIFICATION);
+        resolvers.add(new IntrospectionELResolver());
+        resolvers.addAll(COMPILED);
+        if (registry != null) {
+            // an introspection is the more precise description where it exists, and reflection is the last
+            // resort, so the executable methods sit between them
+            resolvers.add(new ExecutableMethodELExecutor(registry));
+        }
+        resolvers.addAll(REFLECTIVE);
         return resolvers;
     }
 }

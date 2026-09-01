@@ -6,7 +6,7 @@ pluginManagement {
 }
 
 plugins {
-    id 'io.micronaut.build.shared.settings' version '8.0.0-M18'
+    id 'io.micronaut.build.shared.settings' version '8.0.1'
 }
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
@@ -24,6 +24,7 @@ include 'jakarta-el'
 include 'jakarta-el-annotations'
 include 'jakarta-el-bom'
 include 'jakarta-el-interpreter'
+include 'jakarta-el-interpreter-reflection'
 include 'jakarta-el-parser'
 include 'jakarta-el-processor'
 include 'doc-examples:example-java'
@@ -34,6 +35,9 @@ include 'test-suite-groovy'
 include 'test-suite-java'
 include 'test-suite-kotlin'
 include 'tests:jakarta-el-tck'
+include 'tests:jakarta-el-tck-interpreter'
+include 'tests:jakarta-el-tck-interpreter-reflection'
+include 'tests:jakarta-el-fuzz'
 
 micronautBuild {
     useStandardizedProjectNames.set(true)

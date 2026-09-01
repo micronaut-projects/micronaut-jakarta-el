@@ -18,6 +18,8 @@ package io.micronaut.el;
 import io.micronaut.core.annotation.Experimental;
 import org.jspecify.annotations.Nullable;
 import io.micronaut.core.io.service.SoftServiceLoader;
+import io.micronaut.el.resolver.CommonELResolver;
+import io.micronaut.el.resolver.ELResolverChain;
 import io.micronaut.el.resolver.StreamELResolver;
 import io.micronaut.el.runtime.ELLiterals;
 import io.micronaut.el.runtime.ELSupport;
@@ -141,7 +143,7 @@ public class CompiledExpressionFactory extends ExpressionFactory {
     public ValueExpression createValueExpression(ELContext context, String expression, Class<?> expectedType) {
         Class<?> type = Objects.requireNonNull(expectedType, "The expected type cannot be null");
         for (ELExpressionSource source : sourcesOf(expression)) {
-            ValueExpression valueExpression = source.createValueExpression(expression, type);
+            ValueExpression valueExpression = source.createValueExpression(context, expression, type);
             if (valueExpression != null) {
                 return valueExpression;
             }
@@ -164,16 +166,17 @@ public class CompiledExpressionFactory extends ExpressionFactory {
     @Override
     public MethodExpression createMethodExpression(ELContext context,
                                                    String expression,
-                                                   Class<?> expectedReturnType,
-                                                   Class<?>[] expectedParamTypes) {
-        Class<?> returnType = expectedReturnType == null ? Object.class : expectedReturnType;
-        Class<?>[] paramTypes = expectedParamTypes;
+                                                   @Nullable Class<?> expectedReturnType,
+                                                   Class<?> @Nullable [] expectedParamTypes) {
+        Class<?> @Nullable [] paramTypes = expectedParamTypes;
         for (ELExpressionSource source : sourcesOf(expression)) {
-            MethodExpression methodExpression = source.createMethodExpression(expression, returnType, paramTypes);
+            MethodExpression methodExpression = source.createMethodExpression(context, expression, expectedReturnType,
+                paramTypes);
             if (methodExpression != null) {
                 return requireParamTypes(methodExpression, paramTypes);
             }
         }
+        Class<?> returnType = expectedReturnType == null ? Object.class : expectedReturnType;
         String literalText = expression == null ? null : ELLiterals.literalTextOrNull(expression);
         if (literalText != null) {
             return requireParamTypes(new LiteralMethodExpression(literalText, returnType, paramTypes), paramTypes);
@@ -193,7 +196,7 @@ public class CompiledExpressionFactory extends ExpressionFactory {
 
     @Override
     public ELResolver getStreamELResolver() {
-        return new StreamELResolver();
+        return new ELResolverChain(new CommonELResolver(), new StreamELResolver());
     }
 
     @Override
@@ -205,7 +208,7 @@ public class CompiledExpressionFactory extends ExpressionFactory {
      * The parameter types can only be omitted when the expression provides its own parameters.
      */
     private static MethodExpression requireParamTypes(MethodExpression methodExpression,
-                                                      @Nullable Class<?>[] paramTypes) {
+                                                      Class<?> @Nullable [] paramTypes) {
         if (paramTypes == null && !methodExpression.isParametersProvided()) {
             throw new NullPointerException("The expected parameter types are required for the method expression '"
                 + methodExpression.getExpressionString() + "', which does not provide its own parameters");

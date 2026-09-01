@@ -304,20 +304,6 @@ class CompiledVersusInterpretedTest {
     }
 
     @Test
-    void theCompilerResolvesAnOverloadTheInterpreterFindsAmbiguous() throws Exception {
-        // Math.max(int, long) has no single best match among max(int,int), max(long,long), max(float,float)
-        // and max(double,double) once the arguments are only an Integer and a Long, which is all the
-        // interpreter has. Both reference implementations report it ambiguous too. The compiler has the
-        // static types and picks max(long, long).
-        Case one = new Case("${Math.max(book.pages, 1)}", "Object");
-        ClassLoader loader = compile(List.of(one)).loader();
-        assertNotNull(loader);
-        // the values are normalised to their rendering, which is what the comparison uses
-        assertEquals("300", value(compiledFactory(loader), loader, one));
-        assertEquals(new Failure("ambiguous"), value(interpreted, loader, one));
-    }
-
-    @Test
     void theCompilerAndTheInMemoryCompilationAreWiredUp() {
         assertNotNull(compile(List.of(new Case("${book.title}", "String"))).loader(),
             "the batch of one expression must compile, or every comparison of this test is vacuous");

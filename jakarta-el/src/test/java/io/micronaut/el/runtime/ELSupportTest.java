@@ -1,12 +1,17 @@
 package io.micronaut.el.runtime;
 
+import io.micronaut.el.CompiledELContext;
 import jakarta.el.ELException;
+import jakarta.el.LambdaExpression;
+import jakarta.el.MethodNotFoundException;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -16,9 +21,32 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ELSupportTest {
 
+    interface UnannotatedFunction {
+        String apply(String value);
+
+        @Override
+        boolean equals(Object object);
+    }
+
     enum Suit {
         HEART,
         SPADE
+    }
+
+    static final class Varargs {
+        public String join(String... values) {
+            return String.join(",", java.util.Arrays.stream(values).map(String::valueOf).toList());
+        }
+    }
+
+    static final class Overloads {
+        public String target(Long first, Long second) {
+            return "longs";
+        }
+
+        public String target(String first, String... rest) {
+            return "strings";
+        }
     }
 
     @Test
@@ -116,5 +144,67 @@ class ELSupportTest {
         assertThrows(ELException.class, () -> ELSupport.equals(1L, "1.0"));
         // while the arithmetic rule still applies to strings
         assertEquals(2.5d, ELArithmetic.add("1.5", 1L));
+    }
+
+    @Test
+    void lambdaCoercesToAnUnannotatedFunctionalInterface() {
+        CompiledELContext context = new CompiledELContext();
+        LambdaExpression lambda = ELLambdas.create(context, List.of("value"),
+            evaluated -> evaluated.getLambdaArgument("value"));
+
+        UnannotatedFunction function = ELSupport.coerceToType(context, lambda, UnannotatedFunction.class);
+
+        assertEquals("lambda", function.apply("lambda"));
+        assertEquals(function, function);
+        assertFalse(function.equals(new Object()));
+    }
+
+    @Test
+    void functionalInterfaceProxyKeepsTheContextItWasCreatedWith() {
+        CompiledELContext firstContext = new CompiledELContext().setBean("value", "first");
+        CompiledELContext secondContext = new CompiledELContext().setBean("value", "second");
+        assertContextIsCaptured(firstContext, secondContext, ELLambdas.create(firstContext, List.of(),
+            evaluated -> ((CompiledELContext) evaluated).getBean("value")));
+        assertContextIsCaptured(firstContext, secondContext, ELLambdas.lambda0(firstContext,
+            evaluated -> ((CompiledELContext) evaluated).getBean("value")));
+    }
+
+    @Test
+    void onlyTheInvokePropertyInvokesALambdaMethodExpression() {
+        CompiledELContext context = new CompiledELContext();
+        LambdaExpression lambda = ELLambdas.create(context, List.of(), evaluated -> "called");
+
+        assertThrows(MethodNotFoundException.class,
+            () -> ELResolution.invokeWithParamTypes(context, lambda, "other", new Class<?>[0], null));
+        assertEquals("called", ELResolution.invokeWithParamTypes(context, lambda, "invoke", new Class<?>[0], null));
+    }
+
+    private static void assertContextIsCaptured(CompiledELContext firstContext,
+                                                CompiledELContext secondContext,
+                                                LambdaExpression lambda) {
+        Supplier<?> first = ELSupport.coerceToType(firstContext, lambda, Supplier.class);
+        Supplier<?> second = ELSupport.coerceToType(secondContext, lambda, Supplier.class);
+
+        assertEquals("first", first.get());
+        assertEquals("second", second.get());
+        assertEquals("first", first.get());
+    }
+
+    @Test
+    void aSubtypeArrayIsPassedDirectlyToAVariableArityMethod() throws NoSuchMethodException {
+        String[] values = {"a", "b"};
+        Method join = ELMethods.findMethod(Varargs.class, "join", null, new Object[]{values});
+
+        assertEquals("a,b", ELMethods.invoke(new CompiledELContext(), join, new Varargs(),
+            new Object[]{values}));
+    }
+
+    @Test
+    void overloadSelectionChecksWhetherTheActualValueCanBeCoerced() {
+        Method numeric = ELMethods.findMethod(Overloads.class, "target", null, new Object[]{"1", "1"});
+        Method text = ELMethods.findMethod(Overloads.class, "target", null, new Object[]{"aaa", "bbb"});
+
+        assertEquals(Long.class, numeric.getParameterTypes()[0]);
+        assertEquals(String[].class, text.getParameterTypes()[1]);
     }
 }

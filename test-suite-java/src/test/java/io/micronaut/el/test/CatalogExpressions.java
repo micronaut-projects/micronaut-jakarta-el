@@ -10,10 +10,11 @@ import java.util.List;
 @ELEnvironment(
     variables = {
         @ELVariable(name = "author", type = Author.class),
-        @ELVariable(name = "books", type = List.class)
+        @ELVariable(name = "books", type = List.class),
+        @ELVariable(name = "strings", type = String[].class)
     },
-    imports = {Suit.class, Book.class},
-    staticImports = Suit.class,
+    imports = {Suit.class, Book.class, VarargsConstructor.class, Varargs.class},
+    staticImports = {Suit.class, TextFunctions.class},
     functions = @ELFunctions(prefix = "fn", value = TextFunctions.class)
 )
 @ELExpression(value = "${author.name}", name = "authorName")
@@ -23,9 +24,14 @@ import java.util.List;
 @ELExpression(value = "${customer.books[0].category}", expectedType = Object.class, name = "dynamicCategory")
 @ELExpression(value = "${fn:length(author.name)}", name = "nameLength")
 @ELExpression(value = "${fn:upper(author.name)}", name = "upperName")
+@ELExpression(value = "${fn:join('a', 'b')}", name = "functionJoin")
+@ELExpression(value = "${fn:join(strings)}", name = "functionArrayJoin")
+@ELExpression(value = "${join('a', 'b')}", name = "staticJoin")
 @ELExpression(value = "${Suit.SPADE}", name = "suit")
 @ELExpression(value = "${SPADE}", name = "importedSuit")
 @ELExpression(value = "${Book('EL', 'history', 10)}", name = "newBook")
+@ELExpression(value = "${VarargsConstructor('a', 'b').value}", name = "varargsConstructor")
+@ELExpression(value = "${Varargs('a', 'b').value}", name = "varargs")
 @ELExpression(value = "${Boolean.TRUE}", name = "booleanConstant")
 @ELExpression(value = "${Integer.valueOf('42')}", name = "staticMethod")
 @ELExpression(value = "${books.stream().filter(b->b.unitPrice ge 10).map(b->b.title).toList()}", name = "expensive")

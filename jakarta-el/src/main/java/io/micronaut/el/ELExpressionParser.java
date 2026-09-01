@@ -58,5 +58,5 @@ public interface ELExpressionParser {
     MethodExpression createMethodExpression(@Nullable ELContext context,
                                             String expression,
                                             Class<?> expectedReturnType,
-                                            Class<?>[] expectedParamTypes);
+                                            Class<?> @Nullable [] expectedParamTypes);
 }
