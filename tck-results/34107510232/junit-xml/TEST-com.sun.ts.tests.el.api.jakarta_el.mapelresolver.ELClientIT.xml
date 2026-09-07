@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.sun.ts.tests.el.api.jakarta_el.mapelresolver.ELClientIT" tests="3" skipped="0" failures="0" errors="0" timestamp="SANITIZED" hostname="SANITIZED" time="0">
+  <properties/>
+  <testcase name="mapELResolverTest()" classname="com.sun.ts.tests.el.api.jakarta_el.mapelresolver.ELClientIT" time="0"/>
+  <testcase name="mapELResolverPNWETest()" classname="com.sun.ts.tests.el.api.jakarta_el.mapelresolver.ELClientIT" time="0"/>
+  <testcase name="mapELResolverNPETest()" classname="com.sun.ts.tests.el.api.jakarta_el.mapelresolver.ELClientIT" time="0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.mapelresolver.ELClientIT logStartTest
+INFO: STARTING TEST : mapELResolverTest()
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.mapelresolver.ELClientIT logFinishTest
+INFO: FINISHED TEST : mapELResolverTest()
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.mapelresolver.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.mapelresolver.ELClientIT logStartTest
+INFO: STARTING TEST : mapELResolverPNWETest()
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.mapelresolver.ELClientIT logFinishTest
+INFO: FINISHED TEST : mapELResolverPNWETest()
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.mapelresolver.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.mapelresolver.ELClientIT logStartTest
+INFO: STARTING TEST : mapELResolverNPETest()
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.mapelresolver.ELClientIT logFinishTest
+INFO: FINISHED TEST : mapELResolverNPETest()
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.mapelresolver.ELClientIT cleanup
+INFO: Cleanup method called
+]]></system-err>
+</testsuite>

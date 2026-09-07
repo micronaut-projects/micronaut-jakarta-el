@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT" tests="10" skipped="0" failures="0" errors="0" timestamp="SANITIZED" hostname="SANITIZED" time="0">
+  <properties/>
+  <testcase name="beanELResolverNPETest()" classname="com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT" time="0"/>
+  <testcase name="beanELResolverPNWETest()" classname="com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT" time="0"/>
+  <testcase name="beanELResolverMethodVisibilityTest()" classname="com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT" time="0"/>
+  <testcase name="beanELResolverInvokeVoidTest()" classname="com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT" time="0"/>
+  <testcase name="beanELResolverDefaultMethodReadOnlyTest()" classname="com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT" time="0"/>
+  <testcase name="beanELResolverTest()" classname="com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT" time="0"/>
+  <testcase name="beanELResolverInvokeMNFETest()" classname="com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT" time="0"/>
+  <testcase name="beanELResolverInvokeTest()" classname="com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT" time="0"/>
+  <testcase name="beanELResolverDefaultMethodReadWriteTest()" classname="com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT" time="0"/>
+  <testcase name="beanELResolverPNFETest()" classname="com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT" time="0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logStartTest
+INFO: STARTING TEST : beanELResolverNPETest()
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logFinishTest
+INFO: FINISHED TEST : beanELResolverNPETest()
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logStartTest
+INFO: STARTING TEST : beanELResolverPNWETest()
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logFinishTest
+INFO: FINISHED TEST : beanELResolverPNWETest()
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logStartTest
+INFO: STARTING TEST : beanELResolverMethodVisibilityTest()
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logFinishTest
+INFO: FINISHED TEST : beanELResolverMethodVisibilityTest()
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logStartTest
+INFO: STARTING TEST : beanELResolverInvokeVoidTest()
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logFinishTest
+INFO: FINISHED TEST : beanELResolverInvokeVoidTest()
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logStartTest
+INFO: STARTING TEST : beanELResolverDefaultMethodReadOnlyTest()
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logFinishTest
+INFO: FINISHED TEST : beanELResolverDefaultMethodReadOnlyTest()
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logStartTest
+INFO: STARTING TEST : beanELResolverTest()
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logFinishTest
+INFO: FINISHED TEST : beanELResolverTest()
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logStartTest
+INFO: STARTING TEST : beanELResolverInvokeMNFETest()
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logFinishTest
+INFO: FINISHED TEST : beanELResolverInvokeMNFETest()
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logStartTest
+INFO: STARTING TEST : beanELResolverInvokeTest()
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logFinishTest
+INFO: FINISHED TEST : beanELResolverInvokeTest()
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logStartTest
+INFO: STARTING TEST : beanELResolverDefaultMethodReadWriteTest()
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logFinishTest
+INFO: FINISHED TEST : beanELResolverDefaultMethodReadWriteTest()
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT cleanup
+INFO: Cleanup method called
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logStartTest
+INFO: STARTING TEST : beanELResolverPNFETest()
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logFinishTest
+INFO: FINISHED TEST : beanELResolverPNFETest()
+Aug 28, 2026 3:30:36 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT cleanup
+INFO: Cleanup method called
+]]></system-err>
+</testsuite>
