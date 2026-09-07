@@ -14,3 +14,37 @@ dependencies {
     jacocoAggregation projects.micronautTests.micronautJakartaElTck
     jacocoAggregation projects.micronautTests.micronautJakartaElFuzz
 }
+
+// The reflection boundary of the runtime, checked as part of `check`. Expressions are compiled at build time
+// and evaluated without reading a class, so only the optional interpreter-reflection module may reflect; the
+// annotation processor is left out because it reflects while compiling and never at runtime.
+//
+// The rules live in `gradle/checkstyle/` rather than in `config/checkstyle/checkstyle.xml`, which the nightly
+// files sync of micronaut-project-template copies over. Nothing under `gradle/` is in that sync's list, and
+// this wiring is in the per-repo build file, so neither is replaced.
+def reflectionFreeProjects = [
+    "micronaut-jakarta-el",
+    "micronaut-jakarta-el-parser",
+    "micronaut-jakarta-el-interpreter",
+    "micronaut-jakarta-el-annotations"
+]
+
+configure(subprojects.findAll { reflectionFreeProjects.contains(it.name) }) { project ->
+    project.plugins.withId("java") {
+        def reflectionCheck = project.tasks.register("checkstyleReflection", Checkstyle) {
+            description = "Fails when the runtime of this module reflects."
+            group = "verification"
+            source project.sourceSets.main.allJava
+            classpath = project.files()
+            configFile = rootProject.file("gradle/checkstyle/reflection.xml")
+            configDirectory = rootProject.file("gradle/checkstyle")
+            reports {
+                xml.required = false
+                html.required = false
+            }
+        }
+        project.tasks.named("check") {
+            dependsOn reflectionCheck
+        }
+    }
+}

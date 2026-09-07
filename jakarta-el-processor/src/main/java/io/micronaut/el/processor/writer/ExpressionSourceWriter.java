@@ -162,10 +162,14 @@ public final class ExpressionSourceWriter {
                     ExpressionDef result = ExpressionDef.nullValue();
                     for (int i = values.size() - 1; i >= 0; i--) {
                         CompiledValue value = values.get(i);
+                        boolean dynamicExpectedType = value.definition().inferred()
+                            && value.definition().requireExpectedType().getName().equals(Object.class.getName());
                         result = new ExpressionDef.IfElse(
                             requestedType(value.definition().requireExpectedType(), value.definition().inferred(), parameters.get(1)),
-                            ClassTypeDef.of(className)
-                                .getStaticField(value.definition().constantName(), VALUE_EXPRESSION),
+                            dynamicExpectedType
+                                ? ClassTypeDef.of(value.className()).instantiate(parameters.get(1))
+                                : ClassTypeDef.of(className)
+                                    .getStaticField(value.definition().constantName(), VALUE_EXPRESSION),
                             result
                         );
                     }
@@ -283,6 +287,9 @@ public final class ExpressionSourceWriter {
      * was inferred rather than written, also {@link Object}, the type a caller passes when it does not care.
      */
     private static ExpressionDef.ConditionExpressionDef requestedType(ClassElement declared, boolean inferred, ExpressionDef requested) {
+        if (inferred && declared.getName().equals(Object.class.getName())) {
+            return requested.isNonNull();
+        }
         ExpressionDef.ConditionExpressionDef matches = sameType(declared, requested);
         if (inferred && !declared.getName().equals(Object.class.getName())) {
             matches = new ExpressionDef.Or(matches, ExpressionDef.constant(TypeDef.OBJECT).equalsReferentially(requested));

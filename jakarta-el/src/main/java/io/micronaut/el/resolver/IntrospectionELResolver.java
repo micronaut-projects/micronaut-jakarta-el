@@ -15,13 +15,16 @@
  */
 package io.micronaut.el.resolver;
 
+import io.micronaut.core.annotation.AnnotationMetadata;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.beans.BeanIntrospection;
 import io.micronaut.core.beans.BeanIntrospector;
 import io.micronaut.core.beans.BeanMethod;
 import io.micronaut.core.beans.BeanProperty;
-import io.micronaut.core.reflect.ReflectionUtils;
 import io.micronaut.core.type.Argument;
+import io.micronaut.el.ELMethod;
+import io.micronaut.el.ELMethodExecutor;
+import io.micronaut.el.runtime.ELArguments;
 import io.micronaut.el.runtime.ELSupport;
 import jakarta.el.ELContext;
 import jakarta.el.ELException;
@@ -47,10 +50,7 @@ import java.util.Map;
  * @since 1.0
  */
 @Internal
-public final class IntrospectionELResolver extends ELResolver {
-
-    private final BeanIntrospector introspector;
-    private final boolean readOnly;
+public final class IntrospectionELResolver extends ELResolver implements ELMethodExecutor {
 
     /**
      * What the resolver needs of a class, read once: the introspection, its properties by name and its methods
@@ -63,6 +63,9 @@ public final class IntrospectionELResolver extends ELResolver {
             return Introspected.of(findIntrospection(type));
         }
     };
+
+    private final BeanIntrospector introspector;
+    private final boolean readOnly;
 
     /**
      * Creates a resolver using the shared introspector.
@@ -85,6 +88,11 @@ public final class IntrospectionELResolver extends ELResolver {
     public IntrospectionELResolver(BeanIntrospector introspector, boolean readOnly) {
         this.introspector = introspector;
         this.readOnly = readOnly;
+    }
+
+    @Override
+    public int getOrder() {
+        return 100;
     }
 
     @Override
@@ -141,6 +149,21 @@ public final class IntrospectionELResolver extends ELResolver {
                          @Nullable Object method,
                          Class<?> @Nullable [] paramTypes,
                          Object @Nullable [] params) {
+        ELMethod resolved = resolve(context, base, method, ELArguments.of(paramTypes), params);
+        if (resolved == null) {
+            return null;
+        }
+        context.setPropertyResolved(base, method);
+        return resolved.invoke(context, base, params);
+    }
+
+    @Override
+    @Nullable
+    public ELMethod resolve(ELContext context,
+                            @Nullable Object base,
+                            @Nullable Object method,
+                            Argument<?> @Nullable [] argumentTypes,
+                            Object @Nullable [] arguments) {
         if (base == null || !(method instanceof String name)) {
             return null;
         }
@@ -148,182 +171,18 @@ public final class IntrospectionELResolver extends ELResolver {
         if (named == null) {
             return null;
         }
-        Object[] arguments = params == null ? new Object[0] : params;
-        return paramTypes == null
-            ? invokeSelected(context, base, method, named, arguments)
-            : invokeDeclaredWith(context, base, method, named, paramTypes, arguments);
-    }
-
-    /**
-     * Invokes the overload declaring exactly the given parameter types, as a {@code MethodExpression} asks for
-     * it, and declines when the type declares no such overload or the arguments do not fit it.
-     */
-    @Nullable
-    private static Object invokeDeclaredWith(ELContext context,
-                                             Object base,
-                                             Object method,
-                                             BeanMethod<Object, Object>[] named,
-                                             Class<?>[] paramTypes,
-                                             Object[] arguments) {
-        for (BeanMethod<Object, Object> candidate : named) {
-            if (sameTypes(candidate.getArguments(), paramTypes)) {
-                Object[] coerced = coerce(context, candidate.getArguments(), arguments);
-                if (coerced == null) {
-                    return null;
-                }
-                context.setPropertyResolved(base, method);
-                return candidate.invoke(base, coerced);
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Invokes the overload the arguments select, and declines when none of the overloads fits or several fit
-     * equally well.
-     *
-     * <p>Coercing the arguments is part of selecting the overload, so it happens before the resolver commits:
-     * an overload the arguments do not fit is skipped, and when none fits the resolver declines and the
-     * standard resolvers get their chance.</p>
-     */
-    @Nullable
-    private static Object invokeSelected(ELContext context,
-                                         Object base,
-                                         Object method,
-                                         BeanMethod<Object, Object>[] named,
-                                         Object[] arguments) {
-        BeanMethod<Object, Object> selected = null;
-        Object[] selectedArguments = arguments;
-        for (BeanMethod<Object, Object> candidate : named.length == 1 ? List.of(named[0]) : candidates(named, arguments)) {
-            Object[] coerced = coerce(context, candidate.getArguments(), arguments);
-            if (coerced == null) {
-                continue;
-            }
-            if (selected != null) {
-                // The candidates have equal method-selection priority. Let the reflective resolver report
-                // the ambiguity instead of depending on the order of the generated introspection methods.
-                return null;
-            }
-            selected = candidate;
-            selectedArguments = coerced;
-        }
-        if (selected == null) {
-            return null;
-        }
-        context.setPropertyResolved(base, method);
-        return selected.invoke(base, selectedArguments);
+        Object[] values = arguments == null ? new Object[0] : arguments;
+        List<BeanMethod<Object, Object>> overloads = List.of(named);
+        BeanMethod<Object, Object> selected = argumentTypes == null
+            ? ELOverloads.select(context, overloads, BeanMethod::getArguments, values)
+            : ELOverloads.declaring(context, overloads, BeanMethod::getArguments, argumentTypes, values);
+        return selected == null ? null : new IntrospectionMethod(selected);
     }
 
     @Override
     @Nullable
     public Class<?> getCommonPropertyType(ELContext context, @Nullable Object base) {
         return base == null ? null : Object.class;
-    }
-
-    /**
-     * The overloads of the given name that can take the arguments, in the order the section 1.6 of the
-     * specification prefers them: an overload whose parameters accept the arguments as they are, then the
-     * other overloads of the same arity. Expanded variable arity calls are left to the reflective resolver,
-     * because {@link BeanMethod} does not carry the variable arity flag.
-     */
-    private static List<BeanMethod<Object, Object>> candidates(BeanMethod<Object, Object>[] named, Object[] arguments) {
-        List<BeanMethod<Object, Object>> exact = new ArrayList<>(2);
-        List<BeanMethod<Object, Object>> fixedArity = new ArrayList<>(2);
-        for (BeanMethod<Object, Object> beanMethod : named) {
-            Argument<?>[] parameters = beanMethod.getArguments();
-            if (parameters.length == arguments.length) {
-                (accepts(parameters, arguments) ? exact : fixedArity).add(beanMethod);
-            }
-        }
-        if (!exact.isEmpty()) {
-            return mostSpecific(exact);
-        }
-        return fixedArity;
-    }
-
-    /**
-     * Returns the uniquely most specific method from the candidates that already accept every argument, or no
-     * method when the candidates are ambiguous. Returning no method lets the reflective resolver report the
-     * ambiguity according to the EL method-selection rules.
-     */
-    private static List<BeanMethod<Object, Object>> mostSpecific(List<BeanMethod<Object, Object>> candidates) {
-        BeanMethod<Object, Object> result = null;
-        for (int candidateIndex = 0; candidateIndex < candidates.size(); candidateIndex++) {
-            BeanMethod<Object, Object> candidate = candidates.get(candidateIndex);
-            boolean mostSpecific = true;
-            for (int otherIndex = 0; otherIndex < candidates.size(); otherIndex++) {
-                if (candidateIndex != otherIndex && !moreSpecific(candidate.getArguments(), candidates.get(otherIndex).getArguments())) {
-                    mostSpecific = false;
-                    break;
-                }
-            }
-            if (!mostSpecific) {
-                continue;
-            }
-            if (result != null) {
-                return List.of();
-            }
-            result = candidate;
-        }
-        return result == null ? List.of() : List.of(result);
-    }
-
-    private static boolean moreSpecific(Argument<?>[] first, Argument<?>[] second) {
-        for (int i = 0; i < first.length; i++) {
-            if (!second[i].getWrapperType().isAssignableFrom(first[i].getWrapperType())) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private static boolean accepts(Argument<?>[] parameters, Object[] arguments) {
-        for (int i = 0; i < parameters.length; i++) {
-            Object argument = arguments[i];
-            Class<?> type = parameters[i].getWrapperType();
-            if (argument == null ? parameters[i].getType().isPrimitive() : !type.isInstance(argument)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private static boolean sameTypes(Argument<?>[] parameters, Class<?>[] paramTypes) {
-        if (parameters.length != paramTypes.length) {
-            return false;
-        }
-        for (int i = 0; i < parameters.length; i++) {
-            if (parameters[i].getWrapperType() != ReflectionUtils.getWrapperType(paramTypes[i])) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Coerces arguments of the same arity to the declared parameters.
-     *
-     * <p>{@link BeanMethod} does not expose whether a trailing array parameter was declared with varargs.
-     * Expanded calls are therefore left to the reflective resolver later in the chain, which has that flag;
-     * otherwise a fixed array parameter would incorrectly accept a scalar.</p>
-     *
-     * @return The coerced arguments, or {@code null} when the arguments do not fit the parameters, so that the
-     * overload is not selected
-     */
-    private static Object @Nullable [] coerce(ELContext context, Argument<?>[] parameters, Object[] arguments) {
-        if (arguments.length != parameters.length) {
-            return null;
-        }
-        try {
-            Object[] coerced = new Object[parameters.length];
-            for (int i = 0; i < parameters.length; i++) {
-                coerced[i] = ELSupport.coerceToType(context, arguments[i], parameters[i].getType());
-            }
-            return coerced;
-        } catch (ELException e) {
-            // this overload does not accept these arguments
-            return null;
-        }
     }
 
     @Nullable
@@ -346,6 +205,59 @@ public final class IntrospectionELResolver extends ELResolver {
 
     private boolean isReadOnly(BeanProperty<Object, Object> beanProperty) {
         return readOnly || beanProperty.isReadOnly();
+    }
+
+    private static final class IntrospectionMethod implements ELMethod {
+        private final BeanMethod<Object, Object> method;
+
+        private IntrospectionMethod(BeanMethod<Object, Object> method) {
+            this.method = method;
+        }
+
+        @Override
+        public String getName() {
+            return method.getName();
+        }
+
+        @Override
+        public Argument<?> getReturnType() {
+            return method.getReturnType().asArgument();
+        }
+
+        @Override
+        public Argument<?>[] getArguments() {
+            return method.getArguments().clone();
+        }
+
+        @Override
+        public boolean isVarArgs() {
+            return false;
+        }
+
+        @Override
+        public AnnotationMetadata getAnnotationMetadata() {
+            return method.getAnnotationMetadata();
+        }
+
+        @Override
+        @Nullable
+        public Object invoke(ELContext context, @Nullable Object base, Object @Nullable [] arguments) {
+            if (base == null) {
+                throw new IllegalArgumentException("An introspected method requires a base object");
+            }
+            Object[] values = arguments == null ? new Object[0] : arguments;
+            Object[] coerced = ELOverloads.coerce(context, method.getArguments(), values);
+            if (coerced == null) {
+                throw new ELException("The arguments do not match the method '" + method.getName() + "'");
+            }
+            return method.invoke(base, coerced);
+        }
+
+        @Override
+        public String identity() {
+            return method.getDeclaringType().getName() + '#' + method.getName()
+                + java.util.Arrays.toString(Argument.toClassArray(method.getArguments()));
+        }
     }
 
     /**

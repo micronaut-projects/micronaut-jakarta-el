@@ -318,7 +318,12 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
         }
         Map<DeclarationKey, Declared<A>> distinct = new LinkedHashMap<>();
         for (Declared<A> value : declared) {
+            // the declared name is part of the signature because the parameter types are not enough to tell
+            // two declarations apart: the neutral metadata drops a primitive class literal, so
+            // {int.class, String.class} and {long.class, String.class} both arrive as String alone and one
+            // declaration would be dropped here, before the types are recovered from the Java mirrors
             String signature = expressionOf(value.annotation()).orElse("") + "|"
+                + value.annotation().stringValue("name").orElse("") + "|"
                 + value.annotation().annotationClassValue("expectedType").map(AnnotationClassValue::getName).orElse("")
                 + "|" + value.annotation().annotationClassValue("expectedReturnType").map(AnnotationClassValue::getName).orElse("")
                 + "|" + Arrays.stream(value.annotation().annotationClassValues("expectedParamTypes"))
@@ -365,6 +370,12 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
             new ELCompilationException("The expression of @ELMethodExpression is required"));
         ClassElement returnType = ELTypes.resolveMember(annotation, "expectedReturnType", context).orElse(null);
         List<ClassElement> parameterTypes = ELTypes.resolveMembers(annotation, "expectedParamTypes", context);
+        // a primitive class literal does not survive into the neutral metadata, so a declaration naming one
+        // arrives short or empty; the Java mirrors still carry it, and a shorter list is the sign to read them
+        parameterTypes = ELTypes.resolveDeclaredMemberTypes(owner.getNativeType(),
+            ELMethodExpression.class.getName(), List.of("value", "expression"), expression,
+            "name", annotation.stringValue("name").orElse(""), "expectedParamTypes",
+            parameterTypes, context);
         String name = uniqueConstantName(annotation, owner, expression, used);
         return new ELMethodExpressionDefinition(expression, returnType, false, parameterTypes, name,
             ELParser.parseEval(expression));

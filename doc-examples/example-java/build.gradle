@@ -19,6 +19,7 @@ dependencies {
     testRuntimeOnly mn.micronaut.context
     // only the example of parsing at runtime needs the interpreter
     testRuntimeOnly projects.micronautJakartaElInterpreter
+    testRuntimeOnly projects.micronautJakartaElInterpreterReflection
     testImplementation platform(libs.junit.bom)
     testImplementation libs.junit.jupiter
     testRuntimeOnly libs.junit.jupiter.engine

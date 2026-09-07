@@ -1,6 +1,7 @@
-package io.micronaut.el.runtime;
+package io.micronaut.el.interpreter.reflection;
 
 import io.micronaut.el.CompiledELContext;
+import io.micronaut.el.runtime.ELMethods;
 import jakarta.el.ELContext;
 import jakarta.el.MethodNotFoundException;
 import org.junit.jupiter.api.Test;
@@ -18,14 +19,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * The reflective method selection of the section 1.6 of the specification, which the standard resolvers reach
  * for a type without a bean introspection.
  */
-class ELMethodsTest {
+class ReflectiveELMethodsTest {
 
     private final ELContext context = new CompiledELContext();
     private final Bean bean = new Bean();
 
     private Object invoke(String name, Object... arguments) {
-        Method method = ELMethods.findMethod(Bean.class, name, null, arguments);
-        return ELMethods.invoke(context, method, bean, arguments);
+        Method method = ReflectiveELMethods.findMethod(Bean.class, name, null, arguments);
+        return ReflectiveELMethods.invoke(context, method, bean, arguments);
     }
 
     @Test
@@ -34,6 +35,14 @@ class ELMethodsTest {
         assertEquals("string", invoke("pick", "one"));
         // an argument neither overload takes as it is, coerced to the one that accepts it
         assertEquals("long", invoke("pick", 1));
+    }
+
+    @Test
+    void aNullArgumentReachesThePrimitiveOverloadAsTheOtherImplementationsSelectIt() {
+        // Java would rule the primitive parameter out and choose nullable(Object). Expressly and Jasper both
+        // choose nullable(int), coercing the null to its default, and the differential fuzz test holds all
+        // three implementations to that answer
+        assertEquals("int", invoke("nullable", new Object[]{null}));
     }
 
     @Test
@@ -78,12 +87,12 @@ class ELMethodsTest {
     @Test
     void aMethodTheTypeDoesNotDeclareIsReported() {
         MethodNotFoundException e = assertThrows(MethodNotFoundException.class,
-            () -> ELMethods.findMethod(Bean.class, "absent", null, new Object[0]));
+            () -> ReflectiveELMethods.findMethod(Bean.class, "absent", null, new Object[0]));
         assertTrue(e.getMessage().contains("absent"), e.getMessage());
 
-        assertNull(ELMethods.findMethodOrNull(Bean.class, "absent", null, new Object[0], false));
+        assertNull(ReflectiveELMethods.findMethodOrNull(Bean.class, "absent", null, new Object[0], false));
         assertThrows(MethodNotFoundException.class,
-            () -> ELMethods.findStaticMethod(Bean.class, "absent", new Class<?>[0], null));
+            () -> ReflectiveELMethods.findStaticMethod(Bean.class, "absent", new Class<?>[0], null));
     }
 
     @Test
@@ -98,7 +107,7 @@ class ELMethodsTest {
 
     @Test
     void theParameterTypesOfAMethodExpressionSelectTheOverloadOnTheirOwn() {
-        Method declared = ELMethods.findMethod(Bean.class, "pick", new Class<?>[]{String.class}, null);
+        Method declared = ReflectiveELMethods.findMethod(Bean.class, "pick", new Class<?>[]{String.class}, null);
         assertEquals(String.class, declared.getParameterTypes()[0]);
         assertTrue(ELMethods.sameTypes(new Class<?>[]{String.class}, new Class<?>[]{String.class}));
         assertFalse(ELMethods.sameTypes(new Class<?>[]{String.class}, new Class<?>[]{Long.class}));
@@ -107,13 +116,13 @@ class ELMethodsTest {
 
     @Test
     void invokingWithTheWrongNumberOfArgumentsIsRejected() {
-        Method twice = ELMethods.findMethod(Bean.class, "twice", null, new Object[]{1});
+        Method twice = ReflectiveELMethods.findMethod(Bean.class, "twice", null, new Object[]{1});
         assertThrows(IllegalArgumentException.class,
-            () -> ELMethods.invoke(context, twice, bean, new Object[]{1, 2}));
+            () -> ReflectiveELMethods.invoke(context, twice, bean, new Object[]{1, 2}));
 
-        Method mixed = ELMethods.findMethod(Bean.class, "mixed", null, new Object[]{"one", "two"});
+        Method mixed = ReflectiveELMethods.findMethod(Bean.class, "mixed", null, new Object[]{"one", "two"});
         assertThrows(IllegalArgumentException.class,
-            () -> ELMethods.invoke(context, mixed, bean, null));
+            () -> ReflectiveELMethods.invoke(context, mixed, bean, null));
     }
 
     /**
@@ -131,6 +140,14 @@ class ELMethodsTest {
 
         public String pick(String value) {
             return "string";
+        }
+
+        public String nullable(int value) {
+            return "int";
+        }
+
+        public String nullable(Object value) {
+            return "object";
         }
 
         public String widen(Number value) {
@@ -182,4 +199,39 @@ class ELMethodsTest {
             return "string";
         }
     }
+
+    static final class Varargs {
+        public String join(String... values) {
+            return String.join(",", java.util.Arrays.stream(values).map(String::valueOf).toList());
+        }
+    }
+
+    static final class Overloads {
+        public String target(Long first, Long second) {
+            return "longs";
+        }
+
+        public String target(String first, String... rest) {
+            return "strings";
+        }
+    }
+
+    @Test
+    void aSubtypeArrayIsPassedDirectlyToAVariableArityMethod() throws NoSuchMethodException {
+        String[] values = {"a", "b"};
+        Method join = ReflectiveELMethods.findMethod(Varargs.class, "join", null, new Object[]{values});
+
+        assertEquals("a,b", ReflectiveELMethods.invoke(new CompiledELContext(), join, new Varargs(),
+            new Object[]{values}));
+    }
+
+    @Test
+    void overloadSelectionChecksWhetherTheActualValueCanBeCoerced() {
+        Method numeric = ReflectiveELMethods.findMethod(Overloads.class, "target", null, new Object[]{"1", "1"});
+        Method text = ReflectiveELMethods.findMethod(Overloads.class, "target", null, new Object[]{"aaa", "bbb"});
+
+        assertEquals(Long.class, numeric.getParameterTypes()[0]);
+        assertEquals(String[].class, text.getParameterTypes()[1]);
+    }
+
 }

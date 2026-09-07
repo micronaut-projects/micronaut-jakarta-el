@@ -27,13 +27,20 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.ArrayType;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Map;
 import java.util.Optional;
 
 /**
- * Recovers Java array class literals that the neutral annotation metadata cannot currently represent when
- * they are the value of a single {@code Class} member in a nested annotation.
+ * Recovers Java class literals the neutral annotation metadata cannot currently represent: an array literal
+ * that is the value of a single {@code Class} member of a nested annotation, and the primitive literals of a
+ * {@code Class[]} member, which the metadata drops entirely.
+ *
+ * <p>Both read the {@code javax.lang.model} mirrors of the element, so they recover nothing when the class is
+ * compiled by the Groovy or the Kotlin processor: a primitive declared there is still dropped, and the
+ * annotation has to name the wrapper type instead.</p>
  */
 final class JavaAnnotationTypes {
 
@@ -75,6 +82,87 @@ final class JavaAnnotationTypes {
             return type instanceof TypeMirror mirror ? resolve(mirror, context) : Optional.empty();
         }
         return Optional.empty();
+    }
+
+    /**
+     * The class literals of a {@code Class[]} member of one declaration of a repeatable annotation, which the
+     * neutral metadata drops when they are primitive.
+     *
+     * @param nativeType          The native element carrying the annotation
+     * @param annotationName      The name of the annotation
+     * @param discriminatorMembers The members telling the declarations apart, an aliased one being
+     *                             recorded by the compiler under the name that was written
+     * @param discriminatorValue  The value identifying the declaration
+     * @param nameMember          The member naming the declaration
+     * @param nameValue           The name identifying it, empty when it declares none
+     * @param member              The {@code Class[]} member to read
+     * @param context             The visitor context
+     * @return The types every matching declaration names, since a repeatable annotation can carry the same
+     * discriminator more than once
+     */
+    static List<List<ClassElement>> resolveRepeatableMemberTypes(Object nativeType,
+                                                                 String annotationName,
+                                                                 List<String> discriminatorMembers,
+                                                                 String discriminatorValue,
+                                                                 String nameMember,
+                                                                 String nameValue,
+                                                                 String member,
+                                                                 VisitorContext context) {
+        if (!(nativeType instanceof JavaNativeElement javaElement) || javaElement.element() == null) {
+            return List.of();
+        }
+        List<List<ClassElement>> matches = new ArrayList<>(1);
+        for (AnnotationMirror annotation : javaElement.element().getAnnotationMirrors()) {
+            for (AnnotationMirror declaration : declarations(annotation, annotationName)) {
+                if (discriminatorMembers.stream().noneMatch(name ->
+                    Objects.equals(discriminatorValue, memberValue(declaration, name).orElse(null)))) {
+                    continue;
+                }
+                // the name a declaration carries tells it apart from another of the same expression, which
+                // the parameter types cannot when the metadata dropped every one of them
+                if (!nameValue.isEmpty()
+                    && !Objects.equals(nameValue, memberValue(declaration, nameMember).orElse(null))) {
+                    continue;
+                }
+                if (!(memberValue(declaration, member).orElse(null) instanceof List<?> values)) {
+                    continue;
+                }
+                List<ClassElement> types = new ArrayList<>(values.size());
+                for (Object value : values) {
+                    if (unwrap(value) instanceof TypeMirror mirror) {
+                        resolve(mirror, context).ifPresent(types::add);
+                    }
+                }
+                matches.add(types);
+            }
+        }
+        return matches;
+    }
+
+    /**
+     * The declarations of the annotation carried by the mirror, which is either the annotation itself or the
+     * container the compiler wraps a repeated one in.
+     */
+    private static List<AnnotationMirror> declarations(AnnotationMirror annotation, String annotationName) {
+        if (annotationName.equals(annotationName(annotation))) {
+            return List.of(annotation);
+        }
+        if (!(memberValue(annotation, "value").orElse(null) instanceof List<?> values)) {
+            return List.of();
+        }
+        List<AnnotationMirror> declarations = new ArrayList<>(values.size());
+        for (Object value : values) {
+            if (unwrap(value) instanceof AnnotationMirror declaration
+                && annotationName.equals(annotationName(declaration))) {
+                declarations.add(declaration);
+            }
+        }
+        return declarations;
+    }
+
+    private static Object unwrap(Object value) {
+        return value instanceof javax.lang.model.element.AnnotationValue annotationValue
+            ? annotationValue.getValue() : value;
     }
 
     private static Optional<Object> memberValue(AnnotationMirror annotation, String member) {

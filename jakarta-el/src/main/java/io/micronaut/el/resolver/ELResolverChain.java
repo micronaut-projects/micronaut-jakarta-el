@@ -29,9 +29,9 @@ import jakarta.el.ResourceBundleELResolver;
 import jakarta.el.StaticFieldELResolver;
 import org.jspecify.annotations.Nullable;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -57,28 +57,40 @@ public final class ELResolverChain extends CompositeELResolver {
     private static final int INVOKES = 2;
 
     /**
-     * Which of the two methods each class of resolver overrides, computed once per class.
+     * Which of the two methods the resolvers of the specification and of this module leave to
+     * {@link ELResolver}, so that a chain does not offer them a call they would only decline.
+     *
+     * <p>This is declared rather than read from the class: reading it would mean reflecting on every
+     * resolver of every chain, in a module whose runtime does not otherwise reflect. A resolver that is not
+     * named here is offered both, which costs a call it may decline and is what a resolver an application
+     * contributes gets.</p>
      */
-    private static final ClassValue<Integer> OVERRIDES = new ClassValue<>() {
-        @Override
-        protected Integer computeValue(Class<?> type) {
-            int overrides = 0;
-            if (overrides(type, "convertToType", ELContext.class, Object.class, Class.class)) {
-                overrides |= CONVERTS;
-            }
-            if (overrides(type, "invoke", ELContext.class, Object.class, Object.class, Class[].class, Object[].class)) {
-                overrides |= INVOKES;
-            }
-            return overrides;
-        }
-    };
+    private static final Map<Class<?>, Integer> DECLINES = Map.ofEntries(
+        Map.entry(CommonELResolver.class, CONVERTS),
+        Map.entry(IntrospectionELResolver.class, CONVERTS),
+        Map.entry(StreamELResolver.class, CONVERTS),
+        Map.entry(ExecutableMethodELExecutor.class, CONVERTS),
+        Map.entry(StaticFieldELResolver.class, CONVERTS),
+        Map.entry(MapELResolver.class, CONVERTS | INVOKES),
+        Map.entry(ResourceBundleELResolver.class, CONVERTS | INVOKES),
+        Map.entry(ListELResolver.class, CONVERTS | INVOKES),
+        Map.entry(ArrayELResolver.class, CONVERTS | INVOKES),
+        Map.entry(RecordELResolver.class, CONVERTS | INVOKES),
+        Map.entry(BeanELResolver.class, CONVERTS)
+    );
+
+    /**
+     * The two methods minus the ones the resolver declines. {@code OptionalELResolver} declines neither,
+     * which is why it is not named above.
+     */
 
     /**
      * The resolvers of the specification, and of this module, that resolve nothing without a base object: the
      * identifiers, resolved with a null base, are not offered to them.
      */
     private static final Set<Class<?>> BASE_REQUIRED = Set.of(
-        IntrospectionELResolver.class, StreamELResolver.class, ReflectiveMethodELResolver.class,
+        CommonELResolver.class, IntrospectionELResolver.class, StreamELResolver.class,
+        ExecutableMethodELExecutor.class,
         StaticFieldELResolver.class, MapELResolver.class, ResourceBundleELResolver.class, ListELResolver.class,
         ArrayELResolver.class, RecordELResolver.class, OptionalELResolver.class, BeanELResolver.class);
 
@@ -109,6 +121,31 @@ public final class ELResolverChain extends CompositeELResolver {
         }
     }
 
+    /**
+     * Whether the chain treats the resolver as overriding {@code convertToType}, which its test holds to what
+     * the class actually does.
+     *
+     * @param type The class of resolver
+     * @return Whether it is offered a conversion
+     */
+    static boolean overridesConvertToType(Class<?> type) {
+        return (overridesOf(type) & CONVERTS) != 0;
+    }
+
+    /**
+     * Whether the chain treats the resolver as overriding {@code invoke}.
+     *
+     * @param type The class of resolver
+     * @return Whether it is offered an invocation
+     */
+    static boolean overridesInvoke(Class<?> type) {
+        return (overridesOf(type) & INVOKES) != 0;
+    }
+
+    private static int overridesOf(Class<?> type) {
+        return (CONVERTS | INVOKES) & ~DECLINES.getOrDefault(type, 0);
+    }
+
     @Override
     public void add(ELResolver elResolver) {
         if (elResolver instanceof ELResolverChain chain) {
@@ -123,7 +160,7 @@ public final class ELResolverChain extends CompositeELResolver {
         if (!BASE_REQUIRED.contains(elResolver.getClass())) {
             identifiers = concat(identifiers, new ELResolver[] {elResolver});
         }
-        int overrides = OVERRIDES.get(elResolver.getClass());
+        int overrides = overridesOf(elResolver.getClass());
         if ((overrides & CONVERTS) != 0) {
             converters = concat(converters, new ELResolver[] {elResolver});
         }
@@ -189,15 +226,6 @@ public final class ELResolverChain extends CompositeELResolver {
     /**
      * @return Whether the class of the resolver, or a superclass below {@link ELResolver}, declares the method
      */
-    private static boolean overrides(Class<?> resolver, String name, Class<?>... parameterTypes) {
-        try {
-            Method method = resolver.getMethod(name, parameterTypes);
-            return method.getDeclaringClass() != ELResolver.class;
-        } catch (NoSuchMethodException e) {
-            return true;
-        }
-    }
-
     private static ELResolver[] concat(ELResolver[] first, ELResolver[] second) {
         List<ELResolver> all = new ArrayList<>(first.length + second.length);
         all.addAll(List.of(first));

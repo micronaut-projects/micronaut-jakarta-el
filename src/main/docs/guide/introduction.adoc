@@ -18,8 +18,9 @@ The annotation processor runs for Java, Groovy and Kotlin and produces the same 
 three; a Java build additionally gets them as readable generated sources.
 
 The implementation passes the Jakarta Expression Language 6.0 Technology Compatibility Kit — 360 tests, no
-failures, none skipped — on every build; the `tests/jakarta-el-tck` module of the repository runs it, and a
-workflow publishes the evidence of each run.
+failures, none skipped — in three modes on every build: compile-time generated expressions, the reflection-free
+interpreter with a service-loaded direct executor, and the interpreter with its optional reflection executor. A
+workflow publishes the evidence of the compiled run.
 
 NOTE: The public API, annotations included, is marked `@Experimental`: it can change between minor versions until the
 first stable release.

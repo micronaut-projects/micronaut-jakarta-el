@@ -38,14 +38,14 @@ final class ELResolutionSupport {
     }
 
     static void setValue(ELContext context, ELInterpreter.Target target, @Nullable Object value) {
-        ELResolution.setValue(context, target.base(), target.property(), value);
+        ELSandboxGuard.setValue(context, target.base(), target.property(), value);
     }
 
     static boolean isReadOnly(ELContext context, ELInterpreter.Target target) {
         if (target.base() == null) {
             return ELResolution.isIdentifierReadOnly(context, ELSupport.coerceToString(target.property()));
         }
-        return ELResolution.isReadOnly(context, target.base(), target.property());
+        return ELSandboxGuard.isReadOnly(context, target.base(), target.property());
     }
 
     @Nullable
@@ -53,6 +53,6 @@ final class ELResolutionSupport {
         if (target.base() == null) {
             return ELResolution.getIdentifierType(context, ELSupport.coerceToString(target.property()));
         }
-        return ELResolution.getType(context, target.base(), target.property());
+        return ELSandboxGuard.getType(context, target.base(), target.property());
     }
 }

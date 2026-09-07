@@ -16,15 +16,16 @@
 package io.micronaut.el.interpreter;
 
 import io.micronaut.core.annotation.Internal;
+import io.micronaut.core.type.Argument;
+import io.micronaut.el.ELMethod;
+import io.micronaut.el.ELSandbox;
 import io.micronaut.el.parser.ELParser;
 import io.micronaut.el.parser.ELNodes;
 import io.micronaut.el.parser.ast.ELNode;
-import io.micronaut.el.runtime.ELMethods;
 import io.micronaut.el.runtime.ELResolution;
 import io.micronaut.el.runtime.ELSupport;
 import io.micronaut.el.runtime.ELExpressionIdentity;
 import io.micronaut.el.runtime.ELVariableBindings;
-import jakarta.el.ELClass;
 import jakarta.el.ELContext;
 import jakarta.el.MethodExpression;
 import jakarta.el.MethodInfo;
@@ -33,7 +34,6 @@ import jakarta.el.MethodReference;
 import jakarta.el.PropertyNotFoundException;
 import org.jspecify.annotations.Nullable;
 
-import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Objects;
 
@@ -51,7 +51,7 @@ final class InterpretedMethodExpression extends MethodExpression implements ELEx
     private final String expressionString;
     private final Class<?> expectedReturnType;
     private final Class<?> @Nullable [] expectedParamTypes;
-    private final Map<String, ELInterpreter.BoundFunction> functions;
+    private final Map<String, ELMethod> functions;
     private transient @Nullable ELNode node;
     private transient ELNode.@Nullable Method invocation;
     private transient @Nullable ELInterpreter interpreter;
@@ -61,7 +61,7 @@ final class InterpretedMethodExpression extends MethodExpression implements ELEx
                                 Class<?> expectedReturnType,
                                 Class<?> @Nullable [] expectedParamTypes,
                                 ELNode node,
-                                Map<String, ELInterpreter.BoundFunction> functions,
+                                Map<String, ELMethod> functions,
                                 ELInterpreter interpreter) {
         this.expressionString = Objects.requireNonNull(expressionString, "expressionString");
         this.expectedReturnType = Objects.requireNonNull(expectedReturnType, "expectedReturnType");
@@ -79,7 +79,7 @@ final class InterpretedMethodExpression extends MethodExpression implements ELEx
         Object result = doInvoke(context, params);
         Object coerced = expectedReturnType == void.class ? null : ELSupport.coerceToType(context, result, expectedReturnType);
         context.notifyAfterEvaluation(expressionString);
-        return coerced;
+        return ELSandbox.checksResultOf(expectedReturnType) ? ELSandboxGuard.checkResult(context, coerced) : coerced;
     }
 
     @Override
@@ -88,17 +88,25 @@ final class InterpretedMethodExpression extends MethodExpression implements ELEx
         if (identifier != null) {
             return identifier.getMethodInfo(context);
         }
-        Method method = findMethod(context);
-        return new MethodInfo(method.getName(), method.getReturnType(), method.getParameterTypes());
+        ELNode.Method providedInvocation = invocation();
+        ELInterpreter.Target target = interpreter().resolveTarget(context,
+            providedInvocation == null ? node() : methodTargetNode());
+        Object[] arguments = providedInvocation == null
+            ? null
+            : interpreter().evaluateArguments(context, providedInvocation.arguments());
+        ELMethod method = findMethod(context, target, arguments);
+        return methodInfo(method);
     }
 
     @Override
-    @Nullable
     public MethodReference getMethodReference(ELContext context) {
         context.notifyBeforeEvaluation(expressionString);
         MethodExpression identifier = identifierMethodExpression(context);
         if (identifier != null) {
             MethodReference reference = identifier.getMethodReference(context);
+            // the reference comes from another expression, but it leaves through this one, so what it
+            // carries is checked here too
+            checkReference(context, reference);
             context.notifyAfterEvaluation(expressionString);
             return reference;
         }
@@ -109,9 +117,12 @@ final class InterpretedMethodExpression extends MethodExpression implements ELEx
         Object[] arguments = providedInvocation == null
             ? null
             : interpreter().evaluateArguments(context, providedInvocation.arguments());
-        Method method = findMethod(base, target == null ? null : target.property(), arguments);
-        MethodInfo methodInfo = new MethodInfo(method.getName(), method.getReturnType(), method.getParameterTypes());
-        MethodReference reference = new MethodReference(base, methodInfo, method.getAnnotations(), arguments);
+        ELMethod method = findMethod(context, target, arguments);
+        MethodInfo methodInfo = methodInfo(method);
+        // the reference carries the arguments as well as the base, so a denied object reached through one of
+        // them leaves the expression the same way: what the sandbox denies, it denies whatever holds it
+        MethodReference reference = new MethodReference(base, methodInfo, method.synthesizeAnnotations(), arguments);
+        checkReference(context, reference);
         context.notifyAfterEvaluation(expressionString);
         return reference;
     }
@@ -167,7 +178,7 @@ final class InterpretedMethodExpression extends MethodExpression implements ELEx
         String resolved = equalityForm;
         if (resolved == null) {
             resolved = ELNodes.canonical(node(), (prefix, localName) -> {
-                ELInterpreter.BoundFunction function = functions.get(
+                ELMethod function = functions.get(
                     prefix.isEmpty() ? localName : prefix + ":" + localName);
                 return function == null ? null : function.identity();
             });
@@ -192,11 +203,11 @@ final class InterpretedMethodExpression extends MethodExpression implements ELEx
             throw new MethodNotFoundException("The expression '" + expressionString + "' is not a method expression");
         }
         if (target.base() == null) {
-            Object identifier = ELResolution.resolveIdentifier(context, ELSupport.coerceToString(target.property()));
+            Object identifier = ELSandboxGuard.resolveIdentifier(context, ELSupport.coerceToString(target.property()));
             return ELResolution.invokeMethodExpression(context, identifier, params);
         }
         Object base = target.base();
-        return ELResolution.invokeWithParamTypes(context, base, target.property(), expectedParamTypes, params);
+        return ELInterpreter.invokeWithParams(context, executors(), base, target.property(), expectedParamTypes, params);
     }
 
     private ELNode methodTargetNode() {
@@ -204,19 +215,6 @@ final class InterpretedMethodExpression extends MethodExpression implements ELEx
         return providedInvocation == null
             ? node()
             : new ELNode.Property(providedInvocation.base(), providedInvocation.property());
-    }
-
-    private Method findMethod(ELContext context) {
-        ELNode.Method providedInvocation = invocation();
-        if (providedInvocation == null) {
-            ELInterpreter.Target target = interpreter().resolveTarget(context, node());
-            return findMethod(target == null ? null : target.base(),
-                target == null ? null : target.property(), null);
-        }
-        ELInterpreter.Target target = interpreter().resolveTarget(context, methodTargetNode());
-        Object[] arguments = interpreter().evaluateArguments(context, providedInvocation.arguments());
-        return findMethod(target == null ? null : target.base(),
-            target == null ? null : target.property(), arguments);
     }
 
     @Nullable
@@ -235,22 +233,41 @@ final class InterpretedMethodExpression extends MethodExpression implements ELEx
         throw new MethodNotFoundException("The expression '" + expressionString + "' does not resolve to a method expression");
     }
 
-    private Method findMethod(@Nullable Object base,
-                              @Nullable Object property,
-                              Object @Nullable [] arguments) {
-        if (base == null) {
+    /**
+     * Fails when a method reference carries an object the sandbox denies. The reference holds the base and
+     * the evaluated arguments, so a denied object reached through either leaves the expression inside it.
+     */
+    private static void checkReference(ELContext context, MethodReference reference) {
+        ELSandboxGuard.checkResult(context, reference.getBase());
+        Object[] parameters = reference.getEvaluatedParameters();
+        if (parameters != null) {
+            for (Object parameter : parameters) {
+                ELSandboxGuard.checkResult(context, parameter);
+            }
+        }
+    }
+
+    private ELMethod findMethod(ELContext context,
+                                ELInterpreter.@Nullable Target target,
+                                Object @Nullable [] arguments) {
+        if (target == null || target.base() == null) {
             throw new PropertyNotFoundException("Cannot resolve the base object of the expression '"
                 + expressionString + "'");
         }
-        if (property == null) {
+        if (target.property() == null) {
             throw new MethodNotFoundException("Cannot resolve the method of the expression '"
                 + expressionString + "'");
         }
-        String name = ELSupport.coerceToString(property);
+        // the metadata of a method is the method: `getMethodInfo` and `getMethodReference` reach it without
+        // invoking it, and the second hands the base object back, so the sandbox applies here as it does to
+        // the invocation
+        ELSandboxGuard.check(context, target.base(), target.property());
         Class<?>[] paramTypes = arguments == null ? expectedParamTypes : null;
-        return base instanceof ELClass elClass
-            ? ELMethods.findStaticMethod(elClass.getKlass(), name, paramTypes, arguments)
-            : ELMethods.findMethod(base.getClass(), name, paramTypes, arguments);
+        return ELInterpreter.resolveMethod(context, executors(), target.base(), target.property(), paramTypes, arguments);
+    }
+
+    private java.util.List<io.micronaut.el.ELMethodExecutor> executors() {
+        return interpreter().executors();
     }
 
     private ELNode.@Nullable Method invocation() {
@@ -264,5 +281,10 @@ final class InterpretedMethodExpression extends MethodExpression implements ELEx
 
     private static ELNode unwrap(ELNode node) {
         return node instanceof ELNode.Eval eval ? unwrap(eval.expression()) : node;
+    }
+
+    private static MethodInfo methodInfo(ELMethod method) {
+        return new MethodInfo(method.getName(), method.getReturnType().getType(),
+            Argument.toClassArray(method.getArguments()));
     }
 }
