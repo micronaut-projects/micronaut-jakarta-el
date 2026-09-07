@@ -18,6 +18,8 @@ package io.micronaut.el;
 import io.micronaut.core.annotation.Experimental;
 import org.jspecify.annotations.Nullable;
 import io.micronaut.core.io.service.SoftServiceLoader;
+import io.micronaut.el.resolver.CommonELResolver;
+import io.micronaut.el.resolver.ELResolverChain;
 import io.micronaut.el.resolver.StreamELResolver;
 import io.micronaut.el.runtime.ELLiterals;
 import io.micronaut.el.runtime.ELSupport;
@@ -194,7 +196,7 @@ public class CompiledExpressionFactory extends ExpressionFactory {
 
     @Override
     public ELResolver getStreamELResolver() {
-        return new StreamELResolver();
+        return new ELResolverChain(new CommonELResolver(), new StreamELResolver());
     }
 
     @Override

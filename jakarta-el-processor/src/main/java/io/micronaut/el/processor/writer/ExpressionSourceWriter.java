@@ -46,7 +46,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.lang.reflect.Method;
 
 /**
  * The writer of the {@link ELExpressionSource} implementations, which give access to the expressions
@@ -67,10 +66,13 @@ public final class ExpressionSourceWriter {
     private static final TypeDef STRING_LIST = TypeDef.parameterized(ClassTypeDef.of(List.class), STRING);
     private static final TypeDef.Array OBJECT_ARRAY = TypeDef.array(TypeDef.OBJECT);
     private static final ClassTypeDef EL_CONTEXT = ClassTypeDef.of(ELContext.class);
-    private static final Method BIND_VALUE = ReflectionUtils.getRequiredMethod(ELVariableBindings.class, "bindNullable",
-        ELContext.class, ValueExpression.class, String[].class);
-    private static final Method BIND_METHOD = ReflectionUtils.getRequiredMethod(ELVariableBindings.class, "bindNullable",
-        ELContext.class, MethodExpression.class, String[].class);
+    /**
+     * The two {@code bindNullable} overloads, told apart by the types they declare rather than by a
+     * {@code java.lang.reflect.Method} looked up on the class: the processor describes what it emits, it does
+     * not load the runtime to find it.
+     */
+    private static final List<TypeDef> BIND_VALUE = List.of(EL_CONTEXT, VALUE_EXPRESSION, STRING_ARRAY);
+    private static final List<TypeDef> BIND_METHOD = List.of(EL_CONTEXT, METHOD_EXPRESSION, STRING_ARRAY);
     private static final String EXPRESSION = "expression";
 
     private ExpressionSourceWriter() {
@@ -162,10 +164,14 @@ public final class ExpressionSourceWriter {
                     ExpressionDef result = ExpressionDef.nullValue();
                     for (int i = values.size() - 1; i >= 0; i--) {
                         CompiledValue value = values.get(i);
+                        boolean dynamicExpectedType = value.definition().inferred()
+                            && value.definition().requireExpectedType().getName().equals(Object.class.getName());
                         result = new ExpressionDef.IfElse(
                             requestedType(value.definition().requireExpectedType(), value.definition().inferred(), parameters.get(1)),
-                            ClassTypeDef.of(className)
-                                .getStaticField(value.definition().constantName(), VALUE_EXPRESSION),
+                            dynamicExpectedType
+                                ? ClassTypeDef.of(value.className()).instantiate(parameters.get(1))
+                                : ClassTypeDef.of(className)
+                                    .getStaticField(value.definition().constantName(), VALUE_EXPRESSION),
                             result
                         );
                     }
@@ -185,7 +191,8 @@ public final class ExpressionSourceWriter {
             .addParameter(EXPRESSION, STRING)
             .addParameter("expectedType", CLASS_TYPE)
             .returns(VALUE_EXPRESSION)
-            .build((aThis, parameters) -> ClassTypeDef.of(ELVariableBindings.class).invokeStatic(BIND_VALUE,
+            .build((aThis, parameters) -> ClassTypeDef.of(ELVariableBindings.class).invokeStatic("bindNullable", BIND_VALUE,
+                VALUE_EXPRESSION,
                 parameters.get(0),
                 aThis.invoke(create, parameters.get(1), parameters.get(2)),
                 freeIdentifiers(parameters.get(1), expressions.stream()
@@ -258,7 +265,8 @@ public final class ExpressionSourceWriter {
             .addParameter("expectedReturnType", CLASS_TYPE)
             .addParameter("expectedParamTypes", CLASS_ARRAY)
             .returns(METHOD_EXPRESSION)
-            .build((aThis, parameters) -> ClassTypeDef.of(ELVariableBindings.class).invokeStatic(BIND_METHOD,
+            .build((aThis, parameters) -> ClassTypeDef.of(ELVariableBindings.class).invokeStatic("bindNullable", BIND_METHOD,
+                METHOD_EXPRESSION,
                 parameters.get(0),
                 aThis.invoke(create, parameters.get(1), parameters.get(2), parameters.get(3)),
                 freeIdentifiers(parameters.get(1), expressions.stream()
@@ -283,6 +291,9 @@ public final class ExpressionSourceWriter {
      * was inferred rather than written, also {@link Object}, the type a caller passes when it does not care.
      */
     private static ExpressionDef.ConditionExpressionDef requestedType(ClassElement declared, boolean inferred, ExpressionDef requested) {
+        if (inferred && declared.getName().equals(Object.class.getName())) {
+            return requested.isNonNull();
+        }
         ExpressionDef.ConditionExpressionDef matches = sameType(declared, requested);
         if (inferred && !declared.getName().equals(Object.class.getName())) {
             matches = new ExpressionDef.Or(matches, ExpressionDef.constant(TypeDef.OBJECT).equalsReferentially(requested));

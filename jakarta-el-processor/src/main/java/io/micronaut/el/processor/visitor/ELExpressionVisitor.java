@@ -78,6 +78,8 @@ import java.util.Set;
 @Internal
 public final class ELExpressionVisitor implements TypeElementVisitor<Object, Object> {
 
+    private static final String EXPECTED_PARAM_TYPES = "expectedParamTypes";
+
     private final Set<String> processed = new HashSet<>();
     private final List<ClassElement> pending = new ArrayList<>();
 
@@ -318,10 +320,15 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
         }
         Map<DeclarationKey, Declared<A>> distinct = new LinkedHashMap<>();
         for (Declared<A> value : declared) {
+            // the declared name is part of the signature because the parameter types are not enough to tell
+            // two declarations apart: the neutral metadata drops a primitive class literal, so
+            // {int.class, String.class} and {long.class, String.class} both arrive as String alone and one
+            // declaration would be dropped here, before the types are recovered from the Java mirrors
             String signature = expressionOf(value.annotation()).orElse("") + "|"
+                + value.annotation().stringValue("name").orElse("") + "|"
                 + value.annotation().annotationClassValue("expectedType").map(AnnotationClassValue::getName).orElse("")
                 + "|" + value.annotation().annotationClassValue("expectedReturnType").map(AnnotationClassValue::getName).orElse("")
-                + "|" + Arrays.stream(value.annotation().annotationClassValues("expectedParamTypes"))
+                + "|" + Arrays.stream(value.annotation().annotationClassValues(EXPECTED_PARAM_TYPES))
                     .map(AnnotationClassValue::getName)
                     .collect(java.util.stream.Collectors.joining(","));
             // The owner contributes method parameters and member-level @ELEnvironment declarations. Identical
@@ -364,7 +371,13 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
         String expression = expressionOf(annotation).orElseThrow(() ->
             new ELCompilationException("The expression of @ELMethodExpression is required"));
         ClassElement returnType = ELTypes.resolveMember(annotation, "expectedReturnType", context).orElse(null);
-        List<ClassElement> parameterTypes = ELTypes.resolveMembers(annotation, "expectedParamTypes", context);
+        List<ClassElement> parameterTypes = ELTypes.resolveMembers(annotation, EXPECTED_PARAM_TYPES, context);
+        // a primitive class literal does not survive into the neutral metadata, so a declaration naming one
+        // arrives short or empty; the Java mirrors still carry it, and a shorter list is the sign to read them
+        parameterTypes = ELTypes.resolveDeclaredMemberTypes(owner.getNativeType(),
+            ELMethodExpression.class.getName(), List.of("value", "expression"), expression,
+            "name", annotation.stringValue("name").orElse(""), EXPECTED_PARAM_TYPES,
+            parameterTypes, context);
         String name = uniqueConstantName(annotation, owner, expression, used);
         return new ELMethodExpressionDefinition(expression, returnType, false, parameterTypes, name,
             ELParser.parseEval(expression));

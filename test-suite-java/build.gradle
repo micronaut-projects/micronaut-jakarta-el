@@ -12,6 +12,9 @@ dependencies {
 
     testImplementation platform(libs.micronaut.core)
     testImplementation projects.micronautJakartaEl
+    // implements a functional interface the compiler could not resolve, which no longer brings the
+    // interpreter along: the module depends on the core one
+    testRuntimeOnly projects.micronautJakartaElInterpreterReflection
     testImplementation mn.micronaut.core
     testImplementation mn.micronaut.inject
     testImplementation mn.micronaut.aop

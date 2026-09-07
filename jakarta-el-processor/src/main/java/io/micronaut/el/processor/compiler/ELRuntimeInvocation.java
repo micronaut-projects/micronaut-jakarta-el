@@ -61,6 +61,15 @@ final class ELRuntimeInvocation {
         return declaredReturn.equals(returning) ? invocation : invocation.cast(returning);
     }
 
+    /**
+     * The static method the runtime declares, read from the class on the compile classpath.
+     *
+     * <p>The model of the compiler would describe the same method, and {@code ClassElement} was tried here:
+     * it works under javac and not under the Kotlin or the Groovy processor, which report the variable arity
+     * parameter of a binary Java method differently, so the emitted call lost its packing. The class itself
+     * answers the same way for all three. This runs while compiling and never at runtime, which is why the
+     * reflection boundary of the runtime does not cover this module.</p>
+     */
     @Nullable
     private static Method runtimeMethod(ClassTypeDef owner, String name, int argumentCount) {
         Class<?> runtime = ClassUtils.forName(owner.getName(), ELRuntimeInvocation.class.getClassLoader()).orElse(null);

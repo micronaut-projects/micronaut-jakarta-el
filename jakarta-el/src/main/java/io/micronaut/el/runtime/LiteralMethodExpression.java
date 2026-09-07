@@ -72,7 +72,9 @@ public final class LiteralMethodExpression extends CompiledMethodExpression {
     }
 
     @Override
-    @Nullable
+    // a literal expression refers to no method, and the section 1.19 of the specification has it report
+    // that by returning null, which the type of the method it overrides cannot say
+    @SuppressWarnings({"NullAway", "java:S2637"})
     public MethodReference getMethodReference(ELContext context) {
         context.notifyBeforeEvaluation(getExpressionString());
         context.notifyAfterEvaluation(getExpressionString());

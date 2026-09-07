@@ -16,8 +16,10 @@
 package io.micronaut.el.runtime;
 
 import io.micronaut.core.annotation.Experimental;
+import io.micronaut.core.type.Argument;
+import io.micronaut.el.ELExecutors;
+import io.micronaut.el.ELMethod;
 import org.jspecify.annotations.Nullable;
-import jakarta.el.ELClass;
 import jakarta.el.ELContext;
 import jakarta.el.MethodExpression;
 import jakarta.el.MethodInfo;
@@ -25,8 +27,6 @@ import jakarta.el.MethodNotFoundException;
 import jakarta.el.MethodReference;
 import jakarta.el.PropertyNotFoundException;
 
-import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -134,12 +134,11 @@ public abstract class CompiledMethodExpression extends MethodExpression implemen
         if (property == null && base instanceof MethodExpression expression) {
             return expression.getMethodInfo(context);
         }
-        Method method = findMethod(base, property, evaluateArguments(context));
-        return new MethodInfo(method.getName(), method.getReturnType(), method.getParameterTypes());
+        ELMethod method = findMethod(context, base, property, evaluateArguments(context));
+        return methodInfo(method);
     }
 
     @Override
-    @Nullable
     public MethodReference getMethodReference(ELContext context) {
         context.notifyBeforeEvaluation(expressionString);
         Object base = evaluateBase(context);
@@ -150,9 +149,9 @@ public abstract class CompiledMethodExpression extends MethodExpression implemen
             return reference;
         }
         Object[] arguments = evaluateArguments(context);
-        Method method = findMethod(base, property, arguments);
-        MethodInfo methodInfo = new MethodInfo(method.getName(), method.getReturnType(), method.getParameterTypes());
-        MethodReference reference = new MethodReference(base, methodInfo, method.getAnnotations(), arguments);
+        ELMethod method = findMethod(context, base, property, arguments);
+        MethodReference reference = new MethodReference(base, methodInfo(method), method.synthesizeAnnotations(),
+            arguments);
         context.notifyAfterEvaluation(expressionString);
         return reference;
     }
@@ -183,9 +182,11 @@ public abstract class CompiledMethodExpression extends MethodExpression implemen
     /**
      * @return The expected parameter types
      */
+    // the field is the nullable one, not what this hands back: an expression that declared no parameter
+    // types reports none rather than null
+    @SuppressWarnings("java:S2637")
     protected Class<?>[] getExpectedParamTypes() {
-        return expectedParamTypes == null ? NO_PARAM_TYPES
-            : Arrays.copyOf(expectedParamTypes, expectedParamTypes.length);
+        return expectedParamTypes == null ? NO_PARAM_TYPES : expectedParamTypes.clone();
     }
 
     @Override
@@ -221,7 +222,15 @@ public abstract class CompiledMethodExpression extends MethodExpression implemen
         return "MethodExpression[" + expressionString + "]";
     }
 
-    private Method findMethod(@Nullable Object base, @Nullable Object property, Object @Nullable [] arguments) {
+    /**
+     * The method this expression names, described by an executor of the classpath rather than found
+     * reflectively: the metadata of a method expression is all this needs, and the invocation itself is
+     * generated code.
+     */
+    private ELMethod findMethod(ELContext context,
+                                @Nullable Object base,
+                                @Nullable Object property,
+                                Object @Nullable [] arguments) {
         if (base == null) {
             throw new PropertyNotFoundException("Cannot resolve the base object of the expression '"
                 + expressionString + "'");
@@ -232,9 +241,18 @@ public abstract class CompiledMethodExpression extends MethodExpression implemen
         // the parameters provided by the expression select the method, the declared types otherwise
         Class<?>[] paramTypes = arguments == null ? getExpectedParamTypes() : null;
         String name = ELSupport.coerceToString(property);
-        return base instanceof ELClass elClass
-            ? ELMethods.findStaticMethod(elClass.getKlass(), name, paramTypes, arguments)
-            : ELMethods.findMethod(base.getClass(), name, paramTypes, arguments);
+        ELMethod method = ELExecutors.resolve(context, base, name, ELArguments.of(paramTypes), arguments);
+        if (method == null) {
+            throw new MethodNotFoundException("Cannot describe the method '" + name + "' of the expression '"
+                + expressionString + "'. Contribute it with an ELMethodContributor, or add the"
+                + " micronaut-jakarta-el-interpreter-reflection module to describe it reflectively");
+        }
+        return method;
+    }
+
+    private static MethodInfo methodInfo(ELMethod method) {
+        return new MethodInfo(method.getName(), method.getReturnType().getType(),
+            Argument.toClassArray(method.getArguments()));
     }
 
     private static final class UncoercedMethodExpression extends CompiledMethodExpression {

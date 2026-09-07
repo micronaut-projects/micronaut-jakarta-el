@@ -37,7 +37,8 @@ See the [Snapshot Documentation](https://micronaut-projects.github.io/micronaut-
 | `micronaut-jakarta-el`             | The runtime: the resolvers, the coercion rules and the compiled expression base classes  |
 | `micronaut-jakarta-el-parser`      | The lexer, the parser and the abstract syntax tree, with no dependency on the code generator |
 | `micronaut-jakarta-el-processor`   | The annotation processor: the compiler and the writers                                   |
-| `micronaut-jakarta-el-interpreter` | Optional. Parses and evaluates at runtime the expressions that were not compiled          |
+| `micronaut-jakarta-el-interpreter` | Optional. Parses and evaluates runtime expressions through service-contributed executors |
+| `micronaut-jakarta-el-interpreter-reflection` | Optional. The only module of this project that reflects to dispatch: it contributes the reflection-backed `ELMethodExecutor` for arbitrary Java methods and functions, and the reflective `ELResolver` of the chain |
 
 The parser is a module of its own because the compiler is not its only consumer: the interpreter uses the same
 abstract syntax tree, and so can any code that needs to inspect an expression without generating one.
@@ -98,8 +99,9 @@ ValueExpression expression = factory.createValueExpression(context, "${book.titl
 ```
 
 An expression that was not compiled and that is not a literal-expression is rejected, unless the interpreter
-module is on the classpath. The lookup matches the expected type exactly: an expression declared with
-`String.class` is only returned for a request with `String.class`.
+module is on the classpath. An explicitly declared expected type is matched exactly. An inferred expression is
+also available as `Object.class`; when its static type cannot be determined beyond `Object`, it adopts the type
+requested by the caller and applies the standard EL coercion rules.
 
 Two behaviours of Micronaut's annotation metadata affect how an expression is declared. Any annotation string
 containing `#{...}` is treated by Micronaut as one of its own evaluated expressions; the processor reads the
@@ -114,6 +116,8 @@ string is built at runtime, add the interpreter module:
 
 ```groovy
 runtimeOnly("io.micronaut.el:micronaut-jakarta-el-interpreter")
+// Optional: add reflective execution for methods not covered by a direct executor.
+runtimeOnly("io.micronaut.el:micronaut-jakarta-el-interpreter-reflection")
 ```
 
 It registers an `ELExpressionParser` service, which `CompiledExpressionFactory` consults for the expressions that no
@@ -122,7 +126,116 @@ generated source provides. Such an expression is parsed once, when it is created
 
 The interpreter is not a second implementation of the language: it walks the same abstract syntax tree the compiler
 consumes and calls the same runtime as the generated code, so both share one definition of the semantics of the
-specification. The compiled path remains the fast one, and the interpreted path is the fallback.
+specification. The interpreter module itself names no `java.lang.reflect` type at all. Its built-in service
+contributors handle common String, collection, map, array, stream and optional operations, as well as Micronaut bean
+introspections. Add `micronaut-jakarta-el-interpreter-reflection` when arbitrary public Java methods, constructors or
+`FunctionMapper` methods must also be executable. The compiled path remains the fast one, and the interpreted path is
+the fallback.
+`CompiledVersusInterpretedTest` compiles expressions with the annotation processor and evaluates each of them
+both ways, comparing the value, the type, the read-only flag, the value reference and the value after a write.
+
+One difference between the two is not a defect. The compiler selects an overload from the **static** types of
+the arguments, where the interpreter has only their runtime types: `${Math.max(book.pages, 1)}` compiles to
+`Math.max(long, long)`, while at runtime an `Integer` and a `Long` match `max(int,int)`, `max(long,long)`,
+`max(float,float)` and `max(double,double)` equally well and the reference is ambiguous. Both Expressly and
+Tomcat Jasper EL report it ambiguous too. Declaring an expression therefore resolves overloads a runtime string
+cannot.
+
+### Executable methods of beans
+
+A bean introspection is not the only description of a type the compiler emits. Every method annotated
+`@Executable` — directly, or through an annotation meta-annotated with it — is compiled into the `BeanDefinition`
+of its bean, and a great many beans carry that metadata without carrying an introspection: anything AOP-advised,
+anything a framework marks executable for its own dispatch. `ExecutableMethodELExecutor` is registered as an
+`io.micronaut.el.ELMethodExecutor` service, so `${greeter.greet('world')}` invokes such a method directly, with no
+reflection and without the reflection module on the classpath.
+
+An executable method is reached through a bean context, and an application may run more than one, so the executor
+reads the context of each call rather than a static holder. **Register it on the `ELContext` the expression is
+evaluated with**, or the executor declines and the method does not resolve:
+
+```java
+context.putContext(BeanDefinitionRegistry.class, beanContext);
+```
+
+`BeanContext.class` works as the key as well, and `new CompiledELContext(beanContext)` does it for you.
+
+A method that no executor and no resolver answers for reports which of the descriptions it could have been
+reached through did not carry it, and what to do about each — a context carrying no bean context is named as
+such, separately from a registered one whose bean definition has no executable method of that name or arity:
+
+```
+jakarta.el.MethodNotFoundException: Cannot find the method 'greet' of com.example.Greeter accepting 1
+argument(s). No bean context is registered in this ELContext, so the executable methods of the bean definitions
+were not consulted: register one with context.putContext(BeanDefinitionRegistry.class, beanContext), or evaluate
+the expression with new CompiledELContext(beanContext). The type carries no bean introspection either: annotate
+it with @Introspected, and the method with @Executable, to have the method dispatched from generated metadata.
+No reflective executor is registered either, so the method was not looked up reflectively: add the
+micronaut-jakarta-el-interpreter-reflection module to resolve any public method.
+```
+
+## Expressions built from untrusted input
+
+An expression declared with `@ELExpression` is source of the application. An expression string built at runtime
+is not, and the specification resolves properties, methods, static members and constructors dynamically:
+`${Runtime.getRuntime().exec(...)}` is a valid expression, and so is `${bean.getClass().getClassLoader()}`.
+Adding the interpreter module to the classpath must not turn `ExpressionFactory.createValueExpression` into a
+way to run arbitrary code.
+
+Every expression the interpreter creates is therefore evaluated under an `ELSandbox`, which is consulted for the
+base object of every property access and method invocation, for the class of every static reference and for the
+class of every constructor reference. `ELSandbox.standard()`, the default, denies the types through which an
+expression escapes into arbitrary Java:
+
+| Denied                                                                                                              | Why                                                 |
+|---------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------|
+| `Class`, `ClassLoader`, `Module`, `ModuleLayer`, `Package`, and every subtype                                        | The class of any object leads to every other class  |
+| `Runtime`, `Process`, `ProcessBuilder`, `ProcessHandle`, `System`, `Thread`, `ThreadGroup`                           | The process itself                                  |
+| `java.io.File`, `java.net.URI`, `java.net.URL`, `java.nio.file.Path`, `java.util.ServiceLoader`                      | The file system and the service loading             |
+| `jakarta.el.ELContext`, `jakarta.el.ELResolver`                                                                      | An expression would otherwise widen its own sandbox |
+| `java.lang.reflect`, `java.lang.invoke`, `java.lang.module`, `java.security`, `java.rmi`, `javax.naming`, `javax.script`, `jdk`, `sun` | Reflection and the platform internals |
+| The members `class`, `getClass`, `getClassLoader`, `getModule`, `getProtectionDomain`, `wait`, `notify`, `notifyAll` | The step from an allowed object to a denied one     |
+
+Everything else the language offers is untouched: the operators, the coercions, the collection operations, the
+lambdas, and the properties and methods of the beans of the application. `com.sun` is deliberately **not**
+denied: it is not reserved for the platform, and the TCK publishes its own beans under it. The TCK passes with
+the sandbox in place.
+
+An expression that reaches a denied type fails with an `ELSandboxException`. Compiled expressions do not go
+through the sandbox at all. Register another one, `ELSandbox.UNRESTRICTED` included, on the context:
+
+```java
+context.putContext(ELSandbox.class, ELSandbox.UNRESTRICTED);
+```
+
+An expression only reaches a denied type through a bean of the application that exposes one, since the members
+that lead to one from any object are denied. Reaching one is not the same as returning it, so the value an
+expression hands back is checked too, as coerced to the expected type: `${bean.type}` requested as `Object`
+fails, while requested as `String` it yields the coercion, through which nothing of the denied type escapes.
+Only the value itself is examined; a denied object the application put inside a collection it exposes is not
+searched for.
+
+The sandbox bounds what an expression reaches, not what the beans it reaches then do, and an argument the
+application's own method chose to accept is its own business. It keeps a runtime expression from escaping the
+object graph it was given; it is not a licence to evaluate expressions written by an attacker.
+
+The parser is bounded for the same reason. It is a recursive descent implementation and the tree it produces is
+walked recursively, so an expression nested deeply enough would exhaust the call stack. An expression nested
+more than `ELParser.DEFAULT_MAX_DEPTH` levels deep is rejected with an `ELParsingException`; parse with
+`ELParser.parse(expression, maxDepth)` to raise the limit for an expression a tool generated.
+
+### Deliberate divergences
+
+Four behaviours differ from Expressly, from Tomcat Jasper EL, or from both. Each is a place the specification
+leaves open, and the TCK passes either way, so this implementation keeps the reading that is the least
+surprising:
+
+| Behaviour | Here | Elsewhere |
+|-----------|------|-----------|
+| The right operand of a relational operator whose left operand is null | Evaluated, so `${null gt x}` reports that `x` cannot be resolved and `${null gt (y=1)}` performs the assignment | Both references skip it and return `false`. Only `&&`, `\|\|` and `?:` are specified to short-circuit |
+| The iteration order of a set or map construction | Insertion order, so `${{'b','a'}}` is `[b, a]` and a map keeps the order its entries were written in | Both references use a hash set and a hash map, so the order is neither insertion nor sorted |
+| The index of `${null[expr]}` | Evaluated | Expressly skips it; Tomcat rejects a null base outright |
+| A backslash in literal text | `\'` stays `\'` and `\\` becomes `\` | Expressly drops every backslash; Tomcat keeps `\\` as `\\` |
 
 ## Declaring beans
 
@@ -156,8 +269,38 @@ annotation.
 
 ## When and how reflection is used
 
-The module is built so that the paths a typical expression takes are reflection free, but it does not claim to
-avoid reflection everywhere. Precisely:
+The compiled runtime and the interpreter's built-in executors are reflection free for their direct paths. Reflection is
+optional for runtime-parsed expressions: add `micronaut-jakarta-el-interpreter-reflection` when arbitrary public Java
+members must be available.
+
+**Where reflection is allowed to live**
+
+| Module                                       | Reflection                                                                                                                                                                            |
+|----------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `micronaut-jakarta-el-parser`                | None                                                                                                                                                                                    |
+| `micronaut-jakarta-el-interpreter`           | None. The interpreter names no `java.lang.reflect` type at all; it dispatches through the `ELMethodExecutor` services                                                                    |
+| `micronaut-jakarta-el-interpreter-reflection`| Where dispatch by reflection belongs: the reflective executor and the reflective resolver, both contributed as services so nothing depends on them at compile time                       |
+| `micronaut-jakarta-el`                       | Only where the specification defines the behaviour in reflective terms, never to dispatch a runtime-parsed expression — see the table below                                              |
+| `micronaut-jakarta-el-processor`             | Compile-time only, in the annotation processor; none of it reaches the runtime                                                                                                          |
+
+The boundary is enforced by a `checkstyleReflection` task that `check` depends on, so it fails the build
+rather than relying on review: an import of `java.lang.reflect` or `java.lang.invoke`, those names written
+out, or a call that reads a class for a member is rejected in every module but the reflective one and the
+annotation processor. The rules and the full list of exceptions are in `gradle/checkstyle/`.
+
+What remains in `micronaut-jakarta-el` is there because the Jakarta EL API or the specification puts it there:
+`jakarta.el.FunctionMapper.resolveFunction` and `ExpressionFactory.getInitFunctionMap` are declared in terms of
+`java.lang.reflect.Method`; the coercion of a lambda expression to a functional interface needs a `Proxy`, and compiled
+expressions use it with no interpreter present; and `jakarta.el.BeanELResolver` and its siblings are reflective by
+specification. The remaining case is metadata rather than invocation: `CompiledMethodExpression.getMethodInfo` and
+`getMethodReference` reflect to report a name, a return type, parameter types and annotations that the processor
+already knows at build time, and are meant to be generated instead.
+
+The lambda coercion is the case that cannot follow them out of this module. Where the parameter type is known
+while compiling, the compiler already implements the interface directly, and the functional interfaces of the
+platform are implemented here without reflection. What is left is an application's own interface reached through
+a method the resolver chain selects at evaluation time: nothing knows that interface until then, so a `Proxy`
+stands in for it.
 
 **No reflection**
 
@@ -168,23 +311,74 @@ avoid reflection everywhere. Precisely:
 | A method of an `@Introspected` type annotated with `@Executable`    | The generated `BeanIntrospection` dispatch table        |
 | A function declared with `@ELFunctions`                            | Compiled to a direct static invocation                  |
 | An operator, a coercion, a collection operation, a lambda           | Compiled to a direct call into the runtime              |
+| A String, collection, map, array, stream or optional method in an interpreted expression | A service-contributed direct executor |
+| An interpreted method of an `@Introspected` type                    | The generated `BeanIntrospection` dispatch table        |
 | Locating a compiled expression by its string                       | A generated `switch`, no lookup and no parsing          |
 
 **Reflection**
 
 | Path                                                                   | Why                                                                 |
 |-------------------------------------------------------------------------|---------------------------------------------------------------------|
-| `MethodExpression` on a type that is not introspected, or a method that is not `@Executable` | The specification resolves the method against the base object at invocation time, so `ELMethods` selects it with `Class.getMethods()` and invokes it with `Method.invoke` |
-| A function resolved at runtime through a `jakarta.el.FunctionMapper`     | The mapper's contract is `java.lang.reflect.Method`                  |
-| `MethodExpression.getMethodInfo` and `getMethodReference`               | Both return reflective metadata by contract                          |
+| `MethodExpression` on a type that is not introspected, or a method that is not `@Executable`, when the reflection companion is present | The reflection executor selects it with `ELMethods` and invokes it with `Method.invoke` |
+| A function resolved at runtime through a `jakarta.el.FunctionMapper`, when the reflection companion is present     | The mapper's contract is `java.lang.reflect.Method`                  |
+| Metadata for a reflection-backed method expression                               | The reflection executor reads the method's metadata                  |
 | A type with no `BeanIntrospection`, reached through the standard chain   | `jakarta.el.BeanELResolver` is reflective by design                  |
-| Coercing a lambda expression to a functional interface (section 1.25.8)  | A `java.lang.reflect.Proxy` implements the interface                 |
+| Metadata of a compiled `MethodExpression`, through `getMethodInfo` or `getMethodReference` | Reported reflectively today, in `micronaut-jakarta-el`; `invoke` is generated code and never reflects |
+| Coercing a lambda expression to a functional interface the application declares, when the method is selected by the resolver chain at evaluation time (section 1.25.8) | The interface is only known then, so a `java.lang.reflect.Proxy` implements it. A lambda written against a statically known parameter type is compiled into the interface, and `Supplier`, `Function`, `BiFunction`, `UnaryOperator`, `BinaryOperator`, `Consumer`, `BiConsumer`, `Predicate`, `BiPredicate`, `Comparator`, `Runnable` and `Callable` are implemented directly |
 | Coercing a string to a type with a `PropertyEditor` (section 1.25.9)     | `PropertyEditorManager` is the mechanism the specification names     |
-| Reading and writing array elements and the `length` property            | `java.lang.reflect.Array`, which is how the JDK exposes arrays       |
+| A runtime-parsed method with no direct executor and no reflection companion | It fails with `MethodNotFoundException`; the interpreter has no reflective fallback |
 
-The reflective paths are the ones the specification defines in reflective terms; they are not a fallback for
-work that could have been generated. To keep a method invocation off them, annotate the method with
-`@Executable` so that it enters the bean introspection.
+To keep a method invocation off the reflective path, annotate the method with `@Executable` so that it enters the bean
+introspection, or provide an `ELMethodExecutor` with a generated/direct implementation. The executor services are
+ordered with Micronaut's `Ordered` contract, so direct contributors run before the general reflection fallback.
+
+## Keeping an application off the reflective path
+
+Everything reflection is used for can be contributed instead, through the service loader. Each of these is a
+file in `META-INF/services` naming an implementation, and each is consulted before the reflective fallback, so
+an application that contributes all three never reaches one.
+
+**`io.micronaut.el.ELMethodContributor`** — makes a type callable from a runtime-parsed expression. Declare the
+signature next to the code that runs it and the registry does the rest: overload selection, argument coercion,
+variable arity, the metadata a `MethodExpression` reports, and an identity that compares equal to the same
+expression compiled at build time.
+
+```java
+public final class BookMethods implements ELMethodContributor {
+
+    @Override
+    public void contribute(ELMethodRegistry registry) {
+        registry.method(Book.class, "discounted", double.class, Integer.class, Book::discounted)
+                .staticMethod(Math.class, "abs", long.class, long.class, Math::abs)
+                .constructor(Book.class, String.class, Book::new)
+                .function("fmt", "join", Formatting.class, "join", String.class, String.class,
+                          Formatting::join);
+    }
+}
+```
+
+**`io.micronaut.el.ELMethodExecutor`** — the lower level of the same thing, for dispatch an application builds
+itself. It decides at every call which method a name refers to, so it suits generated dispatch tables. Order it
+before the general fallback with the `Ordered` contract.
+
+**`jakarta.el.ELResolver`** — contributed into the standard chain between the executable methods and the
+resolvers of the specification, which is where a resolver that describes a type precisely belongs. This is how
+`micronaut-jakarta-el-interpreter-reflection` adds its own reflective resolver without any module depending on
+it.
+
+The same contributor also covers the one coercion that cannot be resolved while compiling. When the base of an
+expression carries no declared type, the resolver chain selects the method at evaluation time, so nothing knows
+the functional interface it takes until the call happens and a `java.lang.reflect.Proxy` stands in for it.
+Register how to implement it and it does not:
+
+```java
+registry.functionalInterface(TextMapper.class,
+        (context, lambda) -> value -> (String) lambda.invoke(context, value));
+```
+
+The `default` methods of the interface then come from the interface itself, rather than through an invocation
+handler. A lambda written against a parameter type the compiler resolves never reaches a registration, and
+neither do the functional interfaces of the platform, which are implemented without reflection already.
 
 ## Language support
 
@@ -232,33 +426,53 @@ and 1.6 of the specification, which still goes through the generated resolvers w
   `ELStream` and `ELOptional`.
 
 Functions are bound when the expression is created, as required by the section 1.18: the compiler binds them from
-`@ELFunctions`, and the interpreter binds them from the `jakarta.el.FunctionMapper` of the context, so a later change
-of the mapper does not affect an expression that already exists. The `jakarta.el.VariableMapper` bindings are likewise
-captured when the expression is created, as required by the section 1.19. Runtime-parsed expressions consult the
+`@ELFunctions`, and the optional reflection executor binds them from the `jakarta.el.FunctionMapper` of the context,
+so a later change of the mapper does not affect an expression that already exists. A generated executor can provide
+the same binding without reflection. The `jakarta.el.VariableMapper` bindings are likewise captured when the
+expression is created, as required by the section 1.19. Runtime-parsed expressions consult the
 `jakarta.el.ImportHandler` during evaluation; generated expressions bind the imports declared by `@ELEnvironment`
 at compilation time.
 
 ## Technology Compatibility Kit
 
-The `tests/jakarta-el-tck` module runs the Jakarta Expression Language 6.0 TCK against the runtime of this
-repository:
+Three projects run the Jakarta Expression Language 6.0 TCK against the runtime of this repository:
 
 ```
 ./gradlew :micronaut-tests:micronaut-jakarta-el-tck:test
+./gradlew :micronaut-tests:micronaut-jakarta-el-tck-interpreter:test
+./gradlew :micronaut-tests:micronaut-jakarta-el-tck-interpreter-reflection:test
 ```
 
-**360 tests, 0 failures, 0 skipped.**
+Each task runs **360 tests, 0 failures, 0 skipped**. The first project declares every TCK expression as a
+compile-time expression. The second parses the expressions with the reflection-free interpreter and contributes
+the TCK-specific direct method executor through `ServiceLoader`. The third uses the interpreter with its optional
+reflection executor.
 
 The TCK bundle is not published to Maven Central, so it is resolved from the Eclipse download site as a plain
-dependency, unpacked, and its test classes are handed to the test task. The version is set by `elTckBranch` and
-`elTckVersion` in `gradle.properties`.
+dependency. Its test jar is extracted from the upstream zip and placed on the test classpath; an ordinary checked-in
+JUnit Platform suite class selects its tests, following the same pattern as the Micronaut JAX-RS TCK. The version is
+set by `elTckBranch` and `elTckVersion` in `gradle.properties`.
 
-The TCK creates its expressions from strings at runtime through `ExpressionFactory.newInstance()`, so it exercises
-the parser and the interpreter, and through them the coercion, arithmetic, comparison, resolution and collection
-runtime that the generated code also calls. The signature test is excluded: it verifies the signatures of the
-`jakarta.el` API jar, which this repository consumes unchanged rather than implements.
+The interpreted runs create expressions from strings through `ExpressionFactory.newInstance()`. The compiled run
+contains matching annotation declarations for those expression strings, so it exercises generated expressions
+without putting the interpreter on its classpath. The signature test is outside the selected EL test package: it
+verifies the signatures of the `jakarta.el` API jar, which this repository consumes unchanged rather than implements.
 
 The TCK runs as part of `./gradlew build`.
+
+## Fuzzing
+
+`ELFuzzTest` generates expressions from the grammar, mutates them and throws random strings at the parser and
+the interpreter, asserting the invariants that hold for every input: the parser only ever fails with an
+`ELParsingException`, the canonical form of an expression re-parses to itself, and an evaluation only ever
+fails with an `ELException`. A failure is reduced to the shortest expression that still reproduces it before
+it is reported, with the seed and the iteration that produced it.
+
+The build runs 20 000 iterations. To run a longer campaign:
+
+```
+./gradlew :micronaut-jakarta-el-interpreter:test --tests '*ELFuzzTest*' -Dmicronaut.el.fuzz.iterations=1000000 -Dmicronaut.el.fuzz.seed=7
+```
 
 ## Building
 

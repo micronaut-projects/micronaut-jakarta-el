@@ -172,6 +172,67 @@ public final class ELTypes {
     }
 
     /**
+     * The class literals a {@code Class[]} member of a repeatable annotation names, read from the Java
+     * mirrors, which is the only place a primitive one survives: the neutral metadata drops it.
+     *
+     * <p>Nothing is recovered for a class the Groovy or the Kotlin processor compiles, so the annotation has
+     * to name the wrapper type there. Reaching the helper at all would load a type of the Java processor,
+     * which those compilers do not have on the classpath, so the language is checked first.</p>
+     *
+     * @param nativeType          The native element carrying the annotation
+     * @param annotationName      The name of the annotation
+     * @param discriminatorMembers The members telling the declarations apart, since an aliased member is
+     *                             recorded under the name that was written
+     * @param discriminatorValue  The value identifying the declaration
+     * @param nameMember          The member naming the declaration
+     * @param nameValue           The name identifying it, empty when it declares none
+     * @param member              The member to read
+     * @param context             The visitor context
+     * @return The types the member names, empty when they cannot be recovered
+     */
+    static List<ClassElement> resolveDeclaredMemberTypes(Object nativeType,
+                                                         String annotationName,
+                                                         List<String> discriminatorMembers,
+                                                         String discriminatorValue,
+                                                         String nameMember,
+                                                         String nameValue,
+                                                         String member,
+                                                         List<ClassElement> recovered,
+                                                         VisitorContext context) {
+        if (context.getLanguage() != VisitorContext.Language.JAVA) {
+            return recovered;
+        }
+        List<List<ClassElement>> declarations = JavaAnnotationTypes.resolveRepeatableMemberTypes(nativeType,
+            annotationName, discriminatorMembers, discriminatorValue, nameMember, nameValue, member, context);
+        if (declarations.size() == 1) {
+            // the name identified exactly one declaration, so its types are the declared ones whatever the
+            // metadata kept of them
+            return declarations.get(0);
+        }
+        // the discriminator repeats, so the declaration is the one whose types are what the metadata kept
+        // once the primitives it drops are removed; anything else would take another declaration's types
+        List<ClassElement> match = null;
+        for (List<ClassElement> declared : declarations) {
+            if (!names(withoutPrimitives(declared)).equals(names(recovered))) {
+                continue;
+            }
+            if (match != null && !names(match).equals(names(declared))) {
+                return recovered;
+            }
+            match = declared;
+        }
+        return match == null ? recovered : match;
+    }
+
+    private static List<ClassElement> withoutPrimitives(List<ClassElement> types) {
+        return types.stream().filter(type -> !type.isPrimitive()).toList();
+    }
+
+    private static List<String> names(List<ClassElement> types) {
+        return types.stream().map(ClassElement::getName).toList();
+    }
+
+    /**
      * Whether an interface can be the target of a generated Java lambda. Sealed Java interfaces cannot be
      * implemented by the synthetic lambda class, even when they declare a single abstract method.
      *

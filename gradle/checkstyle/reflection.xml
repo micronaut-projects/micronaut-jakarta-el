@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+    "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+    "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<!--
+  Holds the reflection boundary of the runtime: expressions are compiled at build time and evaluated without
+  reading a class, so only the optional interpreter-reflection module may reflect. The annotation processor is
+  not checked, since it reflects while compiling and never at runtime.
+
+  This file is deliberately not `config/checkstyle/checkstyle.xml`: that one is copied over from
+  micronaut-project-template by the nightly files sync, which would take these rules with it. Nothing under
+  `gradle/` is in the sync's list, and the task that applies it is declared in the per-repo `build.gradle`.
+-->
+<module name="Checker">
+    <property name="severity" value="error"/>
+    <property name="fileExtensions" value="java"/>
+
+    <module name="SuppressionFilter">
+        <property name="file" value="${config_loc}/reflection-suppressions.xml"/>
+    </module>
+
+    <module name="TreeWalker">
+        <!-- the import, which is how reflection usually arrives -->
+        <module name="IllegalImport">
+            <property name="id" value="ReflectionImport"/>
+            <property name="illegalPkgs" value="java.lang.reflect,java.lang.invoke"/>
+            <message key="import.illegal"
+                     value="The runtime does not reflect. Move this to jakarta-el-interpreter-reflection, or describe the method with an ELMethodContributor: {0}"/>
+        </module>
+
+        <!-- the same thing written out, which the import rule would miss -->
+        <module name="RegexpSinglelineJava">
+            <property name="id" value="ReflectionQualifiedName"/>
+            <property name="format" value="java\.lang\.(reflect|invoke)\."/>
+            <property name="ignoreComments" value="true"/>
+            <property name="message"
+                      value="The runtime does not reflect. Move this to jakarta-el-interpreter-reflection, or describe the method with an ELMethodContributor."/>
+        </module>
+
+        <!-- and the calls that reflect without naming the package at all -->
+        <module name="RegexpSinglelineJava">
+            <property name="id" value="ReflectionCall"/>
+            <property name="format"
+                      value="\.(getMethods|getMethod|getDeclaredMethods|getDeclaredMethod|getConstructors|getConstructor|getDeclaredConstructors|getDeclaredConstructor|getFields|getField|getDeclaredFields|getDeclaredField|setAccessible|trySetAccessible|canAccess)\s*\(|\bClass\.forName\s*\("/>
+            <property name="ignoreComments" value="true"/>
+            <property name="message"
+                      value="Reading a class to find a member is reflection, which the runtime does not do. Move this to jakarta-el-interpreter-reflection, or describe the method with an ELMethodContributor."/>
+        </module>
+    </module>
+</module>

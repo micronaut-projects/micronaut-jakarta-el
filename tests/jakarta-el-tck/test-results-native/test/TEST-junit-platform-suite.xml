@@ -1,0 +1,2214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="JUnit Platform Suite" tests="360" skipped="0" failures="0" errors="0" time="0.375" hostname="Mac.telekom.ip" timestamp="2026-09-08T09:51:28">
+<properties>
+<property name="file.encoding" value="UTF-8"/>
+<property name="file.separator" value="/"/>
+<property name="java.class.path" value=""/>
+<property name="java.class.version" value="69.0"/>
+<property name="java.endorsed.dirs" value=""/>
+<property name="java.ext.dirs" value=""/>
+<property name="java.io.tmpdir" value="/var/folders/hj/2bq8y7tj73jg6th521fr_13m0000gn/T/"/>
+<property name="java.library.path" value="."/>
+<property name="java.runtime.name" value="GraalVM Runtime Environment"/>
+<property name="java.runtime.version" value="25.0.2+10-jvmci-b01"/>
+<property name="java.specification.name" value="Java Platform API Specification"/>
+<property name="java.specification.vendor" value="Oracle Corporation"/>
+<property name="java.specification.version" value="25"/>
+<property name="java.vendor" value="GraalVM Community"/>
+<property name="java.vendor.url" value="https://www.graalvm.org/"/>
+<property name="java.vendor.version" value="GraalVM CE 25.0.2+10.1"/>
+<property name="java.version" value="25.0.2"/>
+<property name="java.version.date" value="2026-01-20"/>
+<property name="java.vm.info" value="serial gc"/>
+<property name="java.vm.name" value="Substrate VM"/>
+<property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+<property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+<property name="java.vm.specification.version" value="25"/>
+<property name="java.vm.vendor" value="GraalVM Community"/>
+<property name="java.vm.version" value="25.0.2+10"/>
+<property name="jdk.lang.Process.launchMechanism" value="FORK"/>
+<property name="line.separator" value="&#10;"/>
+<property name="native.encoding" value="UTF-8"/>
+<property name="org.graalvm.nativeimage.imagecode" value="runtime"/>
+<property name="org.graalvm.nativeimage.kind" value="executable"/>
+<property name="os.arch" value="aarch64"/>
+<property name="os.name" value="Mac OS X"/>
+<property name="os.version" value="26.6.1"/>
+<property name="path.separator" value=":"/>
+<property name="stderr.encoding" value="UTF-8"/>
+<property name="stdin.encoding" value="UTF-8"/>
+<property name="stdout.encoding" value="UTF-8"/>
+<property name="sun.arch.data.model" value="64"/>
+<property name="sun.jnu.encoding" value="UTF-8"/>
+<property name="user.dir" value="/Users/denisstepanov/dev/micronaut-jakarta-el/.claude/worktrees/interpreter-reflection-split-review-522329/tests/jakarta-el-tck"/>
+<property name="user.home" value="/Users/denisstepanov"/>
+<property name="user.language" value="en"/>
+<property name="user.name" value="denisstepanov"/>
+<property name="user.timezone" value="Europe/Prague"/>
+<property name="variable.mapper" value="io.micronaut.el.runtime.MapVariableMapper"/>
+</properties>
+<testcase name="elBigIntegerSubtractTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elBigIntegerSubtractTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elBigIntegerSubtractTest()
+]]></system-out>
+</testcase>
+<testcase name="createExpressionNPETest()" classname="com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT]/[method:createExpressionNPETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > createExpressionNPETest()
+]]></system-out>
+</testcase>
+<testcase name="elLongEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elLongEqualToTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elLongEqualToTest()
+]]></system-out>
+</testcase>
+<testcase name="elNullOperandAddTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elNullOperandAddTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elNullOperandAddTest()
+]]></system-out>
+</testcase>
+<testcase name="elShortUnaryTest()" classname="com.sun.ts.tests.el.spec.unaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.unaryoperator.ELClientIT]/[method:elShortUnaryTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elShortUnaryTest()
+]]></system-out>
+</testcase>
+<testcase name="elIntegerConcatenationTest()" classname="com.sun.ts.tests.el.spec.concatoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.concatoperator.ELClientIT]/[method:elIntegerConcatenationTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elIntegerConcatenationTest()
+]]></system-out>
+</testcase>
+<testcase name="elLongConcatenationTest()" classname="com.sun.ts.tests.el.spec.concatoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.concatoperator.ELClientIT]/[method:elLongConcatenationTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elLongConcatenationTest()
+]]></system-out>
+</testcase>
+<testcase name="elResolverTest()" classname="com.sun.ts.tests.el.api.jakarta_el.elresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.elresolver.ELClientIT]/[method:elResolverTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elResolverTest()
+]]></system-out>
+</testcase>
+<testcase name="elShortSubtractTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0.002">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elShortSubtractTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elShortSubtractTest()
+]]></system-out>
+</testcase>
+<testcase name="beanELResolverDefaultMethodReadOnlyTest()" classname="com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT]/[method:beanELResolverDefaultMethodReadOnlyTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > beanELResolverDefaultMethodReadOnlyTest()
+]]></system-out>
+</testcase>
+<testcase name="elCollectionSumTest()" classname="com.sun.ts.tests.el.spec.collectionoperators.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.collectionoperators.ELClientIT]/[method:elCollectionSumTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elCollectionSumTest()
+]]></system-out>
+</testcase>
+<testcase name="elPrimitiveToStringCoercionTest()" classname="com.sun.ts.tests.el.spec.coercion.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.coercion.ELClientIT]/[method:elPrimitiveToStringCoercionTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elPrimitiveToStringCoercionTest()
+]]></system-out>
+</testcase>
+<testcase name="elBigDecimalSubtractTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0.002">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elBigDecimalSubtractTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elBigDecimalSubtractTest()
+]]></system-out>
+</testcase>
+<testcase name="elBigIntegerLessThanEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0.003">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elBigIntegerLessThanEqualTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elBigIntegerLessThanEqualTest()
+]]></system-out>
+</testcase>
+<testcase name="elCollectionSetLiteralTest()" classname="com.sun.ts.tests.el.spec.collectionoperators.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.collectionoperators.ELClientIT]/[method:elCollectionSetLiteralTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elCollectionSetLiteralTest()
+]]></system-out>
+</testcase>
+<testcase name="optionalELResolverObjectNullTest()" classname="com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT]/[method:optionalELResolverObjectNullTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > optionalELResolverObjectNullTest()
+]]></system-out>
+</testcase>
+<testcase name="elCollectionMinTest()" classname="com.sun.ts.tests.el.spec.collectionoperators.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.collectionoperators.ELClientIT]/[method:elCollectionMinTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elCollectionMinTest()
+]]></system-out>
+</testcase>
+<testcase name="elShortGreaterThanEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elShortGreaterThanEqualTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elShortGreaterThanEqualTest()
+]]></system-out>
+</testcase>
+<testcase name="elSyntaxAsLiteralTest()" classname="com.sun.ts.tests.el.spec.literal.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.literal.ELClientIT]/[method:elSyntaxAsLiteralTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elSyntaxAsLiteralTest()
+]]></system-out>
+</testcase>
+<testcase name="arrayELResolverOBETest()" classname="com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT]/[method:arrayELResolverOBETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > arrayELResolverOBETest()
+]]></system-out>
+</testcase>
+<testcase name="elByteDivisionTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elByteDivisionTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elByteDivisionTest()
+]]></system-out>
+</testcase>
+<testcase name="negativeMethodExpressionTest()" classname="com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT]/[method:negativeMethodExpressionTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > negativeMethodExpressionTest()
+]]></system-out>
+</testcase>
+<testcase name="elSemiColonOperatorDoubleTest()" classname="com.sun.ts.tests.el.spec.semicolonoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.semicolonoperator.ELClientIT]/[method:elSemiColonOperatorDoubleTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elSemiColonOperatorDoubleTest()
+]]></system-out>
+</testcase>
+<testcase name="elBigDecimalUnaryTest()" classname="com.sun.ts.tests.el.spec.unaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.unaryoperator.ELClientIT]/[method:elBigDecimalUnaryTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elBigDecimalUnaryTest()
+]]></system-out>
+</testcase>
+<testcase name="expressionHashCodeTest()" classname="com.sun.ts.tests.el.api.jakarta_el.expression.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.expression.ELClientIT]/[method:expressionHashCodeTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > expressionHashCodeTest()
+]]></system-out>
+</testcase>
+<testcase name="elIntegerDivisionTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elIntegerDivisionTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elIntegerDivisionTest()
+]]></system-out>
+</testcase>
+<testcase name="methodExpressionMatchingOverloadBeatsExactVarArgsTest()" classname="com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT]/[method:methodExpressionMatchingOverloadBeatsExactVarArgsTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > methodExpressionMatchingOverloadBeatsExactVarArgsTest()
+]]></system-out>
+</testcase>
+<testcase name="elCoerceToEnumTypeTest()" classname="com.sun.ts.tests.el.spec.coercion.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.coercion.ELClientIT]/[method:elCoerceToEnumTypeTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elCoerceToEnumTypeTest()
+]]></system-out>
+</testcase>
+<testcase name="elEmptyArrayTest()" classname="com.sun.ts.tests.el.spec.emptyoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.emptyoperator.ELClientIT]/[method:elEmptyArrayTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elEmptyArrayTest()
+]]></system-out>
+</testcase>
+<testcase name="elModPreBinaryTest()" classname="com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT]/[method:elModPreBinaryTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elModPreBinaryTest()
+]]></system-out>
+</testcase>
+<testcase name="newInstanceTest()" classname="com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT]/[method:newInstanceTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > newInstanceTest()
+]]></system-out>
+</testcase>
+<testcase name="elWrapperToStringCoercionTest()" classname="com.sun.ts.tests.el.spec.coercion.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.coercion.ELClientIT]/[method:elWrapperToStringCoercionTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elWrapperToStringCoercionTest()
+]]></system-out>
+</testcase>
+<testcase name="elAssignmentOperatorBigIntegerTest()" classname="com.sun.ts.tests.el.spec.assignmentoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.assignmentoperator.ELClientIT]/[method:elAssignmentOperatorBigIntegerTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elAssignmentOperatorBigIntegerTest()
+]]></system-out>
+</testcase>
+<testcase name="elCollectionAverageTest()" classname="com.sun.ts.tests.el.spec.collectionoperators.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.collectionoperators.ELClientIT]/[method:elCollectionAverageTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elCollectionAverageTest()
+]]></system-out>
+</testcase>
+<testcase name="methodInfoTest()" classname="com.sun.ts.tests.el.api.jakarta_el.methodinfo.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.methodinfo.ELClientIT]/[method:methodInfoTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > methodInfoTest()
+]]></system-out>
+</testcase>
+<testcase name="functionMapperTest()" classname="com.sun.ts.tests.el.api.jakarta_el.functionmapper.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.functionmapper.ELClientIT]/[method:functionMapperTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > functionMapperTest()
+]]></system-out>
+</testcase>
+<testcase name="elNumberToBigDecimalCoercionTest()" classname="com.sun.ts.tests.el.spec.coercion.ELClientIT" time="0.003">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.coercion.ELClientIT]/[method:elNumberToBigDecimalCoercionTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elNumberToBigDecimalCoercionTest()
+]]></system-out>
+</testcase>
+<testcase name="elFloatingPointLiteralTest()" classname="com.sun.ts.tests.el.spec.literal.ELClientIT" time="0.003">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.literal.ELClientIT]/[method:elFloatingPointLiteralTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elFloatingPointLiteralTest()
+]]></system-out>
+</testcase>
+<testcase name="elShortModulusTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elShortModulusTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elShortModulusTest()
+]]></system-out>
+</testcase>
+<testcase name="elNumberToIntegerCoercionTest()" classname="com.sun.ts.tests.el.spec.coercion.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.coercion.ELClientIT]/[method:elNumberToIntegerCoercionTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elNumberToIntegerCoercionTest()
+]]></system-out>
+</testcase>
+<testcase name="staticFieldELResolverTest()" classname="com.sun.ts.tests.el.api.jakarta_el.staticfieldelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.staticfieldelresolver.ELClientIT]/[method:staticFieldELResolverTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > staticFieldELResolverTest()
+]]></system-out>
+</testcase>
+<testcase name="elDoubleEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elDoubleEqualToTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elDoubleEqualToTest()
+]]></system-out>
+</testcase>
+<testcase name="ELVariableBindingTest()" classname="com.sun.ts.tests.el.spec.mapper.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.mapper.ELClientIT]/[method:ELVariableBindingTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > ELVariableBindingTest()
+]]></system-out>
+</testcase>
+<testcase name="valueExpressionEqualsTest()" classname="com.sun.ts.tests.el.api.jakarta_el.valueexpression.ELClientIT" time="0.003">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.valueexpression.ELClientIT]/[method:valueExpressionEqualsTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > valueExpressionEqualsTest()
+]]></system-out>
+</testcase>
+<testcase name="elBooleanConcatenationTest()" classname="com.sun.ts.tests.el.spec.concatoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.concatoperator.ELClientIT]/[method:elBooleanConcatenationTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elBooleanConcatenationTest()
+]]></system-out>
+</testcase>
+<testcase name="elByteModulusTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elByteModulusTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elByteModulusTest()
+]]></system-out>
+</testcase>
+<testcase name="rValueCoercion2Test()" classname="com.sun.ts.tests.el.spec.language.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.language.ELClientIT]/[method:rValueCoercion2Test()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > rValueCoercion2Test()
+]]></system-out>
+</testcase>
+<testcase name="elFloatGreaterThanEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elFloatGreaterThanEqualTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elFloatGreaterThanEqualTest()
+]]></system-out>
+</testcase>
+<testcase name="beanELResolverPNWETest()" classname="com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT]/[method:beanELResolverPNWETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > beanELResolverPNWETest()
+]]></system-out>
+</testcase>
+<testcase name="elIntegerLessThanEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elIntegerLessThanEqualTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elIntegerLessThanEqualTest()
+]]></system-out>
+</testcase>
+<testcase name="beanNameELResolverInvokeTest()" classname="com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT]/[method:beanNameELResolverInvokeTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > beanNameELResolverInvokeTest()
+]]></system-out>
+</testcase>
+<testcase name="listELResolverPNWETest()" classname="com.sun.ts.tests.el.api.jakarta_el.listelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.listelresolver.ELClientIT]/[method:listELResolverPNWETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > listELResolverPNWETest()
+]]></system-out>
+</testcase>
+<testcase name="elNullOperandSubtractTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elNullOperandSubtractTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elNullOperandSubtractTest()
+]]></system-out>
+</testcase>
+<testcase name="elBooleanOrTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elBooleanOrTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elBooleanOrTest()
+]]></system-out>
+</testcase>
+<testcase name="resourceBundleELResolverTest()" classname="com.sun.ts.tests.el.api.jakarta_el.resourcebundleelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.resourcebundleelresolver.ELClientIT]/[method:resourceBundleELResolverTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > resourceBundleELResolverTest()
+]]></system-out>
+</testcase>
+<testcase name="elFloatNotEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elFloatNotEqualToTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elFloatNotEqualToTest()
+]]></system-out>
+</testcase>
+<testcase name="elLambdaExprByteTest()" classname="com.sun.ts.tests.el.spec.lambda.ELClientIT" time="0.002">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.lambda.ELClientIT]/[method:elLambdaExprByteTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elLambdaExprByteTest()
+]]></system-out>
+</testcase>
+<testcase name="elFloatUnaryTest()" classname="com.sun.ts.tests.el.spec.unaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.unaryoperator.ELClientIT]/[method:elFloatUnaryTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elFloatUnaryTest()
+]]></system-out>
+</testcase>
+<testcase name="arrayELResolverCCETest()" classname="com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT]/[method:arrayELResolverCCETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > arrayELResolverCCETest()
+]]></system-out>
+</testcase>
+<testcase name="arrayELResolverTest()" classname="com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT]/[method:arrayELResolverTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > arrayELResolverTest()
+]]></system-out>
+</testcase>
+<testcase name="elNullOperandLessThanOrEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elNullOperandLessThanOrEqualTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elNullOperandLessThanOrEqualTest()
+]]></system-out>
+</testcase>
+<testcase name="elCollectionMaxTest()" classname="com.sun.ts.tests.el.spec.collectionoperators.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.collectionoperators.ELClientIT]/[method:elCollectionMaxTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elCollectionMaxTest()
+]]></system-out>
+</testcase>
+<testcase name="elDivEqualPreOrTest()" classname="com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT" time="0.002">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT]/[method:elDivEqualPreOrTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elDivEqualPreOrTest()
+]]></system-out>
+</testcase>
+<testcase name="elLongLessThanTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elLongLessThanTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elLongLessThanTest()
+]]></system-out>
+</testcase>
+<testcase name="elNullOperandEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elNullOperandEqualTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elNullOperandEqualTest()
+]]></system-out>
+</testcase>
+<testcase name="elLongSubtractTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elLongSubtractTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elLongSubtractTest()
+]]></system-out>
+</testcase>
+<testcase name="elBigDecimalGreaterThanEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0.005">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elBigDecimalGreaterThanEqualTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elBigDecimalGreaterThanEqualTest()
+]]></system-out>
+</testcase>
+<testcase name="elCharacterToNumberCoercionTest()" classname="com.sun.ts.tests.el.spec.coercion.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.coercion.ELClientIT]/[method:elCharacterToNumberCoercionTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elCharacterToNumberCoercionTest()
+]]></system-out>
+</testcase>
+<testcase name="elNumericStringDivisionTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elNumericStringDivisionTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elNumericStringDivisionTest()
+]]></system-out>
+</testcase>
+<testcase name="optionalELResolverObjectNonNullTest()" classname="com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT]/[method:optionalELResolverObjectNonNullTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > optionalELResolverObjectNonNullTest()
+]]></system-out>
+</testcase>
+<testcase name="elCollectionPeekTest()" classname="com.sun.ts.tests.el.spec.collectionoperators.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.collectionoperators.ELClientIT]/[method:elCollectionPeekTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elCollectionPeekTest()
+]]></system-out>
+</testcase>
+<testcase name="elNumberToBigIntegerCoercionTest()" classname="com.sun.ts.tests.el.spec.coercion.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.coercion.ELClientIT]/[method:elNumberToBigIntegerCoercionTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elNumberToBigIntegerCoercionTest()
+]]></system-out>
+</testcase>
+<testcase name="elCoerceLambdaExpressionToFunctionalInterfaceTest()" classname="com.sun.ts.tests.el.spec.coercion.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.coercion.ELClientIT]/[method:elCoerceLambdaExpressionToFunctionalInterfaceTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elCoerceLambdaExpressionToFunctionalInterfaceTest()
+]]></system-out>
+</testcase>
+<testcase name="elDoubleNotEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elDoubleNotEqualToTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elDoubleNotEqualToTest()
+]]></system-out>
+</testcase>
+<testcase name="elEnumEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elEnumEqualToTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elEnumEqualToTest()
+]]></system-out>
+</testcase>
+<testcase name="elIntegerAddTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elIntegerAddTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elIntegerAddTest()
+]]></system-out>
+</testcase>
+<testcase name="elBigDecimalConcatenationTest()" classname="com.sun.ts.tests.el.spec.concatoperator.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.concatoperator.ELClientIT]/[method:elBigDecimalConcatenationTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elBigDecimalConcatenationTest()
+]]></system-out>
+</testcase>
+<testcase name="staticFieldELResolverNPETest()" classname="com.sun.ts.tests.el.api.jakarta_el.staticfieldelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.staticfieldelresolver.ELClientIT]/[method:staticFieldELResolverNPETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > staticFieldELResolverNPETest()
+]]></system-out>
+</testcase>
+<testcase name="optionalELResolverEmptyInvoke()" classname="com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT]/[method:optionalELResolverEmptyInvoke()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > optionalELResolverEmptyInvoke()
+]]></system-out>
+</testcase>
+<testcase name="mapELResolverTest()" classname="com.sun.ts.tests.el.api.jakarta_el.mapelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.mapelresolver.ELClientIT]/[method:mapELResolverTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > mapELResolverTest()
+]]></system-out>
+</testcase>
+<testcase name="elShortEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elShortEqualToTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elShortEqualToTest()
+]]></system-out>
+</testcase>
+<testcase name="positiveValueExpressionTest()" classname="com.sun.ts.tests.el.api.jakarta_el.valueexpression.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.valueexpression.ELClientIT]/[method:positiveValueExpressionTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > positiveValueExpressionTest()
+]]></system-out>
+</testcase>
+<testcase name="elLambdaExprShortTest()" classname="com.sun.ts.tests.el.spec.lambda.ELClientIT" time="0.004">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.lambda.ELClientIT]/[method:elLambdaExprShortTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elLambdaExprShortTest()
+]]></system-out>
+</testcase>
+<testcase name="elContextPutGetContextTest()" classname="com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT]/[method:elContextPutGetContextTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elContextPutGetContextTest()
+]]></system-out>
+</testcase>
+<testcase name="beanNameELResolverIsReadOnlyNPETest()" classname="com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT]/[method:beanNameELResolverIsReadOnlyNPETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > beanNameELResolverIsReadOnlyNPETest()
+]]></system-out>
+</testcase>
+<testcase name="elLongStringUnaryTest()" classname="com.sun.ts.tests.el.spec.unaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.unaryoperator.ELClientIT]/[method:elLongStringUnaryTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elLongStringUnaryTest()
+]]></system-out>
+</testcase>
+<testcase name="coerceToTypeELExceptionTest()" classname="com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT]/[method:coerceToTypeELExceptionTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > coerceToTypeELExceptionTest()
+]]></system-out>
+</testcase>
+<testcase name="elModEqualPreOrTest()" classname="com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT" time="0.002">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT]/[method:elModEqualPreOrTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elModEqualPreOrTest()
+]]></system-out>
+</testcase>
+<testcase name="elShortLessThanEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elShortLessThanEqualTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elShortLessThanEqualTest()
+]]></system-out>
+</testcase>
+<testcase name="elDoubleSubtractTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0.002">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elDoubleSubtractTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elDoubleSubtractTest()
+]]></system-out>
+</testcase>
+<testcase name="elShortAddTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elShortAddTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elShortAddTest()
+]]></system-out>
+</testcase>
+<testcase name="elDivPreBinaryTest()" classname="com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT" time="0.002">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT]/[method:elDivPreBinaryTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elDivPreBinaryTest()
+]]></system-out>
+</testcase>
+<testcase name="elStringGreaterThanTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elStringGreaterThanTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elStringGreaterThanTest()
+]]></system-out>
+</testcase>
+<testcase name="elByteConcatenationTest()" classname="com.sun.ts.tests.el.spec.concatoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.concatoperator.ELClientIT]/[method:elByteConcatenationTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elByteConcatenationTest()
+]]></system-out>
+</testcase>
+<testcase name="elModEqualPreCondTest()" classname="com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT]/[method:elModEqualPreCondTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elModEqualPreCondTest()
+]]></system-out>
+</testcase>
+<testcase name="elIntegerEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elIntegerEqualToTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elIntegerEqualToTest()
+]]></system-out>
+</testcase>
+<testcase name="elSyntaxEscapeTest()" classname="com.sun.ts.tests.el.spec.language.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.language.ELClientIT]/[method:elSyntaxEscapeTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elSyntaxEscapeTest()
+]]></system-out>
+</testcase>
+<testcase name="elMultiEqualPreCondTest()" classname="com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT]/[method:elMultiEqualPreCondTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elMultiEqualPreCondTest()
+]]></system-out>
+</testcase>
+<testcase name="elDoubleModulusTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elDoubleModulusTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elDoubleModulusTest()
+]]></system-out>
+</testcase>
+<testcase name="elByteGreaterThanTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elByteGreaterThanTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elByteGreaterThanTest()
+]]></system-out>
+</testcase>
+<testcase name="negativeElNumberCoercionTest()" classname="com.sun.ts.tests.el.spec.coercion.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.coercion.ELClientIT]/[method:negativeElNumberCoercionTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > negativeElNumberCoercionTest()
+]]></system-out>
+</testcase>
+<testcase name="elFloatSubtractTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0.005">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elFloatSubtractTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elFloatSubtractTest()
+]]></system-out>
+</testcase>
+<testcase name="elNumberToLongCoercionTest()" classname="com.sun.ts.tests.el.spec.coercion.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.coercion.ELClientIT]/[method:elNumberToLongCoercionTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elNumberToLongCoercionTest()
+]]></system-out>
+</testcase>
+<testcase name="elCollectionCountTest()" classname="com.sun.ts.tests.el.spec.collectionoperators.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.collectionoperators.ELClientIT]/[method:elCollectionCountTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elCollectionCountTest()
+]]></system-out>
+</testcase>
+<testcase name="elBigDecimalAddTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elBigDecimalAddTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elBigDecimalAddTest()
+]]></system-out>
+</testcase>
+<testcase name="elAssignmentOperatorMultiTest()" classname="com.sun.ts.tests.el.spec.assignmentoperator.ELClientIT" time="0.002">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.assignmentoperator.ELClientIT]/[method:elAssignmentOperatorMultiTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elAssignmentOperatorMultiTest()
+]]></system-out>
+</testcase>
+<testcase name="elFloatGreaterThanTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elFloatGreaterThanTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elFloatGreaterThanTest()
+]]></system-out>
+</testcase>
+<testcase name="elSemiColonOperatorIntegerTest()" classname="com.sun.ts.tests.el.spec.semicolonoperator.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.semicolonoperator.ELClientIT]/[method:elSemiColonOperatorIntegerTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elSemiColonOperatorIntegerTest()
+]]></system-out>
+</testcase>
+<testcase name="elDoubleDivisionTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elDoubleDivisionTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elDoubleDivisionTest()
+]]></system-out>
+</testcase>
+<testcase name="elIntegerGreaterThanTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elIntegerGreaterThanTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elIntegerGreaterThanTest()
+]]></system-out>
+</testcase>
+<testcase name="elBigDecimalGreaterThanTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0.002">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elBigDecimalGreaterThanTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elBigDecimalGreaterThanTest()
+]]></system-out>
+</testcase>
+<testcase name="staticFieldELResolverInvokeTest()" classname="com.sun.ts.tests.el.api.jakarta_el.staticfieldelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.staticfieldelresolver.ELClientIT]/[method:staticFieldELResolverInvokeTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > staticFieldELResolverInvokeTest()
+]]></system-out>
+</testcase>
+<testcase name="listELResolverTest()" classname="com.sun.ts.tests.el.api.jakarta_el.listelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.listelresolver.ELClientIT]/[method:listELResolverTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > listELResolverTest()
+]]></system-out>
+</testcase>
+<testcase name="elNumberToByteCoercionTest()" classname="com.sun.ts.tests.el.spec.coercion.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.coercion.ELClientIT]/[method:elNumberToByteCoercionTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elNumberToByteCoercionTest()
+]]></system-out>
+</testcase>
+<testcase name="optionalELResolverEmptyInvokeInvalid()" classname="com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT]/[method:optionalELResolverEmptyInvokeInvalid()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > optionalELResolverEmptyInvokeInvalid()
+]]></system-out>
+</testcase>
+<testcase name="elIntegerGreaterThanEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elIntegerGreaterThanEqualTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elIntegerGreaterThanEqualTest()
+]]></system-out>
+</testcase>
+<testcase name="resourceBundleELResolverPNWETest()" classname="com.sun.ts.tests.el.api.jakarta_el.resourcebundleelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.resourcebundleelresolver.ELClientIT]/[method:resourceBundleELResolverPNWETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > resourceBundleELResolverPNWETest()
+]]></system-out>
+</testcase>
+<testcase name="elByteLessThanEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elByteLessThanEqualTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elByteLessThanEqualTest()
+]]></system-out>
+</testcase>
+<testcase name="elProcessorDefineFunctionNPETest()" classname="com.sun.ts.tests.el.api.jakarta_el.elprocessor.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.elprocessor.ELClientIT]/[method:elProcessorDefineFunctionNPETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elProcessorDefineFunctionNPETest()
+]]></system-out>
+</testcase>
+<testcase name="elProcessorDefineFunctionCNFETest()" classname="com.sun.ts.tests.el.api.jakarta_el.elprocessor.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.elprocessor.ELClientIT]/[method:elProcessorDefineFunctionCNFETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elProcessorDefineFunctionCNFETest()
+]]></system-out>
+</testcase>
+<testcase name="literalExprAsMethodExpr2Test()" classname="com.sun.ts.tests.el.spec.language.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.language.ELClientIT]/[method:literalExprAsMethodExpr2Test()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > literalExprAsMethodExpr2Test()
+]]></system-out>
+</testcase>
+<testcase name="beanELResolverInvokeTest()" classname="com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT]/[method:beanELResolverInvokeTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > beanELResolverInvokeTest()
+]]></system-out>
+</testcase>
+<testcase name="elContextGetSetLocaleTest()" classname="com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT]/[method:elContextGetSetLocaleTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elContextGetSetLocaleTest()
+]]></system-out>
+</testcase>
+<testcase name="elLambdaExprLongTest()" classname="com.sun.ts.tests.el.spec.lambda.ELClientIT" time="0.007">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.lambda.ELClientIT]/[method:elLambdaExprLongTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elLambdaExprLongTest()
+]]></system-out>
+</testcase>
+<testcase name="elOtherGreaterThanEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elOtherGreaterThanEqualTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elOtherGreaterThanEqualTest()
+]]></system-out>
+</testcase>
+<testcase name="elByteEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elByteEqualToTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elByteEqualToTest()
+]]></system-out>
+</testcase>
+<testcase name="elByteNotEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elByteNotEqualToTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elByteNotEqualToTest()
+]]></system-out>
+</testcase>
+<testcase name="beanELResolverDefaultMethodReadWriteTest()" classname="com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT]/[method:beanELResolverDefaultMethodReadWriteTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > beanELResolverDefaultMethodReadWriteTest()
+]]></system-out>
+</testcase>
+<testcase name="elCollectionLimitTest()" classname="com.sun.ts.tests.el.spec.collectionoperators.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.collectionoperators.ELClientIT]/[method:elCollectionLimitTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elCollectionLimitTest()
+]]></system-out>
+</testcase>
+<testcase name="elByteGreaterThanEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elByteGreaterThanEqualTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elByteGreaterThanEqualTest()
+]]></system-out>
+</testcase>
+<testcase name="elStringLessThanTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elStringLessThanTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elStringLessThanTest()
+]]></system-out>
+</testcase>
+<testcase name="elNumericStringSubtractTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elNumericStringSubtractTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elNumericStringSubtractTest()
+]]></system-out>
+</testcase>
+<testcase name="methodReferenceTest()" classname="com.sun.ts.tests.el.api.jakarta_el.methodreference.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.methodreference.ELClientIT]/[method:methodReferenceTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > methodReferenceTest()
+]]></system-out>
+</testcase>
+<testcase name="methodExpressionMatchingVarArgsTest()" classname="com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT]/[method:methodExpressionMatchingVarArgsTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > methodExpressionMatchingVarArgsTest()
+]]></system-out>
+</testcase>
+<testcase name="functionPrecedenceTest()" classname="com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT]/[method:functionPrecedenceTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > functionPrecedenceTest()
+]]></system-out>
+</testcase>
+<testcase name="elSemiColonOperatorNullTest()" classname="com.sun.ts.tests.el.spec.semicolonoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.semicolonoperator.ELClientIT]/[method:elSemiColonOperatorNullTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elSemiColonOperatorNullTest()
+]]></system-out>
+</testcase>
+<testcase name="elEqualOperandGreaterThanOrEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elEqualOperandGreaterThanOrEqualTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elEqualOperandGreaterThanOrEqualTest()
+]]></system-out>
+</testcase>
+<testcase name="listELResolverNPETest()" classname="com.sun.ts.tests.el.api.jakarta_el.listelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.listelresolver.ELClientIT]/[method:listELResolverNPETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > listELResolverNPETest()
+]]></system-out>
+</testcase>
+<testcase name="elBigDecimalDivisionTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elBigDecimalDivisionTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elBigDecimalDivisionTest()
+]]></system-out>
+</testcase>
+<testcase name="elShortConcatenationTest()" classname="com.sun.ts.tests.el.spec.concatoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.concatoperator.ELClientIT]/[method:elShortConcatenationTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elShortConcatenationTest()
+]]></system-out>
+</testcase>
+<testcase name="elStringLiteralTest()" classname="com.sun.ts.tests.el.spec.literal.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.literal.ELClientIT]/[method:elStringLiteralTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elStringLiteralTest()
+]]></system-out>
+</testcase>
+<testcase name="elLambdaExprStringTest()" classname="com.sun.ts.tests.el.spec.lambda.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.lambda.ELClientIT]/[method:elLambdaExprStringTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elLambdaExprStringTest()
+]]></system-out>
+</testcase>
+<testcase name="elNullToNumberCoercionTest()" classname="com.sun.ts.tests.el.spec.coercion.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.coercion.ELClientIT]/[method:elNullToNumberCoercionTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elNullToNumberCoercionTest()
+]]></system-out>
+</testcase>
+<testcase name="elOtherNotEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elOtherNotEqualToTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elOtherNotEqualToTest()
+]]></system-out>
+</testcase>
+<testcase name="elConditionalStringTest()" classname="com.sun.ts.tests.el.spec.conditionaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.conditionaloperator.ELClientIT]/[method:elConditionalStringTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elConditionalStringTest()
+]]></system-out>
+</testcase>
+<testcase name="positiveBoxedToPrimitiveTest()" classname="com.sun.ts.tests.el.spec.coercion.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.coercion.ELClientIT]/[method:positiveBoxedToPrimitiveTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > positiveBoxedToPrimitiveTest()
+]]></system-out>
+</testcase>
+<testcase name="elStringEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elStringEqualToTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elStringEqualToTest()
+]]></system-out>
+</testcase>
+<testcase name="mapELResolverPNWETest()" classname="com.sun.ts.tests.el.api.jakarta_el.mapelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.mapelresolver.ELClientIT]/[method:mapELResolverPNWETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > mapELResolverPNWETest()
+]]></system-out>
+</testcase>
+<testcase name="elNullOperandMultiplyTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elNullOperandMultiplyTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elNullOperandMultiplyTest()
+]]></system-out>
+</testcase>
+<testcase name="elBigIntegerConcatenationTest()" classname="com.sun.ts.tests.el.spec.concatoperator.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.concatoperator.ELClientIT]/[method:elBigIntegerConcatenationTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elBigIntegerConcatenationTest()
+]]></system-out>
+</testcase>
+<testcase name="parseOnceEvalManyTest()" classname="com.sun.ts.tests.el.spec.language.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.language.ELClientIT]/[method:parseOnceEvalManyTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > parseOnceEvalManyTest()
+]]></system-out>
+</testcase>
+<testcase name="positiveElBooleanCoercionTest()" classname="com.sun.ts.tests.el.spec.coercion.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.coercion.ELClientIT]/[method:positiveElBooleanCoercionTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > positiveElBooleanCoercionTest()
+]]></system-out>
+</testcase>
+<testcase name="elOtherGreaterThanTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elOtherGreaterThanTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elOtherGreaterThanTest()
+]]></system-out>
+</testcase>
+<testcase name="elFloatDivisionTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0.004">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elFloatDivisionTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elFloatDivisionTest()
+]]></system-out>
+</testcase>
+<testcase name="beanELResolverNPETest()" classname="com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT]/[method:beanELResolverNPETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > beanELResolverNPETest()
+]]></system-out>
+</testcase>
+<testcase name="elFloatAddTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0.008">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elFloatAddTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elFloatAddTest()
+]]></system-out>
+</testcase>
+<testcase name="elModPreRelationalTest()" classname="com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT" time="0.004">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT]/[method:elModPreRelationalTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elModPreRelationalTest()
+]]></system-out>
+</testcase>
+<testcase name="elIntegerLiteralTest()" classname="com.sun.ts.tests.el.spec.literal.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.literal.ELClientIT]/[method:elIntegerLiteralTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elIntegerLiteralTest()
+]]></system-out>
+</testcase>
+<testcase name="positivePrimitiveToBoxedTest()" classname="com.sun.ts.tests.el.spec.coercion.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.coercion.ELClientIT]/[method:positivePrimitiveToBoxedTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > positivePrimitiveToBoxedTest()
+]]></system-out>
+</testcase>
+<testcase name="elStringGreaterThanEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elStringGreaterThanEqualTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elStringGreaterThanEqualTest()
+]]></system-out>
+</testcase>
+<testcase name="elLongLessThanEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elLongLessThanEqualTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elLongLessThanEqualTest()
+]]></system-out>
+</testcase>
+<testcase name="elDoubleGreaterThanTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elDoubleGreaterThanTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elDoubleGreaterThanTest()
+]]></system-out>
+</testcase>
+<testcase name="elBigIntegerDivisionTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elBigIntegerDivisionTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elBigIntegerDivisionTest()
+]]></system-out>
+</testcase>
+<testcase name="invokeELETest()" classname="com.sun.ts.tests.el.api.jakarta_el.lambdaexpression.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.lambdaexpression.ELClientIT]/[method:invokeELETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > invokeELETest()
+]]></system-out>
+</testcase>
+<testcase name="elSemiColonOperatorLongTest()" classname="com.sun.ts.tests.el.spec.semicolonoperator.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.semicolonoperator.ELClientIT]/[method:elSemiColonOperatorLongTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elSemiColonOperatorLongTest()
+]]></system-out>
+</testcase>
+<testcase name="elFloatLessThanEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elFloatLessThanEqualTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elFloatLessThanEqualTest()
+]]></system-out>
+</testcase>
+<testcase name="elModEqualPreAndTest()" classname="com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT]/[method:elModEqualPreAndTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elModEqualPreAndTest()
+]]></system-out>
+</testcase>
+<testcase name="elBigIntegerGreaterThanTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elBigIntegerGreaterThanTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elBigIntegerGreaterThanTest()
+]]></system-out>
+</testcase>
+<testcase name="elNumberToDoubleCoercionTest()" classname="com.sun.ts.tests.el.spec.coercion.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.coercion.ELClientIT]/[method:elNumberToDoubleCoercionTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elNumberToDoubleCoercionTest()
+]]></system-out>
+</testcase>
+<testcase name="negativeElCharacterCoercionTest()" classname="com.sun.ts.tests.el.spec.coercion.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.coercion.ELClientIT]/[method:negativeElCharacterCoercionTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > negativeElCharacterCoercionTest()
+]]></system-out>
+</testcase>
+<testcase name="elCollectionFindFirstTest()" classname="com.sun.ts.tests.el.spec.collectionoperators.ELClientIT" time="0.005">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.collectionoperators.ELClientIT]/[method:elCollectionFindFirstTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elCollectionFindFirstTest()
+]]></system-out>
+</testcase>
+<testcase name="elDivEqualPreAndTest()" classname="com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT" time="0.002">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT]/[method:elDivEqualPreAndTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elDivEqualPreAndTest()
+]]></system-out>
+</testcase>
+<testcase name="elStringNotEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elStringNotEqualToTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elStringNotEqualToTest()
+]]></system-out>
+</testcase>
+<testcase name="elSemiColonOperatorBigDecimalTest()" classname="com.sun.ts.tests.el.spec.semicolonoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.semicolonoperator.ELClientIT]/[method:elSemiColonOperatorBigDecimalTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elSemiColonOperatorBigDecimalTest()
+]]></system-out>
+</testcase>
+<testcase name="arrayELResolverLengthTest()" classname="com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT]/[method:arrayELResolverLengthTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > arrayELResolverLengthTest()
+]]></system-out>
+</testcase>
+<testcase name="literalExprAsMethodExpr1Test()" classname="com.sun.ts.tests.el.spec.language.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.language.ELClientIT]/[method:literalExprAsMethodExpr1Test()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > literalExprAsMethodExpr1Test()
+]]></system-out>
+</testcase>
+<testcase name="elMultiPreBinaryTest()" classname="com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT]/[method:elMultiPreBinaryTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elMultiPreBinaryTest()
+]]></system-out>
+</testcase>
+<testcase name="elNumericStringMultiplyTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elNumericStringMultiplyTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elNumericStringMultiplyTest()
+]]></system-out>
+</testcase>
+<testcase name="elEmptyStringTest()" classname="com.sun.ts.tests.el.spec.emptyoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.emptyoperator.ELClientIT]/[method:elEmptyStringTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elEmptyStringTest()
+]]></system-out>
+</testcase>
+<testcase name="elBigIntegerNotEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elBigIntegerNotEqualToTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elBigIntegerNotEqualToTest()
+]]></system-out>
+</testcase>
+<testcase name="elShortDivisionTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elShortDivisionTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elShortDivisionTest()
+]]></system-out>
+</testcase>
+<testcase name="elOtherLessThanTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elOtherLessThanTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elOtherLessThanTest()
+]]></system-out>
+</testcase>
+<testcase name="elNullUnaryTest()" classname="com.sun.ts.tests.el.spec.unaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.unaryoperator.ELClientIT]/[method:elNullUnaryTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elNullUnaryTest()
+]]></system-out>
+</testcase>
+<testcase name="positiveMethodExpressionTest()" classname="com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT]/[method:positiveMethodExpressionTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > positiveMethodExpressionTest()
+]]></system-out>
+</testcase>
+<testcase name="elCoerceToOtherTypeTest()" classname="com.sun.ts.tests.el.spec.coercion.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.coercion.ELClientIT]/[method:elCoerceToOtherTypeTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elCoerceToOtherTypeTest()
+]]></system-out>
+</testcase>
+<testcase name="elLongMultiplyTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elLongMultiplyTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elLongMultiplyTest()
+]]></system-out>
+</testcase>
+<testcase name="variableMapperTest()" classname="com.sun.ts.tests.el.api.jakarta_el.variablemapper.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.variablemapper.ELClientIT]/[method:variableMapperTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > variableMapperTest()
+]]></system-out>
+</testcase>
+<testcase name="elNullOperandModulusTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elNullOperandModulusTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elNullOperandModulusTest()
+]]></system-out>
+</testcase>
+<testcase name="elLongDivisionTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elLongDivisionTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elLongDivisionTest()
+]]></system-out>
+</testcase>
+<testcase name="elOtherLessThanEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elOtherLessThanEqualTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elOtherLessThanEqualTest()
+]]></system-out>
+</testcase>
+<testcase name="optionalELResolverObjectInvokeInvalid()" classname="com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT]/[method:optionalELResolverObjectInvokeInvalid()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > optionalELResolverObjectInvokeInvalid()
+]]></system-out>
+</testcase>
+<testcase name="elLambdaExprIntegerTest()" classname="com.sun.ts.tests.el.spec.lambda.ELClientIT" time="0.009">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.lambda.ELClientIT]/[method:elLambdaExprIntegerTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elLambdaExprIntegerTest()
+]]></system-out>
+</testcase>
+<testcase name="elByteMultiplyTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elByteMultiplyTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elByteMultiplyTest()
+]]></system-out>
+</testcase>
+<testcase name="negativeValueExpressionTest()" classname="com.sun.ts.tests.el.api.jakarta_el.valueexpression.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.valueexpression.ELClientIT]/[method:negativeValueExpressionTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > negativeValueExpressionTest()
+]]></system-out>
+</testcase>
+<testcase name="elFloatConcatenationTest()" classname="com.sun.ts.tests.el.spec.concatoperator.ELClientIT" time="0.005">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.concatoperator.ELClientIT]/[method:elFloatConcatenationTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elFloatConcatenationTest()
+]]></system-out>
+</testcase>
+<testcase name="elSemiColonOperatorByteTest()" classname="com.sun.ts.tests.el.spec.semicolonoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.semicolonoperator.ELClientIT]/[method:elSemiColonOperatorByteTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elSemiColonOperatorByteTest()
+]]></system-out>
+</testcase>
+<testcase name="elResolverPNWETest()" classname="com.sun.ts.tests.el.api.jakarta_el.elresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.elresolver.ELClientIT]/[method:elResolverPNWETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elResolverPNWETest()
+]]></system-out>
+</testcase>
+<testcase name="beanNameELResolverGetTypeNPETest()" classname="com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT]/[method:beanNameELResolverGetTypeNPETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > beanNameELResolverGetTypeNPETest()
+]]></system-out>
+</testcase>
+<testcase name="elDoubleGreaterThanEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0.003">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elDoubleGreaterThanEqualTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elDoubleGreaterThanEqualTest()
+]]></system-out>
+</testcase>
+<testcase name="elCollectionMapFilterTest()" classname="com.sun.ts.tests.el.spec.collectionoperators.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.collectionoperators.ELClientIT]/[method:elCollectionMapFilterTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elCollectionMapFilterTest()
+]]></system-out>
+</testcase>
+<testcase name="listELResolverPNFETest()" classname="com.sun.ts.tests.el.api.jakarta_el.listelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.listelresolver.ELClientIT]/[method:listELResolverPNFETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > listELResolverPNFETest()
+]]></system-out>
+</testcase>
+<testcase name="resourceBundleELResolverNPETest()" classname="com.sun.ts.tests.el.api.jakarta_el.resourcebundleelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.resourcebundleelresolver.ELClientIT]/[method:resourceBundleELResolverNPETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > resourceBundleELResolverNPETest()
+]]></system-out>
+</testcase>
+<testcase name="mixedCompositeExpressionsTest()" classname="com.sun.ts.tests.el.spec.language.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.language.ELClientIT]/[method:mixedCompositeExpressionsTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > mixedCompositeExpressionsTest()
+]]></system-out>
+</testcase>
+<testcase name="elDoubleStringUnaryTest()" classname="com.sun.ts.tests.el.spec.unaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.unaryoperator.ELClientIT]/[method:elDoubleStringUnaryTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elDoubleStringUnaryTest()
+]]></system-out>
+</testcase>
+<testcase name="elAssignmentOperatorBigDecimalTest()" classname="com.sun.ts.tests.el.spec.assignmentoperator.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.assignmentoperator.ELClientIT]/[method:elAssignmentOperatorBigDecimalTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elAssignmentOperatorBigDecimalTest()
+]]></system-out>
+</testcase>
+<testcase name="elBigIntegerUnaryTest()" classname="com.sun.ts.tests.el.spec.unaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.unaryoperator.ELClientIT]/[method:elBigIntegerUnaryTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elBigIntegerUnaryTest()
+]]></system-out>
+</testcase>
+<testcase name="elShortNotEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elShortNotEqualToTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elShortNotEqualToTest()
+]]></system-out>
+</testcase>
+<testcase name="elNullLiteralTest()" classname="com.sun.ts.tests.el.spec.literal.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.literal.ELClientIT]/[method:elNullLiteralTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elNullLiteralTest()
+]]></system-out>
+</testcase>
+<testcase name="elCollectionSubStreamTest()" classname="com.sun.ts.tests.el.spec.collectionoperators.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.collectionoperators.ELClientIT]/[method:elCollectionSubStreamTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elCollectionSubStreamTest()
+]]></system-out>
+</testcase>
+<testcase name="elLongGreaterThanEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elLongGreaterThanEqualTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elLongGreaterThanEqualTest()
+]]></system-out>
+</testcase>
+<testcase name="optionalELResolverEmptyNonNullTest()" classname="com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT]/[method:optionalELResolverEmptyNonNullTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > optionalELResolverEmptyNonNullTest()
+]]></system-out>
+</testcase>
+<testcase name="elSemiColonOperatorBigIntegerTest()" classname="com.sun.ts.tests.el.spec.semicolonoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.semicolonoperator.ELClientIT]/[method:elSemiColonOperatorBigIntegerTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elSemiColonOperatorBigIntegerTest()
+]]></system-out>
+</testcase>
+<testcase name="elDoubleConcatenationTest()" classname="com.sun.ts.tests.el.spec.concatoperator.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.concatoperator.ELClientIT]/[method:elDoubleConcatenationTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elDoubleConcatenationTest()
+]]></system-out>
+</testcase>
+<testcase name="elMultiEqualPreAndTest()" classname="com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT]/[method:elMultiEqualPreAndTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elMultiEqualPreAndTest()
+]]></system-out>
+</testcase>
+<testcase name="elFloatEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elFloatEqualToTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elFloatEqualToTest()
+]]></system-out>
+</testcase>
+<testcase name="listELResolverIAETest()" classname="com.sun.ts.tests.el.api.jakarta_el.listelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.listelresolver.ELClientIT]/[method:listELResolverIAETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > listELResolverIAETest()
+]]></system-out>
+</testcase>
+<testcase name="elByteLessThanTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elByteLessThanTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elByteLessThanTest()
+]]></system-out>
+</testcase>
+<testcase name="elBooleanNotEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elBooleanNotEqualToTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elBooleanNotEqualToTest()
+]]></system-out>
+</testcase>
+<testcase name="elContextGetContextNPETest()" classname="com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT]/[method:elContextGetContextNPETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elContextGetContextNPETest()
+]]></system-out>
+</testcase>
+<testcase name="methodExpressionMatchingExactPreferredTest()" classname="com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT]/[method:methodExpressionMatchingExactPreferredTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > methodExpressionMatchingExactPreferredTest()
+]]></system-out>
+</testcase>
+<testcase name="compositeELResolverTest()" classname="com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT]/[method:compositeELResolverTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > compositeELResolverTest()
+]]></system-out>
+</testcase>
+<testcase name="recordELResolverTest()" classname="com.sun.ts.tests.el.api.jakarta_el.recordelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.recordelresolver.ELClientIT]/[method:recordELResolverTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > recordELResolverTest()
+]]></system-out>
+</testcase>
+<testcase name="elIntegerMultiplyTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elIntegerMultiplyTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elIntegerMultiplyTest()
+]]></system-out>
+</testcase>
+<testcase name="elAssignmentOperatorByteTest()" classname="com.sun.ts.tests.el.spec.assignmentoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.assignmentoperator.ELClientIT]/[method:elAssignmentOperatorByteTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elAssignmentOperatorByteTest()
+]]></system-out>
+</testcase>
+<testcase name="elBooleanEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elBooleanEqualToTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elBooleanEqualToTest()
+]]></system-out>
+</testcase>
+<testcase name="createMethodExpressionELExceptionTest()" classname="com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT]/[method:createMethodExpressionELExceptionTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > createMethodExpressionELExceptionTest()
+]]></system-out>
+</testcase>
+<testcase name="beanNameELResolverTest()" classname="com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT]/[method:beanNameELResolverTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > beanNameELResolverTest()
+]]></system-out>
+</testcase>
+<testcase name="elNumberToShortCoercionTest()" classname="com.sun.ts.tests.el.spec.coercion.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.coercion.ELClientIT]/[method:elNumberToShortCoercionTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elNumberToShortCoercionTest()
+]]></system-out>
+</testcase>
+<testcase name="elLambdaExprBigIntegerTest()" classname="com.sun.ts.tests.el.spec.lambda.ELClientIT" time="0.012">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.lambda.ELClientIT]/[method:elLambdaExprBigIntegerTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elLambdaExprBigIntegerTest()
+]]></system-out>
+</testcase>
+<testcase name="elBigIntegerAddTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elBigIntegerAddTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elBigIntegerAddTest()
+]]></system-out>
+</testcase>
+<testcase name="elMultiPreRelationalTest()" classname="com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT" time="0.003">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT]/[method:elMultiPreRelationalTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elMultiPreRelationalTest()
+]]></system-out>
+</testcase>
+<testcase name="compositeExprEval1Test()" classname="com.sun.ts.tests.el.spec.language.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.language.ELClientIT]/[method:compositeExprEval1Test()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > compositeExprEval1Test()
+]]></system-out>
+</testcase>
+<testcase name="elDivPreRelationalTest()" classname="com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT" time="0.005">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT]/[method:elDivPreRelationalTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elDivPreRelationalTest()
+]]></system-out>
+</testcase>
+<testcase name="elAssignmentOperatorShortTest()" classname="com.sun.ts.tests.el.spec.assignmentoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.assignmentoperator.ELClientIT]/[method:elAssignmentOperatorShortTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elAssignmentOperatorShortTest()
+]]></system-out>
+</testcase>
+<testcase name="negativeElBooleanCoercionTest()" classname="com.sun.ts.tests.el.spec.coercion.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.coercion.ELClientIT]/[method:negativeElBooleanCoercionTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > negativeElBooleanCoercionTest()
+]]></system-out>
+</testcase>
+<testcase name="createValueExpressionTest()" classname="com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT]/[method:createValueExpressionTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > createValueExpressionTest()
+]]></system-out>
+</testcase>
+<testcase name="elByteUnaryTest()" classname="com.sun.ts.tests.el.spec.unaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.unaryoperator.ELClientIT]/[method:elByteUnaryTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elByteUnaryTest()
+]]></system-out>
+</testcase>
+<testcase name="methodExpressionMatchingOverloadBeatsCoercionTest()" classname="com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT]/[method:methodExpressionMatchingOverloadBeatsCoercionTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > methodExpressionMatchingOverloadBeatsCoercionTest()
+]]></system-out>
+</testcase>
+<testcase name="elMultiEqualOrCondTest()" classname="com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT]/[method:elMultiEqualOrCondTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elMultiEqualOrCondTest()
+]]></system-out>
+</testcase>
+<testcase name="elCollectionFlatMapTest()" classname="com.sun.ts.tests.el.spec.collectionoperators.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.collectionoperators.ELClientIT]/[method:elCollectionFlatMapTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elCollectionFlatMapTest()
+]]></system-out>
+</testcase>
+<testcase name="elNumberToFloatCoercionTest()" classname="com.sun.ts.tests.el.spec.coercion.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.coercion.ELClientIT]/[method:elNumberToFloatCoercionTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elNumberToFloatCoercionTest()
+]]></system-out>
+</testcase>
+<testcase name="ELFunctionBindingTest()" classname="com.sun.ts.tests.el.spec.mapper.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.mapper.ELClientIT]/[method:ELFunctionBindingTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > ELFunctionBindingTest()
+]]></system-out>
+</testcase>
+<testcase name="elCoerceToArrayTest()" classname="com.sun.ts.tests.el.spec.coercion.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.coercion.ELClientIT]/[method:elCoerceToArrayTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elCoerceToArrayTest()
+]]></system-out>
+</testcase>
+<testcase name="dotAndIndexOperatorsSameTest()" classname="com.sun.ts.tests.el.spec.language.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.language.ELClientIT]/[method:dotAndIndexOperatorsSameTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > dotAndIndexOperatorsSameTest()
+]]></system-out>
+</testcase>
+<testcase name="methodExpressionMatchingAmbiguousTest()" classname="com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT]/[method:methodExpressionMatchingAmbiguousTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > methodExpressionMatchingAmbiguousTest()
+]]></system-out>
+</testcase>
+<testcase name="optionalELResolverObjectInvoke()" classname="com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT]/[method:optionalELResolverObjectInvoke()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > optionalELResolverObjectInvoke()
+]]></system-out>
+</testcase>
+<testcase name="elStringLessThanEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elStringLessThanEqualTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elStringLessThanEqualTest()
+]]></system-out>
+</testcase>
+<testcase name="nestedEvalExpressionsTest()" classname="com.sun.ts.tests.el.spec.language.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.language.ELClientIT]/[method:nestedEvalExpressionsTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > nestedEvalExpressionsTest()
+]]></system-out>
+</testcase>
+<testcase name="arrayELResolverPNFETest()" classname="com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT]/[method:arrayELResolverPNFETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > arrayELResolverPNFETest()
+]]></system-out>
+</testcase>
+<testcase name="createMethodExpressionTest()" classname="com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT]/[method:createMethodExpressionTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > createMethodExpressionTest()
+]]></system-out>
+</testcase>
+<testcase name="elConditionalBooleanTest()" classname="com.sun.ts.tests.el.spec.conditionaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.conditionaloperator.ELClientIT]/[method:elConditionalBooleanTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elConditionalBooleanTest()
+]]></system-out>
+</testcase>
+<testcase name="elIntegerLessThanTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elIntegerLessThanTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elIntegerLessThanTest()
+]]></system-out>
+</testcase>
+<testcase name="compositeELResolverPNWETest()" classname="com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT]/[method:compositeELResolverPNWETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > compositeELResolverPNWETest()
+]]></system-out>
+</testcase>
+<testcase name="elCollectionDistinctTest()" classname="com.sun.ts.tests.el.spec.collectionoperators.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.collectionoperators.ELClientIT]/[method:elCollectionDistinctTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elCollectionDistinctTest()
+]]></system-out>
+</testcase>
+<testcase name="methodExpressionMatchingCoercionBeatsExactVarArgsTest()" classname="com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT]/[method:methodExpressionMatchingCoercionBeatsExactVarArgsTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > methodExpressionMatchingCoercionBeatsExactVarArgsTest()
+]]></system-out>
+</testcase>
+<testcase name="elBooleanUnaryTrueTest()" classname="com.sun.ts.tests.el.spec.unaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.unaryoperator.ELClientIT]/[method:elBooleanUnaryTrueTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elBooleanUnaryTrueTest()
+]]></system-out>
+</testcase>
+<testcase name="elBooleanAndTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elBooleanAndTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elBooleanAndTest()
+]]></system-out>
+</testcase>
+<testcase name="beanELResolverInvokeVoidTest()" classname="com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT]/[method:beanELResolverInvokeVoidTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > beanELResolverInvokeVoidTest()
+]]></system-out>
+</testcase>
+<testcase name="elBigIntegerGreaterThanEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elBigIntegerGreaterThanEqualTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elBigIntegerGreaterThanEqualTest()
+]]></system-out>
+</testcase>
+<testcase name="arrayELResolverIAETest()" classname="com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT]/[method:arrayELResolverIAETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > arrayELResolverIAETest()
+]]></system-out>
+</testcase>
+<testcase name="elIntegerUnaryTest()" classname="com.sun.ts.tests.el.spec.unaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.unaryoperator.ELClientIT]/[method:elIntegerUnaryTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elIntegerUnaryTest()
+]]></system-out>
+</testcase>
+<testcase name="beanNameELResolverInvokeMNFETest()" classname="com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT]/[method:beanNameELResolverInvokeMNFETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > beanNameELResolverInvokeMNFETest()
+]]></system-out>
+</testcase>
+<testcase name="elLongUnaryTest()" classname="com.sun.ts.tests.el.spec.unaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.unaryoperator.ELClientIT]/[method:elLongUnaryTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elLongUnaryTest()
+]]></system-out>
+</testcase>
+<testcase name="elByteAddTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elByteAddTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elByteAddTest()
+]]></system-out>
+</testcase>
+<testcase name="coerceToTypeTest()" classname="com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT]/[method:coerceToTypeTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > coerceToTypeTest()
+]]></system-out>
+</testcase>
+<testcase name="compositeELResolverInvokeTest()" classname="com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT]/[method:compositeELResolverInvokeTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > compositeELResolverInvokeTest()
+]]></system-out>
+</testcase>
+<testcase name="elDoubleAddTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elDoubleAddTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elDoubleAddTest()
+]]></system-out>
+</testcase>
+<testcase name="negativeEqualsTest()" classname="com.sun.ts.tests.el.api.jakarta_el.expression.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.expression.ELClientIT]/[method:negativeEqualsTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > negativeEqualsTest()
+]]></system-out>
+</testcase>
+<testcase name="mapELResolverNPETest()" classname="com.sun.ts.tests.el.api.jakarta_el.mapelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.mapelresolver.ELClientIT]/[method:mapELResolverNPETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > mapELResolverNPETest()
+]]></system-out>
+</testcase>
+<testcase name="elEnumNotEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elEnumNotEqualToTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elEnumNotEqualToTest()
+]]></system-out>
+</testcase>
+<testcase name="elDoubleLessThanEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elDoubleLessThanEqualTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elDoubleLessThanEqualTest()
+]]></system-out>
+</testcase>
+<testcase name="elBigDecimalNotEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elBigDecimalNotEqualToTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elBigDecimalNotEqualToTest()
+]]></system-out>
+</testcase>
+<testcase name="elResolverNPETest()" classname="com.sun.ts.tests.el.api.jakarta_el.elresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.elresolver.ELClientIT]/[method:elResolverNPETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elResolverNPETest()
+]]></system-out>
+</testcase>
+<testcase name="elCollectionToArrayTest()" classname="com.sun.ts.tests.el.spec.collectionoperators.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.collectionoperators.ELClientIT]/[method:elCollectionToArrayTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elCollectionToArrayTest()
+]]></system-out>
+</testcase>
+<testcase name="elLambdaExprNullTest()" classname="com.sun.ts.tests.el.spec.lambda.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.lambda.ELClientIT]/[method:elLambdaExprNullTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elLambdaExprNullTest()
+]]></system-out>
+</testcase>
+<testcase name="elProcessorDefineFunctionNSMETest()" classname="com.sun.ts.tests.el.api.jakarta_el.elprocessor.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.elprocessor.ELClientIT]/[method:elProcessorDefineFunctionNSMETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elProcessorDefineFunctionNSMETest()
+]]></system-out>
+</testcase>
+<testcase name="elByteSubtractTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elByteSubtractTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elByteSubtractTest()
+]]></system-out>
+</testcase>
+<testcase name="elBigIntegerModulusTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elBigIntegerModulusTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elBigIntegerModulusTest()
+]]></system-out>
+</testcase>
+<testcase name="elStringToNumberCoercionTest()" classname="com.sun.ts.tests.el.spec.coercion.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.coercion.ELClientIT]/[method:elStringToNumberCoercionTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elStringToNumberCoercionTest()
+]]></system-out>
+</testcase>
+<testcase name="elFloatModulusTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0.009">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elFloatModulusTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elFloatModulusTest()
+]]></system-out>
+</testcase>
+<testcase name="elSemiColonOperatorShortTest()" classname="com.sun.ts.tests.el.spec.semicolonoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.semicolonoperator.ELClientIT]/[method:elSemiColonOperatorShortTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elSemiColonOperatorShortTest()
+]]></system-out>
+</testcase>
+<testcase name="rValueCoercion1Test()" classname="com.sun.ts.tests.el.spec.language.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.language.ELClientIT]/[method:rValueCoercion1Test()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > rValueCoercion1Test()
+]]></system-out>
+</testcase>
+<testcase name="optionalELResolverEmptyNullTest()" classname="com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.optionalelresolver.ELClientIT]/[method:optionalELResolverEmptyNullTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > optionalELResolverEmptyNullTest()
+]]></system-out>
+</testcase>
+<testcase name="valueExpressionSerializableTest()" classname="com.sun.ts.tests.el.api.jakarta_el.valueexpression.ELClientIT" time="0.003">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.valueexpression.ELClientIT]/[method:valueExpressionSerializableTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > valueExpressionSerializableTest()
+]]></system-out>
+</testcase>
+<testcase name="elShortLessThanTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elShortLessThanTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elShortLessThanTest()
+]]></system-out>
+</testcase>
+<testcase name="elOtherEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elOtherEqualToTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elOtherEqualToTest()
+]]></system-out>
+</testcase>
+<testcase name="positiveElCharacterCoercionTest()" classname="com.sun.ts.tests.el.spec.coercion.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.coercion.ELClientIT]/[method:positiveElCharacterCoercionTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > positiveElCharacterCoercionTest()
+]]></system-out>
+</testcase>
+<testcase name="elParenPreBinaryTest()" classname="com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT" time="0.003">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT]/[method:elParenPreBinaryTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elParenPreBinaryTest()
+]]></system-out>
+</testcase>
+<testcase name="elEmptyMapTest()" classname="com.sun.ts.tests.el.spec.emptyoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.emptyoperator.ELClientIT]/[method:elEmptyMapTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elEmptyMapTest()
+]]></system-out>
+</testcase>
+<testcase name="elNumericStringModulusTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elNumericStringModulusTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elNumericStringModulusTest()
+]]></system-out>
+</testcase>
+<testcase name="elBigIntegerMultiplyTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elBigIntegerMultiplyTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elBigIntegerMultiplyTest()
+]]></system-out>
+</testcase>
+<testcase name="elBigIntegerLessThanTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elBigIntegerLessThanTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elBigIntegerLessThanTest()
+]]></system-out>
+</testcase>
+<testcase name="elCollectionReduceTest()" classname="com.sun.ts.tests.el.spec.collectionoperators.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.collectionoperators.ELClientIT]/[method:elCollectionReduceTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elCollectionReduceTest()
+]]></system-out>
+</testcase>
+<testcase name="elAssignmentOperatorNullTest()" classname="com.sun.ts.tests.el.spec.assignmentoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.assignmentoperator.ELClientIT]/[method:elAssignmentOperatorNullTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elAssignmentOperatorNullTest()
+]]></system-out>
+</testcase>
+<testcase name="elBooleanUnaryFalseTest()" classname="com.sun.ts.tests.el.spec.unaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.unaryoperator.ELClientIT]/[method:elBooleanUnaryFalseTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elBooleanUnaryFalseTest()
+]]></system-out>
+</testcase>
+<testcase name="createValueExpressionELExceptionTest()" classname="com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT]/[method:createValueExpressionELExceptionTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > createValueExpressionELExceptionTest()
+]]></system-out>
+</testcase>
+<testcase name="invokeNPETest()" classname="com.sun.ts.tests.el.api.jakarta_el.lambdaexpression.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.lambdaexpression.ELClientIT]/[method:invokeNPETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > invokeNPETest()
+]]></system-out>
+</testcase>
+<testcase name="elShortMultiplyTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elShortMultiplyTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elShortMultiplyTest()
+]]></system-out>
+</testcase>
+<testcase name="elLongGreaterThanTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elLongGreaterThanTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elLongGreaterThanTest()
+]]></system-out>
+</testcase>
+<testcase name="elBigDecimalMultiplyTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elBigDecimalMultiplyTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elBigDecimalMultiplyTest()
+]]></system-out>
+</testcase>
+<testcase name="elLongNotEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elLongNotEqualToTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elLongNotEqualToTest()
+]]></system-out>
+</testcase>
+<testcase name="arrayELResolverPNWETest()" classname="com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT]/[method:arrayELResolverPNWETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > arrayELResolverPNWETest()
+]]></system-out>
+</testcase>
+<testcase name="elEqualOperandLessThanOrEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elEqualOperandLessThanOrEqualTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elEqualOperandLessThanOrEqualTest()
+]]></system-out>
+</testcase>
+<testcase name="compositeELResolverPNFETest()" classname="com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT]/[method:compositeELResolverPNFETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > compositeELResolverPNFETest()
+]]></system-out>
+</testcase>
+<testcase name="elBigDecimalEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elBigDecimalEqualToTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elBigDecimalEqualToTest()
+]]></system-out>
+</testcase>
+<testcase name="elNullOperandGreaterThanOrEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elNullOperandGreaterThanOrEqualTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elNullOperandGreaterThanOrEqualTest()
+]]></system-out>
+</testcase>
+<testcase name="elFloatMultiplyTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0.005">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elFloatMultiplyTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elFloatMultiplyTest()
+]]></system-out>
+</testcase>
+<testcase name="elNullOperandDivisionTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elNullOperandDivisionTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elNullOperandDivisionTest()
+]]></system-out>
+</testcase>
+<testcase name="elBigDecimalLessThanEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0.002">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elBigDecimalLessThanEqualTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elBigDecimalLessThanEqualTest()
+]]></system-out>
+</testcase>
+<testcase name="elNullOperandNotEqualTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elNullOperandNotEqualTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elNullOperandNotEqualTest()
+]]></system-out>
+</testcase>
+<testcase name="elCollectionMapLiteralTest()" classname="com.sun.ts.tests.el.spec.collectionoperators.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.collectionoperators.ELClientIT]/[method:elCollectionMapLiteralTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elCollectionMapLiteralTest()
+]]></system-out>
+</testcase>
+<testcase name="elFloatLessThanTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elFloatLessThanTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elFloatLessThanTest()
+]]></system-out>
+</testcase>
+<testcase name="elBigIntegerEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elBigIntegerEqualToTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elBigIntegerEqualToTest()
+]]></system-out>
+</testcase>
+<testcase name="elBooleanLiteralTest()" classname="com.sun.ts.tests.el.spec.literal.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.literal.ELClientIT]/[method:elBooleanLiteralTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elBooleanLiteralTest()
+]]></system-out>
+</testcase>
+<testcase name="elIntegerModulusTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elIntegerModulusTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elIntegerModulusTest()
+]]></system-out>
+</testcase>
+<testcase name="elBigDecimalLessThanTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elBigDecimalLessThanTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elBigDecimalLessThanTest()
+]]></system-out>
+</testcase>
+<testcase name="literalExprEval2Test()" classname="com.sun.ts.tests.el.spec.language.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.language.ELClientIT]/[method:literalExprEval2Test()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > literalExprEval2Test()
+]]></system-out>
+</testcase>
+<testcase name="elAssignmentOperatorDoubleTest()" classname="com.sun.ts.tests.el.spec.assignmentoperator.ELClientIT" time="0.002">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.assignmentoperator.ELClientIT]/[method:elAssignmentOperatorDoubleTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elAssignmentOperatorDoubleTest()
+]]></system-out>
+</testcase>
+<testcase name="literalExprEval1Test()" classname="com.sun.ts.tests.el.spec.language.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.language.ELClientIT]/[method:literalExprEval1Test()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > literalExprEval1Test()
+]]></system-out>
+</testcase>
+<testcase name="elEmptyNullTest()" classname="com.sun.ts.tests.el.spec.emptyoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.emptyoperator.ELClientIT]/[method:elEmptyNullTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elEmptyNullTest()
+]]></system-out>
+</testcase>
+<testcase name="elLongModulusTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elLongModulusTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elLongModulusTest()
+]]></system-out>
+</testcase>
+<testcase name="elEmptyCollectionTest()" classname="com.sun.ts.tests.el.spec.emptyoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.emptyoperator.ELClientIT]/[method:elEmptyCollectionTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elEmptyCollectionTest()
+]]></system-out>
+</testcase>
+<testcase name="elLongAddTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0.007">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elLongAddTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elLongAddTest()
+]]></system-out>
+</testcase>
+<testcase name="createValueExpression2Test()" classname="com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT]/[method:createValueExpression2Test()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > createValueExpression2Test()
+]]></system-out>
+</testcase>
+<testcase name="elLambdaExprBigDecimalTest()" classname="com.sun.ts.tests.el.spec.lambda.ELClientIT" time="0.011">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.lambda.ELClientIT]/[method:elLambdaExprBigDecimalTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elLambdaExprBigDecimalTest()
+]]></system-out>
+</testcase>
+<testcase name="elDoubleLessThanTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elDoubleLessThanTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elDoubleLessThanTest()
+]]></system-out>
+</testcase>
+<testcase name="elContextAddGetListenersTest()" classname="com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT]/[method:elContextAddGetListenersTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elContextAddGetListenersTest()
+]]></system-out>
+</testcase>
+<testcase name="elAssignmentOperatorIntegerTest()" classname="com.sun.ts.tests.el.spec.assignmentoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.assignmentoperator.ELClientIT]/[method:elAssignmentOperatorIntegerTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elAssignmentOperatorIntegerTest()
+]]></system-out>
+</testcase>
+<testcase name="elAssignmentOperatorFloatTest()" classname="com.sun.ts.tests.el.spec.assignmentoperator.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.assignmentoperator.ELClientIT]/[method:elAssignmentOperatorFloatTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elAssignmentOperatorFloatTest()
+]]></system-out>
+</testcase>
+<testcase name="methodExpressionSerializableTest()" classname="com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT]/[method:methodExpressionSerializableTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > methodExpressionSerializableTest()
+]]></system-out>
+</testcase>
+<testcase name="beanELResolverMethodVisibilityTest()" classname="com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT]/[method:beanELResolverMethodVisibilityTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > beanELResolverMethodVisibilityTest()
+]]></system-out>
+</testcase>
+<testcase name="poundDollarSameMeaning1Test()" classname="com.sun.ts.tests.el.spec.language.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.language.ELClientIT]/[method:poundDollarSameMeaning1Test()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > poundDollarSameMeaning1Test()
+]]></system-out>
+</testcase>
+<testcase name="arrayELResolverNPETest()" classname="com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT]/[method:arrayELResolverNPETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > arrayELResolverNPETest()
+]]></system-out>
+</testcase>
+<testcase name="elResolverPNFETest()" classname="com.sun.ts.tests.el.api.jakarta_el.elresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.elresolver.ELClientIT]/[method:elResolverPNFETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elResolverPNFETest()
+]]></system-out>
+</testcase>
+<testcase name="elDoubleMultiplyTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elDoubleMultiplyTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elDoubleMultiplyTest()
+]]></system-out>
+</testcase>
+<testcase name="beanNameELResolverSetValueNPETest()" classname="com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT]/[method:beanNameELResolverSetValueNPETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > beanNameELResolverSetValueNPETest()
+]]></system-out>
+</testcase>
+<testcase name="elDivEqualPreCondTest()" classname="com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT]/[method:elDivEqualPreCondTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elDivEqualPreCondTest()
+]]></system-out>
+</testcase>
+<testcase name="compositeELResolverAddNPETest()" classname="com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT]/[method:compositeELResolverAddNPETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > compositeELResolverAddNPETest()
+]]></system-out>
+</testcase>
+<testcase name="staticFieldResolverInvokeMNFETest()" classname="com.sun.ts.tests.el.api.jakarta_el.staticfieldelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.staticfieldelresolver.ELClientIT]/[method:staticFieldResolverInvokeMNFETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > staticFieldResolverInvokeMNFETest()
+]]></system-out>
+</testcase>
+<testcase name="compositeExprEval2Test()" classname="com.sun.ts.tests.el.spec.language.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.language.ELClientIT]/[method:compositeExprEval2Test()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > compositeExprEval2Test()
+]]></system-out>
+</testcase>
+<testcase name="elDoubleUnaryTest()" classname="com.sun.ts.tests.el.spec.unaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.unaryoperator.ELClientIT]/[method:elDoubleUnaryTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elDoubleUnaryTest()
+]]></system-out>
+</testcase>
+<testcase name="elLambdaExprFloatTest()" classname="com.sun.ts.tests.el.spec.lambda.ELClientIT" time="0.018">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.lambda.ELClientIT]/[method:elLambdaExprFloatTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elLambdaExprFloatTest()
+]]></system-out>
+</testcase>
+<testcase name="beanNameELResolverGetValueNPETest()" classname="com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT]/[method:beanNameELResolverGetValueNPETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > beanNameELResolverGetValueNPETest()
+]]></system-out>
+</testcase>
+<testcase name="beanELResolverInvokeMNFETest()" classname="com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT]/[method:beanELResolverInvokeMNFETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > beanELResolverInvokeMNFETest()
+]]></system-out>
+</testcase>
+<testcase name="compositeELResolverNPETest()" classname="com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT]/[method:compositeELResolverNPETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > compositeELResolverNPETest()
+]]></system-out>
+</testcase>
+<testcase name="staticFieldResolverInvokePNFETest()" classname="com.sun.ts.tests.el.api.jakarta_el.staticfieldelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.staticfieldelresolver.ELClientIT]/[method:staticFieldResolverInvokePNFETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > staticFieldResolverInvokePNFETest()
+]]></system-out>
+</testcase>
+<testcase name="elIntegerSubtractTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elIntegerSubtractTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elIntegerSubtractTest()
+]]></system-out>
+</testcase>
+<testcase name="beanELResolverPNFETest()" classname="com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT]/[method:beanELResolverPNFETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > beanELResolverPNFETest()
+]]></system-out>
+</testcase>
+<testcase name="elLambdaExprDoubleTest()" classname="com.sun.ts.tests.el.spec.lambda.ELClientIT" time="0.02">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.lambda.ELClientIT]/[method:elLambdaExprDoubleTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elLambdaExprDoubleTest()
+]]></system-out>
+</testcase>
+<testcase name="elCollectionListLiteralTest()" classname="com.sun.ts.tests.el.spec.collectionoperators.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.collectionoperators.ELClientIT]/[method:elCollectionListLiteralTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elCollectionListLiteralTest()
+]]></system-out>
+</testcase>
+<testcase name="poundDollarSameMeaning2Test()" classname="com.sun.ts.tests.el.spec.language.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.language.ELClientIT]/[method:poundDollarSameMeaning2Test()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > poundDollarSameMeaning2Test()
+]]></system-out>
+</testcase>
+<testcase name="elBigDecimalModulusTest()" classname="com.sun.ts.tests.el.spec.binaryoperator.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.binaryoperator.ELClientIT]/[method:elBigDecimalModulusTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elBigDecimalModulusTest()
+]]></system-out>
+</testcase>
+<testcase name="elContextIsSetPropertyResolvedTest()" classname="com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT]/[method:elContextIsSetPropertyResolvedTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elContextIsSetPropertyResolvedTest()
+]]></system-out>
+</testcase>
+<testcase name="elIntegerNotEqualToTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elIntegerNotEqualToTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elIntegerNotEqualToTest()
+]]></system-out>
+</testcase>
+<testcase name="elSemiColonOperatorFloatTest()" classname="com.sun.ts.tests.el.spec.semicolonoperator.ELClientIT" time="0.001">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.semicolonoperator.ELClientIT]/[method:elSemiColonOperatorFloatTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elSemiColonOperatorFloatTest()
+]]></system-out>
+</testcase>
+<testcase name="beanELResolverTest()" classname="com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT]/[method:beanELResolverTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > beanELResolverTest()
+]]></system-out>
+</testcase>
+<testcase name="elAssignmentOperatorLongTest()" classname="com.sun.ts.tests.el.spec.assignmentoperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.assignmentoperator.ELClientIT]/[method:elAssignmentOperatorLongTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elAssignmentOperatorLongTest()
+]]></system-out>
+</testcase>
+<testcase name="elCollectionForEachTest()" classname="com.sun.ts.tests.el.spec.collectionoperators.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.collectionoperators.ELClientIT]/[method:elCollectionForEachTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elCollectionForEachTest()
+]]></system-out>
+</testcase>
+<testcase name="elShortGreaterThanTest()" classname="com.sun.ts.tests.el.spec.relationaloperator.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.spec.relationaloperator.ELClientIT]/[method:elShortGreaterThanTest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elShortGreaterThanTest()
+]]></system-out>
+</testcase>
+<testcase name="elContextPutContextNPETest()" classname="com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT" time="0">
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]/[suite:io.micronaut.el.tck.TckTestSuite]/[engine:junit-jupiter]/[class:com.sun.ts.tests.el.api.jakarta_el.elcontext.ELClientIT]/[method:elContextPutContextNPETest()]
+display-name: JUnit Platform Suite > TckTestSuite > JUnit Jupiter > ELClientIT > elContextPutContextNPETest()
+]]></system-out>
+</testcase>
+<system-out><![CDATA[
+unique-id: [engine:junit-platform-suite]
+display-name: JUnit Platform Suite
+]]></system-out>
+</testsuite>

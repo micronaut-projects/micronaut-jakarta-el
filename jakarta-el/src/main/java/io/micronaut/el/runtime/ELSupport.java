@@ -16,6 +16,10 @@
 package io.micronaut.el.runtime;
 
 import io.micronaut.core.annotation.Internal;
+import io.micronaut.core.io.service.SoftServiceLoader;
+import io.micronaut.el.ELContributions;
+import io.micronaut.el.ELProxyFactory;
+import io.micronaut.el.ELMethodRegistry;
 import io.micronaut.el.resolver.ELResolverChain;
 import org.jspecify.annotations.Nullable;
 import jakarta.el.ELContext;
@@ -25,18 +29,12 @@ import jakarta.el.LambdaExpression;
 
 import java.beans.PropertyEditor;
 import java.beans.PropertyEditorManager;
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Array;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Proxy;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Objects;
 
 /**
  * The type conversion, comparison and emptiness rules of the Jakarta Expression Language specification.
@@ -49,25 +47,6 @@ import java.util.Set;
  */
 @Internal
 public final class ELSupport {
-
-    private static final ClassValue<Boolean> FUNCTIONAL_INTERFACES = new ClassValue<>() {
-        @Override
-        protected Boolean computeValue(Class<?> type) {
-            if (!type.isInterface() || type.isAnnotation() || type.isSealed()) {
-                return false;
-            }
-            Set<String> abstractMethods = new HashSet<>();
-            for (Method method : type.getMethods()) {
-                if (Modifier.isAbstract(method.getModifiers()) && !isObjectMethod(method)) {
-                    abstractMethods.add(method.getName() + java.util.Arrays.toString(method.getParameterTypes()));
-                }
-            }
-            return abstractMethods.size() == 1;
-        }
-    };
-
-    private ELSupport() {
-    }
 
     /**
      * Coerces a value applying the custom converters of the context before the standard rules.
@@ -196,62 +175,36 @@ public final class ELSupport {
     }
 
     private static boolean isFunctionalInterface(@Nullable Class<?> type) {
-        return type != null && FUNCTIONAL_INTERFACES.get(type);
+        if (type == null) {
+            return false;
+        }
+        return ELFunctionalInterfaces.isKnown(type) || contributed(type) != null
+            || (Proxies.FACTORY != null && Proxies.FACTORY.isFunctionalInterface(type));
+    }
+
+    /**
+     * What an {@link io.micronaut.el.ELMethodContributor} registered for the given interface, which keeps the
+     * coercion to it off the reflective path.
+     */
+    private static ELMethodRegistry.@Nullable Lambda<?> contributed(Class<?> type) {
+        return ELContributions.shared().functionalInterface(type);
     }
 
     @SuppressWarnings("unchecked")
     private static <T> T functionalInterface(@Nullable ELContext context, LambdaExpression lambda, Class<T> type) {
-        return (T) Proxy.newProxyInstance(
-            type.getClassLoader(),
-            new Class<?>[]{type},
-            (proxy, method, args) -> {
-                if (isObjectMethod(method)) {
-                    return switch (method.getName()) {
-                        case "equals" -> proxy == args[0];
-                        case "hashCode" -> System.identityHashCode(proxy);
-                        case "toString" -> lambda.toString();
-                        default -> throw new IllegalStateException("Unexpected Object method: " + method);
-                    };
-                }
-                if (method.isDefault()) {
-                    return invokeDefault(proxy, method, args == null ? new Object[0] : args);
-                }
-                Object[] arguments = args == null ? new Object[0] : args;
-                Object result = context == null ? lambda.invoke(arguments) : lambda.invoke(context, arguments);
-                Class<?> returnType = method.getReturnType();
-                return returnType == void.class ? null : coerceToType(context, result, returnType);
-            }
-        );
-    }
-
-    /**
-     * Invokes a default method of the coerced interface on the proxy.
-     *
-     * <p>The lookup in the interface itself is what a GraalVM native image can do:
-     * {@link InvocationHandler#invokeDefault} goes through the module the proxy was defined in, which cannot
-     * read the interface of an application there. An interface of a module that does not open its package
-     * keeps the standard call, which is the one that reaches it.</p>
-     */
-    private static Object invokeDefault(Object proxy, Method method, Object[] arguments) throws Throwable {
-        Class<?> declaringClass = method.getDeclaringClass();
-        MethodHandles.Lookup lookup;
-        try {
-            lookup = MethodHandles.privateLookupIn(declaringClass, MethodHandles.lookup());
-        } catch (IllegalAccessException e) {
-            return InvocationHandler.invokeDefault(proxy, method, arguments);
+        if (ELFunctionalInterfaces.isKnown(type)) {
+            // the method, its arity and its return type are known here, so the interface is implemented
+            // directly and no proxy is built for it
+            return (T) ELFunctionalInterfaces.create(context, lambda, type);
         }
-        return lookup.unreflectSpecial(method, declaringClass)
-            .bindTo(proxy)
-            .invokeWithArguments(arguments);
-    }
-
-    private static boolean isObjectMethod(Method method) {
-        try {
-            Object.class.getMethod(method.getName(), method.getParameterTypes());
-            return true;
-        } catch (NoSuchMethodException e) {
-            return false;
+        ELMethodRegistry.Lambda<?> registered = contributed(type);
+        if (registered != null) {
+            // a contributor registered how to implement this interface, which is how an application keeps the
+            // coercion off the reflective path
+            return (T) registered.create(context, lambda);
         }
+        // isFunctionalInterface accepted the type, so one of the three knows it
+        return Objects.requireNonNull(Proxies.FACTORY).create(context, lambda, type);
     }
 
     /**
@@ -421,17 +374,17 @@ public final class ELSupport {
         if (value == null) {
             return null;
         }
-        Class<?> arrayType = Array.newInstance(componentType, 0).getClass();
+        Class<?> arrayType = componentType.arrayType();
         if (arrayType.isInstance(value)) {
             return value;
         }
-        if (!value.getClass().isArray()) {
+        if (!ELArray.isArray(value)) {
             throw cannotCoerce(value, arrayType);
         }
-        int length = Array.getLength(value);
-        Object result = Array.newInstance(componentType, length);
+        int length = ELArray.length(value);
+        Object result = ELArray.newInstance(componentType, length);
         for (int i = 0; i < length; i++) {
-            Array.set(result, i, coerce(Array.get(value, i), componentType));
+            ELArray.set(result, i, coerce(ELArray.get(value, i), componentType));
         }
         return result;
     }
@@ -446,8 +399,8 @@ public final class ELSupport {
         if (value == null || "".equals(value)) {
             return true;
         }
-        if (value.getClass().isArray()) {
-            return Array.getLength(value) == 0;
+        if (ELArray.isArray(value)) {
+            return ELArray.length(value) == 0;
         }
         if (value instanceof Map<?, ?> map) {
             return map.isEmpty();
@@ -497,6 +450,21 @@ public final class ELSupport {
     @Nullable
     public static Object sequence(@Nullable Object discarded, @Nullable Object value) {
         return value;
+    }
+
+    /**
+     * Evaluates the right operand of a generated semicolon expression after the left operand.
+     *
+     * @param discarded The value of the left operand
+     * @param context   The evaluation context
+     * @param value     The compiled right operand
+     * @return The value of the right operand
+     */
+    @Nullable
+    public static Object sequenceLazy(@Nullable Object discarded,
+                                      ELContext context,
+                                      ELLambdaBody.Nullary value) {
+        return value.evaluate(context);
     }
 
     /**
@@ -663,16 +631,37 @@ public final class ELSupport {
         if (isWholeNumberOperand(left, right)) {
             return Long.compare(longValue(left), longValue(right));
         }
+        // the same rule, and the same place in the order, as the equality of the section 1.9.2: a boolean
+        // operand decides the comparison, so that 'false gt "9"' is the false the equality of the two implies
+        // rather than the lexical comparison of "false" with "9"
+        if (left instanceof Boolean || right instanceof Boolean) {
+            return Boolean.compare(toBoolean(left), toBoolean(right));
+        }
         if (left instanceof String || right instanceof String) {
             return coerceToString(left).compareTo(coerceToString(right));
         }
+        // the section 1.9.1 of the specification: when the comparison of two Comparable operands fails, the
+        // failure is an error of the language, not the exception the comparator happens to raise
         if (left instanceof Comparable comparable) {
-            return comparable.compareTo(right);
+            return compareTo(comparable, right, false);
         }
         if (right instanceof Comparable comparable) {
-            return -comparable.compareTo(left);
+            return compareTo(comparable, left, true);
         }
         throw new ELException("Cannot compare " + left + " to " + right);
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private static int compareTo(Comparable comparable, @Nullable Object other, boolean inverted) {
+        int result;
+        try {
+            result = comparable.compareTo(other);
+        } catch (ELException e) {
+            throw e;
+        } catch (RuntimeException e) {
+            throw new ELException("Cannot compare " + comparable + " to " + other, e);
+        }
+        return inverted ? -result : result;
     }
 
     /**
@@ -874,7 +863,30 @@ public final class ELSupport {
     }
 
     private static ELException cannotCoerce(@Nullable Object value, Class<?> type) {
-        return new ELException("Cannot convert " + value + " of type "
-            + (value == null ? "null" : value.getClass().getName()) + " to " + type.getName());
+        String message = "Cannot convert " + value + " of type "
+            + (value == null ? "null" : value.getClass().getName()) + " to " + type.getName();
+        if (value instanceof LambdaExpression && type.isInterface()) {
+            // the coercion of the section 1.23.2 would apply to a functional interface, so the interface is
+            // one nothing described: say how it is described rather than only that the conversion failed
+            message += ". Register it with ELMethodRegistry.functionalInterface, or add the"
+                + " micronaut-jakarta-el-interpreter-reflection module to implement it reflectively";
+        }
+        return new ELException(message);
     }
+
+    /**
+     * The factory that implements an interface nothing described, loaded once from the classpath.
+     */
+    private static final class Proxies {
+
+        private static final @Nullable ELProxyFactory FACTORY = load();
+
+        private static @Nullable ELProxyFactory load() {
+            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+            List<ELProxyFactory> factories = SoftServiceLoader.load(ELProxyFactory.class,
+                classLoader == null ? ELSupport.class.getClassLoader() : classLoader).collectAll();
+            return factories.isEmpty() ? null : factories.get(0);
+        }
+    }
+
 }

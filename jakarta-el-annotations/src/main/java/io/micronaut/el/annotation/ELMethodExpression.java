@@ -65,6 +65,12 @@ public @interface ELMethodExpression {
     Class<?> expectedReturnType() default Object.class;
 
     /**
+     * The expected parameter types of the invoked method.
+     *
+     * <p>A primitive class literal is kept by the Java compiler only. The neutral annotation metadata cannot
+     * represent one, and the Groovy and the Kotlin processors have no way to recover it, so name the wrapper
+     * type there: {@code Integer.class} rather than {@code int.class}.</p>
+     *
      * @return The expected parameter types of the invoked method
      */
     Class<?>[] expectedParamTypes() default {};
