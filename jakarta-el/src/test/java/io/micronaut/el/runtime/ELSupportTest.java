@@ -6,12 +6,15 @@ import jakarta.el.LambdaExpression;
 import jakarta.el.MethodNotFoundException;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.function.Supplier;
+import java.util.function.Predicate;
+import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -21,13 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ELSupportTest {
 
-    interface UnannotatedFunction {
-        String apply(String value);
-
-        @Override
-        boolean equals(Object object);
-    }
-
     enum Suit {
         HEART,
         SPADE
@@ -36,6 +32,16 @@ class ELSupportTest {
     static final class Varargs {
         public String join(String... values) {
             return String.join(",", java.util.Arrays.stream(values).map(String::valueOf).toList());
+        }
+    }
+
+    static final class Overloads {
+        public String target(Long first, Long second) {
+            return "longs";
+        }
+
+        public String target(String first, String... rest) {
+            return "strings";
         }
     }
 
@@ -137,16 +143,104 @@ class ELSupportTest {
     }
 
     @Test
-    void lambdaCoercesToAnUnannotatedFunctionalInterface() {
+    void aKnownFunctionalInterfaceIsImplementedWithoutAProxy() {
         CompiledELContext context = new CompiledELContext();
         LambdaExpression lambda = ELLambdas.create(context, List.of("value"),
             evaluated -> evaluated.getLambdaArgument("value"));
 
-        UnannotatedFunction function = ELSupport.coerceToType(context, lambda, UnannotatedFunction.class);
+        Function<Object, Object> function = ELSupport.coerceToType(context, lambda, Function.class);
+        Supplier<?> supplier = ELSupport.coerceToType(context, ELLambdas.create(context, List.of(),
+            evaluated -> "supplied"), Supplier.class);
 
-        assertEquals("lambda", function.apply("lambda"));
-        assertTrue(function.equals(function));
-        assertFalse(function.equals(new Object()));
+        assertEquals("mapped", function.apply("mapped"));
+        assertEquals("supplied", supplier.get());
+        // the interface is one this module implements, so nothing reflective stands in for it
+        assertFalse(Proxy.isProxyClass(function.getClass()), function.getClass().getName());
+        assertFalse(Proxy.isProxyClass(supplier.getClass()), supplier.getClass().getName());
+    }
+
+    @Test
+    void theDeclaredParameterTypesAlsoSelectTheValueOfOverload() {
+        CompiledELContext context = new CompiledELContext();
+
+        // declared as taking a String, so the argument is parsed rather than read as a number
+        assertEquals(12, context.getELResolver().invoke(context, new jakarta.el.ELClass(Integer.class),
+            "valueOf", new Class<?>[]{String.class}, new Object[]{"12"}));
+        // declared as taking an int, so a string argument is coerced to one
+        assertEquals(12, context.getELResolver().invoke(context, new jakarta.el.ELClass(Integer.class),
+            "valueOf", new Class<?>[]{int.class}, new Object[]{"12"}));
+    }
+
+    @Test
+    void theDeclaredParameterTypesSelectTheOverloadRatherThanTheArgumentClasses() {
+        CompiledELContext context = new CompiledELContext();
+
+        // the values are Integers, but the expression declared long parameters: section 1.6 selects from what
+        // was declared, so the long overload runs and the result is a Long
+        Object max = context.getELResolver().invoke(context, new jakarta.el.ELClass(Math.class), "max",
+            new Class<?>[]{long.class, long.class}, new Object[]{1, 2});
+
+        assertEquals(2L, max);
+    }
+
+    @Test
+    void aStaticMethodDeclaringNoParameterTypesIsDeclinedRatherThanFailing() {
+        CompiledELContext context = new CompiledELContext();
+
+        // a method expression can declare no parameter types at all: the resolver must decline and let the
+        // chain continue, not index an empty array
+        assertThrows(jakarta.el.MethodNotFoundException.class,
+            () -> context.getELResolver().invoke(context, new jakarta.el.ELClass(Math.class), "max",
+                new Class<?>[0], new Object[0]));
+    }
+
+    @Test
+    void aDirectMathMethodCoercesTheArgumentsSelectedByTheirDeclaredTypes() {
+        CompiledELContext context = new CompiledELContext();
+
+        // the overload is selected from the parameter types a method expression declared, so the arguments
+        // still have to be coerced to them at the invocation
+        Object max = context.getELResolver().invoke(context, new jakarta.el.ELClass(Math.class), "max",
+            new Class<?>[]{int.class, int.class}, new Object[]{"1", "2"});
+        Object min = context.getELResolver().invoke(context, new jakarta.el.ELClass(Math.class), "min",
+            new Class<?>[]{long.class, long.class}, new Object[]{"3", "4"});
+
+        assertEquals(2, max);
+        assertEquals(3L, min);
+    }
+
+    @Test
+    void aComparatorReturningNullCoercesToTheDefaultOfItsPrimitiveReturnType() {
+        CompiledELContext context = new CompiledELContext();
+        Comparator<Object> comparator = ELSupport.coerceToType(context, ELLambdas.create(context,
+            List.of("first", "second"), evaluated -> null), Comparator.class);
+
+        // compare() returns a primitive, so the null coerces to zero instead of failing to unbox
+        assertEquals(0, comparator.compare("a", "b"));
+    }
+
+    @Test
+    void anArrayOfAnyComponentTypeIsCreatedWithoutReflection() {
+        assertEquals(int[].class, ELArray.newInstance(int.class, 2).getClass());
+        assertEquals(boolean[].class, ELArray.newInstance(boolean.class, 0).getClass());
+        assertEquals(double[].class, ELArray.newInstance(double.class, 1).getClass());
+        assertEquals(String[].class, ELArray.newInstance(String.class, 3).getClass());
+        assertEquals(3, ((String[]) ELArray.newInstance(String.class, 3)).length);
+        assertNull(((String[]) ELArray.newInstance(String.class, 1))[0]);
+    }
+
+    @Test
+    void aPredicateAndAComparatorCoerceTheirResultToTheDeclaredReturnType() {
+        CompiledELContext context = new CompiledELContext();
+
+        Predicate<Object> predicate = ELSupport.coerceToType(context, ELLambdas.create(context, List.of("value"),
+            evaluated -> "true"), Predicate.class);
+        Comparator<Object> comparator = ELSupport.coerceToType(context, ELLambdas.create(context,
+            List.of("first", "second"), evaluated -> "-1"), Comparator.class);
+
+        assertTrue(predicate.test("ignored"));
+        assertEquals(-1, comparator.compare("a", "b"));
+        assertFalse(Proxy.isProxyClass(predicate.getClass()));
     }
 
     @Test
@@ -178,14 +272,5 @@ class ELSupportTest {
         assertEquals("first", first.get());
         assertEquals("second", second.get());
         assertEquals("first", first.get());
-    }
-
-    @Test
-    void aSubtypeArrayIsPassedDirectlyToAVariableArityMethod() throws NoSuchMethodException {
-        String[] values = {"a", "b"};
-        Method join = ELMethods.findMethod(Varargs.class, "join", null, new Object[]{values});
-
-        assertEquals("a,b", ELMethods.invoke(new CompiledELContext(), join, new Varargs(),
-            new Object[]{values}));
     }
 }

@@ -1,27 +1,46 @@
-The paths a typical expression takes — declared variables, introspected beans, operators, lambda expressions,
-streams, the expression lookup itself — use no reflection at all, which is what the <<whyCompiled,benchmarks>>
-measure and what makes the module work in a GraalVM native image without configuration.
+The paths a typical compiled expression takes — declared variables, introspected beans, operators, lambda
+expressions, streams and the expression lookup itself — use no reflection at all. Runtime-parsed expressions use the
+same direct executors for common values and introspected beans; arbitrary reflective execution is supplied separately
+by `micronaut-jakarta-el-interpreter-reflection`.
 
-Reflection remains only where the specification itself defines a behaviour in reflective terms:
+Where reflection is allowed to live is a property of the module. `micronaut-jakarta-el-parser` and
+`micronaut-jakarta-el-interpreter` name no `java.lang.reflect` type at all: the interpreter dispatches through the
+`ELMethodExecutor` services and nothing else. `micronaut-jakarta-el-interpreter-reflection` is where dispatch by
+reflection belongs, and it contributes both the reflective executor and the reflective `ELResolver` of the chain as
+services, so no other module depends on it at compile time. `micronaut-jakarta-el-processor` reflects only while
+compiling, never at runtime.
+
+What remains in `micronaut-jakarta-el` is there because the specification or the Jakarta EL API puts it there, never
+to dispatch a runtime-parsed expression:
 
 * invoking a method of a type that has no bean introspection, or reading its properties, through the standard
 resolvers — annotate the type with `@Introspected` (and methods with `@Executable`) to move it to the generated
 dispatch instead;
-* a `jakarta.el.FunctionMapper`, `MethodExpression.getMethodInfo` and `getMethodReference`, whose contracts are
-`java.lang.reflect` types;
-* an expanded variable arity call, `${bean.join('-', 'a', 'b')}`, of a method that takes the trailing arguments
-as an array: the bean introspection does not record which methods were declared with varargs, so the standard
-resolvers select and pack the call;
-* coercing a `LambdaExpression` held in a variable to a functional interface (a lambda written in place is
-compiled to the interface directly), and coercing a string through a `PropertyEditor`;
-* array access, which the JDK only exposes reflectively.
+* runtime-parsed methods and `jakarta.el.FunctionMapper` functions when the optional reflection executor is present;
+  the mapper's contract, like `jakarta.el.ExpressionFactory.getInitFunctionMap`, is declared in terms of
+  `java.lang.reflect.Method`;
+* `MethodExpression` metadata: `getMethodInfo` and `getMethodReference` report a name, a return type, parameter
+  types and annotations reflectively, for a compiled expression as well as a reflection-backed one, while `invoke`
+  itself is generated code and never reflects;
+* coercing a lambda expression to a functional interface an application declares, when the method taking it is
+  selected by the resolver chain at evaluation time and the interface is therefore unknown until then. A lambda
+  written against a parameter type the compiler resolves is compiled into the interface directly, and the
+  functional interfaces of the platform — `Supplier`, `Function`, `BiFunction`, `UnaryOperator`,
+  `BinaryOperator`, `Consumer`, `BiConsumer`, `Predicate`, `BiPredicate`, `Comparator`, `Runnable` and
+  `Callable` — are implemented without reflection;
+* coercing a string through a `PropertyEditor`;
+* any runtime-parsed method for which no direct executor is registered and the reflection executor is absent simply
+  fails to resolve; it does not silently fall back to reflection.
+
+The boundary is checked rather than described: `./gradlew check` runs a `checkstyleReflection` task over
+`micronaut-jakarta-el`, `micronaut-jakarta-el-parser`, `micronaut-jakarta-el-interpreter` and
+`micronaut-jakarta-el-annotations` that rejects an import of `java.lang.reflect` or `java.lang.invoke`, the
+same names written out, and the calls that read a class for a member without naming either package. The rules
+are in `gradle/checkstyle/reflection.xml`, with every exception listed in the suppressions next to it: the two
+signatures the Jakarta EL API dictates, and the sandbox, which names the packages in order to deny them.
 
 Even these are served through a per-class method cache, so they stay fast — the `staticMethod` and
 `stringMethods` benchmarks run them — but a native image needs the involved types registered for reflection.
 
 TIP: To keep a method invocation off the reflective path, annotate the method with `@Executable` so that it
-enters the bean introspection of its type.
-
-Serializing an expression, which section 1.14 of the specification requires of every one of them, needs no
-configuration either: the annotation processor declares the classes it generates for the declared expressions
-next to the registry it generates them into, and the runtime declares its own hierarchy.
+enters the bean introspection of its type, or provide an `ELMethodExecutor` backed by generated dispatch.

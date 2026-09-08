@@ -105,12 +105,54 @@
       }
     },
     {
-      "comment": "A lambda passed as the argument of a method is coerced to the functional interface it declares, and a default method of that interface is called on the proxy.",
+      "comment": "A lambda coerced to the interface is a proxy standing in for it, and a default method on it reaches InvocationHandler.invokeDefault, which looks the proxy class up.",
       "type": {
         "proxy": [
           "io.micronaut.el.test.Formatting$TextMapper"
         ]
+      },
+      "methods": [
+        {
+          "name": "proxyClassLookup",
+          "parameterTypes": [
+            "java.lang.invoke.MethodHandles$Lookup"
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "Neither introspected nor a bean, so the expression reaches it through the reflective resolver, which is what the scenario is for.",
+      "type": "io.micronaut.el.test.executable.Plain",
+      "allPublicMethods": true
+    },
+    {
+      "comment": "MethodExpression.getMethodInfo and getMethodReference describe a method through an executor rather than reflectively, and the annotations they report are synthesized as a proxy of the annotation type.",
+      "type": {
+        "proxy": [
+          "io.micronaut.context.annotation.Executable",
+          "io.micronaut.core.annotation.AnnotationValueProvider"
+        ]
       }
+    },
+    {
+      "comment": "The default method of the coerced interface reaches InvocationHandler.invokeDefault, which needs the interface itself, not only the proxy of it.",
+      "type": "io.micronaut.el.test.Formatting$TextMapper",
+      "allDeclaredMethods": true,
+      "allPublicMethods": true
+    },
+    {
+      "comment": "The annotations a method expression reports are synthesized as a proxy of the annotation type.",
+      "type": {
+        "proxy": [
+          "io.micronaut.core.annotation.Introspected",
+          "io.micronaut.core.annotation.AnnotationValueProvider"
+        ]
+      }
+    },
+    {
+      "comment": "The method deliberately left without @Executable, which the reflective resolver of the chain invokes.",
+      "type": "io.micronaut.el.test.executable.Greeter",
+      "allPublicMethods": true
     }
   ]
 }

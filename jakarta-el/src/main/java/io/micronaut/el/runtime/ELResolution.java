@@ -17,7 +17,10 @@ package io.micronaut.el.runtime;
 
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.el.CompiledELContext;
+import io.micronaut.el.ELExecutors;
+import io.micronaut.el.ELMethod;
 import io.micronaut.el.ELBeanProvider;
+import io.micronaut.el.resolver.ELMethodDiagnostics;
 import org.jspecify.annotations.Nullable;
 import jakarta.el.ELClass;
 import jakarta.el.ELContext;
@@ -34,7 +37,6 @@ import jakarta.el.VariableMapper;
 import java.util.List;
 import java.util.Map;
 
-import java.lang.reflect.Method;
 
 /**
  * The resolution of identifiers, properties and methods described in the sections 1.5 and 1.6 of the
@@ -466,26 +468,7 @@ public final class ELResolution {
         if (context.isPropertyResolved()) {
             return result;
         }
-        throw new MethodNotFoundException("Cannot find the method '" + method + "' of "
-            + base.getClass().getName());
-    }
-
-    /**
-     * Invokes a method of a base object with the parameters passed to
-     * {@code jakarta.el.MethodExpression.invoke(ELContext, Object[])}.
-     *
-     * @param context  The context
-     * @param base     The base object
-     * @param method   The method name
-     * @param params   The parameters, can be {@code null}
-     * @return The result of the invocation
-     */
-    @Nullable
-    public static Object invokeWithParams(ELContext context,
-                                          @Nullable Object base,
-                                          @Nullable Object method,
-                                          Object @Nullable [] params) {
-        return invoke(context, base, method, params == null ? new Object[0] : params);
+        throw ELMethodDiagnostics.notFound(context, base, method, arguments);
     }
 
     /**
@@ -518,28 +501,14 @@ public final class ELResolution {
         if (context.isPropertyResolved()) {
             return result;
         }
-        Method fallback = base instanceof ELClass elClass
-            ? ELMethods.findStaticMethod(elClass.getKlass(), method.toString(), paramTypes, arguments)
-            : ELMethods.findMethod(base.getClass(), method.toString(), paramTypes, arguments);
-        return ELMethods.invoke(context, fallback, base instanceof ELClass ? null : base, arguments);
-    }
-
-    /**
-     * Invokes a method found on the base object, which is how the section 1.6 of the specification invokes a
-     * method expression that does not provide its own parameters.
-     *
-     * @param context   The context
-     * @param base      The base object
-     * @param method    The method
-     * @param arguments The arguments
-     * @return The result of the invocation
-     */
-    @Nullable
-    public static Object invokeMethod(ELContext context,
-                                      Object base,
-                                      Method method,
-                                      Object @Nullable [] arguments) {
-        return ELMethods.invoke(context, method, base, arguments);
+        // the chain declined, so the method is described by an executor of the classpath rather than found
+        // reflectively here: a contributor describes its own types, and the interpreter-reflection module
+        // describes anything, when it is present
+        ELMethod resolved = ELExecutors.resolve(context, base, method, ELArguments.of(paramTypes), arguments);
+        if (resolved == null) {
+            throw ELMethodDiagnostics.notFound(context, base, method, arguments);
+        }
+        return resolved.invoke(context, base, arguments);
     }
 
     /**

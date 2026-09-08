@@ -52,9 +52,9 @@ final class InterpreterDifferentialFuzzTest {
         ExpressionFactory subject = new CompiledExpressionFactory(List.of(), new InterpretingELExpressionParser());
         ExpressionFactory expressly = new org.glassfish.expressly.ExpressionFactoryImpl();
         ExpressionFactory tomcat = new org.apache.el.ExpressionFactoryImpl();
-        ELContext subjectContext = new StandardELContext(subject);
-        ELContext expresslyContext = new StandardELContext(expressly);
-        ELContext tomcatContext = new StandardELContext(tomcat);
+        ELContext subjectContext = fixtures(subject);
+        ELContext expresslyContext = fixtures(expressly);
+        ELContext tomcatContext = fixtures(tomcat);
 
         for (int caseNumber = 0; caseNumber < cases; caseNumber++) {
             Expr generated = expression(random, MAX_DEPTH);
@@ -70,6 +70,57 @@ final class InterpreterDifferentialFuzzTest {
                     + "\nactual (Micronaut): " + actual.describe());
             }
         }
+    }
+
+    /**
+     * The context the three implementations share: a bean whose methods exercise the parts of the section 1.6
+     * an expression of literals never reaches, and the arrays and collections to call them with.
+     */
+    private static ELContext fixtures(ExpressionFactory factory) {
+        StandardELContext context = new StandardELContext(factory);
+        context.getVariableMapper().setVariable("bean",
+            factory.createValueExpression(new Fixtures(), Object.class));
+        context.getVariableMapper().setVariable("strings",
+            factory.createValueExpression(new String[]{"a", "b"}, Object.class));
+        context.getVariableMapper().setVariable("objects",
+            factory.createValueExpression(new Object[]{"a", "b"}, Object.class));
+        context.getVariableMapper().setVariable("numbers",
+            factory.createValueExpression(new int[]{1, 2}, Object.class));
+        context.getVariableMapper().setVariable("items",
+            factory.createValueExpression(java.util.List.of("a", "b"), Object.class));
+        return context;
+    }
+
+    /**
+     * Method dispatch, which is where the implementations can differ without any operator being involved:
+     * which overload a set of arguments selects, whether an array is the variable arity array or the first
+     * of its elements, and what a lambda becomes when a parameter asks for an interface.
+     */
+    private static Expr dispatch(Random random) {
+        String text = switch (random.nextInt(16)) {
+            // a variable arity parameter reached with an array of its own type, of a subtype, of a
+            // primitive component type, and with loose elements
+            case 0 -> "bean.argumentType(objects)";
+            case 1 -> "bean.argumentType(strings)";
+            case 2 -> "bean.argumentType(numbers)";
+            case 3 -> "bean.argumentType('a', 'b')";
+            case 4 -> "bean.argumentType()";
+            case 5 -> "bean.argumentType(null)";
+            // overloads a single argument can reach in more than one way
+            case 6 -> "bean.select(1)";
+            case 7 -> "bean.select('1')";
+            case 8 -> "bean.select(null)";
+            case 9 -> "bean.pick(null)";
+            case 10 -> "bean.pick(1)";
+            // a lambda coerced to an interface the specification never named
+            case 11 -> "bean.map(v -> v += '!', 'el')";
+            case 12 -> "bean.map(v -> null, 'el')";
+            // a fixed parameter followed by a variable arity one
+            case 13 -> "bean.join('-', 'a', 'b')";
+            case 14 -> "bean.join('-')";
+            default -> "bean.join('-', strings)";
+        };
+        return new Expr(text, Kind.ANY);
     }
 
     private static String expressionText(Random random, Expr expression) {
@@ -92,10 +143,11 @@ final class InterpreterDifferentialFuzzTest {
     }
 
     private static Expr expression(Random random, int depth) {
-        return switch (random.nextInt(4)) {
+        return switch (random.nextInt(5)) {
             case 0 -> number(random, depth);
             case 1 -> bool(random, depth);
             case 2 -> string(random, depth);
+            case 3 -> dispatch(random);
             default -> value(random, depth);
         };
     }
@@ -328,5 +380,53 @@ final class InterpreterDifferentialFuzzTest {
             }
             return value == null ? "null" : value.getClass().getName() + " " + value;
         }
+    }
+
+    /**
+     * A plain public bean, so that every implementation reaches it the same way, through the resolvers of the
+     * specification.
+     */
+    public static final class Fixtures {
+
+        public String argumentType(Object... values) {
+            if (values == null) {
+                return "null";
+            }
+            return values.length + ":" + (values.length == 0 ? "-"
+                : values[0] == null ? "null" : values[0].getClass().getName());
+        }
+
+        public String join(String separator, String... parts) {
+            return parts.length + ":" + String.join(separator, parts);
+        }
+
+        public String select(Integer value) {
+            return "integer";
+        }
+
+        public String select(String value) {
+            return "string";
+        }
+
+        public String pick(int value) {
+            return "int";
+        }
+
+        public String pick(Object value) {
+            return "object";
+        }
+
+        public String map(Mapper mapper, String value) {
+            return String.valueOf(mapper.apply(value));
+        }
+    }
+
+    /**
+     * A single abstract method and no {@code FunctionalInterface} annotation, which is what an application
+     * declares and what the coercion of a lambda expression has to accept.
+     */
+    public interface Mapper {
+
+        String apply(String value);
     }
 }

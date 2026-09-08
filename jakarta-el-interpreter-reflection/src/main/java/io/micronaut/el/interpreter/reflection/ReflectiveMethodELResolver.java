@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.micronaut.el.resolver;
+package io.micronaut.el.interpreter.reflection;
 
 import io.micronaut.core.annotation.Experimental;
 import io.micronaut.el.runtime.ELMethods;
@@ -38,7 +38,7 @@ import java.util.Optional;
  * the constructors, so that those resolvers keep them.</p>
  *
  * @author Denis Stepanov
- * @since 1.0
+ * @since 1.1
  */
 @Experimental
 public final class ReflectiveMethodELResolver extends ELResolver {
@@ -58,13 +58,13 @@ public final class ReflectiveMethodELResolver extends ELResolver {
             if (CONSTRUCTOR.equals(name)) {
                 return null;
             }
-            target = ELMethods.findMethodOrNull(elClass.getKlass(), name, paramTypes, params, true);
+            target = ReflectiveELMethods.findMethodOrNull(elClass.getKlass(), name, paramTypes, params, true);
             instance = null;
         } else {
             if (base instanceof ELStream<?> || base instanceof ELOptional<?> || base instanceof Optional<?>) {
                 return null;
             }
-            target = ELMethods.findMethodOrNull(base.getClass(), name, paramTypes, params, false);
+            target = ReflectiveELMethods.findMethodOrNull(base.getClass(), name, paramTypes, params, false);
             instance = base;
         }
         if (target == null) {
@@ -77,7 +77,7 @@ public final class ReflectiveMethodELResolver extends ELResolver {
                 }
             }
         }
-        Object result = ELMethods.invoke(context, target, instance, params);
+        Object result = ReflectiveELMethods.invoke(context, target, instance, params);
         context.setPropertyResolved(base, method);
         return result;
     }

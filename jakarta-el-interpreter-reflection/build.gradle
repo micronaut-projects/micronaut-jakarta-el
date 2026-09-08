@@ -1,0 +1,18 @@
+plugins {
+    id "io.micronaut.build.internal.jakarta-el-module"
+}
+
+dependencies {
+    // the reflective executor and resolver are contributed as services of the core module; the interpreter
+    // is what usually loads them, but a compiled expression reaches them through the resolver chain too, so
+    // nothing here depends on it
+    api projects.micronautJakartaEl
+    // one identity helper, so that a function resolved here compares equal to a compiled one
+    api projects.micronautJakartaElParser
+
+    testImplementation projects.micronautJakartaElInterpreter
+
+    testImplementation platform(libs.junit.bom)
+    testImplementation libs.junit.jupiter
+    testRuntimeOnly libs.junit.jupiter.engine
+}

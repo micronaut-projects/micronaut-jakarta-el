@@ -1,0 +1,12 @@
+plugins {
+    id "io.micronaut.build.internal.jakarta-el-tck-test-suite"
+}
+
+description = "Runs the Jakarta Expression Language TCK using the reflection-backed interpreter."
+
+dependencies {
+    // the reflection module no longer carries the interpreter with it, so the suite that runs the TCK
+    // through the interpreter asks for both
+    testImplementation projects.micronautJakartaElInterpreter
+    testImplementation projects.micronautJakartaElInterpreterReflection
+}

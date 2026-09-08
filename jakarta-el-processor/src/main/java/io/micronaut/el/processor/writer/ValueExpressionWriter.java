@@ -33,6 +33,8 @@ import io.micronaut.sourcegen.model.TypeDef;
 import jakarta.el.ELContext;
 import jakarta.el.ValueReference;
 
+import java.util.List;
+
 import javax.lang.model.element.Modifier;
 
 /**
@@ -81,6 +83,9 @@ public final class ValueExpressionWriter {
             .addJavadoc("The compiled form of the expression <code>" + definition.expression().replace("$", "$$") + "</code>.")
             .addMethod(constructor(definition, compiler, coerced))
             .addMethod(evaluate);
+        if (definition.inferred() && definition.requireExpectedType().getName().equals(Object.class.getName())) {
+            builder.addMethod(constructor(definition, compiler));
+        }
 
         ELNode node = unwrap(definition.node());
         if (isLValue(node)) {
@@ -118,6 +123,18 @@ public final class ValueExpressionWriter {
                 ExpressionDef.constant(compiler.canonical(definition.node())),
                 ExpressionDef.constant(TypeDef.erasure(definition.requireExpectedType())),
                 ExpressionDef.constant(coerced)
+            ));
+    }
+
+    private static MethodDef constructor(ELExpressionDefinition definition, ELCompiler compiler) {
+        return MethodDef.constructor()
+            .addModifiers(Modifier.PUBLIC)
+            .addParameter("expectedType", CLASS_TYPE)
+            .build((aThis, parameters) -> aThis.superRef().invokeSuperConstructor(
+                ExpressionDef.constant(definition.expression()),
+                ExpressionDef.constant(compiler.canonical(definition.node())),
+                parameters.get(0),
+                ExpressionDef.trueValue()
             ));
     }
 
@@ -197,8 +214,10 @@ public final class ValueExpressionWriter {
                 ExpressionDef context = parameters.get(0);
                 ELCompiler.LValue lValue = lValueOf(compiler, node, context);
                 ExpressionDef base = lValue.base() == null ? ExpressionDef.nullValue() : lValue.base();
+                // the constructor takes two Objects, and selecting it by the static types of the base and of
+                // the property would emit a call to a constructor that does not exist
                 return ClassTypeDef.of(ValueReference.class)
-                    .instantiate(base, lValue.property())
+                    .instantiate(List.of(TypeDef.OBJECT, TypeDef.OBJECT), base, lValue.property())
                     .returning();
             });
     }

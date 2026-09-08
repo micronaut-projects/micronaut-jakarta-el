@@ -22,6 +22,7 @@ import java.util.List;
         @ELVariable(name = "sequences", type = CharSequence[].class),
         @ELVariable(name = "varargs", type = Varargs.class),
         @ELVariable(name = "strings", type = String[].class),
+        @ELVariable(name = "numbers", type = int[].class),
         @ELVariable(name = "functions", type = Formatting.class),
         @ELVariable(name = "f", type = Formatting.class),
         @ELVariable(name = "formatting", type = Formatting.class),
@@ -108,6 +109,11 @@ import java.util.List;
 @ELExpression(value = "${greeting}", name = "greeting")
 @ELExpression(value = "${greeting.length()}", name = "greetingLength")
 @ELExpression(value = "${greeting.toUpperCase()}", name = "uppercaseGreeting")
+@ELExpression(value = "${greeting.toUpperCase().substring(0, 3)}", name = "shortUppercaseGreeting")
+@ELExpression(value = "${strings.length}", name = "stringsLength")
+@ELExpression(value = "${numbers[1]}", name = "primitiveArrayElement")
+@ELExpression(value = "${numbers.stream().sum()}", name = "primitiveArrayStreamSum")
+@ELExpression(value = "${numbers[1] = Integer.valueOf(4)}", name = "primitiveArrayAssignment")
 @ELExpression(value = "${Boolean.TRUE}", name = "booleanConstant")
 @ELExpression(value = "${Integer.valueOf(3)}", name = "integerValueOf")
 @ELExpression(value = "${String('x')}", name = "stringConstructor")
