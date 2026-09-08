@@ -58,6 +58,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#constructor-detail" tabindex="0">Constructor Details</a>
 <ol class="toc-list">
 <li><a href="#%3Cinit%3E()" tabindex="0">InterpretingELExpressionParser()</a></li>
+<li><a href="#%3Cinit%3E(java.util.List)" tabindex="0">InterpretingELExpressionParser(List)</a></li>
 </ol>
 </li>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
@@ -110,7 +111,14 @@ to make <code>jakarta.el.ExpressionFactory</code> accept expression strings that
 <div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
 <div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E()" class="member-name-link">InterpretingELExpressionParser</a>()</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-last even-row-color">
+<div class="block">Creates a parser using the method executors visible to the context class loader.</div>
+</div>
+<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(java.util.List)" class="member-name-link">InterpretingELExpressionParser</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="../ELMethodExecutor.html" title="interface in io.micronaut.el">ELMethodExecutor</a>&gt;&nbsp;executors)</code></div>
+<div class="col-last odd-row-color">
+<div class="block">Creates a parser using the given method executors, instead of the ones the context class loader
+declares as services.</div>
+</div>
 </div>
 </section>
 </li>
@@ -162,6 +170,25 @@ to make <code>jakarta.el.ExpressionFactory</code> accept expression strings that
 <h3>InterpretingELExpressionParser</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">InterpretingELExpressionParser</span>()</div>
+<div class="block">Creates a parser using the method executors visible to the context class loader.</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="&lt;init&gt;(java.util.List)">
+<h3>InterpretingELExpressionParser</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">InterpretingELExpressionParser</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="../ELMethodExecutor.html" title="interface in io.micronaut.el">ELMethodExecutor</a>&gt;&nbsp;executors)</span></div>
+<div class="block">Creates a parser using the given method executors, instead of the ones the context class loader
+declares as services.
+
+<p>This is how an application registers its own executor programmatically, and the only way it can
+leave one out: a deployment that must not reach a method reflectively passes the executors it wants,
+rather than relying on the reflective one being absent from the classpath.</p></div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>executors</code> - The executors, in any order; they are consulted following the <code>Ordered</code> contract</dd>
+</dl>
 </div>
 </section>
 </li>

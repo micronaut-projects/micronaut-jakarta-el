@@ -75,9 +75,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#assignProperty(jakarta.el.ELContext,java.lang.Object,java.lang.Object,java.lang.Object)" tabindex="0">assignProperty(ELContext, Object, Object, Object)</a></li>
 <li><a href="#invokeMethodExpression(jakarta.el.ELContext,java.lang.Object,java.lang.Object%5B%5D)" tabindex="0">invokeMethodExpression(ELContext, Object, Object[])</a></li>
 <li><a href="#invoke(jakarta.el.ELContext,java.lang.Object,java.lang.Object,java.lang.Object...)" tabindex="0">invoke(ELContext, Object, Object, Object...)</a></li>
-<li><a href="#invokeWithParams(jakarta.el.ELContext,java.lang.Object,java.lang.Object,java.lang.Object%5B%5D)" tabindex="0">invokeWithParams(ELContext, Object, Object, Object[])</a></li>
 <li><a href="#invokeWithParamTypes(jakarta.el.ELContext,java.lang.Object,java.lang.Object,java.lang.Class%5B%5D,java.lang.Object%5B%5D)" tabindex="0">invokeWithParamTypes(ELContext, Object, Object, Class[], Object[])</a></li>
-<li><a href="#invokeMethod(jakarta.el.ELContext,java.lang.Object,java.lang.reflect.Method,java.lang.Object%5B%5D)" tabindex="0">invokeMethod(ELContext, Object, Method, Object[])</a></li>
 <li><a href="#invokeCallable(jakarta.el.ELContext,java.lang.Object,java.lang.Object...)" tabindex="0">invokeCallable(ELContext, Object, Object...)</a></li>
 <li><a href="#resolveCallableIdentifier(jakarta.el.ELContext,java.lang.String)" tabindex="0">resolveCallableIdentifier(ELContext, String)</a></li>
 <li><a href="#newInstance(jakarta.el.ELContext,jakarta.el.ELClass,java.lang.Object...)" tabindex="0">newInstance(ELContext, ELClass, Object...)</a></li>
@@ -206,30 +204,12 @@ type, or the one the <a href="../ELBeanProvider.html" title="interface in io.mic
 which covers the invocation of lambda expressions returning lambda expressions.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#invokeMethod(jakarta.el.ELContext,java.lang.Object,java.lang.reflect.Method,java.lang.Object%5B%5D)" class="member-name-link">invokeMethod</a><wbr>(jakarta.el.ELContext&nbsp;context,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;base,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/reflect/Method.html" title="class or interface in java.lang.reflect" class="external-link">Method</a>&nbsp;method,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a> @Nullable []&nbsp;arguments)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Invokes a method found on the base object, which is how the section 1.6 of the specification invokes a
-method expression that does not provide its own parameters.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#invokeMethodExpression(jakarta.el.ELContext,java.lang.Object,java.lang.Object%5B%5D)" class="member-name-link">invokeMethodExpression</a><wbr>(jakarta.el.ELContext&nbsp;context,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#invokeMethodExpression(jakarta.el.ELContext,java.lang.Object,java.lang.Object%5B%5D)" class="member-name-link">invokeMethodExpression</a><wbr>(jakarta.el.ELContext&nbsp;context,
  @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;target,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a> @Nullable []&nbsp;arguments)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Invokes a method expression resolved from a single identifier, as described in the section 1.5.4 of
 the specification.</div>
-</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#invokeWithParams(jakarta.el.ELContext,java.lang.Object,java.lang.Object,java.lang.Object%5B%5D)" class="member-name-link">invokeWithParams</a><wbr>(jakarta.el.ELContext&nbsp;context,
- @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;base,
- @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;method,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a> @Nullable []&nbsp;params)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Invokes a method of a base object with the parameters passed to
-<code>jakarta.el.MethodExpression.invoke(ELContext, Object[])</code>.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#invokeWithParamTypes(jakarta.el.ELContext,java.lang.Object,java.lang.Object,java.lang.Class%5B%5D,java.lang.Object%5B%5D)" class="member-name-link">invokeWithParamTypes</a><wbr>(jakarta.el.ELContext&nbsp;context,
@@ -689,28 +669,6 @@ the specification.</div>
 </section>
 </li>
 <li>
-<section class="detail" id="invokeWithParams(jakarta.el.ELContext,java.lang.Object,java.lang.Object,java.lang.Object[])">
-<h3>invokeWithParams</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">@Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span>&nbsp;<span class="element-name">invokeWithParams</span><wbr><span class="parameters">(jakarta.el.ELContext&nbsp;context,
- @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;base,
- @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;method,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a> @Nullable []&nbsp;params)</span></div>
-<div class="block">Invokes a method of a base object with the parameters passed to
-<code>jakarta.el.MethodExpression.invoke(ELContext, Object[])</code>.</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>context</code> - The context</dd>
-<dd><code>base</code> - The base object</dd>
-<dd><code>method</code> - The method name</dd>
-<dd><code>params</code> - The parameters, can be <code>null</code></dd>
-<dt>Returns:</dt>
-<dd>The result of the invocation</dd>
-</dl>
-</div>
-</section>
-</li>
-<li>
 <section class="detail" id="invokeWithParamTypes(jakarta.el.ELContext,java.lang.Object,java.lang.Object,java.lang.Class[],java.lang.Object[])">
 <h3>invokeWithParamTypes</h3>
 <div class="horizontal-scroll">
@@ -728,28 +686,6 @@ which is how the section 1.6 of the specification resolves an overloaded method.
 <dd><code>method</code> - The method name</dd>
 <dd><code>paramTypes</code> - The parameter types provided at parse time, can be <code>null</code></dd>
 <dd><code>params</code> - The arguments</dd>
-<dt>Returns:</dt>
-<dd>The result of the invocation</dd>
-</dl>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="invokeMethod(jakarta.el.ELContext,java.lang.Object,java.lang.reflect.Method,java.lang.Object[])">
-<h3>invokeMethod</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">@Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span>&nbsp;<span class="element-name">invokeMethod</span><wbr><span class="parameters">(jakarta.el.ELContext&nbsp;context,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;base,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/reflect/Method.html" title="class or interface in java.lang.reflect" class="external-link">Method</a>&nbsp;method,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a> @Nullable []&nbsp;arguments)</span></div>
-<div class="block">Invokes a method found on the base object, which is how the section 1.6 of the specification invokes a
-method expression that does not provide its own parameters.</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>context</code> - The context</dd>
-<dd><code>base</code> - The base object</dd>
-<dd><code>method</code> - The method</dd>
-<dd><code>arguments</code> - The arguments</dd>
 <dt>Returns:</dt>
 <dd>The result of the invocation</dd>
 </dl>

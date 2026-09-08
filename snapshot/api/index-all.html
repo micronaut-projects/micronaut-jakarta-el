@@ -49,14 +49,14 @@ loadScripts(document, 'script');</script>
 <div class="header">
 <h1>Index</h1>
 </div>
-<a href="#I:A">A</a>&nbsp;<a href="#I:B">B</a>&nbsp;<a href="#I:C">C</a>&nbsp;<a href="#I:D">D</a>&nbsp;<a href="#I:E">E</a>&nbsp;<a href="#I:F">F</a>&nbsp;<a href="#I:G">G</a>&nbsp;<a href="#I:H">H</a>&nbsp;<a href="#I:I">I</a>&nbsp;<a href="#I:K">K</a>&nbsp;<a href="#I:L">L</a>&nbsp;<a href="#I:M">M</a>&nbsp;<a href="#I:N">N</a>&nbsp;<a href="#I:O">O</a>&nbsp;<a href="#I:P">P</a>&nbsp;<a href="#I:Q">Q</a>&nbsp;<a href="#I:R">R</a>&nbsp;<a href="#I:S">S</a>&nbsp;<a href="#I:T">T</a>&nbsp;<a href="#I:U">U</a>&nbsp;<a href="#I:V">V</a>&nbsp;<a href="#I:W">W</a>&nbsp;<br><a href="allclasses-index.html">All&nbsp;Classes&nbsp;and&nbsp;Interfaces</a><span class="vertical-separator">|</span><a href="allpackages-index.html">All&nbsp;Packages</a><span class="vertical-separator">|</span><a href="serialized-form.html">Serialized&nbsp;Form</a>
+<a href="#I:A">A</a>&nbsp;<a href="#I:B">B</a>&nbsp;<a href="#I:C">C</a>&nbsp;<a href="#I:D">D</a>&nbsp;<a href="#I:E">E</a>&nbsp;<a href="#I:F">F</a>&nbsp;<a href="#I:G">G</a>&nbsp;<a href="#I:H">H</a>&nbsp;<a href="#I:I">I</a>&nbsp;<a href="#I:K">K</a>&nbsp;<a href="#I:L">L</a>&nbsp;<a href="#I:M">M</a>&nbsp;<a href="#I:N">N</a>&nbsp;<a href="#I:O">O</a>&nbsp;<a href="#I:P">P</a>&nbsp;<a href="#I:Q">Q</a>&nbsp;<a href="#I:R">R</a>&nbsp;<a href="#I:S">S</a>&nbsp;<a href="#I:T">T</a>&nbsp;<a href="#I:U">U</a>&nbsp;<a href="#I:V">V</a>&nbsp;<a href="#I:W">W</a>&nbsp;<br><a href="allclasses-index.html">All&nbsp;Classes&nbsp;and&nbsp;Interfaces</a><span class="vertical-separator">|</span><a href="allpackages-index.html">All&nbsp;Packages</a><span class="vertical-separator">|</span><a href="constant-values.html">Constant&nbsp;Field&nbsp;Values</a><span class="vertical-separator">|</span><a href="serialized-form.html">Serialized&nbsp;Form</a>
 <h2 class="title" id="I:A">A</h2>
 <dl class="index">
 <dt><a href="io/micronaut/el/runtime/ELResolution.html#access(jakarta.el.ELContext,java.lang.Object,io.micronaut.el.runtime.ELLambdaBody.Unary)" class="member-name-link">access(ELContext, Object, ELLambdaBody.Unary)</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELResolution.html" title="class in io.micronaut.el.runtime">ELResolution</a></dt>
 <dd>
 <div class="block">Evaluates a property or method continuation only when its base is non-null.</div>
 </dd>
-<dt><a href="io/micronaut/el/runtime/ELMethods.html#accessible(java.lang.reflect.Method)" class="member-name-link">accessible(Method)</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELMethods.html" title="class in io.micronaut.el.runtime">ELMethods</a></dt>
+<dt><a href="io/micronaut/el/interpreter/reflection/ReflectiveELMethods.html#accessible(java.lang.reflect.Method)" class="member-name-link">accessible(Method)</a> - Static method in class io.micronaut.el.interpreter.reflection.<a href="io/micronaut/el/interpreter/reflection/ReflectiveELMethods.html" title="class in io.micronaut.el.interpreter.reflection">ReflectiveELMethods</a></dt>
 <dd>
 <div class="block">Returns a declaration of the method that can be invoked reflectively.</div>
 </dd>
@@ -81,6 +81,21 @@ loadScripts(document, 'script');</script>
 <dt><a href="io/micronaut/el/stream/ELStream.html#allMatch(jakarta.el.LambdaExpression)" class="member-name-link">allMatch(LambdaExpression)</a> - Method in class io.micronaut.el.stream.<a href="io/micronaut/el/stream/ELStream.html" title="class in io.micronaut.el.stream">ELStream</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/stream/ELStream.html#allMatch(java.util.function.Predicate)" class="member-name-link">allMatch(Predicate)</a> - Method in class io.micronaut.el.stream.<a href="io/micronaut/el/stream/ELStream.html" title="class in io.micronaut.el.stream">ELStream</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/ELSandbox.html#allowsMember(java.lang.Class,java.lang.String)" class="member-name-link">allowsMember(Class, String)</a> - Method in interface io.micronaut.el.<a href="io/micronaut/el/ELSandbox.html" title="interface in io.micronaut.el">ELSandbox</a></dt>
+<dd>
+<div class="block">Whether an expression may read a property of a type or invoke a method of it, asked once the type
+itself is allowed.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELSandbox.StandardELSandbox.html#allowsMember(java.lang.Class,java.lang.String)" class="member-name-link">allowsMember(Class, String)</a> - Method in class io.micronaut.el.<a href="io/micronaut/el/ELSandbox.StandardELSandbox.html" title="class in io.micronaut.el">ELSandbox.StandardELSandbox</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/ELSandbox.html#allowsType(java.lang.Class)" class="member-name-link">allowsType(Class)</a> - Method in interface io.micronaut.el.<a href="io/micronaut/el/ELSandbox.html" title="interface in io.micronaut.el">ELSandbox</a></dt>
+<dd>
+<div class="block">Whether an expression may read the properties of a type and invoke its methods, which is asked of the
+base object of every property access and method invocation, of the class of every static reference and
+of the class of every constructor reference.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELSandbox.StandardELSandbox.html#allowsType(java.lang.Class)" class="member-name-link">allowsType(Class)</a> - Method in class io.micronaut.el.<a href="io/micronaut/el/ELSandbox.StandardELSandbox.html" title="class in io.micronaut.el">ELSandbox.StandardELSandbox</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/parser/ast/BinaryOperator.html#AND" class="member-name-link">AND</a> - Enum constant in enum class io.micronaut.el.parser.ast.<a href="io/micronaut/el/parser/ast/BinaryOperator.html" title="enum class in io.micronaut.el.parser.ast">BinaryOperator</a></dt>
 <dd>&nbsp;</dd>
@@ -186,9 +201,41 @@ the <code>@JvmStatic</code> functions of its Kotlin companion object.</div>
 <dd>
 <div class="block">Creates an instance of a <code>BooleanLiteral</code> record class.</div>
 </dd>
+<dt><a href="io/micronaut/el/runtime/ELMethods.Candidate.html#bridge()" class="member-name-link">bridge()</a> - Method in record class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELMethods.Candidate.html" title="class in io.micronaut.el.runtime">ELMethods.Candidate</a></dt>
+<dd>
+<div class="block">Returns the value of the <a href="./io/micronaut/el/runtime/ELMethods.Candidate.html#param-bridge"><code>bridge</code></a> record component.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELMethodRegistry.html#build(int)" class="member-name-link">build(int)</a> - Method in class io.micronaut.el.<a href="io/micronaut/el/ELMethodRegistry.html" title="class in io.micronaut.el">ELMethodRegistry</a></dt>
+<dd>
+<div class="block">Builds the executor dispatching everything registered so far.</div>
+</dd>
 </dl>
 <h2 class="title" id="I:C">C</h2>
 <dl class="index">
+<dt><a href="io/micronaut/el/ELMethodRegistry.Fn0.html#call()" class="member-name-link">call()</a> - Method in interface io.micronaut.el.<a href="io/micronaut/el/ELMethodRegistry.Fn0.html" title="interface in io.micronaut.el">ELMethodRegistry.Fn0</a></dt>
+<dd>
+<div class="block">Invokes the method.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELMethodRegistry.Fn1.html#call(A)" class="member-name-link">call(A)</a> - Method in interface io.micronaut.el.<a href="io/micronaut/el/ELMethodRegistry.Fn1.html" title="interface in io.micronaut.el">ELMethodRegistry.Fn1</a></dt>
+<dd>
+<div class="block">Invokes the method.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELMethodRegistry.Fn2.html#call(A,B)" class="member-name-link">call(A, B)</a> - Method in interface io.micronaut.el.<a href="io/micronaut/el/ELMethodRegistry.Fn2.html" title="interface in io.micronaut.el">ELMethodRegistry.Fn2</a></dt>
+<dd>
+<div class="block">Invokes the method.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELMethodRegistry.Call0.html#call(T)" class="member-name-link">call(T)</a> - Method in interface io.micronaut.el.<a href="io/micronaut/el/ELMethodRegistry.Call0.html" title="interface in io.micronaut.el">ELMethodRegistry.Call0</a></dt>
+<dd>
+<div class="block">Invokes the method.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELMethodRegistry.Call1.html#call(T,A)" class="member-name-link">call(T, A)</a> - Method in interface io.micronaut.el.<a href="io/micronaut/el/ELMethodRegistry.Call1.html" title="interface in io.micronaut.el">ELMethodRegistry.Call1</a></dt>
+<dd>
+<div class="block">Invokes the method.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELMethodRegistry.Call2.html#call(T,A,B)" class="member-name-link">call(T, A, B)</a> - Method in interface io.micronaut.el.<a href="io/micronaut/el/ELMethodRegistry.Call2.html" title="interface in io.micronaut.el">ELMethodRegistry.Call2</a></dt>
+<dd>
+<div class="block">Invokes the method.</div>
+</dd>
 <dt><a href="io/micronaut/el/parser/ast/ELNode.Call.html#%3Cinit%3E(io.micronaut.el.parser.ast.ELNode,java.util.List)" class="member-name-link">Call(ELNode, List)</a> - Constructor for record class io.micronaut.el.parser.ast.<a href="io/micronaut/el/parser/ast/ELNode.Call.html" title="class in io.micronaut.el.parser.ast">ELNode.Call</a></dt>
 <dd>
 <div class="block">Creates an instance of a <code>Call</code> record class.</div>
@@ -196,6 +243,14 @@ the <code>@JvmStatic</code> functions of its Kotlin companion object.</div>
 <dt><a href="io/micronaut/el/parser/ast/ELNode.Kind.html#CALL" class="member-name-link">CALL</a> - Enum constant in enum class io.micronaut.el.parser.ast.<a href="io/micronaut/el/parser/ast/ELNode.Kind.html" title="enum class in io.micronaut.el.parser.ast">ELNode.Kind</a></dt>
 <dd>
 <div class="block">Call.</div>
+</dd>
+<dt><a href="io/micronaut/el/runtime/ELMethods.Candidate.html#%3Cinit%3E(T,java.lang.Class%5B%5D)" class="member-name-link">Candidate(T, Class[])</a> - Constructor for record class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELMethods.Candidate.html" title="class in io.micronaut.el.runtime">ELMethods.Candidate</a></dt>
+<dd>
+<div class="block">A candidate for a method that is neither of variable arity, nor static, nor a bridge.</div>
+</dd>
+<dt><a href="io/micronaut/el/runtime/ELMethods.Candidate.html#%3Cinit%3E(T,java.lang.Class%5B%5D,boolean,boolean,boolean)" class="member-name-link">Candidate(T, Class[], boolean, boolean, boolean)</a> - Constructor for record class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELMethods.Candidate.html" title="class in io.micronaut.el.runtime">ELMethods.Candidate</a></dt>
+<dd>
+<div class="block">Creates an instance of a <code>Candidate</code> record class.</div>
 </dd>
 <dt><a href="io/micronaut/el/parser/ELNodes.html#canonical(io.micronaut.el.parser.ast.ELNode)" class="member-name-link">canonical(ELNode)</a> - Static method in class io.micronaut.el.parser.<a href="io/micronaut/el/parser/ELNodes.html" title="class in io.micronaut.el.parser">ELNodes</a></dt>
 <dd>
@@ -211,6 +266,11 @@ bound to them as required by the Jakarta EL expression equality contract.</div>
 <dd>
 <div class="block">Renders the canonical form while replacing mapped function names with their bound-method identities.</div>
 </dd>
+<dt><a href="io/micronaut/el/ELSandbox.html#checksResultOf(java.lang.Class)" class="member-name-link">checksResultOf(Class)</a> - Static method in interface io.micronaut.el.<a href="io/micronaut/el/ELSandbox.html" title="interface in io.micronaut.el">ELSandbox</a></dt>
+<dd>
+<div class="block">Whether a value coerced to the given type can be an instance of a type a sandbox denies, which decides
+whether the value an expression returns has to be checked at all.</div>
+</dd>
 <dt><a href="io/micronaut/el/processor/writer/ExpressionSourceWriter.CompiledMethod.html#className()" class="member-name-link">className()</a> - Method in record class io.micronaut.el.processor.writer.<a href="io/micronaut/el/processor/writer/ExpressionSourceWriter.CompiledMethod.html" title="class in io.micronaut.el.processor.writer">ExpressionSourceWriter.CompiledMethod</a></dt>
 <dd>
 <div class="block">Returns the value of the <a href="./io/micronaut/el/processor/writer/ExpressionSourceWriter.CompiledMethod.html#param-className"><code>className</code></a> record component.</div>
@@ -222,6 +282,12 @@ bound to them as required by the Jakarta EL expression equality contract.</div>
 <dt><a href="io/micronaut/el/runtime/ELSupport.html#coerce(java.lang.Object,java.lang.Class)" class="member-name-link">coerce(Object, Class)</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELSupport.html" title="class in io.micronaut.el.runtime">ELSupport</a></dt>
 <dd>
 <div class="block">Coerces a value applying the standard rules of the specification.</div>
+</dd>
+<dt><a href="io/micronaut/el/runtime/ELMethods.html#coerceArguments(jakarta.el.ELContext,java.lang.String,java.lang.Class%5B%5D,boolean,java.lang.Object%5B%5D)" class="member-name-link">coerceArguments(ELContext, String, Class[], boolean, Object[])</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELMethods.html" title="class in io.micronaut.el.runtime">ELMethods</a></dt>
+<dd>
+<div class="block">Prepares the arguments of a call for the declared parameters, as described in the section 1.23 of the
+specification: every argument is coerced to its parameter type, and the arguments a variable arity
+parameter takes are packed into an array of its component type.</div>
 </dd>
 <dt><a href="io/micronaut/el/runtime/ELSupport.html#coerceToArray(java.lang.Object,java.lang.Class)" class="member-name-link">coerceToArray(Object, Class)</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELSupport.html" title="class in io.micronaut.el.runtime">ELSupport</a></dt>
 <dd>
@@ -257,6 +323,12 @@ bound to them as required by the Jakarta EL expression equality contract.</div>
 </dd>
 <dt><a href="io/micronaut/el/CompiledExpressionFactory.html#coerceToType(java.lang.Object,java.lang.Class)" class="member-name-link">coerceToType(Object, Class)</a> - Method in class io.micronaut.el.<a href="io/micronaut/el/CompiledExpressionFactory.html" title="class in io.micronaut.el">CompiledExpressionFactory</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/resolver/CommonELResolver.html" class="type-name-link" title="class in io.micronaut.el.resolver">CommonELResolver</a> - Class in <a href="io/micronaut/el/resolver/package-summary.html">io.micronaut.el.resolver</a></dt>
+<dd>
+<div class="block">Resolves the common JDK member operations without reflective invocation.</div>
+</dd>
+<dt><a href="io/micronaut/el/resolver/CommonELResolver.html#%3Cinit%3E()" class="member-name-link">CommonELResolver()</a> - Constructor for class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/CommonELResolver.html" title="class in io.micronaut.el.resolver">CommonELResolver</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/runtime/ELSupport.html#compare(java.lang.Object,java.lang.Object)" class="member-name-link">compare(Object, Object)</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELSupport.html" title="class in io.micronaut.el.runtime">ELSupport</a></dt>
 <dd>
 <div class="block">Compares two values as described in the section 1.9.1 of the specification.</div>
@@ -278,6 +350,12 @@ bound to them as required by the Jakarta EL expression equality contract.</div>
 <dt><a href="io/micronaut/el/CompiledELContext.html#%3Cinit%3E()" class="member-name-link">CompiledELContext()</a> - Constructor for class io.micronaut.el.<a href="io/micronaut/el/CompiledELContext.html" title="class in io.micronaut.el">CompiledELContext</a></dt>
 <dd>
 <div class="block">Creates a context using the standard chain of resolvers.</div>
+</dd>
+<dt><a href="io/micronaut/el/CompiledELContext.html#%3Cinit%3E(io.micronaut.context.BeanDefinitionRegistry,jakarta.el.ELResolver...)" class="member-name-link">CompiledELContext(BeanDefinitionRegistry, ELResolver...)</a> - Constructor for class io.micronaut.el.<a href="io/micronaut/el/CompiledELContext.html" title="class in io.micronaut.el">CompiledELContext</a></dt>
+<dd>
+<div class="block">Creates a context using the standard chain of resolvers of an application that has a bean context, which
+also invokes the executable methods the beans of that context carry, without the types they are declared
+on having to be annotated <code>@Introspected</code>.</div>
 </dd>
 <dt><a href="io/micronaut/el/CompiledELContext.html#%3Cinit%3E(jakarta.el.ELResolver...)" class="member-name-link">CompiledELContext(ELResolver...)</a> - Constructor for class io.micronaut.el.<a href="io/micronaut/el/CompiledELContext.html" title="class in io.micronaut.el">CompiledELContext</a></dt>
 <dd>&nbsp;</dd>
@@ -374,11 +452,45 @@ specification.</div>
 <dd>
 <div class="block">Returns the value of the <a href="./io/micronaut/el/processor/compiler/ELMethodExpressionDefinition.html#param-constantName"><code>constantName</code></a> record component.</div>
 </dd>
+<dt><a href="io/micronaut/el/ELMethodRegistry.html#constructor(java.lang.Class,java.lang.Class%5B%5D,boolean,io.micronaut.el.ELMethodRegistry.Invocation)" class="member-name-link">constructor(Class, Class[], boolean, ELMethodRegistry.Invocation)</a> - Method in class io.micronaut.el.<a href="io/micronaut/el/ELMethodRegistry.html" title="class in io.micronaut.el">ELMethodRegistry</a></dt>
+<dd>
+<div class="block">Registers a constructor of any arity, callable as <code>Type(arguments)</code>.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELMethodRegistry.html#constructor(java.lang.Class,java.lang.Class,io.micronaut.el.ELMethodRegistry.Fn1)" class="member-name-link">constructor(Class, Class, ELMethodRegistry.Fn1)</a> - Method in class io.micronaut.el.<a href="io/micronaut/el/ELMethodRegistry.html" title="class in io.micronaut.el">ELMethodRegistry</a></dt>
+<dd>
+<div class="block">Registers a constructor taking one argument, callable as <code>Type(argument)</code>.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELMethodContributor.html#contribute(io.micronaut.el.ELMethodRegistry)" class="member-name-link">contribute(ELMethodRegistry)</a> - Method in interface io.micronaut.el.<a href="io/micronaut/el/ELMethodContributor.html" title="interface in io.micronaut.el">ELMethodContributor</a></dt>
+<dd>
+<div class="block">Registers the methods, constructors and functions this contributor makes callable.</div>
+</dd>
+<dt><a href="io/micronaut/el/ContributedELMethodExecutor.html" class="type-name-link" title="class in io.micronaut.el">ContributedELMethodExecutor</a> - Class in <a href="io/micronaut/el/package-summary.html">io.micronaut.el</a></dt>
+<dd>
+<div class="block">Dispatches the methods every <a href="io/micronaut/el/ELMethodContributor.html" title="interface in io.micronaut.el"><code>ELMethodContributor</code></a> on the classpath registered.</div>
+</dd>
+<dt><a href="io/micronaut/el/ContributedELMethodExecutor.html#%3Cinit%3E()" class="member-name-link">ContributedELMethodExecutor()</a> - Constructor for class io.micronaut.el.<a href="io/micronaut/el/ContributedELMethodExecutor.html" title="class in io.micronaut.el">ContributedELMethodExecutor</a></dt>
+<dd>
+<div class="block">Creates the executor from the contributors visible to the context class loader.</div>
+</dd>
+<dt><a href="io/micronaut/el/ContributedELMethodExecutor.html#%3Cinit%3E(java.util.List)" class="member-name-link">ContributedELMethodExecutor(List)</a> - Constructor for class io.micronaut.el.<a href="io/micronaut/el/ContributedELMethodExecutor.html" title="class in io.micronaut.el">ContributedELMethodExecutor</a></dt>
+<dd>
+<div class="block">Creates the executor from the given contributors.</div>
+</dd>
 <dt><a href="io/micronaut/el/resolver/ELResolverChain.html#converts()" class="member-name-link">converts()</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/ELResolverChain.html" title="class in io.micronaut.el.resolver">ELResolverChain</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/resolver/ELResolverChain.html#convertToType(jakarta.el.ELContext,java.lang.Object,java.lang.Class)" class="member-name-link">convertToType(ELContext, Object, Class)</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/ELResolverChain.html" title="class in io.micronaut.el.resolver">ELResolverChain</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/stream/ELStream.html#count()" class="member-name-link">count()</a> - Method in class io.micronaut.el.stream.<a href="io/micronaut/el/stream/ELStream.html" title="class in io.micronaut.el.stream">ELStream</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/ELMethodRegistry.Lambda.html#create(jakarta.el.ELContext,jakarta.el.LambdaExpression)" class="member-name-link">create(ELContext, LambdaExpression)</a> - Method in interface io.micronaut.el.<a href="io/micronaut/el/ELMethodRegistry.Lambda.html" title="interface in io.micronaut.el">ELMethodRegistry.Lambda</a></dt>
+<dd>
+<div class="block">Builds the instance.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELProxyFactory.html#create(jakarta.el.ELContext,jakarta.el.LambdaExpression,java.lang.Class)" class="member-name-link">create(ELContext, LambdaExpression, Class)</a> - Method in interface io.micronaut.el.<a href="io/micronaut/el/ELProxyFactory.html" title="interface in io.micronaut.el">ELProxyFactory</a></dt>
+<dd>
+<div class="block">Implements the functional interface with the lambda expression.</div>
+</dd>
+<dt><a href="io/micronaut/el/interpreter/reflection/ReflectiveELProxyFactory.html#create(jakarta.el.ELContext,jakarta.el.LambdaExpression,java.lang.Class)" class="member-name-link">create(ELContext, LambdaExpression, Class)</a> - Method in class io.micronaut.el.interpreter.reflection.<a href="io/micronaut/el/interpreter/reflection/ReflectiveELProxyFactory.html" title="class in io.micronaut.el.interpreter.reflection">ReflectiveELProxyFactory</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/runtime/ELLambdas.html#create(jakarta.el.ELContext,java.util.List,java.util.function.Function)" class="member-name-link">create(ELContext, List, Function)</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELLambdas.html" title="class in io.micronaut.el.runtime">ELLambdas</a></dt>
 <dd>
@@ -422,6 +534,10 @@ with the arguments in the lambda scope of the context.</div>
 <dl class="index">
 <dt><a href="io/micronaut/el/processor/compiler/ELFunctionBinder.html#declaresFunctions(io.micronaut.inject.ast.ClassElement)" class="member-name-link">declaresFunctions(ClassElement)</a> - Static method in class io.micronaut.el.processor.compiler.<a href="io/micronaut/el/processor/compiler/ELFunctionBinder.html" title="class in io.micronaut.el.processor.compiler">ELFunctionBinder</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/parser/ELParser.html#DEFAULT_MAX_DEPTH" class="member-name-link">DEFAULT_MAX_DEPTH</a> - Static variable in class io.micronaut.el.parser.<a href="io/micronaut/el/parser/ELParser.html" title="class in io.micronaut.el.parser">ELParser</a></dt>
+<dd>
+<div class="block">The nesting depth an expression may reach by default.</div>
+</dd>
 <dt><a href="io/micronaut/el/processor/writer/ExpressionSourceWriter.CompiledMethod.html#definition()" class="member-name-link">definition()</a> - Method in record class io.micronaut.el.processor.writer.<a href="io/micronaut/el/processor/writer/ExpressionSourceWriter.CompiledMethod.html" title="class in io.micronaut.el.processor.writer">ExpressionSourceWriter.CompiledMethod</a></dt>
 <dd>
 <div class="block">Returns the value of the <a href="./io/micronaut/el/processor/writer/ExpressionSourceWriter.CompiledMethod.html#param-definition"><code>definition</code></a> record component.</div>
@@ -460,9 +576,17 @@ returns nothing.</div>
 </dl>
 <h2 class="title" id="I:E">E</h2>
 <dl class="index">
+<dt><a href="io/micronaut/el/runtime/ELArguments.html" class="type-name-link" title="class in io.micronaut.el.runtime">ELArguments</a> - Class in <a href="io/micronaut/el/runtime/package-summary.html">io.micronaut.el.runtime</a></dt>
+<dd>
+<div class="block">Adapts the raw parameter types of the Jakarta EL API to Micronaut arguments.</div>
+</dd>
 <dt><a href="io/micronaut/el/runtime/ELArithmetic.html" class="type-name-link" title="class in io.micronaut.el.runtime">ELArithmetic</a> - Class in <a href="io/micronaut/el/runtime/package-summary.html">io.micronaut.el.runtime</a></dt>
 <dd>
 <div class="block">The arithmetic and string concatenation operators of the Jakarta Expression Language specification.</div>
+</dd>
+<dt><a href="io/micronaut/el/runtime/ELArray.html" class="type-name-link" title="class in io.micronaut.el.runtime">ELArray</a> - Class in <a href="io/micronaut/el/runtime/package-summary.html">io.micronaut.el.runtime</a></dt>
+<dd>
+<div class="block">Direct operations on Java arrays.</div>
 </dd>
 <dt><a href="io/micronaut/el/ELBeanProvider.html" class="type-name-link" title="interface in io.micronaut.el">ELBeanProvider</a> - Interface in <a href="io/micronaut/el/package-summary.html">io.micronaut.el</a></dt>
 <dd>
@@ -493,6 +617,10 @@ Language specification.</div>
 <dd>
 <div class="block">A compiled expression and its statically known type, when available.</div>
 </dd>
+<dt><a href="io/micronaut/el/ELContributions.html" class="type-name-link" title="class in io.micronaut.el">ELContributions</a> - Class in <a href="io/micronaut/el/package-summary.html">io.micronaut.el</a></dt>
+<dd>
+<div class="block">What the <a href="io/micronaut/el/ELMethodContributor.html" title="interface in io.micronaut.el"><code>ELMethodContributor</code></a> services of the classpath registered, merged into one registry.</div>
+</dd>
 <dt><a href="io/micronaut/el/parser/ast/ELNode.ListData.html#elements()" class="member-name-link">elements()</a> - Method in record class io.micronaut.el.parser.ast.<a href="io/micronaut/el/parser/ast/ELNode.ListData.html" title="class in io.micronaut.el.parser.ast">ELNode.ListData</a></dt>
 <dd>
 <div class="block">Returns the value of the <a href="./io/micronaut/el/parser/ast/ELNode.ListData.html#param-elements"><code>elements</code></a> record component.</div>
@@ -504,6 +632,10 @@ Language specification.</div>
 <dt><a href="io/micronaut/el/annotation/ELEnvironment.html" class="type-name-link" title="annotation interface in io.micronaut.el.annotation">ELEnvironment</a> - Annotation Interface in <a href="io/micronaut/el/annotation/package-summary.html">io.micronaut.el.annotation</a></dt>
 <dd>
 <div class="block">Declares the compilation time environment shared by the expressions of the annotated type.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELExecutors.html" class="type-name-link" title="class in io.micronaut.el">ELExecutors</a> - Class in <a href="io/micronaut/el/package-summary.html">io.micronaut.el</a></dt>
+<dd>
+<div class="block">The <a href="io/micronaut/el/ELMethodExecutor.html" title="interface in io.micronaut.el"><code>ELMethodExecutor</code></a> services of the classpath, which describe a method without reflecting.</div>
 </dd>
 <dt><a href="io/micronaut/el/annotation/ELExpression.html" class="type-name-link" title="annotation interface in io.micronaut.el.annotation">ELExpression</a> - Annotation Interface in <a href="io/micronaut/el/annotation/package-summary.html">io.micronaut.el.annotation</a></dt>
 <dd>
@@ -598,6 +730,24 @@ Expression Language functions.</div>
 <div class="block">The handling of the literal-expressions described in the section 1.2.2 of the Jakarta Expression
 Language specification.</div>
 </dd>
+<dt><a href="io/micronaut/el/ELMethod.html" class="type-name-link" title="interface in io.micronaut.el">ELMethod</a> - Interface in <a href="io/micronaut/el/package-summary.html">io.micronaut.el</a></dt>
+<dd>
+<div class="block">A method resolved by an <a href="io/micronaut/el/ELMethodExecutor.html" title="interface in io.micronaut.el"><code>ELMethodExecutor</code></a>.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELMethodContributor.html" class="type-name-link" title="interface in io.micronaut.el">ELMethodContributor</a> - Interface in <a href="io/micronaut/el/package-summary.html">io.micronaut.el</a></dt>
+<dd>
+<div class="block">Contributes the methods, constructors and functions that expressions parsed at runtime may call, without
+reflection.</div>
+</dd>
+<dt><a href="io/micronaut/el/resolver/ELMethodDiagnostics.html" class="type-name-link" title="class in io.micronaut.el.resolver">ELMethodDiagnostics</a> - Class in <a href="io/micronaut/el/resolver/package-summary.html">io.micronaut.el.resolver</a></dt>
+<dd>
+<div class="block">Builds the <code>MethodNotFoundException</code> of a method that no executor and no resolver of the chain could
+resolve, saying why each of the descriptions a method can be reached through did not answer.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELMethodExecutor.html" class="type-name-link" title="interface in io.micronaut.el">ELMethodExecutor</a> - Interface in <a href="io/micronaut/el/package-summary.html">io.micronaut.el</a></dt>
+<dd>
+<div class="block">Resolves and executes methods for expressions parsed at runtime.</div>
+</dd>
 <dt><a href="io/micronaut/el/annotation/ELMethodExpression.html" class="type-name-link" title="annotation interface in io.micronaut.el.annotation">ELMethodExpression</a> - Annotation Interface in <a href="io/micronaut/el/annotation/package-summary.html">io.micronaut.el.annotation</a></dt>
 <dd>
 <div class="block">Declares a Jakarta Expression Language method expression to be compiled at compilation time.</div>
@@ -614,10 +764,56 @@ Language specification.</div>
 <dd>
 <div class="block">The container annotation of <a href="io/micronaut/el/annotation/ELMethodExpression.html" title="annotation interface in io.micronaut.el.annotation"><code>ELMethodExpression</code></a>.</div>
 </dd>
+<dt><a href="io/micronaut/el/ELMethodRegistry.html" class="type-name-link" title="class in io.micronaut.el">ELMethodRegistry</a> - Class in <a href="io/micronaut/el/package-summary.html">io.micronaut.el</a></dt>
+<dd>
+<div class="block">Declares the methods, constructors and functions an <a href="io/micronaut/el/ELMethodContributor.html" title="interface in io.micronaut.el"><code>ELMethodContributor</code></a> makes callable from
+expressions parsed at runtime, and turns them into an <a href="io/micronaut/el/ELMethodExecutor.html" title="interface in io.micronaut.el"><code>ELMethodExecutor</code></a> that dispatches them
+directly, without reflection.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELMethodRegistry.html#%3Cinit%3E()" class="member-name-link">ELMethodRegistry()</a> - Constructor for class io.micronaut.el.<a href="io/micronaut/el/ELMethodRegistry.html" title="class in io.micronaut.el">ELMethodRegistry</a></dt>
+<dd>
+<div class="block">Creates an empty registry.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELMethodRegistry.Call0.html" class="type-name-link" title="interface in io.micronaut.el">ELMethodRegistry.Call0&lt;T,<wbr>R&gt;</a> - Interface in <a href="io/micronaut/el/package-summary.html">io.micronaut.el</a></dt>
+<dd>
+<div class="block">Invokes an instance method taking no argument.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELMethodRegistry.Call1.html" class="type-name-link" title="interface in io.micronaut.el">ELMethodRegistry.Call1&lt;T,<wbr>A,<wbr>R&gt;</a> - Interface in <a href="io/micronaut/el/package-summary.html">io.micronaut.el</a></dt>
+<dd>
+<div class="block">Invokes an instance method taking one argument.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELMethodRegistry.Call2.html" class="type-name-link" title="interface in io.micronaut.el">ELMethodRegistry.Call2&lt;T,<wbr>A,<wbr>B,<wbr>R&gt;</a> - Interface in <a href="io/micronaut/el/package-summary.html">io.micronaut.el</a></dt>
+<dd>
+<div class="block">Invokes an instance method taking two arguments.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELMethodRegistry.Fn0.html" class="type-name-link" title="interface in io.micronaut.el">ELMethodRegistry.Fn0&lt;R&gt;</a> - Interface in <a href="io/micronaut/el/package-summary.html">io.micronaut.el</a></dt>
+<dd>
+<div class="block">Invokes a static method, a constructor or a function taking no argument.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELMethodRegistry.Fn1.html" class="type-name-link" title="interface in io.micronaut.el">ELMethodRegistry.Fn1&lt;A,<wbr>R&gt;</a> - Interface in <a href="io/micronaut/el/package-summary.html">io.micronaut.el</a></dt>
+<dd>
+<div class="block">Invokes a static method, a constructor or a function taking one argument.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELMethodRegistry.Fn2.html" class="type-name-link" title="interface in io.micronaut.el">ELMethodRegistry.Fn2&lt;A,<wbr>B,<wbr>R&gt;</a> - Interface in <a href="io/micronaut/el/package-summary.html">io.micronaut.el</a></dt>
+<dd>
+<div class="block">Invokes a static method, a constructor or a function taking two arguments.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELMethodRegistry.Invocation.html" class="type-name-link" title="interface in io.micronaut.el">ELMethodRegistry.Invocation</a> - Interface in <a href="io/micronaut/el/package-summary.html">io.micronaut.el</a></dt>
+<dd>
+<div class="block">Invokes a registered method of any arity.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELMethodRegistry.Lambda.html" class="type-name-link" title="interface in io.micronaut.el">ELMethodRegistry.Lambda&lt;T&gt;</a> - Interface in <a href="io/micronaut/el/package-summary.html">io.micronaut.el</a></dt>
+<dd>
+<div class="block">Builds an instance of a functional interface that runs a lambda expression.</div>
+</dd>
 <dt><a href="io/micronaut/el/runtime/ELMethods.html" class="type-name-link" title="class in io.micronaut.el.runtime">ELMethods</a> - Class in <a href="io/micronaut/el/runtime/package-summary.html">io.micronaut.el.runtime</a></dt>
 <dd>
 <div class="block">Selects the method a method expression refers to, as described in the section 1.6 of the Jakarta
 Expression Language specification.</div>
+</dd>
+<dt><a href="io/micronaut/el/runtime/ELMethods.Candidate.html" class="type-name-link" title="class in io.micronaut.el.runtime">ELMethods.Candidate&lt;T&gt;</a> - Record Class in <a href="io/micronaut/el/runtime/package-summary.html">io.micronaut.el.runtime</a></dt>
+<dd>
+<div class="block">A method the selection of the section 1.6 can choose between, with what the selection needs read once.</div>
 </dd>
 <dt><a href="io/micronaut/el/parser/ast/ELNode.html" class="type-name-link" title="interface in io.micronaut.el.parser.ast">ELNode</a> - Interface in <a href="io/micronaut/el/parser/ast/package-summary.html">io.micronaut.el.parser.ast</a></dt>
 <dd>
@@ -741,6 +937,11 @@ specification.</div>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/parser/ELParsingException.html#%3Cinit%3E(java.lang.String,java.lang.String,int)" class="member-name-link">ELParsingException(String, String, int)</a> - Constructor for exception class io.micronaut.el.parser.<a href="io/micronaut/el/parser/ELParsingException.html" title="class in io.micronaut.el.parser">ELParsingException</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/ELProxyFactory.html" class="type-name-link" title="interface in io.micronaut.el">ELProxyFactory</a> - Interface in <a href="io/micronaut/el/package-summary.html">io.micronaut.el</a></dt>
+<dd>
+<div class="block">Implements a functional interface nothing described in advance, which is the last resort of the coercion of
+the section 1.23.2 of the specification.</div>
+</dd>
 <dt><a href="io/micronaut/el/runtime/ELResolution.html" class="type-name-link" title="class in io.micronaut.el.runtime">ELResolution</a> - Class in <a href="io/micronaut/el/runtime/package-summary.html">io.micronaut.el.runtime</a></dt>
 <dd>
 <div class="block">The resolution of identifiers, properties and methods described in the sections 1.5 and 1.6 of the
@@ -763,6 +964,20 @@ the resolvers that implement it.</div>
 <dd>
 <div class="block">The factory of the standard resolver chain of the module.</div>
 </dd>
+<dt><a href="io/micronaut/el/ELSandbox.html" class="type-name-link" title="interface in io.micronaut.el">ELSandbox</a> - Interface in <a href="io/micronaut/el/package-summary.html">io.micronaut.el</a></dt>
+<dd>
+<div class="block">The types and members an expression parsed at runtime may reach.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELSandbox.StandardELSandbox.html" class="type-name-link" title="class in io.micronaut.el">ELSandbox.StandardELSandbox</a> - Class in <a href="io/micronaut/el/package-summary.html">io.micronaut.el</a></dt>
+<dd>
+<div class="block">The default deny list.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELSandboxException.html" class="type-name-link" title="class in io.micronaut.el">ELSandboxException</a> - Exception Class in <a href="io/micronaut/el/package-summary.html">io.micronaut.el</a></dt>
+<dd>
+<div class="block">Raised when an expression parsed at runtime reaches a type or a member its <a href="io/micronaut/el/ELSandbox.html" title="interface in io.micronaut.el"><code>ELSandbox</code></a> denies.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELSandboxException.html#%3Cinit%3E(java.lang.Class,java.lang.String)" class="member-name-link">ELSandboxException(Class, String)</a> - Constructor for exception class io.micronaut.el.<a href="io/micronaut/el/ELSandboxException.html" title="class in io.micronaut.el">ELSandboxException</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/stream/ELStream.html" class="type-name-link" title="class in io.micronaut.el.stream">ELStream&lt;T&gt;</a> - Class in <a href="io/micronaut/el/stream/package-summary.html">io.micronaut.el.stream</a></dt>
 <dd>
 <div class="block">The <code>Stream</code> implementation class described in the section 2.3.3.1 of the Jakarta Expression
@@ -772,6 +987,8 @@ Language specification.</div>
 <dd>
 <div class="block">The type conversion, comparison and emptiness rules of the Jakarta Expression Language specification.</div>
 </dd>
+<dt><a href="io/micronaut/el/runtime/ELSupport.html#%3Cinit%3E()" class="member-name-link">ELSupport()</a> - Constructor for class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELSupport.html" title="class in io.micronaut.el.runtime">ELSupport</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/processor/visitor/ELTypes.html" class="type-name-link" title="class in io.micronaut.el.processor.visitor">ELTypes</a> - Class in <a href="io/micronaut/el/processor/visitor/package-summary.html">io.micronaut.el.processor.visitor</a></dt>
 <dd>
 <div class="block">The resolution of the types referenced by the annotations of the module.</div>
@@ -950,6 +1167,10 @@ Language specification.</div>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/runtime/CompiledValueExpression.html#equals(java.lang.Object)" class="member-name-link">equals(Object)</a> - Method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/CompiledValueExpression.html" title="class in io.micronaut.el.runtime">CompiledValueExpression</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/runtime/ELMethods.Candidate.html#equals(java.lang.Object)" class="member-name-link">equals(Object)</a> - Method in record class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELMethods.Candidate.html" title="class in io.micronaut.el.runtime">ELMethods.Candidate</a></dt>
+<dd>
+<div class="block">Indicates whether some other object is "equal to" this one.</div>
+</dd>
 <dt><a href="io/micronaut/el/parser/ast/ELNode.Eval.html#%3Cinit%3E(io.micronaut.el.parser.ast.ELNode)" class="member-name-link">Eval(ELNode)</a> - Constructor for record class io.micronaut.el.parser.ast.<a href="io/micronaut/el/parser/ast/ELNode.Eval.html" title="class in io.micronaut.el.parser.ast">ELNode.Eval</a></dt>
 <dd>
 <div class="block">Creates an instance of a <code>Eval</code> record class.</div>
@@ -1003,6 +1224,23 @@ consisting of a single identifier.</div>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/processor/compiler/ELCompiler.html#evaluationType()" class="member-name-link">evaluationType()</a> - Method in class io.micronaut.el.processor.compiler.<a href="io/micronaut/el/processor/compiler/ELCompiler.html" title="class in io.micronaut.el.processor.compiler">ELCompiler</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/resolver/ExecutableMethodELExecutor.html" class="type-name-link" title="class in io.micronaut.el.resolver">ExecutableMethodELExecutor</a> - Class in <a href="io/micronaut/el/resolver/package-summary.html">io.micronaut.el.resolver</a></dt>
+<dd>
+<div class="block">The <a href="io/micronaut/el/ELMethodExecutor.html" title="interface in io.micronaut.el"><code>ELMethodExecutor</code></a> invoking a method of a bean through the executable metadata its bean definition
+carries, the metadata Micronaut generates for every method annotated with
+<code>io.micronaut.context.annotation.Executable</code>, directly or through an annotation that is itself
+meta-annotated with it.</div>
+</dd>
+<dt><a href="io/micronaut/el/resolver/ExecutableMethodELExecutor.html#%3Cinit%3E()" class="member-name-link">ExecutableMethodELExecutor()</a> - Constructor for class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/ExecutableMethodELExecutor.html" title="class in io.micronaut.el.resolver">ExecutableMethodELExecutor</a></dt>
+<dd>
+<div class="block">Creates the executor reading, on every call, the registry registered in the <code>ELContext</code> the
+expression is evaluated with, under the key <code>BeanDefinitionRegistry.class</code> or
+<code>BeanContext.class</code>.</div>
+</dd>
+<dt><a href="io/micronaut/el/resolver/ExecutableMethodELExecutor.html#%3Cinit%3E(io.micronaut.context.BeanDefinitionRegistry)" class="member-name-link">ExecutableMethodELExecutor(BeanDefinitionRegistry)</a> - Constructor for class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/ExecutableMethodELExecutor.html" title="class in io.micronaut.el.resolver">ExecutableMethodELExecutor</a></dt>
+<dd>
+<div class="block">Creates the executor reading the definitions of a registry.</div>
+</dd>
 <dt><a href="io/micronaut/el/CompiledELContext.html#exitLambdaScope()" class="member-name-link">exitLambdaScope()</a> - Method in class io.micronaut.el.<a href="io/micronaut/el/CompiledELContext.html" title="class in io.micronaut.el">CompiledELContext</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/processor/compiler/CompilationContext.html#exitLambdaScope()" class="member-name-link">exitLambdaScope()</a> - Method in class io.micronaut.el.processor.compiler.<a href="io/micronaut/el/processor/compiler/CompilationContext.html" title="class in io.micronaut.el.processor.compiler">CompilationContext</a></dt>
@@ -1010,7 +1248,9 @@ consisting of a single identifier.</div>
 <div class="block">Exits the scope of a lambda expression.</div>
 </dd>
 <dt><a href="io/micronaut/el/annotation/ELMethodExpression.html#expectedParamTypes()" class="member-name-link">expectedParamTypes()</a> - Element in annotation interface io.micronaut.el.annotation.<a href="io/micronaut/el/annotation/ELMethodExpression.html" title="annotation interface in io.micronaut.el.annotation">ELMethodExpression</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">The expected parameter types of the invoked method.</div>
+</dd>
 <dt><a href="io/micronaut/el/annotation/ELMethodExpression.html#expectedReturnType()" class="member-name-link">expectedReturnType()</a> - Element in annotation interface io.micronaut.el.annotation.<a href="io/micronaut/el/annotation/ELMethodExpression.html" title="annotation interface in io.micronaut.el.annotation">ELMethodExpression</a></dt>
 <dd>
 <div class="block">When it is not declared, the compiler infers it from the static type of the invocation, the same way
@@ -1073,16 +1313,16 @@ compiled for a type.</div>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/stream/ELStream.html#findFirst()" class="member-name-link">findFirst()</a> - Method in class io.micronaut.el.stream.<a href="io/micronaut/el/stream/ELStream.html" title="class in io.micronaut.el.stream">ELStream</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="io/micronaut/el/runtime/ELMethods.html#findMethod(java.lang.Class,java.lang.String,java.lang.Class%5B%5D,java.lang.Object%5B%5D)" class="member-name-link">findMethod(Class, String, Class[], Object[])</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELMethods.html" title="class in io.micronaut.el.runtime">ELMethods</a></dt>
+<dt><a href="io/micronaut/el/interpreter/reflection/ReflectiveELMethods.html#findMethod(java.lang.Class,java.lang.String,java.lang.Class%5B%5D,java.lang.Object%5B%5D)" class="member-name-link">findMethod(Class, String, Class[], Object[])</a> - Static method in class io.micronaut.el.interpreter.reflection.<a href="io/micronaut/el/interpreter/reflection/ReflectiveELMethods.html" title="class in io.micronaut.el.interpreter.reflection">ReflectiveELMethods</a></dt>
 <dd>
 <div class="block">Finds the method a method expression refers to.</div>
 </dd>
-<dt><a href="io/micronaut/el/runtime/ELMethods.html#findMethodOrNull(java.lang.Class,java.lang.String,java.lang.Class%5B%5D,java.lang.Object%5B%5D,boolean)" class="member-name-link">findMethodOrNull(Class, String, Class[], Object[], boolean)</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELMethods.html" title="class in io.micronaut.el.runtime">ELMethods</a></dt>
+<dt><a href="io/micronaut/el/interpreter/reflection/ReflectiveELMethods.html#findMethodOrNull(java.lang.Class,java.lang.String,java.lang.Class%5B%5D,java.lang.Object%5B%5D,boolean)" class="member-name-link">findMethodOrNull(Class, String, Class[], Object[], boolean)</a> - Static method in class io.micronaut.el.interpreter.reflection.<a href="io/micronaut/el/interpreter/reflection/ReflectiveELMethods.html" title="class in io.micronaut.el.interpreter.reflection">ReflectiveELMethods</a></dt>
 <dd>
-<div class="block">Finds a method by name and arguments, as <a href="io/micronaut/el/runtime/ELMethods.html#findMethod(java.lang.Class,java.lang.String,java.lang.Class%5B%5D,java.lang.Object%5B%5D)"><code>ELMethods.findMethod(Class, String, Class[], Object[])</code></a> does, or
+<div class="block">Finds a method by name and arguments, as <a href="io/micronaut/el/interpreter/reflection/ReflectiveELMethods.html#findMethod(java.lang.Class,java.lang.String,java.lang.Class%5B%5D,java.lang.Object%5B%5D)"><code>ReflectiveELMethods.findMethod(Class, String, Class[], Object[])</code></a> does, or
 returns <code>null</code> when the type declares no public method of the name.</div>
 </dd>
-<dt><a href="io/micronaut/el/runtime/ELMethods.html#findStaticMethod(java.lang.Class,java.lang.String,java.lang.Class%5B%5D,java.lang.Object%5B%5D)" class="member-name-link">findStaticMethod(Class, String, Class[], Object[])</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELMethods.html" title="class in io.micronaut.el.runtime">ELMethods</a></dt>
+<dt><a href="io/micronaut/el/interpreter/reflection/ReflectiveELMethods.html#findStaticMethod(java.lang.Class,java.lang.String,java.lang.Class%5B%5D,java.lang.Object%5B%5D)" class="member-name-link">findStaticMethod(Class, String, Class[], Object[])</a> - Static method in class io.micronaut.el.interpreter.reflection.<a href="io/micronaut/el/interpreter/reflection/ReflectiveELMethods.html" title="class in io.micronaut.el.interpreter.reflection">ReflectiveELMethods</a></dt>
 <dd>
 <div class="block">Finds the static method a method expression refers to.</div>
 </dd>
@@ -1114,6 +1354,15 @@ returns <code>null</code> when the type declares no public method of the name.</
 <dd>
 <div class="block">Finds the free identifiers of a parsed expression.</div>
 </dd>
+<dt><a href="io/micronaut/el/ELMethodRegistry.html#function(java.lang.String,java.lang.String,java.lang.Class,java.lang.String,java.lang.Class,java.lang.Class%5B%5D,boolean,io.micronaut.el.ELMethodRegistry.Invocation)" class="member-name-link">function(String, String, Class, String, Class, Class[], boolean, ELMethodRegistry.Invocation)</a> - Method in class io.micronaut.el.<a href="io/micronaut/el/ELMethodRegistry.html" title="class in io.micronaut.el">ELMethodRegistry</a></dt>
+<dd>
+<div class="block">Registers a function, callable as <code>prefix:localName(arguments)</code>, or as <code>localName(arguments)</code>
+when the prefix is empty.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELMethodRegistry.html#function(java.lang.String,java.lang.String,java.lang.Class,java.lang.String,java.lang.Class,java.lang.Class,io.micronaut.el.ELMethodRegistry.Fn1)" class="member-name-link">function(String, String, Class, String, Class, Class, ELMethodRegistry.Fn1)</a> - Method in class io.micronaut.el.<a href="io/micronaut/el/ELMethodRegistry.html" title="class in io.micronaut.el">ELMethodRegistry</a></dt>
+<dd>
+<div class="block">Registers a function taking one argument.</div>
+</dd>
 <dt><a href="io/micronaut/el/parser/ast/ELNode.Function.html#%3Cinit%3E(java.lang.String,java.lang.String,java.util.List)" class="member-name-link">Function(String, String, List)</a> - Constructor for record class io.micronaut.el.parser.ast.<a href="io/micronaut/el/parser/ast/ELNode.Function.html" title="class in io.micronaut.el.parser.ast">ELNode.Function</a></dt>
 <dd>
 <div class="block">Creates an instance of a <code>Function</code> record class.</div>
@@ -1121,6 +1370,15 @@ returns <code>null</code> when the type declares no public method of the name.</
 <dt><a href="io/micronaut/el/parser/ast/ELNode.Kind.html#FUNCTION" class="member-name-link">FUNCTION</a> - Enum constant in enum class io.micronaut.el.parser.ast.<a href="io/micronaut/el/parser/ast/ELNode.Kind.html" title="enum class in io.micronaut.el.parser.ast">ELNode.Kind</a></dt>
 <dd>
 <div class="block">Function.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELMethodRegistry.html#functionalInterface(java.lang.Class)" class="member-name-link">functionalInterface(Class)</a> - Method in class io.micronaut.el.<a href="io/micronaut/el/ELMethodRegistry.html" title="class in io.micronaut.el">ELMethodRegistry</a></dt>
+<dd>
+<div class="block">The registration presenting a lambda expression as the given functional interface.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELMethodRegistry.html#functionalInterface(java.lang.Class,io.micronaut.el.ELMethodRegistry.Lambda)" class="member-name-link">functionalInterface(Class, ELMethodRegistry.Lambda)</a> - Method in class io.micronaut.el.<a href="io/micronaut/el/ELMethodRegistry.html" title="class in io.micronaut.el">ELMethodRegistry</a></dt>
+<dd>
+<div class="block">Registers how a lambda expression is presented as an instance of a functional interface the application
+declares, which is the coercion of the section 1.23.2 of the specification.</div>
 </dd>
 <dt><a href="io/micronaut/el/parser/ELNodes.html#functionIdentity(java.lang.String,java.lang.String,java.util.List)" class="member-name-link">functionIdentity(String, String, List)</a> - Static method in class io.micronaut.el.parser.<a href="io/micronaut/el/parser/ELNodes.html" title="class in io.micronaut.el.parser">ELNodes</a></dt>
 <dd>
@@ -1140,11 +1398,27 @@ type, or the one the <a href="io/micronaut/el/ELBeanProvider.html" title="interf
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/ELBeanProvider.html#get(java.lang.Class)" class="member-name-link">get(Class)</a> - Method in interface io.micronaut.el.<a href="io/micronaut/el/ELBeanProvider.html" title="interface in io.micronaut.el">ELBeanProvider</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/runtime/ELArray.html#get(java.lang.Object,int)" class="member-name-link">get(Object, int)</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELArray.html" title="class in io.micronaut.el.runtime">ELArray</a></dt>
+<dd>
+<div class="block">Reads an array element using a typed JVM array operation.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELMethod.html#getAnnotationMetadata()" class="member-name-link">getAnnotationMetadata()</a> - Method in interface io.micronaut.el.<a href="io/micronaut/el/ELMethod.html" title="interface in io.micronaut.el">ELMethod</a></dt>
+<dd>
+<div class="block">Returns the method annotation metadata.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELMethod.html#getArguments()" class="member-name-link">getArguments()</a> - Method in interface io.micronaut.el.<a href="io/micronaut/el/ELMethod.html" title="interface in io.micronaut.el">ELMethod</a></dt>
+<dd>
+<div class="block">Returns the declared parameter types.</div>
+</dd>
 <dt><a href="io/micronaut/el/CompiledELContext.html#getBean(java.lang.String)" class="member-name-link">getBean(String)</a> - Method in class io.micronaut.el.<a href="io/micronaut/el/CompiledELContext.html" title="class in io.micronaut.el">CompiledELContext</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="io/micronaut/el/resolver/IntrospectionELResolver.html#getCommonPropertyType(jakarta.el.ELContext,java.lang.Object)" class="member-name-link">getCommonPropertyType(ELContext, Object)</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/IntrospectionELResolver.html" title="class in io.micronaut.el.resolver">IntrospectionELResolver</a></dt>
+<dt><a href="io/micronaut/el/interpreter/reflection/ReflectiveMethodELResolver.html#getCommonPropertyType(jakarta.el.ELContext,java.lang.Object)" class="member-name-link">getCommonPropertyType(ELContext, Object)</a> - Method in class io.micronaut.el.interpreter.reflection.<a href="io/micronaut/el/interpreter/reflection/ReflectiveMethodELResolver.html" title="class in io.micronaut.el.interpreter.reflection">ReflectiveMethodELResolver</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="io/micronaut/el/resolver/ReflectiveMethodELResolver.html#getCommonPropertyType(jakarta.el.ELContext,java.lang.Object)" class="member-name-link">getCommonPropertyType(ELContext, Object)</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/ReflectiveMethodELResolver.html" title="class in io.micronaut.el.resolver">ReflectiveMethodELResolver</a></dt>
+<dt><a href="io/micronaut/el/resolver/CommonELResolver.html#getCommonPropertyType(jakarta.el.ELContext,java.lang.Object)" class="member-name-link">getCommonPropertyType(ELContext, Object)</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/CommonELResolver.html" title="class in io.micronaut.el.resolver">CommonELResolver</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/resolver/ExecutableMethodELExecutor.html#getCommonPropertyType(jakarta.el.ELContext,java.lang.Object)" class="member-name-link">getCommonPropertyType(ELContext, Object)</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/ExecutableMethodELExecutor.html" title="class in io.micronaut.el.resolver">ExecutableMethodELExecutor</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/resolver/IntrospectionELResolver.html#getCommonPropertyType(jakarta.el.ELContext,java.lang.Object)" class="member-name-link">getCommonPropertyType(ELContext, Object)</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/IntrospectionELResolver.html" title="class in io.micronaut.el.resolver">IntrospectionELResolver</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/resolver/StreamELResolver.html#getCommonPropertyType(jakarta.el.ELContext,java.lang.Object)" class="member-name-link">getCommonPropertyType(ELContext, Object)</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/StreamELResolver.html" title="class in io.micronaut.el.resolver">StreamELResolver</a></dt>
 <dd>&nbsp;</dd>
@@ -1172,6 +1446,8 @@ type, or the one the <a href="io/micronaut/el/ELBeanProvider.html" title="interf
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/CompiledExpressionFactory.html#getInitFunctionMap()" class="member-name-link">getInitFunctionMap()</a> - Method in class io.micronaut.el.<a href="io/micronaut/el/CompiledExpressionFactory.html" title="class in io.micronaut.el">CompiledExpressionFactory</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/ELSandboxException.html#getMember()" class="member-name-link">getMember()</a> - Method in exception class io.micronaut.el.<a href="io/micronaut/el/ELSandboxException.html" title="class in io.micronaut.el">ELSandboxException</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/runtime/CompiledMethodExpression.html#getMethodInfo(jakarta.el.ELContext)" class="member-name-link">getMethodInfo(ELContext)</a> - Method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/CompiledMethodExpression.html" title="class in io.micronaut.el.runtime">CompiledMethodExpression</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/runtime/LiteralMethodExpression.html#getMethodInfo(jakarta.el.ELContext)" class="member-name-link">getMethodInfo(ELContext)</a> - Method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/LiteralMethodExpression.html" title="class in io.micronaut.el.runtime">LiteralMethodExpression</a></dt>
@@ -1180,15 +1456,45 @@ type, or the one the <a href="io/micronaut/el/ELBeanProvider.html" title="interf
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/runtime/LiteralMethodExpression.html#getMethodReference(jakarta.el.ELContext)" class="member-name-link">getMethodReference(ELContext)</a> - Method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/LiteralMethodExpression.html" title="class in io.micronaut.el.runtime">LiteralMethodExpression</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/ELMethod.html#getName()" class="member-name-link">getName()</a> - Method in interface io.micronaut.el.<a href="io/micronaut/el/ELMethod.html" title="interface in io.micronaut.el">ELMethod</a></dt>
+<dd>
+<div class="block">Returns the method name.</div>
+</dd>
+<dt><a href="io/micronaut/el/ContributedELMethodExecutor.html#getOrder()" class="member-name-link">getOrder()</a> - Method in class io.micronaut.el.<a href="io/micronaut/el/ContributedELMethodExecutor.html" title="class in io.micronaut.el">ContributedELMethodExecutor</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/ELMethodContributor.html#getOrder()" class="member-name-link">getOrder()</a> - Method in interface io.micronaut.el.<a href="io/micronaut/el/ELMethodContributor.html" title="interface in io.micronaut.el">ELMethodContributor</a></dt>
+<dd>
+<div class="block">Returns the order in which contributors are consulted.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELMethodExecutor.html#getOrder()" class="member-name-link">getOrder()</a> - Method in interface io.micronaut.el.<a href="io/micronaut/el/ELMethodExecutor.html" title="interface in io.micronaut.el">ELMethodExecutor</a></dt>
+<dd>
+<div class="block">Returns the executor order.</div>
+</dd>
+<dt><a href="io/micronaut/el/interpreter/reflection/ReflectiveELMethodExecutor.html#getOrder()" class="member-name-link">getOrder()</a> - Method in class io.micronaut.el.interpreter.reflection.<a href="io/micronaut/el/interpreter/reflection/ReflectiveELMethodExecutor.html" title="class in io.micronaut.el.interpreter.reflection">ReflectiveELMethodExecutor</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/processor/visitor/ELFunctionVisitor.html#getOrder()" class="member-name-link">getOrder()</a> - Method in class io.micronaut.el.processor.visitor.<a href="io/micronaut/el/processor/visitor/ELFunctionVisitor.html" title="class in io.micronaut.el.processor.visitor">ELFunctionVisitor</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/resolver/CommonELResolver.html#getOrder()" class="member-name-link">getOrder()</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/CommonELResolver.html" title="class in io.micronaut.el.resolver">CommonELResolver</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/resolver/ExecutableMethodELExecutor.html#getOrder()" class="member-name-link">getOrder()</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/ExecutableMethodELExecutor.html" title="class in io.micronaut.el.resolver">ExecutableMethodELExecutor</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/resolver/IntrospectionELResolver.html#getOrder()" class="member-name-link">getOrder()</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/IntrospectionELResolver.html" title="class in io.micronaut.el.resolver">IntrospectionELResolver</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/resolver/StreamELResolver.html#getOrder()" class="member-name-link">getOrder()</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/StreamELResolver.html" title="class in io.micronaut.el.resolver">StreamELResolver</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/processor/compiler/CompilationContext.html#getOriginatingElement()" class="member-name-link">getOriginatingElement()</a> - Method in class io.micronaut.el.processor.compiler.<a href="io/micronaut/el/processor/compiler/CompilationContext.html" title="class in io.micronaut.el.processor.compiler">CompilationContext</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/ELMethod.html#getReturnType()" class="member-name-link">getReturnType()</a> - Method in interface io.micronaut.el.<a href="io/micronaut/el/ELMethod.html" title="interface in io.micronaut.el">ELMethod</a></dt>
+<dd>
+<div class="block">Returns the return type.</div>
+</dd>
 <dt><a href="io/micronaut/el/CompiledExpressionFactory.html#getStreamELResolver()" class="member-name-link">getStreamELResolver()</a> - Method in class io.micronaut.el.<a href="io/micronaut/el/CompiledExpressionFactory.html" title="class in io.micronaut.el">CompiledExpressionFactory</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/processor/visitor/ELExpressionVisitor.html#getSupportedAnnotationNames()" class="member-name-link">getSupportedAnnotationNames()</a> - Method in class io.micronaut.el.processor.visitor.<a href="io/micronaut/el/processor/visitor/ELExpressionVisitor.html" title="class in io.micronaut.el.processor.visitor">ELExpressionVisitor</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/processor/visitor/ELFunctionVisitor.html#getSupportedAnnotationNames()" class="member-name-link">getSupportedAnnotationNames()</a> - Method in class io.micronaut.el.processor.visitor.<a href="io/micronaut/el/processor/visitor/ELFunctionVisitor.html" title="class in io.micronaut.el.processor.visitor">ELFunctionVisitor</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/ELSandboxException.html#getType()" class="member-name-link">getType()</a> - Method in exception class io.micronaut.el.<a href="io/micronaut/el/ELSandboxException.html" title="class in io.micronaut.el">ELSandboxException</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/runtime/CompiledValueExpression.html#getType(jakarta.el.ELContext)" class="member-name-link">getType(ELContext)</a> - Method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/CompiledValueExpression.html" title="class in io.micronaut.el.runtime">CompiledValueExpression</a></dt>
 <dd>&nbsp;</dd>
@@ -1196,9 +1502,13 @@ type, or the one the <a href="io/micronaut/el/ELBeanProvider.html" title="interf
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/runtime/ObjectValueExpression.html#getType(jakarta.el.ELContext)" class="member-name-link">getType(ELContext)</a> - Method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ObjectValueExpression.html" title="class in io.micronaut.el.runtime">ObjectValueExpression</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="io/micronaut/el/resolver/IntrospectionELResolver.html#getType(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">getType(ELContext, Object, Object)</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/IntrospectionELResolver.html" title="class in io.micronaut.el.resolver">IntrospectionELResolver</a></dt>
+<dt><a href="io/micronaut/el/interpreter/reflection/ReflectiveMethodELResolver.html#getType(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">getType(ELContext, Object, Object)</a> - Method in class io.micronaut.el.interpreter.reflection.<a href="io/micronaut/el/interpreter/reflection/ReflectiveMethodELResolver.html" title="class in io.micronaut.el.interpreter.reflection">ReflectiveMethodELResolver</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="io/micronaut/el/resolver/ReflectiveMethodELResolver.html#getType(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">getType(ELContext, Object, Object)</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/ReflectiveMethodELResolver.html" title="class in io.micronaut.el.resolver">ReflectiveMethodELResolver</a></dt>
+<dt><a href="io/micronaut/el/resolver/CommonELResolver.html#getType(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">getType(ELContext, Object, Object)</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/CommonELResolver.html" title="class in io.micronaut.el.resolver">CommonELResolver</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/resolver/ExecutableMethodELExecutor.html#getType(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">getType(ELContext, Object, Object)</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/ExecutableMethodELExecutor.html" title="class in io.micronaut.el.resolver">ExecutableMethodELExecutor</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/resolver/IntrospectionELResolver.html#getType(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">getType(ELContext, Object, Object)</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/IntrospectionELResolver.html" title="class in io.micronaut.el.resolver">IntrospectionELResolver</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/runtime/ELResolution.html#getType(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">getType(ELContext, Object, Object)</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELResolution.html" title="class in io.micronaut.el.runtime">ELResolution</a></dt>
 <dd>&nbsp;</dd>
@@ -1208,11 +1518,15 @@ type, or the one the <a href="io/micronaut/el/ELBeanProvider.html" title="interf
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/runtime/ObjectValueExpression.html#getValue(jakarta.el.ELContext)" class="member-name-link">getValue(ELContext)</a> - Method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ObjectValueExpression.html" title="class in io.micronaut.el.runtime">ObjectValueExpression</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/interpreter/reflection/ReflectiveMethodELResolver.html#getValue(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">getValue(ELContext, Object, Object)</a> - Method in class io.micronaut.el.interpreter.reflection.<a href="io/micronaut/el/interpreter/reflection/ReflectiveMethodELResolver.html" title="class in io.micronaut.el.interpreter.reflection">ReflectiveMethodELResolver</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/resolver/CommonELResolver.html#getValue(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">getValue(ELContext, Object, Object)</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/CommonELResolver.html" title="class in io.micronaut.el.resolver">CommonELResolver</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/resolver/ELResolverChain.html#getValue(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">getValue(ELContext, Object, Object)</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/ELResolverChain.html" title="class in io.micronaut.el.resolver">ELResolverChain</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="io/micronaut/el/resolver/IntrospectionELResolver.html#getValue(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">getValue(ELContext, Object, Object)</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/IntrospectionELResolver.html" title="class in io.micronaut.el.resolver">IntrospectionELResolver</a></dt>
+<dt><a href="io/micronaut/el/resolver/ExecutableMethodELExecutor.html#getValue(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">getValue(ELContext, Object, Object)</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/ExecutableMethodELExecutor.html" title="class in io.micronaut.el.resolver">ExecutableMethodELExecutor</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="io/micronaut/el/resolver/ReflectiveMethodELResolver.html#getValue(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">getValue(ELContext, Object, Object)</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/ReflectiveMethodELResolver.html" title="class in io.micronaut.el.resolver">ReflectiveMethodELResolver</a></dt>
+<dt><a href="io/micronaut/el/resolver/IntrospectionELResolver.html#getValue(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">getValue(ELContext, Object, Object)</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/IntrospectionELResolver.html" title="class in io.micronaut.el.resolver">IntrospectionELResolver</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/runtime/ELResolution.html#getValue(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">getValue(ELContext, Object, Object)</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELResolution.html" title="class in io.micronaut.el.runtime">ELResolution</a></dt>
 <dd>
@@ -1382,6 +1696,10 @@ type, or the one the <a href="io/micronaut/el/ELBeanProvider.html" title="interf
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/runtime/CompiledValueExpression.html#hashCode()" class="member-name-link">hashCode()</a> - Method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/CompiledValueExpression.html" title="class in io.micronaut.el.runtime">CompiledValueExpression</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/runtime/ELMethods.Candidate.html#hashCode()" class="member-name-link">hashCode()</a> - Method in record class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELMethods.Candidate.html" title="class in io.micronaut.el.runtime">ELMethods.Candidate</a></dt>
+<dd>
+<div class="block">Returns a hash code value for this object.</div>
+</dd>
 <dt><a href="io/micronaut/el/runtime/ObjectValueExpression.html#hashCode()" class="member-name-link">hashCode()</a> - Method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ObjectValueExpression.html" title="class in io.micronaut.el.runtime">ObjectValueExpression</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/stream/ELOptional.html#hashCode()" class="member-name-link">hashCode()</a> - Method in class io.micronaut.el.stream.<a href="io/micronaut/el/stream/ELOptional.html" title="class in io.micronaut.el.stream">ELOptional</a></dt>
@@ -1396,6 +1714,15 @@ type, or the one the <a href="io/micronaut/el/ELBeanProvider.html" title="interf
 <dt><a href="io/micronaut/el/parser/ast/ELNode.Kind.html#IDENTIFIER" class="member-name-link">IDENTIFIER</a> - Enum constant in enum class io.micronaut.el.parser.ast.<a href="io/micronaut/el/parser/ast/ELNode.Kind.html" title="enum class in io.micronaut.el.parser.ast">ELNode.Kind</a></dt>
 <dd>
 <div class="block">Identifier.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELMethod.html#identity()" class="member-name-link">identity()</a> - Method in interface io.micronaut.el.<a href="io/micronaut/el/ELMethod.html" title="interface in io.micronaut.el">ELMethod</a></dt>
+<dd>
+<div class="block">Returns the identity used when an expression containing a bound function is compared with another one.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELMethod.html#identity(java.lang.Class,java.lang.String,java.lang.Class%5B%5D)" class="member-name-link">identity(Class, String, Class[])</a> - Static method in interface io.micronaut.el.<a href="io/micronaut/el/ELMethod.html" title="interface in io.micronaut.el">ELMethod</a></dt>
+<dd>
+<div class="block">Builds the identity of a method in the form the compiler gives it, so that an expression parsed at
+runtime compares equal to the same expression compiled at build time.</div>
 </dd>
 <dt><a href="io/micronaut/el/parser/ast/ELNode.Ternary.html#ifFalse()" class="member-name-link">ifFalse()</a> - Method in record class io.micronaut.el.parser.ast.<a href="io/micronaut/el/parser/ast/ELNode.Ternary.html" title="class in io.micronaut.el.parser.ast">ELNode.Ternary</a></dt>
 <dd>
@@ -1466,7 +1793,14 @@ type.</div>
 <div class="block">Creates the expressions that were not compiled at compilation time by parsing them at runtime.</div>
 </dd>
 <dt><a href="io/micronaut/el/interpreter/InterpretingELExpressionParser.html#%3Cinit%3E()" class="member-name-link">InterpretingELExpressionParser()</a> - Constructor for class io.micronaut.el.interpreter.<a href="io/micronaut/el/interpreter/InterpretingELExpressionParser.html" title="class in io.micronaut.el.interpreter">InterpretingELExpressionParser</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">Creates a parser using the method executors visible to the context class loader.</div>
+</dd>
+<dt><a href="io/micronaut/el/interpreter/InterpretingELExpressionParser.html#%3Cinit%3E(java.util.List)" class="member-name-link">InterpretingELExpressionParser(List)</a> - Constructor for class io.micronaut.el.interpreter.<a href="io/micronaut/el/interpreter/InterpretingELExpressionParser.html" title="class in io.micronaut.el.interpreter">InterpretingELExpressionParser</a></dt>
+<dd>
+<div class="block">Creates a parser using the given method executors, instead of the ones the context class loader
+declares as services.</div>
+</dd>
 <dt><a href="io/micronaut/el/resolver/IntrospectionELResolver.html" class="type-name-link" title="class in io.micronaut.el.resolver">IntrospectionELResolver</a> - Class in <a href="io/micronaut/el/resolver/package-summary.html">io.micronaut.el.resolver</a></dt>
 <dd>
 <div class="block">The <code>ELResolver</code> resolving the types annotated with <code>Introspected</code>
@@ -1486,9 +1820,13 @@ through the bean introspection generated for them at compilation time.</div>
 <dd>
 <div class="block">Returns the value of the <a href="./io/micronaut/el/parser/ast/ELNode.Function.html#param-invocations"><code>invocations</code></a> record component.</div>
 </dd>
+<dt><a href="io/micronaut/el/interpreter/reflection/ReflectiveMethodELResolver.html#invoke(jakarta.el.ELContext,java.lang.Object,java.lang.Object,java.lang.Class%5B%5D,java.lang.Object%5B%5D)" class="member-name-link">invoke(ELContext, Object, Object, Class[], Object[])</a> - Method in class io.micronaut.el.interpreter.reflection.<a href="io/micronaut/el/interpreter/reflection/ReflectiveMethodELResolver.html" title="class in io.micronaut.el.interpreter.reflection">ReflectiveMethodELResolver</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/resolver/CommonELResolver.html#invoke(jakarta.el.ELContext,java.lang.Object,java.lang.Object,java.lang.Class%5B%5D,java.lang.Object%5B%5D)" class="member-name-link">invoke(ELContext, Object, Object, Class[], Object[])</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/CommonELResolver.html" title="class in io.micronaut.el.resolver">CommonELResolver</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/resolver/ELResolverChain.html#invoke(jakarta.el.ELContext,java.lang.Object,java.lang.Object,java.lang.Class%5B%5D,java.lang.Object%5B%5D)" class="member-name-link">invoke(ELContext, Object, Object, Class[], Object[])</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/ELResolverChain.html" title="class in io.micronaut.el.resolver">ELResolverChain</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="io/micronaut/el/resolver/ReflectiveMethodELResolver.html#invoke(jakarta.el.ELContext,java.lang.Object,java.lang.Object,java.lang.Class%5B%5D,java.lang.Object%5B%5D)" class="member-name-link">invoke(ELContext, Object, Object, Class[], Object[])</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/ReflectiveMethodELResolver.html" title="class in io.micronaut.el.resolver">ReflectiveMethodELResolver</a></dt>
+<dt><a href="io/micronaut/el/resolver/ExecutableMethodELExecutor.html#invoke(jakarta.el.ELContext,java.lang.Object,java.lang.Object,java.lang.Class%5B%5D,java.lang.Object%5B%5D)" class="member-name-link">invoke(ELContext, Object, Object, Class[], Object[])</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/ExecutableMethodELExecutor.html" title="class in io.micronaut.el.resolver">ExecutableMethodELExecutor</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/resolver/IntrospectionELResolver.html#invoke(jakarta.el.ELContext,java.lang.Object,java.lang.Object,java.lang.Class%5B%5D,java.lang.Object%5B%5D)" class="member-name-link">invoke(ELContext, Object, Object, Class[], Object[])</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/IntrospectionELResolver.html" title="class in io.micronaut.el.resolver">IntrospectionELResolver</a></dt>
 <dd>&nbsp;</dd>
@@ -1496,13 +1834,21 @@ through the bean introspection generated for them at compilation time.</div>
 <dd>
 <div class="block">Invokes a method of a base object as described in the section 1.6 of the specification.</div>
 </dd>
+<dt><a href="io/micronaut/el/ELMethodRegistry.Invocation.html#invoke(jakarta.el.ELContext,java.lang.Object,java.lang.Object%5B%5D)" class="member-name-link">invoke(ELContext, Object, Object[])</a> - Method in interface io.micronaut.el.<a href="io/micronaut/el/ELMethodRegistry.Invocation.html" title="interface in io.micronaut.el">ELMethodRegistry.Invocation</a></dt>
+<dd>
+<div class="block">Invokes the method.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELMethod.html#invoke(jakarta.el.ELContext,java.lang.Object,java.lang.Object%5B%5D)" class="member-name-link">invoke(ELContext, Object, Object[])</a> - Method in interface io.micronaut.el.<a href="io/micronaut/el/ELMethod.html" title="interface in io.micronaut.el">ELMethod</a></dt>
+<dd>
+<div class="block">Invokes the method.</div>
+</dd>
 <dt><a href="io/micronaut/el/runtime/CompiledLambdaExpression.html#invoke(jakarta.el.ELContext,java.lang.Object...)" class="member-name-link">invoke(ELContext, Object...)</a> - Method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/CompiledLambdaExpression.html" title="class in io.micronaut.el.runtime">CompiledLambdaExpression</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/runtime/CompiledMethodExpression.html#invoke(jakarta.el.ELContext,java.lang.Object%5B%5D)" class="member-name-link">invoke(ELContext, Object[])</a> - Method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/CompiledMethodExpression.html" title="class in io.micronaut.el.runtime">CompiledMethodExpression</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/resolver/StreamELResolver.html#invoke(jakarta.el.ELContext,java.lang.Object,java.lang.Object,java.lang.Class%5B%5D,java.lang.Object%5B%5D)" class="member-name-link">invoke(ELContext, Object, Object, Class[], Object[])</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/StreamELResolver.html" title="class in io.micronaut.el.resolver">StreamELResolver</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="io/micronaut/el/runtime/ELMethods.html#invoke(jakarta.el.ELContext,java.lang.reflect.Method,java.lang.Object,java.lang.Object%5B%5D)" class="member-name-link">invoke(ELContext, Method, Object, Object[])</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELMethods.html" title="class in io.micronaut.el.runtime">ELMethods</a></dt>
+<dt><a href="io/micronaut/el/interpreter/reflection/ReflectiveELMethods.html#invoke(jakarta.el.ELContext,java.lang.reflect.Method,java.lang.Object,java.lang.Object%5B%5D)" class="member-name-link">invoke(ELContext, Method, Object, Object[])</a> - Static method in class io.micronaut.el.interpreter.reflection.<a href="io/micronaut/el/interpreter/reflection/ReflectiveELMethods.html" title="class in io.micronaut.el.interpreter.reflection">ReflectiveELMethods</a></dt>
 <dd>
 <div class="block">Invokes a method reflectively, the arguments coerced to the parameter types as described in the section
 1.23 of the specification, the variable arity arguments packed into an array, the exceptions of the
@@ -1514,11 +1860,6 @@ method unwrapped.</div>
 <dd>
 <div class="block">Invokes the result of a function expression as described in the section 1.5.2 of the specification,
 which covers the invocation of lambda expressions returning lambda expressions.</div>
-</dd>
-<dt><a href="io/micronaut/el/runtime/ELResolution.html#invokeMethod(jakarta.el.ELContext,java.lang.Object,java.lang.reflect.Method,java.lang.Object%5B%5D)" class="member-name-link">invokeMethod(ELContext, Object, Method, Object[])</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELResolution.html" title="class in io.micronaut.el.runtime">ELResolution</a></dt>
-<dd>
-<div class="block">Invokes a method found on the base object, which is how the section 1.6 of the specification invokes a
-method expression that does not provide its own parameters.</div>
 </dd>
 <dt><a href="io/micronaut/el/runtime/ELResolution.html#invokeMethodExpression(jakarta.el.ELContext,java.lang.Object,java.lang.Object%5B%5D)" class="member-name-link">invokeMethodExpression(ELContext, Object, Object[])</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELResolution.html" title="class in io.micronaut.el.runtime">ELResolution</a></dt>
 <dd>
@@ -1539,11 +1880,6 @@ resolvers.</div>
 <dd>
 <div class="block">Invokes a static method of the runtime with the signature the runtime actually declares, for the writers.</div>
 </dd>
-<dt><a href="io/micronaut/el/runtime/ELResolution.html#invokeWithParams(jakarta.el.ELContext,java.lang.Object,java.lang.Object,java.lang.Object%5B%5D)" class="member-name-link">invokeWithParams(ELContext, Object, Object, Object[])</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELResolution.html" title="class in io.micronaut.el.runtime">ELResolution</a></dt>
-<dd>
-<div class="block">Invokes a method of a base object with the parameters passed to
-<code>jakarta.el.MethodExpression.invoke(ELContext, Object[])</code>.</div>
-</dd>
 <dt><a href="io/micronaut/el/runtime/ELResolution.html#invokeWithParamTypes(jakarta.el.ELContext,java.lang.Object,java.lang.Object,java.lang.Class%5B%5D,java.lang.Object%5B%5D)" class="member-name-link">invokeWithParamTypes(ELContext, Object, Object, Class[], Object[])</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELResolution.html" title="class in io.micronaut.el.runtime">ELResolution</a></dt>
 <dd>
 <div class="block">Invokes a method of a base object with the parameter types provided when the expression was created,
@@ -1563,6 +1899,10 @@ compilation time.</div>
 <dt><a href="io/micronaut/el/interpreter/package-summary.html">io.micronaut.el.interpreter</a> - package io.micronaut.el.interpreter</dt>
 <dd>
 <div class="block">The runtime parsing and evaluation of the expressions that were not compiled at compilation time.</div>
+</dd>
+<dt><a href="io/micronaut/el/interpreter/reflection/package-summary.html">io.micronaut.el.interpreter.reflection</a> - package io.micronaut.el.interpreter.reflection</dt>
+<dd>
+<div class="block">Reflection-backed method execution for the Jakarta Expression Language interpreter.</div>
 </dd>
 <dt><a href="io/micronaut/el/parser/package-summary.html">io.micronaut.el.parser</a> - package io.micronaut.el.parser</dt>
 <dd>
@@ -1596,8 +1936,16 @@ compilation time.</div>
 <dd>
 <div class="block">The implementation of the operations on collection objects.</div>
 </dd>
+<dt><a href="io/micronaut/el/runtime/ELArray.html#isArray(java.lang.Object)" class="member-name-link">isArray(Object)</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELArray.html" title="class in io.micronaut.el.runtime">ELArray</a></dt>
+<dd>
+<div class="block">Returns whether the value is a Java array.</div>
+</dd>
 <dt><a href="io/micronaut/el/processor/visitor/ELTypes.html#isCompanion(io.micronaut.inject.ast.ClassElement)" class="member-name-link">isCompanion(ClassElement)</a> - Static method in class io.micronaut.el.processor.visitor.<a href="io/micronaut/el/processor/visitor/ELTypes.html" title="class in io.micronaut.el.processor.visitor">ELTypes</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/ELMethodRegistry.html#isEmpty()" class="member-name-link">isEmpty()</a> - Method in class io.micronaut.el.<a href="io/micronaut/el/ELMethodRegistry.html" title="class in io.micronaut.el">ELMethodRegistry</a></dt>
+<dd>
+<div class="block">Whether nothing has been registered.</div>
+</dd>
 <dt><a href="io/micronaut/el/runtime/MapVariableMapper.html#isEmpty()" class="member-name-link">isEmpty()</a> - Method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/MapVariableMapper.html" title="class in io.micronaut.el.runtime">MapVariableMapper</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/runtime/ELSupport.html#isEmpty(java.lang.Object)" class="member-name-link">isEmpty(Object)</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELSupport.html" title="class in io.micronaut.el.runtime">ELSupport</a></dt>
@@ -1614,6 +1962,12 @@ specification restrict to actual <a href="https://docs.oracle.com/en/java/javase
 <dt><a href="io/micronaut/el/runtime/ELSupport.html#isFloatingPointNotation(java.lang.String)" class="member-name-link">isFloatingPointNotation(String)</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELSupport.html" title="class in io.micronaut.el.runtime">ELSupport</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/runtime/ELSupport.html#isFloatingPointOperand(java.lang.Object,java.lang.Object)" class="member-name-link">isFloatingPointOperand(Object, Object)</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELSupport.html" title="class in io.micronaut.el.runtime">ELSupport</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/ELProxyFactory.html#isFunctionalInterface(java.lang.Class)" class="member-name-link">isFunctionalInterface(Class)</a> - Method in interface io.micronaut.el.<a href="io/micronaut/el/ELProxyFactory.html" title="interface in io.micronaut.el">ELProxyFactory</a></dt>
+<dd>
+<div class="block">Whether the given type is a functional interface this factory can implement.</div>
+</dd>
+<dt><a href="io/micronaut/el/interpreter/reflection/ReflectiveELProxyFactory.html#isFunctionalInterface(java.lang.Class)" class="member-name-link">isFunctionalInterface(Class)</a> - Method in class io.micronaut.el.interpreter.reflection.<a href="io/micronaut/el/interpreter/reflection/ReflectiveELProxyFactory.html" title="class in io.micronaut.el.interpreter.reflection">ReflectiveELProxyFactory</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/processor/visitor/ELTypes.html#isFunctionalInterfaceCandidate(io.micronaut.inject.ast.ClassElement,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">isFunctionalInterfaceCandidate(ClassElement, VisitorContext)</a> - Static method in class io.micronaut.el.processor.visitor.<a href="io/micronaut/el/processor/visitor/ELTypes.html" title="class in io.micronaut.el.processor.visitor">ELTypes</a></dt>
 <dd>
@@ -1649,17 +2003,33 @@ specification restrict to actual <a href="https://docs.oracle.com/en/java/javase
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/runtime/ObjectValueExpression.html#isReadOnly(jakarta.el.ELContext)" class="member-name-link">isReadOnly(ELContext)</a> - Method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ObjectValueExpression.html" title="class in io.micronaut.el.runtime">ObjectValueExpression</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="io/micronaut/el/resolver/IntrospectionELResolver.html#isReadOnly(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">isReadOnly(ELContext, Object, Object)</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/IntrospectionELResolver.html" title="class in io.micronaut.el.resolver">IntrospectionELResolver</a></dt>
+<dt><a href="io/micronaut/el/interpreter/reflection/ReflectiveMethodELResolver.html#isReadOnly(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">isReadOnly(ELContext, Object, Object)</a> - Method in class io.micronaut.el.interpreter.reflection.<a href="io/micronaut/el/interpreter/reflection/ReflectiveMethodELResolver.html" title="class in io.micronaut.el.interpreter.reflection">ReflectiveMethodELResolver</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="io/micronaut/el/resolver/ReflectiveMethodELResolver.html#isReadOnly(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">isReadOnly(ELContext, Object, Object)</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/ReflectiveMethodELResolver.html" title="class in io.micronaut.el.resolver">ReflectiveMethodELResolver</a></dt>
+<dt><a href="io/micronaut/el/resolver/CommonELResolver.html#isReadOnly(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">isReadOnly(ELContext, Object, Object)</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/CommonELResolver.html" title="class in io.micronaut.el.resolver">CommonELResolver</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/resolver/ExecutableMethodELExecutor.html#isReadOnly(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">isReadOnly(ELContext, Object, Object)</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/ExecutableMethodELExecutor.html" title="class in io.micronaut.el.resolver">ExecutableMethodELExecutor</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/resolver/IntrospectionELResolver.html#isReadOnly(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">isReadOnly(ELContext, Object, Object)</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/IntrospectionELResolver.html" title="class in io.micronaut.el.resolver">IntrospectionELResolver</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/runtime/ELResolution.html#isReadOnly(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">isReadOnly(ELContext, Object, Object)</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELResolution.html" title="class in io.micronaut.el.runtime">ELResolution</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/resolver/StreamELResolver.html#isReadOnly(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">isReadOnly(ELContext, Object, Object)</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/StreamELResolver.html" title="class in io.micronaut.el.resolver">StreamELResolver</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/ELMethod.html#isReusable()" class="member-name-link">isReusable()</a> - Method in interface io.micronaut.el.<a href="io/micronaut/el/ELMethod.html" title="interface in io.micronaut.el">ELMethod</a></dt>
+<dd>
+<div class="block">Whether this method can be kept by the caller and invoked again.</div>
+</dd>
+<dt><a href="io/micronaut/el/runtime/ELMethods.Candidate.html#isStatic()" class="member-name-link">isStatic()</a> - Method in record class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELMethods.Candidate.html" title="class in io.micronaut.el.runtime">ELMethods.Candidate</a></dt>
+<dd>
+<div class="block">Returns the value of the <a href="./io/micronaut/el/runtime/ELMethods.Candidate.html#param-isStatic"><code>isStatic</code></a> record component.</div>
+</dd>
 <dt><a href="io/micronaut/el/processor/visitor/ELTypes.html#isStatic(io.micronaut.inject.ast.MethodElement)" class="member-name-link">isStatic(MethodElement)</a> - Static method in class io.micronaut.el.processor.visitor.<a href="io/micronaut/el/processor/visitor/ELTypes.html" title="class in io.micronaut.el.processor.visitor">ELTypes</a></dt>
 <dd>
 <div class="block">Whether the method is invoked statically.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELMethod.html#isVarArgs()" class="member-name-link">isVarArgs()</a> - Method in interface io.micronaut.el.<a href="io/micronaut/el/ELMethod.html" title="interface in io.micronaut.el">ELMethod</a></dt>
+<dd>
+<div class="block">Returns whether the method has a variable arity parameter.</div>
 </dd>
 <dt><a href="io/micronaut/el/stream/ELStream.html#iterator()" class="member-name-link">iterator()</a> - Method in class io.micronaut.el.stream.<a href="io/micronaut/el/stream/ELStream.html" title="class in io.micronaut.el.stream">ELStream</a></dt>
 <dd>&nbsp;</dd>
@@ -1761,6 +2131,10 @@ one.</div>
 <dt><a href="io/micronaut/el/parser/ast/ELNode.Semicolon.html#left()" class="member-name-link">left()</a> - Method in record class io.micronaut.el.parser.ast.<a href="io/micronaut/el/parser/ast/ELNode.Semicolon.html" title="class in io.micronaut.el.parser.ast">ELNode.Semicolon</a></dt>
 <dd>
 <div class="block">Returns the value of the <a href="./io/micronaut/el/parser/ast/ELNode.Semicolon.html#param-left"><code>left</code></a> record component.</div>
+</dd>
+<dt><a href="io/micronaut/el/runtime/ELArray.html#length(java.lang.Object)" class="member-name-link">length(Object)</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELArray.html" title="class in io.micronaut.el.runtime">ELArray</a></dt>
+<dd>
+<div class="block">Returns the array length, or <code>-1</code> when the value is not an array.</div>
 </dd>
 <dt><a href="io/micronaut/el/parser/ast/BinaryOperator.html#LESS_THAN" class="member-name-link">LESS_THAN</a> - Enum constant in enum class io.micronaut.el.parser.ast.<a href="io/micronaut/el/parser/ast/BinaryOperator.html" title="enum class in io.micronaut.el.parser.ast">BinaryOperator</a></dt>
 <dd>&nbsp;</dd>
@@ -1868,6 +2242,27 @@ specification in a map.</div>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/stream/ELStream.html#max(java.util.Comparator)" class="member-name-link">max(Comparator)</a> - Method in class io.micronaut.el.stream.<a href="io/micronaut/el/stream/ELStream.html" title="class in io.micronaut.el.stream">ELStream</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/ELMethodRegistry.html#method(java.lang.Class,java.lang.String,java.lang.Class,java.lang.Class%5B%5D,boolean,io.micronaut.el.ELMethodRegistry.Invocation)" class="member-name-link">method(Class, String, Class, Class[], boolean, ELMethodRegistry.Invocation)</a> - Method in class io.micronaut.el.<a href="io/micronaut/el/ELMethodRegistry.html" title="class in io.micronaut.el">ELMethodRegistry</a></dt>
+<dd>
+<div class="block">Registers an instance method of any arity, including one of variable arity.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELMethodRegistry.html#method(java.lang.Class,java.lang.String,java.lang.Class,java.lang.Class%5B%5D,boolean,java.lang.annotation.Annotation%5B%5D,io.micronaut.el.ELMethodRegistry.Invocation)" class="member-name-link">method(Class, String, Class, Class[], boolean, Annotation[], ELMethodRegistry.Invocation)</a> - Method in class io.micronaut.el.<a href="io/micronaut/el/ELMethodRegistry.html" title="class in io.micronaut.el">ELMethodRegistry</a></dt>
+<dd>
+<div class="block">Registers an instance method carrying annotations, which a <code>jakarta.el.MethodExpression</code> reports
+through <code>jakarta.el.MethodReference</code>.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELMethodRegistry.html#method(java.lang.Class,java.lang.String,java.lang.Class,io.micronaut.el.ELMethodRegistry.Call0)" class="member-name-link">method(Class, String, Class, ELMethodRegistry.Call0)</a> - Method in class io.micronaut.el.<a href="io/micronaut/el/ELMethodRegistry.html" title="class in io.micronaut.el">ELMethodRegistry</a></dt>
+<dd>
+<div class="block">Registers an instance method taking no argument.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELMethodRegistry.html#method(java.lang.Class,java.lang.String,java.lang.Class,java.lang.Class,io.micronaut.el.ELMethodRegistry.Call1)" class="member-name-link">method(Class, String, Class, Class, ELMethodRegistry.Call1)</a> - Method in class io.micronaut.el.<a href="io/micronaut/el/ELMethodRegistry.html" title="class in io.micronaut.el">ELMethodRegistry</a></dt>
+<dd>
+<div class="block">Registers an instance method taking one argument.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELMethodRegistry.html#method(java.lang.Class,java.lang.String,java.lang.Class,java.lang.Class,java.lang.Class,io.micronaut.el.ELMethodRegistry.Call2)" class="member-name-link">method(Class, String, Class, Class, Class, ELMethodRegistry.Call2)</a> - Method in class io.micronaut.el.<a href="io/micronaut/el/ELMethodRegistry.html" title="class in io.micronaut.el">ELMethodRegistry</a></dt>
+<dd>
+<div class="block">Registers an instance method taking two arguments.</div>
+</dd>
 <dt><a href="io/micronaut/el/parser/ast/ELNode.Method.html#%3Cinit%3E(io.micronaut.el.parser.ast.ELNode,io.micronaut.el.parser.ast.ELNode,java.util.List)" class="member-name-link">Method(ELNode, ELNode, List)</a> - Constructor for record class io.micronaut.el.parser.ast.<a href="io/micronaut/el/parser/ast/ELNode.Method.html" title="class in io.micronaut.el.parser.ast">ELNode.Method</a></dt>
 <dd>
 <div class="block">Creates an instance of a <code>Method</code> record class.</div>
@@ -1891,6 +2286,10 @@ specification in a map.</div>
 <dt><a href="io/micronaut/el/info/MicronautJakartaElInterpreterModuleInfo.html" class="type-name-link" title="class in io.micronaut.el.info">MicronautJakartaElInterpreterModuleInfo</a> - Class in <a href="io/micronaut/el/info/package-summary.html">io.micronaut.el.info</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/info/MicronautJakartaElInterpreterModuleInfo.html#%3Cinit%3E()" class="member-name-link">MicronautJakartaElInterpreterModuleInfo()</a> - Constructor for class io.micronaut.el.info.<a href="io/micronaut/el/info/MicronautJakartaElInterpreterModuleInfo.html" title="class in io.micronaut.el.info">MicronautJakartaElInterpreterModuleInfo</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/info/MicronautJakartaElInterpreterReflectionModuleInfo.html" class="type-name-link" title="class in io.micronaut.el.info">MicronautJakartaElInterpreterReflectionModuleInfo</a> - Class in <a href="io/micronaut/el/info/package-summary.html">io.micronaut.el.info</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/info/MicronautJakartaElInterpreterReflectionModuleInfo.html#%3Cinit%3E()" class="member-name-link">MicronautJakartaElInterpreterReflectionModuleInfo()</a> - Constructor for class io.micronaut.el.info.<a href="io/micronaut/el/info/MicronautJakartaElInterpreterReflectionModuleInfo.html" title="class in io.micronaut.el.info">MicronautJakartaElInterpreterReflectionModuleInfo</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/info/MicronautJakartaElModuleInfo.html" class="type-name-link" title="class in io.micronaut.el.info">MicronautJakartaElModuleInfo</a> - Class in <a href="io/micronaut/el/info/package-summary.html">io.micronaut.el.info</a></dt>
 <dd>&nbsp;</dd>
@@ -1949,6 +2348,10 @@ specification in a map.</div>
 <dd>
 <div class="block">Invokes the constructor of an imported class as described in the section 1.24.3 of the specification.</div>
 </dd>
+<dt><a href="io/micronaut/el/runtime/ELArray.html#newInstance(java.lang.Class,int)" class="member-name-link">newInstance(Class, int)</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELArray.html" title="class in io.micronaut.el.runtime">ELArray</a></dt>
+<dd>
+<div class="block">Creates an array of the given component type, without <code>java.lang.reflect.Array</code>.</div>
+</dd>
 <dt><a href="io/micronaut/el/processor/compiler/ELExpressionDefinition.html#node()" class="member-name-link">node()</a> - Method in record class io.micronaut.el.processor.compiler.<a href="io/micronaut/el/processor/compiler/ELExpressionDefinition.html" title="class in io.micronaut.el.processor.compiler">ELExpressionDefinition</a></dt>
 <dd>
 <div class="block">Returns the value of the <a href="./io/micronaut/el/processor/compiler/ELExpressionDefinition.html#param-node"><code>node</code></a> record component.</div>
@@ -1974,6 +2377,18 @@ specification in a map.</div>
 <dt><a href="io/micronaut/el/runtime/ELSupport.html#notEquals(java.lang.Object,java.lang.Object)" class="member-name-link">notEquals(Object, Object)</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELSupport.html" title="class in io.micronaut.el.runtime">ELSupport</a></dt>
 <dd>
 <div class="block">The <code>!=</code> operator described in the section 1.9.2 of the specification.</div>
+</dd>
+<dt><a href="io/micronaut/el/resolver/ELMethodDiagnostics.html#notFound(jakarta.el.ELContext,java.lang.Object,java.lang.Object,java.lang.Object%5B%5D)" class="member-name-link">notFound(ELContext, Object, Object, Object[])</a> - Static method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/ELMethodDiagnostics.html" title="class in io.micronaut.el.resolver">ELMethodDiagnostics</a></dt>
+<dd>
+<div class="block">The exception of a method the resolver chain of a context did not resolve.</div>
+</dd>
+<dt><a href="io/micronaut/el/resolver/ELMethodDiagnostics.html#notFound(jakarta.el.ELContext,java.lang.Object,java.lang.Object,java.lang.Object%5B%5D,java.util.List)" class="member-name-link">notFound(ELContext, Object, Object, Object[], List)</a> - Static method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/ELMethodDiagnostics.html" title="class in io.micronaut.el.resolver">ELMethodDiagnostics</a></dt>
+<dd>
+<div class="block">The exception of a method none of the executors of an expression parsed at runtime resolved.</div>
+</dd>
+<dt><a href="io/micronaut/el/runtime/ELMethods.html#notFound(java.lang.Class,java.lang.String,int)" class="member-name-link">notFound(Class, String, int)</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELMethods.html" title="class in io.micronaut.el.runtime">ELMethods</a></dt>
+<dd>
+<div class="block">The failure reported when a type declares no method of the given name and arity.</div>
 </dd>
 <dt><a href="io/micronaut/el/CompiledELContext.html#notifyAfterEvaluation(java.lang.String)" class="member-name-link">notifyAfterEvaluation(String)</a> - Method in class io.micronaut.el.<a href="io/micronaut/el/CompiledELContext.html" title="class in io.micronaut.el">CompiledELContext</a></dt>
 <dd>&nbsp;</dd>
@@ -2001,9 +2416,19 @@ specification in a map.</div>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/stream/ELOptional.html#of(T)" class="member-name-link">of(T)</a> - Static method in class io.micronaut.el.stream.<a href="io/micronaut/el/stream/ELOptional.html" title="class in io.micronaut.el.stream">ELOptional</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/ELSandbox.html#of(jakarta.el.ELContext)" class="member-name-link">of(ELContext)</a> - Static method in interface io.micronaut.el.<a href="io/micronaut/el/ELSandbox.html" title="interface in io.micronaut.el">ELSandbox</a></dt>
+<dd>
+<div class="block">Reads the sandbox an expression is evaluated under from the context, which is
+<a href="io/micronaut/el/ELSandbox.html#standard()"><code>ELSandbox.standard()</code></a> unless one was registered with
+<code>ELContext.putContext(ELSandbox.class, sandbox)</code>.</div>
+</dd>
 <dt><a href="io/micronaut/el/stream/ELStream.html#of(jakarta.el.ELContext,java.lang.Object)" class="member-name-link">of(ELContext, Object)</a> - Static method in class io.micronaut.el.stream.<a href="io/micronaut/el/stream/ELStream.html" title="class in io.micronaut.el.stream">ELStream</a></dt>
 <dd>
 <div class="block">Creates a stream from a <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link"><code>Collection</code></a> or a Java array.</div>
+</dd>
+<dt><a href="io/micronaut/el/runtime/ELArguments.html#of(java.lang.Class%5B%5D)" class="member-name-link">of(Class[])</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELArguments.html" title="class in io.micronaut.el.runtime">ELArguments</a></dt>
+<dd>
+<div class="block">Returns Micronaut arguments for raw Jakarta EL parameter types.</div>
 </dd>
 <dt><a href="io/micronaut/el/parser/ast/ELNode.Unary.html#operand()" class="member-name-link">operand()</a> - Method in record class io.micronaut.el.parser.ast.<a href="io/micronaut/el/parser/ast/ELNode.Unary.html" title="class in io.micronaut.el.parser.ast">ELNode.Unary</a></dt>
 <dd>
@@ -2019,6 +2444,11 @@ specification in a map.</div>
 </dd>
 <dt><a href="io/micronaut/el/parser/ast/BinaryOperator.html#OR" class="member-name-link">OR</a> - Enum constant in enum class io.micronaut.el.parser.ast.<a href="io/micronaut/el/parser/ast/BinaryOperator.html" title="enum class in io.micronaut.el.parser.ast">BinaryOperator</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/ContributedELMethodExecutor.html#ORDER" class="member-name-link">ORDER</a> - Static variable in class io.micronaut.el.<a href="io/micronaut/el/ContributedELMethodExecutor.html" title="class in io.micronaut.el">ContributedELMethodExecutor</a></dt>
+<dd>
+<div class="block">Contributions describe one type each, so they are consulted before the built-in executors, which
+describe whole families of types, and before the reflective one, which describes anything.</div>
+</dd>
 <dt><a href="io/micronaut/el/stream/ELOptional.html#orElse(java.lang.Object)" class="member-name-link">orElse(Object)</a> - Method in class io.micronaut.el.stream.<a href="io/micronaut/el/stream/ELOptional.html" title="class in io.micronaut.el.stream">ELOptional</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/stream/ELOptional.html#orElseGet(jakarta.el.LambdaExpression)" class="member-name-link">orElseGet(LambdaExpression)</a> - Method in class io.micronaut.el.stream.<a href="io/micronaut/el/stream/ELOptional.html" title="class in io.micronaut.el.stream">ELOptional</a></dt>
@@ -2036,12 +2466,26 @@ specification in a map.</div>
 <dd>
 <div class="block">Returns the value of the <a href="./io/micronaut/el/processor/compiler/ELMethodExpressionDefinition.html#param-parameterTypes"><code>parameterTypes</code></a> record component.</div>
 </dd>
+<dt><a href="io/micronaut/el/runtime/ELMethods.Candidate.html#parameterTypes()" class="member-name-link">parameterTypes()</a> - Method in record class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELMethods.Candidate.html" title="class in io.micronaut.el.runtime">ELMethods.Candidate</a></dt>
+<dd>
+<div class="block">Returns the value of the <a href="./io/micronaut/el/runtime/ELMethods.Candidate.html#param-parameterTypes"><code>parameterTypes</code></a> record component.</div>
+</dd>
 <dt><a href="io/micronaut/el/parser/ELParser.html#parse(java.lang.String)" class="member-name-link">parse(String)</a> - Static method in class io.micronaut.el.parser.<a href="io/micronaut/el/parser/ELParser.html" title="class in io.micronaut.el.parser">ELParser</a></dt>
+<dd>
+<div class="block">Parses an expression, which can be a literal-expression, an eval-expression or a composite
+expression, nested at most <a href="io/micronaut/el/parser/ELParser.html#DEFAULT_MAX_DEPTH"><code>ELParser.DEFAULT_MAX_DEPTH</code></a> levels deep.</div>
+</dd>
+<dt><a href="io/micronaut/el/parser/ELParser.html#parse(java.lang.String,int)" class="member-name-link">parse(String, int)</a> - Static method in class io.micronaut.el.parser.<a href="io/micronaut/el/parser/ELParser.html" title="class in io.micronaut.el.parser">ELParser</a></dt>
 <dd>
 <div class="block">Parses an expression, which can be a literal-expression, an eval-expression or a composite
 expression.</div>
 </dd>
 <dt><a href="io/micronaut/el/parser/ELParser.html#parseEval(java.lang.String)" class="member-name-link">parseEval(String)</a> - Static method in class io.micronaut.el.parser.<a href="io/micronaut/el/parser/ELParser.html" title="class in io.micronaut.el.parser">ELParser</a></dt>
+<dd>
+<div class="block">Parses an expression that must consist of a single eval-expression, as required for a method
+expression by the section 1.2.3 of the specification.</div>
+</dd>
+<dt><a href="io/micronaut/el/parser/ELParser.html#parseEval(java.lang.String,int)" class="member-name-link">parseEval(String, int)</a> - Static method in class io.micronaut.el.parser.<a href="io/micronaut/el/parser/ELParser.html" title="class in io.micronaut.el.parser">ELParser</a></dt>
 <dd>
 <div class="block">Parses an expression that must consist of a single eval-expression, as required for a method
 expression by the section 1.2.3 of the specification.</div>
@@ -2102,13 +2546,31 @@ expression by the section 1.2.3 of the specification.</div>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/stream/ELStream.html#reduce(java.util.function.BinaryOperator)" class="member-name-link">reduce(BinaryOperator)</a> - Method in class io.micronaut.el.stream.<a href="io/micronaut/el/stream/ELStream.html" title="class in io.micronaut.el.stream">ELStream</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="io/micronaut/el/resolver/ReflectiveMethodELResolver.html" class="type-name-link" title="class in io.micronaut.el.resolver">ReflectiveMethodELResolver</a> - Class in <a href="io/micronaut/el/resolver/package-summary.html">io.micronaut.el.resolver</a></dt>
+<dt><a href="io/micronaut/el/interpreter/reflection/ReflectiveELMethodExecutor.html" class="type-name-link" title="class in io.micronaut.el.interpreter.reflection">ReflectiveELMethodExecutor</a> - Class in <a href="io/micronaut/el/interpreter/reflection/package-summary.html">io.micronaut.el.interpreter.reflection</a></dt>
+<dd>
+<div class="block">Resolves interpreter methods through the public Java reflection API.</div>
+</dd>
+<dt><a href="io/micronaut/el/interpreter/reflection/ReflectiveELMethodExecutor.html#%3Cinit%3E()" class="member-name-link">ReflectiveELMethodExecutor()</a> - Constructor for class io.micronaut.el.interpreter.reflection.<a href="io/micronaut/el/interpreter/reflection/ReflectiveELMethodExecutor.html" title="class in io.micronaut.el.interpreter.reflection">ReflectiveELMethodExecutor</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/interpreter/reflection/ReflectiveELMethods.html" class="type-name-link" title="class in io.micronaut.el.interpreter.reflection">ReflectiveELMethods</a> - Class in <a href="io/micronaut/el/interpreter/reflection/package-summary.html">io.micronaut.el.interpreter.reflection</a></dt>
+<dd>
+<div class="block">Finds and invokes a <code>java.lang.reflect.Method</code>, which is the selection of the section 1.6 of the
+specification applied to what a class reports about itself.</div>
+</dd>
+<dt><a href="io/micronaut/el/interpreter/reflection/ReflectiveELProxyFactory.html" class="type-name-link" title="class in io.micronaut.el.interpreter.reflection">ReflectiveELProxyFactory</a> - Class in <a href="io/micronaut/el/interpreter/reflection/package-summary.html">io.micronaut.el.interpreter.reflection</a></dt>
+<dd>
+<div class="block">Implements a functional interface nothing described in advance, by discovering its single abstract method
+and standing in for it with a <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/reflect/Proxy.html" title="class or interface in java.lang.reflect" class="external-link"><code>Proxy</code></a>.</div>
+</dd>
+<dt><a href="io/micronaut/el/interpreter/reflection/ReflectiveELProxyFactory.html#%3Cinit%3E()" class="member-name-link">ReflectiveELProxyFactory()</a> - Constructor for class io.micronaut.el.interpreter.reflection.<a href="io/micronaut/el/interpreter/reflection/ReflectiveELProxyFactory.html" title="class in io.micronaut.el.interpreter.reflection">ReflectiveELProxyFactory</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/interpreter/reflection/ReflectiveMethodELResolver.html" class="type-name-link" title="class in io.micronaut.el.interpreter.reflection">ReflectiveMethodELResolver</a> - Class in <a href="io/micronaut/el/interpreter/reflection/package-summary.html">io.micronaut.el.interpreter.reflection</a></dt>
 <dd>
 <div class="block">Invokes the methods of the types that have no bean introspection, reflectively, as <code>BeanELResolver</code>
 and <code>StaticFieldELResolver</code> do, with the method looked up through the cache of <a href="io/micronaut/el/runtime/ELMethods.html" title="class in io.micronaut.el.runtime"><code>ELMethods</code></a>:
 the resolvers of the specification read <code>Class.getMethods()</code> on every invocation.</div>
 </dd>
-<dt><a href="io/micronaut/el/resolver/ReflectiveMethodELResolver.html#%3Cinit%3E()" class="member-name-link">ReflectiveMethodELResolver()</a> - Constructor for class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/ReflectiveMethodELResolver.html" title="class in io.micronaut.el.resolver">ReflectiveMethodELResolver</a></dt>
+<dt><a href="io/micronaut/el/interpreter/reflection/ReflectiveMethodELResolver.html#%3Cinit%3E()" class="member-name-link">ReflectiveMethodELResolver()</a> - Constructor for class io.micronaut.el.interpreter.reflection.<a href="io/micronaut/el/interpreter/reflection/ReflectiveMethodELResolver.html" title="class in io.micronaut.el.interpreter.reflection">ReflectiveMethodELResolver</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/processor/compiler/ELFunctionDiscovery.html#register(io.micronaut.inject.ast.ClassElement)" class="member-name-link">register(ClassElement)</a> - Method in class io.micronaut.el.processor.compiler.<a href="io/micronaut/el/processor/compiler/ELFunctionDiscovery.html" title="class in io.micronaut.el.processor.compiler">ELFunctionDiscovery</a></dt>
 <dd>
@@ -2126,6 +2588,26 @@ the resolvers of the specification read <code>Class.getMethods()</code> on every
 <dd>
 <div class="block">Forgets everything, at the start of a compilation.</div>
 </dd>
+<dt><a href="io/micronaut/el/ContributedELMethodExecutor.html#resolve(jakarta.el.ELContext,java.lang.Object,java.lang.Object,io.micronaut.core.type.Argument%5B%5D,java.lang.Object%5B%5D)" class="member-name-link">resolve(ELContext, Object, Object, Argument[], Object[])</a> - Method in class io.micronaut.el.<a href="io/micronaut/el/ContributedELMethodExecutor.html" title="class in io.micronaut.el">ContributedELMethodExecutor</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/ELExecutors.html#resolve(jakarta.el.ELContext,java.lang.Object,java.lang.Object,io.micronaut.core.type.Argument%5B%5D,java.lang.Object%5B%5D)" class="member-name-link">resolve(ELContext, Object, Object, Argument[], Object[])</a> - Static method in class io.micronaut.el.<a href="io/micronaut/el/ELExecutors.html" title="class in io.micronaut.el">ELExecutors</a></dt>
+<dd>
+<div class="block">Resolves a method through the executors of the classpath.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELMethodExecutor.html#resolve(jakarta.el.ELContext,java.lang.Object,java.lang.Object,io.micronaut.core.type.Argument%5B%5D,java.lang.Object%5B%5D)" class="member-name-link">resolve(ELContext, Object, Object, Argument[], Object[])</a> - Method in interface io.micronaut.el.<a href="io/micronaut/el/ELMethodExecutor.html" title="interface in io.micronaut.el">ELMethodExecutor</a></dt>
+<dd>
+<div class="block">Resolves an instance or static method, or a constructor represented by <code>&lt;init&gt;</code>.</div>
+</dd>
+<dt><a href="io/micronaut/el/interpreter/reflection/ReflectiveELMethodExecutor.html#resolve(jakarta.el.ELContext,java.lang.Object,java.lang.Object,io.micronaut.core.type.Argument%5B%5D,java.lang.Object%5B%5D)" class="member-name-link">resolve(ELContext, Object, Object, Argument[], Object[])</a> - Method in class io.micronaut.el.interpreter.reflection.<a href="io/micronaut/el/interpreter/reflection/ReflectiveELMethodExecutor.html" title="class in io.micronaut.el.interpreter.reflection">ReflectiveELMethodExecutor</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/resolver/CommonELResolver.html#resolve(jakarta.el.ELContext,java.lang.Object,java.lang.Object,io.micronaut.core.type.Argument%5B%5D,java.lang.Object%5B%5D)" class="member-name-link">resolve(ELContext, Object, Object, Argument[], Object[])</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/CommonELResolver.html" title="class in io.micronaut.el.resolver">CommonELResolver</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/resolver/ExecutableMethodELExecutor.html#resolve(jakarta.el.ELContext,java.lang.Object,java.lang.Object,io.micronaut.core.type.Argument%5B%5D,java.lang.Object%5B%5D)" class="member-name-link">resolve(ELContext, Object, Object, Argument[], Object[])</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/ExecutableMethodELExecutor.html" title="class in io.micronaut.el.resolver">ExecutableMethodELExecutor</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/resolver/IntrospectionELResolver.html#resolve(jakarta.el.ELContext,java.lang.Object,java.lang.Object,io.micronaut.core.type.Argument%5B%5D,java.lang.Object%5B%5D)" class="member-name-link">resolve(ELContext, Object, Object, Argument[], Object[])</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/IntrospectionELResolver.html" title="class in io.micronaut.el.resolver">IntrospectionELResolver</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/resolver/StreamELResolver.html#resolve(jakarta.el.ELContext,java.lang.Object,java.lang.Object,io.micronaut.core.type.Argument%5B%5D,java.lang.Object%5B%5D)" class="member-name-link">resolve(ELContext, Object, Object, Argument[], Object[])</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/StreamELResolver.html" title="class in io.micronaut.el.resolver">StreamELResolver</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/CompiledELContext.html#resolveBean(java.lang.String)" class="member-name-link">resolveBean(String)</a> - Method in class io.micronaut.el.<a href="io/micronaut/el/CompiledELContext.html" title="class in io.micronaut.el">CompiledELContext</a></dt>
 <dd>
 <div class="block">Resolves a declared variable the way <code>ELResolution.resolveVariable</code> does, from the beans of this
@@ -2140,6 +2622,14 @@ variable.</div>
 <dd>
 <div class="block">Resolves a class by its simple name, as described in the section 1.24.2 of the specification.</div>
 </dd>
+<dt><a href="io/micronaut/el/ContributedELMethodExecutor.html#resolveFunction(jakarta.el.ELContext,java.lang.String,java.lang.String)" class="member-name-link">resolveFunction(ELContext, String, String)</a> - Method in class io.micronaut.el.<a href="io/micronaut/el/ContributedELMethodExecutor.html" title="class in io.micronaut.el">ContributedELMethodExecutor</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/ELMethodExecutor.html#resolveFunction(jakarta.el.ELContext,java.lang.String,java.lang.String)" class="member-name-link">resolveFunction(ELContext, String, String)</a> - Method in interface io.micronaut.el.<a href="io/micronaut/el/ELMethodExecutor.html" title="interface in io.micronaut.el">ELMethodExecutor</a></dt>
+<dd>
+<div class="block">Resolves a function bound by the expression context.</div>
+</dd>
+<dt><a href="io/micronaut/el/interpreter/reflection/ReflectiveELMethodExecutor.html#resolveFunction(jakarta.el.ELContext,java.lang.String,java.lang.String)" class="member-name-link">resolveFunction(ELContext, String, String)</a> - Method in class io.micronaut.el.interpreter.reflection.<a href="io/micronaut/el/interpreter/reflection/ReflectiveELMethodExecutor.html" title="class in io.micronaut.el.interpreter.reflection">ReflectiveELMethodExecutor</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/processor/compiler/CompilationContext.html#resolveFunction(java.lang.String,java.lang.String)" class="member-name-link">resolveFunction(String, String)</a> - Method in class io.micronaut.el.processor.compiler.<a href="io/micronaut/el/processor/compiler/CompilationContext.html" title="class in io.micronaut.el.processor.compiler">CompilationContext</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/runtime/ELResolution.html#resolveIdentifier(jakarta.el.ELContext,java.lang.String)" class="member-name-link">resolveIdentifier(ELContext, String)</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELResolution.html" title="class in io.micronaut.el.runtime">ELResolution</a></dt>
@@ -2183,6 +2673,10 @@ and the resolvers, without the static imports, which the compiler resolves itsel
 <dd>
 <div class="block">Compares parameter types, treating a primitive and its wrapper as the same type.</div>
 </dd>
+<dt><a href="io/micronaut/el/runtime/ELMethods.html#select(java.lang.Class,java.lang.String,java.util.List,java.lang.Class%5B%5D,java.lang.Object%5B%5D,boolean)" class="member-name-link">select(Class, String, List, Class[], Object[], boolean)</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELMethods.html" title="class in io.micronaut.el.runtime">ELMethods</a></dt>
+<dd>
+<div class="block">Selects the method the section 1.6 of the specification prefers among the candidates of a name.</div>
+</dd>
 <dt><a href="io/micronaut/el/parser/ast/ELNode.Semicolon.html#%3Cinit%3E(io.micronaut.el.parser.ast.ELNode,io.micronaut.el.parser.ast.ELNode)" class="member-name-link">Semicolon(ELNode, ELNode)</a> - Constructor for record class io.micronaut.el.parser.ast.<a href="io/micronaut/el/parser/ast/ELNode.Semicolon.html" title="class in io.micronaut.el.parser.ast">ELNode.Semicolon</a></dt>
 <dd>
 <div class="block">Creates an instance of a <code>Semicolon</code> record class.</div>
@@ -2195,8 +2689,16 @@ and the resolvers, without the static imports, which the compiler resolves itsel
 <dd>
 <div class="block">The semicolon operator described in the section 1.14 of the specification.</div>
 </dd>
+<dt><a href="io/micronaut/el/runtime/ELSupport.html#sequenceLazy(java.lang.Object,jakarta.el.ELContext,io.micronaut.el.runtime.ELLambdaBody.Nullary)" class="member-name-link">sequenceLazy(Object, ELContext, ELLambdaBody.Nullary)</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELSupport.html" title="class in io.micronaut.el.runtime">ELSupport</a></dt>
+<dd>
+<div class="block">Evaluates the right operand of a generated semicolon expression after the left operand.</div>
+</dd>
 <dt><a href="io/micronaut/el/runtime/ELCollections.html#set(java.lang.Object...)" class="member-name-link">set(Object...)</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELCollections.html" title="class in io.micronaut.el.runtime">ELCollections</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/runtime/ELArray.html#set(java.lang.Object,int,java.lang.Object)" class="member-name-link">set(Object, int, Object)</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELArray.html" title="class in io.micronaut.el.runtime">ELArray</a></dt>
+<dd>
+<div class="block">Writes an array element using a typed JVM array operation.</div>
+</dd>
 <dt><a href="io/micronaut/el/parser/ast/ELNode.Kind.html#SET_DATA" class="member-name-link">SET_DATA</a> - Enum constant in enum class io.micronaut.el.parser.ast.<a href="io/micronaut/el/parser/ast/ELNode.Kind.html" title="enum class in io.micronaut.el.parser.ast">ELNode.Kind</a></dt>
 <dd>
 <div class="block">SetData.</div>
@@ -2219,9 +2721,13 @@ and the resolvers, without the static imports, which the compiler resolves itsel
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/runtime/ObjectValueExpression.html#setValue(jakarta.el.ELContext,java.lang.Object)" class="member-name-link">setValue(ELContext, Object)</a> - Method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ObjectValueExpression.html" title="class in io.micronaut.el.runtime">ObjectValueExpression</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="io/micronaut/el/resolver/IntrospectionELResolver.html#setValue(jakarta.el.ELContext,java.lang.Object,java.lang.Object,java.lang.Object)" class="member-name-link">setValue(ELContext, Object, Object, Object)</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/IntrospectionELResolver.html" title="class in io.micronaut.el.resolver">IntrospectionELResolver</a></dt>
+<dt><a href="io/micronaut/el/interpreter/reflection/ReflectiveMethodELResolver.html#setValue(jakarta.el.ELContext,java.lang.Object,java.lang.Object,java.lang.Object)" class="member-name-link">setValue(ELContext, Object, Object, Object)</a> - Method in class io.micronaut.el.interpreter.reflection.<a href="io/micronaut/el/interpreter/reflection/ReflectiveMethodELResolver.html" title="class in io.micronaut.el.interpreter.reflection">ReflectiveMethodELResolver</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="io/micronaut/el/resolver/ReflectiveMethodELResolver.html#setValue(jakarta.el.ELContext,java.lang.Object,java.lang.Object,java.lang.Object)" class="member-name-link">setValue(ELContext, Object, Object, Object)</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/ReflectiveMethodELResolver.html" title="class in io.micronaut.el.resolver">ReflectiveMethodELResolver</a></dt>
+<dt><a href="io/micronaut/el/resolver/CommonELResolver.html#setValue(jakarta.el.ELContext,java.lang.Object,java.lang.Object,java.lang.Object)" class="member-name-link">setValue(ELContext, Object, Object, Object)</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/CommonELResolver.html" title="class in io.micronaut.el.resolver">CommonELResolver</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/resolver/ExecutableMethodELExecutor.html#setValue(jakarta.el.ELContext,java.lang.Object,java.lang.Object,java.lang.Object)" class="member-name-link">setValue(ELContext, Object, Object, Object)</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/ExecutableMethodELExecutor.html" title="class in io.micronaut.el.resolver">ExecutableMethodELExecutor</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/resolver/IntrospectionELResolver.html#setValue(jakarta.el.ELContext,java.lang.Object,java.lang.Object,java.lang.Object)" class="member-name-link">setValue(ELContext, Object, Object, Object)</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/IntrospectionELResolver.html" title="class in io.micronaut.el.resolver">IntrospectionELResolver</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/runtime/ELResolution.html#setValue(jakarta.el.ELContext,java.lang.Object,java.lang.Object,java.lang.Object)" class="member-name-link">setValue(ELContext, Object, Object, Object)</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELResolution.html" title="class in io.micronaut.el.runtime">ELResolution</a></dt>
 <dd>
@@ -2231,20 +2737,40 @@ and the resolvers, without the static imports, which the compiler resolves itsel
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/runtime/MapVariableMapper.html#setVariable(java.lang.String,jakarta.el.ValueExpression)" class="member-name-link">setVariable(String, ValueExpression)</a> - Method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/MapVariableMapper.html" title="class in io.micronaut.el.runtime">MapVariableMapper</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/ELContributions.html#shared()" class="member-name-link">shared()</a> - Static method in class io.micronaut.el.<a href="io/micronaut/el/ELContributions.html" title="class in io.micronaut.el">ELContributions</a></dt>
+<dd>
+<div class="block">The registry the contributors of the classpath declared into.</div>
+</dd>
 <dt><a href="io/micronaut/el/stream/ELStream.html#sorted()" class="member-name-link">sorted()</a> - Method in class io.micronaut.el.stream.<a href="io/micronaut/el/stream/ELStream.html" title="class in io.micronaut.el.stream">ELStream</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/stream/ELStream.html#sorted(jakarta.el.LambdaExpression)" class="member-name-link">sorted(LambdaExpression)</a> - Method in class io.micronaut.el.stream.<a href="io/micronaut/el/stream/ELStream.html" title="class in io.micronaut.el.stream">ELStream</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/stream/ELStream.html#sorted(java.util.Comparator)" class="member-name-link">sorted(Comparator)</a> - Method in class io.micronaut.el.stream.<a href="io/micronaut/el/stream/ELStream.html" title="class in io.micronaut.el.stream">ELStream</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/ELSandbox.html#standard()" class="member-name-link">standard()</a> - Static method in interface io.micronaut.el.<a href="io/micronaut/el/ELSandbox.html" title="interface in io.micronaut.el">ELSandbox</a></dt>
+<dd>
+<div class="block">The sandbox applied to the expressions parsed at runtime: it denies the types through which an
+expression escapes into arbitrary Java, and lets everything else through.</div>
+</dd>
 <dt><a href="io/micronaut/el/resolver/ELResolvers.html#standard()" class="member-name-link">standard()</a> - Static method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/ELResolvers.html" title="class in io.micronaut.el.resolver">ELResolvers</a></dt>
 <dd>
 <div class="block">Creates the standard chain of resolvers, which starts with the bean introspections generated at
 compilation time and continues with the resolvers of the specification.</div>
 </dd>
+<dt><a href="io/micronaut/el/resolver/ELResolvers.html#standard(io.micronaut.context.BeanDefinitionRegistry,jakarta.el.ELResolver...)" class="member-name-link">standard(BeanDefinitionRegistry, ELResolver...)</a> - Static method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/ELResolvers.html" title="class in io.micronaut.el.resolver">ELResolvers</a></dt>
+<dd>
+<div class="block">Creates the standard chain of resolvers for an application that has a bean context, which adds, between
+the introspections and the reflective invocation, the resolver reading the executable methods the beans
+of that context carry.</div>
+</dd>
 <dt><a href="io/micronaut/el/resolver/ELResolvers.html#standard(jakarta.el.ELResolver...)" class="member-name-link">standard(ELResolver...)</a> - Static method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/ELResolvers.html" title="class in io.micronaut.el.resolver">ELResolvers</a></dt>
 <dd>
 <div class="block">Creates the standard chain of resolvers, starting with the given resolvers.</div>
+</dd>
+<dt><a href="io/micronaut/el/resolver/ELResolvers.html#standardResolvers(io.micronaut.context.BeanDefinitionRegistry,jakarta.el.ELResolver...)" class="member-name-link">standardResolvers(BeanDefinitionRegistry, ELResolver...)</a> - Static method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/ELResolvers.html" title="class in io.micronaut.el.resolver">ELResolvers</a></dt>
+<dd>
+<div class="block">The resolvers of the standard chain of an application that has a bean context, in order, for a chain that
+adds resolvers in front of them.</div>
 </dd>
 <dt><a href="io/micronaut/el/resolver/ELResolvers.html#standardResolvers(jakarta.el.ELResolver...)" class="member-name-link">standardResolvers(ELResolver...)</a> - Static method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/ELResolvers.html" title="class in io.micronaut.el.resolver">ELResolvers</a></dt>
 <dd>
@@ -2258,6 +2784,22 @@ compilation time and continues with the resolvers of the specification.</div>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/processor/compiler/CompilationContext.html#staticImports()" class="member-name-link">staticImports()</a> - Method in class io.micronaut.el.processor.compiler.<a href="io/micronaut/el/processor/compiler/CompilationContext.html" title="class in io.micronaut.el.processor.compiler">CompilationContext</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/ELMethodRegistry.html#staticMethod(java.lang.Class,java.lang.String,java.lang.Class,java.lang.Class%5B%5D,boolean,io.micronaut.el.ELMethodRegistry.Invocation)" class="member-name-link">staticMethod(Class, String, Class, Class[], boolean, ELMethodRegistry.Invocation)</a> - Method in class io.micronaut.el.<a href="io/micronaut/el/ELMethodRegistry.html" title="class in io.micronaut.el">ELMethodRegistry</a></dt>
+<dd>
+<div class="block">Registers a static method of any arity, including one of variable arity.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELMethodRegistry.html#staticMethod(java.lang.Class,java.lang.String,java.lang.Class,io.micronaut.el.ELMethodRegistry.Fn0)" class="member-name-link">staticMethod(Class, String, Class, ELMethodRegistry.Fn0)</a> - Method in class io.micronaut.el.<a href="io/micronaut/el/ELMethodRegistry.html" title="class in io.micronaut.el">ELMethodRegistry</a></dt>
+<dd>
+<div class="block">Registers a static method taking no argument.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELMethodRegistry.html#staticMethod(java.lang.Class,java.lang.String,java.lang.Class,java.lang.Class,io.micronaut.el.ELMethodRegistry.Fn1)" class="member-name-link">staticMethod(Class, String, Class, Class, ELMethodRegistry.Fn1)</a> - Method in class io.micronaut.el.<a href="io/micronaut/el/ELMethodRegistry.html" title="class in io.micronaut.el">ELMethodRegistry</a></dt>
+<dd>
+<div class="block">Registers a static method taking one argument.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELMethodRegistry.html#staticMethod(java.lang.Class,java.lang.String,java.lang.Class,java.lang.Class,java.lang.Class,io.micronaut.el.ELMethodRegistry.Fn2)" class="member-name-link">staticMethod(Class, String, Class, Class, Class, ELMethodRegistry.Fn2)</a> - Method in class io.micronaut.el.<a href="io/micronaut/el/ELMethodRegistry.html" title="class in io.micronaut.el">ELMethodRegistry</a></dt>
+<dd>
+<div class="block">Registers a static method taking two arguments.</div>
+</dd>
 <dt><a href="io/micronaut/el/processor/visitor/ELTypes.html#staticOwner(io.micronaut.inject.ast.MethodElement)" class="member-name-link">staticOwner(MethodElement)</a> - Static method in class io.micronaut.el.processor.visitor.<a href="io/micronaut/el/processor/visitor/ELTypes.html" title="class in io.micronaut.el.processor.visitor">ELTypes</a></dt>
 <dd>
 <div class="block">The class a static function is invoked on.</div>
@@ -2289,6 +2831,10 @@ the Jakarta Expression Language specification.</div>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/stream/ELStream.html#sum()" class="member-name-link">sum()</a> - Method in class io.micronaut.el.stream.<a href="io/micronaut/el/stream/ELStream.html" title="class in io.micronaut.el.stream">ELStream</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/ELMethod.html#synthesizeAnnotations()" class="member-name-link">synthesizeAnnotations()</a> - Method in interface io.micronaut.el.<a href="io/micronaut/el/ELMethod.html" title="interface in io.micronaut.el">ELMethod</a></dt>
+<dd>
+<div class="block">Synthesizes the annotations required by the Jakarta EL method-reference API.</div>
+</dd>
 </dl>
 <h2 class="title" id="I:T">T</h2>
 <dl class="index">
@@ -2319,6 +2865,8 @@ the Jakarta Expression Language specification.</div>
 <div class="block">Coerces a value to a primitive <code>boolean</code>, the form used by the logical operators.</div>
 </dd>
 <dt><a href="io/micronaut/el/stream/ELStream.html#toList()" class="member-name-link">toList()</a> - Method in class io.micronaut.el.stream.<a href="io/micronaut/el/stream/ELStream.html" title="class in io.micronaut.el.stream">ELStream</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/ELSandbox.StandardELSandbox.html#toString()" class="member-name-link">toString()</a> - Method in class io.micronaut.el.<a href="io/micronaut/el/ELSandbox.StandardELSandbox.html" title="class in io.micronaut.el">ELSandbox.StandardELSandbox</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/parser/ast/ELNode.Assign.html#toString()" class="member-name-link">toString()</a> - Method in record class io.micronaut.el.parser.ast.<a href="io/micronaut/el/parser/ast/ELNode.Assign.html" title="class in io.micronaut.el.parser.ast">ELNode.Assign</a></dt>
 <dd>
@@ -2448,6 +2996,10 @@ the Jakarta Expression Language specification.</div>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/runtime/CompiledValueExpression.html#toString()" class="member-name-link">toString()</a> - Method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/CompiledValueExpression.html" title="class in io.micronaut.el.runtime">CompiledValueExpression</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/runtime/ELMethods.Candidate.html#toString()" class="member-name-link">toString()</a> - Method in record class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELMethods.Candidate.html" title="class in io.micronaut.el.runtime">ELMethods.Candidate</a></dt>
+<dd>
+<div class="block">Returns a string representation of this record class.</div>
+</dd>
 <dt><a href="io/micronaut/el/stream/ELOptional.html#toString()" class="member-name-link">toString()</a> - Method in class io.micronaut.el.stream.<a href="io/micronaut/el/stream/ELOptional.html" title="class in io.micronaut.el.stream">ELOptional</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/annotation/ELFunctions.html#type()" class="member-name-link">type()</a> - Element in annotation interface io.micronaut.el.annotation.<a href="io/micronaut/el/annotation/ELFunctions.html" title="annotation interface in io.micronaut.el.annotation">ELFunctions</a></dt>
@@ -2489,6 +3041,10 @@ the Jakarta Expression Language specification.</div>
 </dd>
 <dt><a href="io/micronaut/el/processor/compiler/ELCompiler.html#unresolvedIdentifiers()" class="member-name-link">unresolvedIdentifiers()</a> - Method in class io.micronaut.el.processor.compiler.<a href="io/micronaut/el/processor/compiler/ELCompiler.html" title="class in io.micronaut.el.processor.compiler">ELCompiler</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/ELSandbox.html#UNRESTRICTED" class="member-name-link">UNRESTRICTED</a> - Static variable in interface io.micronaut.el.<a href="io/micronaut/el/ELSandbox.html" title="interface in io.micronaut.el">ELSandbox</a></dt>
+<dd>
+<div class="block">The sandbox allowing everything, which is how an expression compiled at compilation time is evaluated.</div>
+</dd>
 <dt><a href="io/micronaut/el/runtime/ELVariableBindings.html#unwrap(jakarta.el.Expression)" class="member-name-link">unwrap(Expression)</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELVariableBindings.html" title="class in io.micronaut.el.runtime">ELVariableBindings</a></dt>
 <dd>
 <div class="block">Returns the parsed expression behind a creation-time variable-binding view.</div>
@@ -2535,6 +3091,10 @@ or a composite expression as defined by the Jakarta Expression Language specific
 <dd>
 <div class="block">Returns the value of the <a href="./io/micronaut/el/parser/ast/ELNode.StringLiteral.html#param-value"><code>value</code></a> record component.</div>
 </dd>
+<dt><a href="io/micronaut/el/runtime/ELMethods.Candidate.html#value()" class="member-name-link">value()</a> - Method in record class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELMethods.Candidate.html" title="class in io.micronaut.el.runtime">ELMethods.Candidate</a></dt>
+<dd>
+<div class="block">Returns the value of the <a href="./io/micronaut/el/runtime/ELMethods.Candidate.html#param-value"><code>value</code></a> record component.</div>
+</dd>
 <dt><a href="io/micronaut/el/processor/writer/ValueExpressionWriter.html" class="type-name-link" title="class in io.micronaut.el.processor.writer">ValueExpressionWriter</a> - Class in <a href="io/micronaut/el/processor/writer/package-summary.html">io.micronaut.el.processor.writer</a></dt>
 <dd>
 <div class="block">The writer of the <code>jakarta.el.ValueExpression</code> implementations.</div>
@@ -2569,6 +3129,10 @@ the order they are declared.</div>
 <dd>
 <div class="block">Returns an array containing the constants of this enum class, in
 the order they are declared.</div>
+</dd>
+<dt><a href="io/micronaut/el/runtime/ELMethods.Candidate.html#varArgs()" class="member-name-link">varArgs()</a> - Method in record class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELMethods.Candidate.html" title="class in io.micronaut.el.runtime">ELMethods.Candidate</a></dt>
+<dd>
+<div class="block">Returns the value of the <a href="./io/micronaut/el/runtime/ELMethods.Candidate.html#param-varArgs"><code>varArgs</code></a> record component.</div>
 </dd>
 <dt><a href="io/micronaut/el/annotation/ELEnvironment.html#variables()" class="member-name-link">variables()</a> - Element in annotation interface io.micronaut.el.annotation.<a href="io/micronaut/el/annotation/ELEnvironment.html" title="annotation interface in io.micronaut.el.annotation">ELEnvironment</a></dt>
 <dd>&nbsp;</dd>
@@ -2606,7 +3170,7 @@ the order they are declared.</div>
 <div class="block">Creates an instance of a <code>Written</code> record class.</div>
 </dd>
 </dl>
-<a href="#I:A">A</a>&nbsp;<a href="#I:B">B</a>&nbsp;<a href="#I:C">C</a>&nbsp;<a href="#I:D">D</a>&nbsp;<a href="#I:E">E</a>&nbsp;<a href="#I:F">F</a>&nbsp;<a href="#I:G">G</a>&nbsp;<a href="#I:H">H</a>&nbsp;<a href="#I:I">I</a>&nbsp;<a href="#I:K">K</a>&nbsp;<a href="#I:L">L</a>&nbsp;<a href="#I:M">M</a>&nbsp;<a href="#I:N">N</a>&nbsp;<a href="#I:O">O</a>&nbsp;<a href="#I:P">P</a>&nbsp;<a href="#I:Q">Q</a>&nbsp;<a href="#I:R">R</a>&nbsp;<a href="#I:S">S</a>&nbsp;<a href="#I:T">T</a>&nbsp;<a href="#I:U">U</a>&nbsp;<a href="#I:V">V</a>&nbsp;<a href="#I:W">W</a>&nbsp;<br><a href="allclasses-index.html">All&nbsp;Classes&nbsp;and&nbsp;Interfaces</a><span class="vertical-separator">|</span><a href="allpackages-index.html">All&nbsp;Packages</a><span class="vertical-separator">|</span><a href="serialized-form.html">Serialized&nbsp;Form</a></main>
+<a href="#I:A">A</a>&nbsp;<a href="#I:B">B</a>&nbsp;<a href="#I:C">C</a>&nbsp;<a href="#I:D">D</a>&nbsp;<a href="#I:E">E</a>&nbsp;<a href="#I:F">F</a>&nbsp;<a href="#I:G">G</a>&nbsp;<a href="#I:H">H</a>&nbsp;<a href="#I:I">I</a>&nbsp;<a href="#I:K">K</a>&nbsp;<a href="#I:L">L</a>&nbsp;<a href="#I:M">M</a>&nbsp;<a href="#I:N">N</a>&nbsp;<a href="#I:O">O</a>&nbsp;<a href="#I:P">P</a>&nbsp;<a href="#I:Q">Q</a>&nbsp;<a href="#I:R">R</a>&nbsp;<a href="#I:S">S</a>&nbsp;<a href="#I:T">T</a>&nbsp;<a href="#I:U">U</a>&nbsp;<a href="#I:V">V</a>&nbsp;<a href="#I:W">W</a>&nbsp;<br><a href="allclasses-index.html">All&nbsp;Classes&nbsp;and&nbsp;Interfaces</a><span class="vertical-separator">|</span><a href="allpackages-index.html">All&nbsp;Packages</a><span class="vertical-separator">|</span><a href="constant-values.html">Constant&nbsp;Field&nbsp;Values</a><span class="vertical-separator">|</span><a href="serialized-form.html">Serialized&nbsp;Form</a></main>
 </div>
 </body>
 </html>

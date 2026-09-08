@@ -168,8 +168,9 @@ three; a Java build additionally gets them as readable generated sources.</p>
 </div>
 <div class="paragraph">
 <p>The implementation passes the Jakarta Expression Language 6.0 Technology Compatibility Kit — 360 tests, no
-failures, none skipped — on every build; the <code>tests/jakarta-el-tck</code> module of the repository runs it, and a
-workflow publishes the evidence of each run.</p>
+failures, none skipped — in three modes on every build: compile-time generated expressions, the reflection-free
+interpreter with a service-loaded direct executor, and the interpreter with its optional reflection executor. A
+workflow publishes the evidence of the compiled run.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -227,23 +228,23 @@ all the benchmarks; its ratio reads as "how many times slower than the compiled 
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Micronaut compiled</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">8.63 ns</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">9.26 ns</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1.0x</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Micronaut interpreted</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">82.9 ns</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">9.6x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">101 ns</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10.9x</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Eclipse Expressly</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">367 ns</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">42.5x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">388 ns</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">41.9x</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Tomcat Jasper EL</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">449 ns</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">52.0x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">473 ns</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">51.1x</p></td>
 </tr>
 </tbody>
 </table>
@@ -253,7 +254,10 @@ all the benchmarks; its ratio reads as "how many times slower than the compiled 
 </div>
 </div>
 <div class="paragraph">
-<p>In this run a compiled expression evaluated in 8.6 ns on average — about 43 times faster than the reference implementation and 52 times faster than Tomcat&#8217;s. The gap is narrowest, around 6x, where every implementation resolves at runtime (a bean not declared with a type), and widest — one hundred times and more — wherever the others fall back to reflection: a method call on a <code>List</code> or a <code>String</code>, a lambda expression coerced to a functional interface, a stream pipeline. The interpreter of this module, the fallback for expressions created at runtime, averaged 83 ns — itself over 4 times faster than the reference implementation — because it walks its trees against the same compiled runtime.</p>
+<p>In this run a compiled expression evaluated in 9.3 ns on average — about 42 times faster than the reference implementation and 51 times faster than Tomcat&#8217;s. The gap is narrowest, around 8x, where every implementation resolves at runtime (a bean not declared with a type), and widest — one hundred times and more — wherever the others fall back to reflection: a method call on a <code>List</code> or a <code>String</code>, a lambda expression coerced to a functional interface, a stream pipeline. The interpreter of this module, the fallback for expressions created at runtime, averaged 101 ns — itself close to 4 times faster than the reference implementation — because it walks its trees against the same compiled runtime.</p>
+</div>
+<div class="paragraph">
+<p>The interpreted figures carry the sandbox of the <a href="#runtimeParsing">expressions parsed at runtime</a>, which asks of every base object an expression reaches whether it is allowed. That costs a few nanoseconds per resolution, and shows up as around a fifth on the expressions that do little else: a bare property read is 22.6 ns against the 16.5 ns it would be without the check. The compiled expressions do not go through it and are unaffected.</p>
 </div>
 <div class="paragraph">
 <p>Click the chart for the chart of every benchmark; the <code>benchmarks</code> module of the repository holds the harness,
@@ -1388,8 +1392,9 @@ and every bean can declare functions.</td>
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-A function on a bean is a compiled construct: the interpreter resolves functions through the
-<code>jakarta.el.FunctionMapper</code> of the context, which the specification defines over static methods only.
+A function on a bean is a compiled construct. Runtime-parsed functions are resolved through
+<code>io.micronaut.el.ELMethodExecutor</code> services; the optional reflection executor adapts the
+<code>jakarta.el.FunctionMapper</code> contract, which the specification defines over static methods only.
 </td>
 </tr>
 </table>
@@ -1407,11 +1412,11 @@ method as variables, under their names and with their declared types.</p>
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-The generated registry matches the expected type of a request: an expression declared with
+The generated registry matches an explicitly declared expected type exactly: an expression declared with
 <code>expectedType = String.class</code> is only returned for a request with <code>String.class</code>. A primitive and its wrapper
-are the same expectation, so <code>double.class</code> and <code>Double.class</code> match each other. A request for the same string
-with another type, <code>Object.class</code> included, is treated as a different expression, and is rejected as not compiled
-unless the interpreter module is present.
+are the same expectation, so <code>double.class</code> and <code>Double.class</code> match each other. Inferred expressions are also
+served for <code>Object.class</code>. When the compiler cannot infer a type more specific than <code>Object</code>, the generated
+expression adopts the caller&#8217;s requested type and applies the standard EL coercion rules.
 </td>
 </tr>
 </table>
@@ -2660,6 +2665,326 @@ expression string is built at runtime, add the interpreter module:</p>
 no generated source provides. Such an expression is parsed once, when it is created, and its tree is then
 evaluated by the interpreter.</p>
 </div>
+<div class="paragraph">
+<p>The interpreter resolves methods through <code>io.micronaut.el.ELMethodExecutor</code> services. The interpreter module includes
+direct executors for common String, collection, map, array, stream and optional operations, and for Micronaut bean
+introspections. To make arbitrary public Java methods, constructors and <code>FunctionMapper</code> functions available, also
+add the optional reflection executor:</p>
+</div>
+<div class="paragraph">
+<p>        <div class="listingblock multi-language-sample">
+<div class="title"></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">runtimeOnly(<span class="hljs-string">"io.micronaut.el:micronaut-jakarta-el-interpreter-reflection")</span></code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="maven">&lt;dependency&gt;
+    &lt;groupId&gt;io.micronaut.el&lt;/groupId&gt;
+    &lt;artifactId&gt;micronaut-jakarta-el-interpreter-reflection&lt;/artifactId&gt;
+    &lt;scope&gt;runtime&lt;/scope&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+</p>
+</div>
+<div class="sect1">
+<h2 id="_contributing_methods_without_reflection">Contributing Methods Without Reflection</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The reflection executor is not the only way to make a type callable. An application can declare the methods,
+constructors and functions its expressions use, and the interpreter dispatches them directly. Implement
+<a href="../api/io/micronaut/el/ELMethodContributor.html">ELMethodContributor</a> and name it in <code>META-INF/services/io.micronaut.el.ELMethodContributor</code>:</p>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">BookMethods</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package example;
+
+import io.micronaut.el.ELMethodContributor;
+import io.micronaut.el.ELMethodRegistry;
+
+public final class BookMethods implements ELMethodContributor { // <b class="conum">(1)</b>
+
+    @Override
+    public void contribute(ELMethodRegistry registry) {
+        registry
+            .method(Book.class, "title", String.class, Book::getTitle) // <b class="conum">(2)</b>
+            .method(Book.class, "discounted", double.class, Double.class, Book::discounted) // <b class="conum">(3)</b>
+            .method(Book.class, "label", String.class, String.class, Double.class,
+                (Book book, String currency, Double percent) -&gt; currency + book.discounted(percent)) // <b class="conum">(4)</b>
+            .method(Book.class, "tagged", String.class, new Class&lt;?&gt;[]{String.class, String[].class}, true,
+                (context, base, arguments) -&gt; ((Book) base).getTitle()
+                    + " " + String.join((String) arguments[0], (String[]) arguments[1])) // <b class="conum">(5)</b>
+            .method(Book.class, "summarised", String.class, Summary.class,
+                (Book book, Summary summary) -&gt; summary.of(book)) // <b class="conum">(6)</b>
+            .staticMethod(Math.class, "abs", long.class, long.class, Math::abs) // <b class="conum">(7)</b>
+            .constructor(Book.class, new Class&lt;?&gt;[]{String.class, String.class, double.class}, false,
+                (context, base, arguments) -&gt;
+                    new Book((String) arguments[0], (String) arguments[1], (Double) arguments[2])) // <b class="conum">(8)</b>
+            .function("fmt", "shout", TextFunctions.class, "shout", String.class, String.class,
+                TextFunctions::shout) // <b class="conum">(9)</b>
+            .functionalInterface(Summary.class,
+                (context, lambda) -&gt; book -&gt; String.valueOf(lambda.invoke(context, book))); // <b class="conum">(10)</b>
+    }
+
+    @Override
+    public int getOrder() { // <b class="conum">(11)</b>
+        return -100;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">BookMethods</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">package example
+
+import io.micronaut.el.ELMethodContributor
+import io.micronaut.el.ELMethodRegistry
+
+class BookMethods : ELMethodContributor { // <b class="conum">(1)</b>
+
+    override fun contribute(registry: ELMethodRegistry) {
+        registry
+            .method(Book::class.java, "title", String::class.java,
+                ELMethodRegistry.Call0 { book: Book -&gt; book.title }) // <b class="conum">(2)</b>
+            .method(Book::class.java, "discounted", Double::class.javaPrimitiveType!!, Double::class.java,
+                ELMethodRegistry.Call1 { book: Book, percent: Double? -&gt; book.discounted(percent!!) }) // <b class="conum">(3)</b>
+            .method(Book::class.java, "label", String::class.java, String::class.java, Double::class.java,
+                ELMethodRegistry.Call2 { book: Book, currency: String?, percent: Double? -&gt;
+                    currency + book.discounted(percent!!)
+                }) // <b class="conum">(4)</b>
+            .method(Book::class.java, "tagged", String::class.java,
+                arrayOf&lt;Class&lt;*&gt;&gt;(String::class.java, Array&lt;String&gt;::class.java), true,
+                { _, base, arguments -&gt;
+                    (base as Book).title + " " +
+                        java.lang.String.join(arguments[0] as String, *(arguments[1] as Array&lt;String&gt;))
+                }) // <b class="conum">(5)</b>
+            .method(Book::class.java, "summarised", String::class.java, Summary::class.java,
+                ELMethodRegistry.Call1 { book: Book, summary: Summary? -&gt; summary!!.of(book) }) // <b class="conum">(6)</b>
+            .staticMethod(Math::class.java, "abs", Long::class.javaPrimitiveType!!, Long::class.java,
+                ELMethodRegistry.Fn1 { value: Long? -&gt; Math.abs(value!!) }) // <b class="conum">(7)</b>
+            .constructor(Book::class.java,
+                arrayOf&lt;Class&lt;*&gt;&gt;(String::class.java, String::class.java, Double::class.javaPrimitiveType!!),
+                false,
+                { _, _, arguments -&gt;
+                    Book(arguments[0] as String, arguments[1] as String, arguments[2] as Double)
+                }) // <b class="conum">(8)</b>
+            .function("fmt", "shout", TextFunctions::class.java, "shout", String::class.java,
+                String::class.java,
+                ELMethodRegistry.Fn1 { text: String? -&gt; TextFunctions.shout(text!!) }) // <b class="conum">(9)</b>
+            .functionalInterface(Summary::class.java) { context, lambda -&gt;
+                Summary { book -&gt; lambda.invoke(context, book).toString() }
+            } // <b class="conum">(10)</b>
+    }
+
+    override fun getOrder(): Int = -100 // <b class="conum">(11)</b>
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">BookMethods</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">package example
+
+import io.micronaut.el.ELMethodContributor
+import io.micronaut.el.ELMethodRegistry
+
+class BookMethods implements ELMethodContributor { // <b class="conum">(1)</b>
+
+    @Override
+    void contribute(ELMethodRegistry registry) {
+        registry
+            .method(Book, 'title', String, { Book book -&gt; book.title }) // <b class="conum">(2)</b>
+            .method(Book, 'discounted', double, Double, { Book book, Double percent -&gt; book.discounted(percent) }) // <b class="conum">(3)</b>
+            .method(Book, 'label', String, String, Double,
+                { Book book, String currency, Double percent -&gt; currency + book.discounted(percent) }) // <b class="conum">(4)</b>
+            .method(Book, 'tagged', String, [String, String[]] as Class&lt;?&gt;[], true,
+                { context, base, arguments -&gt;
+                    ((Book) base).title + ' ' + String.join((String) arguments[0], (String[]) arguments[1])
+                }) // <b class="conum">(5)</b>
+            .method(Book, 'summarised', String, Summary,
+                { Book book, Summary summary -&gt; summary.of(book) }) // <b class="conum">(6)</b>
+            .staticMethod(Math, 'abs', long, long, { Long value -&gt; Math.abs(value) }) // <b class="conum">(7)</b>
+            .constructor(Book, [String, String, double] as Class&lt;?&gt;[], false,
+                { context, base, arguments -&gt;
+                    new Book((String) arguments[0], (String) arguments[1], (Double) arguments[2])
+                }) // <b class="conum">(8)</b>
+            .function('fmt', 'shout', TextFunctions, 'shout', String, String,
+                { String text -&gt; TextFunctions.shout(text) }) // <b class="conum">(9)</b>
+            .functionalInterface(Summary,
+                { context, lambda -&gt; { Book book -&gt; String.valueOf(lambda.invoke(context, book)) } as Summary }) // <b class="conum">(10)</b>
+    }
+
+    @Override
+    int getOrder() { // <b class="conum">(11)</b>
+        -100
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The contributor, named in <code>META-INF/services/io.micronaut.el.ELMethodContributor</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>An instance method taking no argument.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>An instance method taking one argument, whose declared type the argument is coerced to.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>An instance method taking two arguments.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>An instance method of any arity, here of variable arity: the trailing arguments are packed into an array of
+the component type of the last parameter.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>A method taking a functional interface the application declares, which callout 10 says how to implement.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>A static method, callable as <code>${Math.abs(-7)}</code> once the class is imported.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="8"></i><b>8</b></td>
+<td>A constructor, callable as <code>${Book('Jakarta EL', 'reference', 20)}</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="9"></i><b>9</b></td>
+<td>A function, callable as <code>${fmt:shout('hi')}</code>, which replaces the <code>jakarta.el.FunctionMapper</code> lookup the
+specification defines in terms of <code>java.lang.reflect.Method</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="10"></i><b>10</b></td>
+<td>How a lambda expression becomes an instance of an interface the application declares, which is the one
+coercion that cannot be resolved while compiling.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="11"></i><b>11</b></td>
+<td>The order contributors are consulted in, following the Micronaut <code>Ordered</code> contract.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Every registration has the same shape — the declared signature, then the code that runs it:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Registration</th>
+<th class="tableblock halign-left valign-top">What it declares</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>method(type, name, returnType, call)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An instance method taking no argument</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>method(type, name, returnType, first, call)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An instance method taking one argument</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>method(type, name, returnType, first, second, call)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An instance method taking two arguments</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>method(type, name, returnType, parameterTypes, varArgs, invocation)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An instance method of any arity, of variable arity when <code>varArgs</code> is set, which requires an array as the last
+parameter</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>method(type, name, returnType, parameterTypes, varArgs, annotations, invocation)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The same, carrying the annotations a <code>jakarta.el.MethodExpression</code> reports through <code>MethodReference</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>staticMethod(type, name, returnType, call)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A static method taking no argument</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>staticMethod(type, name, returnType, first, call)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A static method taking one argument</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>staticMethod(type, name, returnType, first, second, call)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A static method taking two arguments</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>staticMethod(type, name, returnType, parameterTypes, varArgs, invocation)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A static method of any arity</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>constructor(type, first, call)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A constructor taking one argument, callable as <code>Type(argument)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>constructor(type, parameterTypes, varArgs, invocation)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A constructor of any arity</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>function(prefix, localName, declaringType, methodName, returnType, first, call)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A function taking one argument, callable as <code>prefix:localName(argument)</code>, or as <code>localName(argument)</code> when the
+prefix is empty</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>function(prefix, localName, declaringType, methodName, returnType, parameterTypes, varArgs, invocation)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A function of any arity</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>functionalInterface(type, factory)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">How a lambda expression becomes an instance of a functional interface the application declares</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>A method registered on an interface is callable on every type implementing it, since the registry merges what
+the supertypes and the interfaces of a type declare into it. A constructor is not inherited that way: it
+constructs the type it was registered for.</p>
+</div>
+<div class="paragraph">
+<p>A registration carries the declared signature next to the code that runs it, because the signature is what the
+specification needs and what a method reference cannot supply on its own: the overload selection of the section
+1.6, the coercions of the section 1.23 and the metadata a <code>jakarta.el.MethodExpression</code> reports are all defined
+in terms of the declared parameter types. <a href="../api/io/micronaut/el/ELMethodRegistry.html">ELMethodRegistry</a> does the rest — it selects the overload,
+coerces the arguments, packs the variable arity ones, and builds an identity that compares equal to the same
+expression compiled at build time.</p>
+</div>
+<div class="paragraph">
+<p>The methods it produces are reusable, so a call site resolves once and invokes the same method on every later
+evaluation; only an overloaded name is resolved again per call, since the arguments then decide which overload
+applies.</p>
+</div>
+<div class="paragraph">
+<p>A contributor is consulted before the built-in executors, and long before the reflection executor. It runs once,
+the first time an expression needs what it registered, so it cannot see the <code>jakarta.el.ELContext</code>: anything
+that depends on the context belongs on the <a href="../api/io/micronaut/el/ELMethodExecutor.html">ELMethodExecutor</a> contract instead, which resolves a method
+per call.</p>
+</div>
+<div class="paragraph">
+<p>To leave an executor out altogether — a deployment that must not reach a method reflectively, whatever a
+transitive dependency put on the classpath — construct the parser with the executors it may use:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">new CompiledExpressionFactory(List.of(),
+    new InterpretingELExpressionParser(List.of(new ContributedELMethodExecutor(List.of(new BookMethods())))));</code></pre>
+</div>
+</div>
 <div class="admonitionblock warning">
 <table>
 <tr>
@@ -2667,17 +2992,18 @@ evaluated by the interpreter.</p>
 <i class="fa icon-warning" title="Warning"></i>
 </td>
 <td class="content">
-Runtime expressions are executable application code, not sandboxed data. The standard Jakarta EL
-context can construct imported classes and invoke their public static and instance methods. Only parse strings
-from a fully trusted source; an operator or database field that an untrusted user can modify must not be passed
-directly to the expression factory.
+Runtime expressions are executable application code, not sandboxed data. When the reflection executor is
+present, the standard Jakarta EL context can construct imported classes and invoke their public static and instance
+methods. Only parse strings from a fully trusted source; an operator or database field that an untrusted user can
+modify must not be passed directly to the expression factory.
 </td>
 </tr>
 </table>
 </div>
 <div class="paragraph">
 <p>To bound CPU, memory and stack use, the parser rejects an expression longer than 16,384 characters, containing
-more than 1,024 tokens or nested more than 128 levels.</p>
+more than 1,024 tokens, or nested deeper than <code>ELParser.DEFAULT_MAX_DEPTH</code>, which is 100 levels. Parse with
+<code>ELParser.parse(String, int)</code> to raise the depth for expressions a tool generates.</p>
 </div>
 <div class="listingblock multi-language-sample">
 <div class="title">RuntimeExpressionTest</div>
@@ -2804,6 +3130,218 @@ remains the fast one and the interpreted path is the fallback.</p>
 <p>The parser is a module of its own for the same reason: the compiler is not its only consumer, and any code that
 needs to inspect an expression without generating one can depend on it alone.</p>
 </div>
+<div class="paragraph">
+<p>One difference between the two paths is not a defect. The compiler selects an overload from the <strong>static</strong> types
+of the arguments, where the interpreter has only their runtime types: <code>${Math.max(book.pages, 1)}</code> compiles to
+<code>Math.max(long, long)</code>, while at runtime an <code>Integer</code> and a <code>Long</code> match <code>max(int,int)</code>, <code>max(long,long)</code>,
+<code>max(float,float)</code> and <code>max(double,double)</code> equally well, which makes the reference ambiguous, as it is for
+both reference implementations. Declaring an expression therefore resolves overloads that a string built at
+runtime cannot.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_executable_methods_of_beans">Executable Methods Of Beans</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A bean introspection is not the only description of a type the compiler emits. Every method annotated
+<code>@Executable</code> — directly, or through an annotation that is itself meta-annotated with it — is compiled into the
+<code>BeanDefinition</code> of its bean, and a great many beans carry that metadata without carrying an introspection:
+anything AOP-advised, anything a framework marks executable for its own dispatch, scheduled methods, message
+listeners. <code>micronaut-jakarta-el</code> registers <a href="../api/io/micronaut/el/resolver/ExecutableMethodELExecutor.html">ExecutableMethodELExecutor</a> as an
+<code>io.micronaut.el.ELMethodExecutor</code> service, so <code>${greeter.greet('world')}</code> invokes such a method directly, with
+no reflection and therefore no reflection registration in a GraalVM native image, and without the reflection
+executor being on the classpath at all.</p>
+</div>
+<div class="paragraph">
+<p>It is consulted after the bean introspections, which are the more precise description where they exist, and
+before the reflective executor, which stays the last resort. A type that is neither introspected nor a bean of
+the context is left exactly where it was.</p>
+</div>
+<div class="paragraph">
+<p>Unlike an introspection, an executable method is reached through a bean context, and an application may run
+more than one, so the executor reads the context of each call rather than a static holder. Register it on the
+<code>ELContext</code> the expression is evaluated with:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">context.putContext(BeanDefinitionRegistry.class, beanContext); <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>BeanContext.class</code> works as the key as well; <code>BeanContext</code> is a <code>BeanDefinitionRegistry</code>, which is all the
+executor needs — it reads definitions and never looks a bean up or creates one.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>new CompiledELContext(beanContext)</code> does this for you, and additionally puts the executor into the resolver
+chain, so expressions compiled at compilation time resolve the same methods the same way. A context that
+carries no registry is not one the executor can read, so it declines and the chain resolves the method as it
+did before.</p>
+</div>
+<div class="sect2">
+<h3 id="_when_a_method_does_not_resolve">When A Method Does Not Resolve</h3>
+<div class="paragraph">
+<p>Registering the bean context is easy to forget, and forgetting it used to read as a method that plainly exists
+not being found. A method that no executor and no resolver answers for therefore reports which of the
+descriptions it could have been reached through did not carry it, and what to do about each. A context carrying
+no bean context, with the reflection module absent:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">jakarta.el.MethodNotFoundException: Cannot find the method 'greet' of com.example.Greeter accepting 1
+argument(s). No bean context is registered in this ELContext, so the executable methods of the bean definitions
+were not consulted: register one with context.putContext(BeanDefinitionRegistry.class, beanContext), or
+evaluate the expression with new CompiledELContext(beanContext). The type carries no bean introspection either:
+annotate it with @Introspected, and the method with @Executable, to have the method dispatched from generated
+metadata. No reflective executor is registered either, so the method was not looked up reflectively: add the
+micronaut-jakarta-el-interpreter-reflection module to resolve any public method.</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A bean context that <strong>is</strong> registered says so instead, and the remedy it names is the annotation the method is
+missing rather than the context:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">jakarta.el.MethodNotFoundException: Cannot find the method 'hidden' of com.example.Greeter accepting 1
+argument(s). com.example.Greeter is a bean of the bean context registered in this ELContext, but its definition
+carries no executable method named 'hidden': annotate the method with @Executable, directly or through an
+annotation meta-annotated with it, so that it is compiled into the bean definition. [...]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A name that is carried, but not with that arity, reports the signatures that were found next to the number of
+arguments that selected none of them, so an overload that does not match is not mistaken for a method that is
+absent. None of this runs while an expression evaluates: every check is made once, on the path that is about to
+throw, and which executor resolves a method is unchanged.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_expressions_built_from_untrusted_input">Expressions Built From Untrusted Input</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>An expression declared with <code>@ELExpression</code> is source of the application, as trusted as the code around it.
+An expression string built at runtime is not, and the specification resolves properties, methods, static
+members and constructors dynamically: <code>${Runtime.getRuntime().exec(&#8230;&#8203;)}</code> is a valid expression, and so is
+<code>${bean.getClass().getClassLoader()}</code>. Adding the interpreter module to the classpath must not turn
+<code>ExpressionFactory.createValueExpression</code> into a way to run arbitrary code.</p>
+</div>
+<div class="paragraph">
+<p>Every expression the interpreter creates is therefore evaluated under an <a href="../api/io/micronaut/el/ELSandbox.html">ELSandbox</a>, which is
+consulted for the base object of each property access and method invocation, for the class of each static
+reference and for the class of each constructor reference. <code>ELSandbox.standard()</code>, the default, denies:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>java.lang.Class</code>, <code>ClassLoader</code>, <code>Module</code>, <code>ModuleLayer</code> and <code>Package</code>, and every subtype of them;</p>
+</li>
+<li>
+<p><code>Runtime</code>, <code>Process</code>, <code>ProcessBuilder</code>, <code>ProcessHandle</code>, <code>System</code>, <code>Thread</code> and <code>ThreadGroup</code>;</p>
+</li>
+<li>
+<p><code>java.io.File</code>, <code>java.net.URI</code>, <code>java.net.URL</code>, <code>java.nio.file.Path</code> and <code>java.util.ServiceLoader</code>;</p>
+</li>
+<li>
+<p><code>jakarta.el.ELContext</code> and <code>jakarta.el.ELResolver</code>, through which an expression would widen its own sandbox;</p>
+</li>
+<li>
+<p>everything in <code>java.lang.reflect</code>, <code>java.lang.invoke</code>, <code>java.lang.module</code>, <code>java.security</code>, <code>java.rmi</code>,
+<code>javax.naming</code>, <code>javax.script</code>, <code>jdk</code> and <code>sun</code>;</p>
+</li>
+<li>
+<p>the members <code>class</code>, <code>getClass</code>, <code>getClassLoader</code>, <code>getModule</code>, <code>getProtectionDomain</code>, <code>wait</code>, <code>notify</code> and
+<code>notifyAll</code> of any type.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Everything else the language offers is untouched: the operators, the coercions, the collection operations,
+the lambdas, and the properties and methods of the beans of the application. An expression that reaches a
+denied type fails with an <a href="../api/io/micronaut/el/ELSandboxException.html">ELSandboxException</a>. The Technology Compatibility Kit passes with the
+sandbox in place.</p>
+</div>
+<div class="paragraph">
+<p>Expressions compiled at compilation time do not go through it, so a declared expression may use whatever its
+author wrote.</p>
+</div>
+<div class="paragraph">
+<p>To widen, narrow or remove the sandbox, register one on the context the expression is evaluated with:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">context.putContext(ELSandbox.class, ELSandbox.UNRESTRICTED);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>An expression only reaches a denied type through a bean of the application that exposes one, since the
+members that lead to one from any object are denied. Reaching one is not the same as returning it, so the
+value an expression hands back is checked as well, as coerced to the expected type: <code>${bean.type}</code> requested
+as <code>Object</code> fails, and requested as <code>String</code> yields the coercion of it, through which nothing of the denied
+type escapes. Only the value itself is examined; a denied object the application put inside a collection it
+exposes is not searched for.</p>
+</div>
+<div class="paragraph">
+<p>The sandbox bounds what an expression reaches; it does not bound what the beans it reaches then do, and an
+argument the application&#8217;s own method chose to accept is its own business. It is a way to keep a runtime
+expression from escaping the object graph it was given, not a licence to evaluate expressions written by an
+attacker.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_bounded_parsing">Bounded Parsing</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The parser is a recursive descent implementation and the tree it produces is walked recursively, so an
+expression nested deeply enough would exhaust the call stack. <code>ELParser</code> rejects an expression nested more
+than <code>ELParser.DEFAULT_MAX_DEPTH</code> levels deep with an <code>ELParsingException</code>, which the interpreter reports the
+way it reports any other syntax error. No expression a person writes comes close to the limit; parse with
+<code>ELParser.parse(expression, maxDepth)</code> to raise it for an expression a tool generated.</p>
+</div>
+<div class="paragraph">
+<p>The interpreter keeps the trees it parsed in a bounded cache, so a stream of distinct expression strings
+cannot grow the heap.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_deliberate_divergences">Deliberate Divergences</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Four behaviours differ from Expressly, from Tomcat Jasper EL, or from both. Each is a place the specification
+leaves open, and the Technology Compatibility Kit passes either way, so the reading kept here is the one that
+is the least surprising.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The right operand of a relational operator whose left operand is null is evaluated, so <code>${null gt x}</code>
+reports that <code>x</code> cannot be resolved and <code>${null gt (y=1)}</code> performs the assignment. Both references skip it
+and answer <code>false</code>; only <code>&amp;&amp;</code>, <code>||</code> and <code>?:</code> are specified to short-circuit.</p>
+</li>
+<li>
+<p>A set or map construction iterates in the order it was written in, so <code>${{'b','a'}}</code> is <code>[b, a]</code>. Both
+references use a hash set and a hash map, whose order is neither the one written nor sorted.</p>
+</li>
+<li>
+<p>The index of <code>${null[expr]}</code> is evaluated. Expressly skips it, and Tomcat rejects a null base outright.</p>
+</li>
+<li>
+<p>A backslash in literal text follows the escapes of the section 1.2.2 and no others, so <code>\'</code> stays <code>\'</code> and
+<code>\\</code> becomes <code>\</code>. Expressly drops every backslash, and Tomcat keeps <code>\\</code> as <code>\\</code>.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
 
 <h1 id="reflection"><a class="anchor" href="#reflection"></a>9 When Reflection Is Used</h1>
 
@@ -2815,12 +3353,22 @@ needs to inspect an expression without generating one can depend on it alone.</p
 
 
 <div class="paragraph">
-<p>The paths a typical expression takes — declared variables, introspected beans, operators, lambda expressions,
-streams, the expression lookup itself — use no reflection at all, which is what the <a href="#whyCompiled">benchmarks</a>
-measure and what makes the module work in a GraalVM native image without configuration.</p>
+<p>The paths a typical compiled expression takes — declared variables, introspected beans, operators, lambda
+expressions, streams and the expression lookup itself — use no reflection at all. Runtime-parsed expressions use the
+same direct executors for common values and introspected beans; arbitrary reflective execution is supplied separately
+by <code>micronaut-jakarta-el-interpreter-reflection</code>.</p>
 </div>
 <div class="paragraph">
-<p>Reflection remains only where the specification itself defines a behaviour in reflective terms:</p>
+<p>Where reflection is allowed to live is a property of the module. <code>micronaut-jakarta-el-parser</code> and
+<code>micronaut-jakarta-el-interpreter</code> name no <code>java.lang.reflect</code> type at all: the interpreter dispatches through the
+<code>ELMethodExecutor</code> services and nothing else. <code>micronaut-jakarta-el-interpreter-reflection</code> is where dispatch by
+reflection belongs, and it contributes both the reflective executor and the reflective <code>ELResolver</code> of the chain as
+services, so no other module depends on it at compile time. <code>micronaut-jakarta-el-processor</code> reflects only while
+compiling, never at runtime.</p>
+</div>
+<div class="paragraph">
+<p>What remains in <code>micronaut-jakarta-el</code> is there because the specification or the Jakarta EL API puts it there, never
+to dispatch a runtime-parsed expression:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -2830,22 +3378,39 @@ resolvers — annotate the type with <code>@Introspected</code> (and methods wit
 dispatch instead;</p>
 </li>
 <li>
-<p>a <code>jakarta.el.FunctionMapper</code>, <code>MethodExpression.getMethodInfo</code> and <code>getMethodReference</code>, whose contracts are
-<code>java.lang.reflect</code> types;</p>
+<p>runtime-parsed methods and <code>jakarta.el.FunctionMapper</code> functions when the optional reflection executor is present;
+the mapper&#8217;s contract, like <code>jakarta.el.ExpressionFactory.getInitFunctionMap</code>, is declared in terms of
+<code>java.lang.reflect.Method</code>;</p>
 </li>
 <li>
-<p>an expanded variable arity call, <code>${bean.join('-', 'a', 'b')}</code>, of a method that takes the trailing arguments
-as an array: the bean introspection does not record which methods were declared with varargs, so the standard
-resolvers select and pack the call;</p>
+<p><code>MethodExpression</code> metadata: <code>getMethodInfo</code> and <code>getMethodReference</code> report a name, a return type, parameter
+types and annotations reflectively, for a compiled expression as well as a reflection-backed one, while <code>invoke</code>
+itself is generated code and never reflects;</p>
 </li>
 <li>
-<p>coercing a <code>LambdaExpression</code> held in a variable to a functional interface (a lambda written in place is
-compiled to the interface directly), and coercing a string through a <code>PropertyEditor</code>;</p>
+<p>coercing a lambda expression to a functional interface an application declares, when the method taking it is
+selected by the resolver chain at evaluation time and the interface is therefore unknown until then. A lambda
+written against a parameter type the compiler resolves is compiled into the interface directly, and the
+functional interfaces of the platform — <code>Supplier</code>, <code>Function</code>, <code>BiFunction</code>, <code>UnaryOperator</code>,
+<code>BinaryOperator</code>, <code>Consumer</code>, <code>BiConsumer</code>, <code>Predicate</code>, <code>BiPredicate</code>, <code>Comparator</code>, <code>Runnable</code> and
+<code>Callable</code> — are implemented without reflection;</p>
 </li>
 <li>
-<p>array access, which the JDK only exposes reflectively.</p>
+<p>coercing a string through a <code>PropertyEditor</code>;</p>
+</li>
+<li>
+<p>any runtime-parsed method for which no direct executor is registered and the reflection executor is absent simply
+fails to resolve; it does not silently fall back to reflection.</p>
 </li>
 </ul>
+</div>
+<div class="paragraph">
+<p>The boundary is checked rather than described: <code>./gradlew check</code> runs a <code>checkstyleReflection</code> task over
+<code>micronaut-jakarta-el</code>, <code>micronaut-jakarta-el-parser</code>, <code>micronaut-jakarta-el-interpreter</code> and
+<code>micronaut-jakarta-el-annotations</code> that rejects an import of <code>java.lang.reflect</code> or <code>java.lang.invoke</code>, the
+same names written out, and the calls that read a class for a member without naming either package. The rules
+are in <code>gradle/checkstyle/reflection.xml</code>, with every exception listed in the suppressions next to it: the two
+signatures the Jakarta EL API dictates, and the sandbox, which names the packages in order to deny them.</p>
 </div>
 <div class="paragraph">
 <p>Even these are served through a per-class method cache, so they stay fast — the <code>staticMethod</code> and
@@ -2859,15 +3424,10 @@ compiled to the interface directly), and coercing a string through a <code>Prope
 </td>
 <td class="content">
 To keep a method invocation off the reflective path, annotate the method with <code>@Executable</code> so that it
-enters the bean introspection of its type.
+enters the bean introspection of its type, or provide an <code>ELMethodExecutor</code> backed by generated dispatch.
 </td>
 </tr>
 </table>
-</div>
-<div class="paragraph">
-<p>Serializing an expression, which section 1.14 of the specification requires of every one of them, needs no
-configuration either: the annotation processor declares the classes it generates for the declared expressions
-next to the registry it generates them into, and the runtime declares its own hierarchy.</p>
 </div>
 
 <h1 id="repository"><a class="anchor" href="#repository"></a>10 Repository</h1>
