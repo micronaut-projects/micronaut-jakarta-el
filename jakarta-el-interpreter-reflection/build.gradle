@@ -2,6 +2,11 @@ plugins {
     id "io.micronaut.build.internal.jakarta-el-module"
 }
 
+noReflection {
+    // the one module of the runtime that reflects: the executor, the resolver and the proxy factory it contributes
+    allowIn 'io.micronaut.el.interpreter.reflection.*'
+}
+
 dependencies {
     // the reflective executor and resolver are contributed as services of the core module; the interpreter
     // is what usually loads them, but a compiled expression reaches them through the resolver chain too, so

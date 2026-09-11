@@ -272,7 +272,11 @@ public interface ELSandbox {
         }
 
         private static boolean implementsDenied(Class<?> type) {
-            for (Class<?> anInterface : type.getInterfaces()) {
+            // a denied interface is denied however far up the hierarchy it is implemented, and the interfaces of a
+            // class have no other source than the class itself
+            @SuppressWarnings("NoReflection")
+            Class<?>[] interfaces = type.getInterfaces();
+            for (Class<?> anInterface : interfaces) {
                 if (DENIED_TYPES.contains(anInterface.getName()) || implementsDenied(anInterface)) {
                     return true;
                 }

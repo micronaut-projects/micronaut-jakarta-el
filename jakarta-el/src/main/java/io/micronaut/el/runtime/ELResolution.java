@@ -605,7 +605,7 @@ public final class ELResolution {
             }
         }
         throw new ELException("No instance of " + type.getName() + " is available to the functions it declares."
-            + " Register one with ELContext.putContext(" + type.getSimpleName() + ".class, instance), or a"
+            + " Register one with ELContext.putContext(" + type.getName().replace('$', '.') + ".class, instance), or a"
             + " provider with ELContext.putContext(ELBeanProvider.class, provider)");
     }
 

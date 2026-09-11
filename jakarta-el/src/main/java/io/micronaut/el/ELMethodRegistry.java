@@ -870,7 +870,11 @@ public final class ELMethodRegistry {
                     }
                 });
             }
-            for (Class<?> anInterface : type.getInterfaces()) {
+            // a registration on an interface applies to the types implementing it, and the interfaces of a class
+            // have no other source than the class itself
+            @SuppressWarnings("NoReflection")
+            Class<?>[] interfaces = type.getInterfaces();
+            for (Class<?> anInterface : interfaces) {
                 collect(anInterface, into, false);
             }
             Class<?> superclass = type.getSuperclass();

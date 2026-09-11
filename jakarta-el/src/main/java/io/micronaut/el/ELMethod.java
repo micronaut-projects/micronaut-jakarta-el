@@ -84,7 +84,10 @@ public interface ELMethod extends Serializable {
      * @return The method annotations
      */
     default Annotation[] synthesizeAnnotations() {
-        return getAnnotationMetadata().synthesizeAll();
+        // jakarta.el.MethodReference hands out annotation instances, which only synthesis produces from metadata
+        @SuppressWarnings("NoReflection")
+        Annotation[] annotations = getAnnotationMetadata().synthesizeAll();
+        return annotations;
     }
 
     /**

@@ -283,10 +283,14 @@ members must be available.
 | `micronaut-jakarta-el`                       | Only where the specification defines the behaviour in reflective terms, never to dispatch a runtime-parsed expression — see the table below                                              |
 | `micronaut-jakarta-el-processor`             | Compile-time only, in the annotation processor; none of it reaches the runtime                                                                                                          |
 
-The boundary is enforced by a `checkstyleReflection` task that `check` depends on, so it fails the build
-rather than relying on review: an import of `java.lang.reflect` or `java.lang.invoke`, those names written
-out, or a call that reads a class for a member is rejected in every module but the reflective one and the
-annotation processor. The rules and the full list of exceptions are in `gradle/checkstyle/`.
+The boundary is enforced while the modules compile, by the `NoReflection` check of
+[errorprone-no-reflection](https://github.com/micronaut-projects/errorprone-no-reflection), so it fails the build
+rather than relying on review. The check matches the method a call resolves to rather than how the source spells it,
+and names the kind of reflection the call reaches for: looking a member up or invoking it, and also what does not look
+like reflection, such as synthesizing an annotation, coercing to an enum by name, or reading the interfaces of a class.
+The reflective module and the annotation processor are allowed all of it in their builds, and the modules that load
+the services the runtime is extended with are allowed that. Anywhere else, a call the specification leaves no
+alternative to is suppressed on the variable holding its result, with the reason next to it.
 
 What remains in `micronaut-jakarta-el` is there because the Jakarta EL API or the specification puts it there:
 `jakarta.el.FunctionMapper.resolveFunction` and `ExpressionFactory.getInitFunctionMap` are declared in terms of
