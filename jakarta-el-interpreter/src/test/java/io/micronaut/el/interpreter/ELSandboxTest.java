@@ -37,6 +37,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -52,7 +53,6 @@ class ELSandboxTest {
 
     @Test
     void theProcessIsOutOfReach() {
-        assertDenied("${Runtime}");
         assertDenied("${Runtime.getRuntime()}");
         assertDenied("${Runtime.getRuntime().exec('/usr/bin/true')}");
         assertDenied("${ProcessBuilder('sh','-c','id').start()}");
@@ -85,17 +85,17 @@ class ELSandboxTest {
 
     @Test
     void aDeniedTypeIsDeniedThroughAnAssignmentAndThroughAMethodExpression() {
-        assertDenied("${bean.class = 1}");
-        ELContext context = context();
+        CompiledELContext context = context().setBean("described", new DescribedHolder());
+        assertDenied(context, "${described.type.name = 'x'}");
         MethodExpression expression =
             factory.createMethodExpression(context, "${bean.getClass}", Object.class, new Class<?>[0]);
         assertThrows(ELSandboxException.class, () -> expression.invoke(context, new Object[0]));
     }
 
     @Test
-    void everyOperationOfAMethodExpressionIsDeniedNotOnlyItsInvocation() {
-        ELContext context = context();
-        MethodExpression expression = factory.createMethodExpression(context, "${bean.getClass}",
+    void everyOperationOfAMethodExpressionOnADeniedBaseIsDeniedNotOnlyItsInvocation() {
+        CompiledELContext context = context().setBean("described", new DescribedHolder());
+        MethodExpression expression = factory.createMethodExpression(context, "${described.type.getName}",
             Object.class, new Class<?>[0]);
 
         assertThrows(ELSandboxException.class, () -> expression.invoke(context, new Object[0]));
@@ -196,8 +196,9 @@ class ELSandboxTest {
     void thePropertyOfTheValueAnOptionalHoldsIsResolvedUnderTheSandbox() {
         // the resolver of the specification hands the property of the value on to the resolver of the context,
         // which must not be where the sandbox is left behind
-        CompiledELContext context = context().setBean("optional", Optional.of("hello"));
-        assertDenied(context, "${optional.class}");
+        assertDenied(context().setBean("optional", Optional.of("hello")), "${optional.class}");
+        CompiledELContext unrestricted = unrestricted(context().setBean("optional", Optional.of("hello")));
+        assertEquals(String.class, evaluate(unrestricted, "${optional.class}"));
     }
 
     @Test
@@ -205,24 +206,18 @@ class ELSandboxTest {
         CompiledELContext context = context();
         context.getImportHandler().importStatic("java.lang.Integer.TYPE");
         assertDenied(context, "${TYPE}");
+        CompiledELContext unrestricted = unrestricted(context());
+        unrestricted.getImportHandler().importStatic("java.lang.Integer.TYPE");
+        assertEquals(int.class, evaluate(unrestricted, "${TYPE}"));
     }
 
     @Test
     void aFunctionTheFunctionMapperBindsIsInvokedUnderTheSandbox() throws NoSuchMethodException {
         // the reflective executor binds the functions of the mapper and invokes them reflectively
         Method runtime = Runtime.class.getMethod("getRuntime");
-        CompiledELContext context = new CompiledELContext() {
-            @Override
-            public FunctionMapper getFunctionMapper() {
-                return new FunctionMapper() {
-                    @Override
-                    public Method resolveFunction(String prefix, String localName) {
-                        return "runtime".equals(localName) ? runtime : null;
-                    }
-                };
-            }
-        };
-        assertDenied(context, "${f:runtime()}");
+        assertDenied(runtimeFunctionContext(runtime), "${rt:runtime()}");
+        CompiledELContext unrestricted = unrestricted(runtimeFunctionContext(runtime));
+        assertSame(Runtime.getRuntime(), evaluate(unrestricted, "${rt:runtime()}"));
     }
 
     @Test
@@ -257,8 +252,7 @@ class ELSandboxTest {
 
     @Test
     void theSandboxOfTheContextReplacesTheStandardOne() {
-        CompiledELContext context = context();
-        context.putContext(ELSandbox.class, ELSandbox.UNRESTRICTED);
+        CompiledELContext context = unrestricted(context());
         assertEquals("java.lang.String", evaluate(context, "${bean.getClass().getName()}"));
     }
 
@@ -266,8 +260,7 @@ class ELSandboxTest {
     void theSandboxIsReadFromTheContextOfEachEvaluation() {
         // the interpreter caches the syntax tree of an expression string and shares the evaluators compiled
         // from it, so a sandbox baked into them would leak from one context to the next
-        CompiledELContext open = context();
-        open.putContext(ELSandbox.class, ELSandbox.UNRESTRICTED);
+        CompiledELContext open = unrestricted(context());
         CompiledELContext standard = context();
         assertEquals("java.lang.String", evaluate(open, "${bean.getClass().getName()}"));
         ValueExpression shared =
@@ -309,6 +302,25 @@ class ELSandboxTest {
             .setBean("bean", "hello")
             .setBean("list", new ArrayList<>(List.of(1L, 2L, 3L)))
             .setBean("map", new LinkedHashMap<>(Map.of("k", "v")));
+    }
+
+    private static CompiledELContext unrestricted(CompiledELContext context) {
+        context.putContext(ELSandbox.class, ELSandbox.UNRESTRICTED);
+        return context;
+    }
+
+    private static CompiledELContext runtimeFunctionContext(Method runtime) {
+        return new CompiledELContext() {
+            @Override
+            public FunctionMapper getFunctionMapper() {
+                return new FunctionMapper() {
+                    @Override
+                    public Method resolveFunction(String prefix, String localName) {
+                        return "rt".equals(prefix) && "runtime".equals(localName) ? runtime : null;
+                    }
+                };
+            }
+        };
     }
 
     private static final class SecureClassLoaderSubclass extends ClassLoader {

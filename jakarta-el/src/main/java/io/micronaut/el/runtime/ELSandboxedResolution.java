@@ -28,8 +28,8 @@ import org.jspecify.annotations.Nullable;
  * The resolution of the properties of an expression parsed at runtime, under the {@link ELSandbox} of its
  * context where the resolution reflects.
  *
- * <p>A chain of this module knows which of its resolvers read the members of a base object reflectively, and
- * consults the sandbox before those and after them only: see {@link ELResolverChain#getValueSandboxed}. What
+ * <p>A chain of this module knows which of its resolvers read the members of a base object without reflection,
+ * and consults the sandbox before and after the others only: see {@link ELResolverChain#getValueSandboxed}. What
  * another resolver does cannot be told apart, so a context whose resolver is not such a chain is checked on
  * every property. An expression compiled at compilation time resolves through {@link ELResolution} and is never
  * checked.</p>
@@ -45,7 +45,7 @@ public final class ELSandboxedResolution {
 
     /**
      * Resolves an identifier as {@link ELResolution#resolveIdentifier} does, reading the field of a static import
-     * under the sandbox and checking a class the identifier names, which the import handler loads by name.
+     * under the sandbox.
      *
      * @param context The context
      * @param name    The identifier
@@ -53,8 +53,7 @@ public final class ELSandboxedResolution {
      */
     @Nullable
     public static Object resolveIdentifier(ELContext context, String name) {
-        Object value = ELResolution.resolveIdentifier(context, name, true);
-        return value instanceof ELClass ? checkValue(ELSandbox.of(context), value) : value;
+        return ELResolution.resolveIdentifier(context, name, true);
     }
 
     /**
@@ -96,7 +95,7 @@ public final class ELSandboxedResolution {
             return chain.getValueSandboxed(context, base, property);
         }
         ELSandbox sandbox = ELSandbox.of(context);
-        checkAccess(sandbox, base, property);
+        checkAccess(sandbox, base);
         return checkValue(sandbox, resolver.getValue(context, base, property));
     }
 
@@ -120,7 +119,7 @@ public final class ELSandboxedResolution {
         if (resolver instanceof ELResolverChain chain) {
             chain.setValueSandboxed(context, base, property, value);
         } else {
-            checkAccess(ELSandbox.of(context), base, property);
+            checkAccess(ELSandbox.of(context), base);
             resolver.setValue(context, base, property, value);
         }
         if (!context.isPropertyResolved()) {
@@ -163,7 +162,7 @@ public final class ELSandboxedResolution {
         if (resolver instanceof ELResolverChain chain) {
             type = chain.getTypeSandboxed(context, base, property);
         } else {
-            checkAccess(ELSandbox.of(context), base, property);
+            checkAccess(ELSandbox.of(context), base);
             type = resolver.getType(context, base, property);
         }
         if (context.isPropertyResolved()) {
@@ -188,7 +187,7 @@ public final class ELSandboxedResolution {
         if (resolver instanceof ELResolverChain chain) {
             readOnly = chain.isReadOnlySandboxed(context, base, property);
         } else {
-            checkAccess(ELSandbox.of(context), base, property);
+            checkAccess(ELSandbox.of(context), base);
             readOnly = resolver.isReadOnly(context, base, property);
         }
         if (context.isPropertyResolved()) {
@@ -198,23 +197,17 @@ public final class ELSandboxedResolution {
     }
 
     /**
-     * Fails when the sandbox denies the base object of a reflective access, or the member of it the access
-     * names.
+     * Fails when the sandbox denies the base object of a reflective access.
      *
      * @param sandbox The sandbox
      * @param base    The base object, an {@link ELClass} for a static member
-     * @param member  The property or the method; one that is not a string is a key or an index, not a member
      */
-    public static void checkAccess(ELSandbox sandbox, Object base, @Nullable Object member) {
-        if (sandbox == ELSandbox.UNRESTRICTED) {
-            return;
-        }
-        Class<?> type = typeOf(base);
-        if (!sandbox.allowsType(type)) {
-            throw new ELSandboxException(type, null);
-        }
-        if (member instanceof String name && !sandbox.allowsMember(type, name)) {
-            throw new ELSandboxException(type, name);
+    public static void checkAccess(ELSandbox sandbox, Object base) {
+        if (sandbox != ELSandbox.UNRESTRICTED) {
+            Class<?> type = typeOf(base);
+            if (!sandbox.allowsType(type)) {
+                throw new ELSandboxException(type);
+            }
         }
     }
 
@@ -232,7 +225,7 @@ public final class ELSandboxedResolution {
         if (value != null && sandbox != ELSandbox.UNRESTRICTED) {
             Class<?> type = typeOf(value);
             if (!sandbox.allowsType(type)) {
-                throw new ELSandboxException(type, null);
+                throw new ELSandboxException(type);
             }
         }
         return value;

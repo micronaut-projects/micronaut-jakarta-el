@@ -771,8 +771,7 @@ final class ELInterpreter {
             if (importHandler != null) {
                 Class<?> resolvedClass = importHandler.resolveClass(localName);
                 if (resolvedClass != null) {
-                    ELClass named = ELSandboxGuard.checkClass(context, new ELClass(resolvedClass));
-                    return invokeCallable(context, named, evaluateAll(context, firstArguments));
+                    return invokeCallable(context, new ELClass(resolvedClass), evaluateAll(context, firstArguments));
                 }
                 Class<?> staticClass = importHandler.resolveStatic(localName);
                 if (staticClass != null) {
@@ -842,7 +841,7 @@ final class ELInterpreter {
                 // what an executor reaches reflectively is what the sandbox of an expression parsed at runtime is
                 // for, and all it is for: a method generated or registered while the application compiled is not
                 // held up by it
-                return executor.isReflective() ? new SandboxedELMethod(resolved, method.toString()) : resolved;
+                return executor.isReflective() ? new SandboxedELMethod(resolved) : resolved;
             }
         }
         // the executors that were consulted are what says which of the remedies applies: the reflective one is
@@ -859,7 +858,7 @@ final class ELInterpreter {
             ELMethod resolved = executor.resolveFunction(context, prefix, localName);
             if (resolved != null) {
                 // a function a reflective executor binds is invoked reflectively, so what it returns is checked
-                return executor.isReflective() ? new SandboxedELMethod(resolved, localName) : resolved;
+                return executor.isReflective() ? new SandboxedELMethod(resolved) : resolved;
             }
         }
         return null;

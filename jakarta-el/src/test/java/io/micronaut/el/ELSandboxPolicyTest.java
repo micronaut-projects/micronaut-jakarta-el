@@ -18,7 +18,6 @@ package io.micronaut.el;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -26,20 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ELSandboxPolicyTest {
 
     private final ELSandbox sandbox = ELSandbox.standard();
-
-    @Test
-    void theFastMemberCheckAgreesWithTheDeclaredList() {
-        // allowsMember switches on the length of the name rather than reading the set, because it is asked
-        // of every property reflection reads. The set stays the declaration of what is denied.
-        for (String denied : ELSandbox.StandardELSandbox.DENIED_MEMBERS) {
-            assertFalse(sandbox.allowsMember(Object.class, denied), denied);
-        }
-        for (String allowed : List.of("title", "name", "get", "getTitle", "value", "getValue", "wai", "waits",
-            "clas", "classes", "getClasses", "modules", "notified", "protection", "getProtection", "",
-            "notifyAl", "notifyAlls", "getClassLoaders", "classLoade", "getModul", "getProtectionDomains")) {
-            assertTrue(sandbox.allowsMember(Object.class, allowed), allowed);
-        }
-    }
 
     @Test
     void aSubtypeOfADeniedTypeIsDeniedWhereverItImplementsIt() {

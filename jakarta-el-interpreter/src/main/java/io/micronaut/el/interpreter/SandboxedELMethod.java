@@ -29,7 +29,7 @@ import java.lang.annotation.Annotation;
 /**
  * A method a {@link io.micronaut.el.ELMethodExecutor#isReflective() reflective executor} resolved for an
  * expression parsed at runtime, invoked under the {@link ELSandbox} of the context of each invocation: the base
- * object and the name of the method are checked before it runs, and the value it returned after.
+ * object is checked before the method runs, and the value it returned after.
  *
  * <p>A call site keeps the method it resolved and invokes it again on later evaluations, possibly with another
  * context, so the sandbox travels with the method rather than being consulted once when it was found.</p>
@@ -43,25 +43,22 @@ final class SandboxedELMethod implements ELMethod {
     private static final long serialVersionUID = 1L;
 
     private final ELMethod method;
-    private final String name;
 
     /**
      * @param method The method the reflective executor resolved
-     * @param name   The name the expression invoked it by, {@code <init>} for a constructor
      */
-    SandboxedELMethod(ELMethod method, String name) {
+    SandboxedELMethod(ELMethod method) {
         this.method = method;
-        this.name = name;
     }
 
     /**
-     * Fails when the sandbox of the context denies the base object, or the method of it.
+     * Fails when the sandbox of the context denies the base object the method would be reached on.
      *
      * @param context The context
      * @param base    The base object, an {@link jakarta.el.ELClass} for a static method or a constructor
      */
     void checkAccess(ELContext context, Object base) {
-        ELSandboxedResolution.checkAccess(ELSandbox.of(context), base, name);
+        ELSandboxedResolution.checkAccess(ELSandbox.of(context), base);
     }
 
     @Override
@@ -69,7 +66,7 @@ final class SandboxedELMethod implements ELMethod {
     public Object invoke(ELContext context, @Nullable Object base, Object @Nullable [] arguments) {
         ELSandbox sandbox = ELSandbox.of(context);
         if (base != null) {
-            ELSandboxedResolution.checkAccess(sandbox, base, name);
+            ELSandboxedResolution.checkAccess(sandbox, base);
         }
         return ELSandboxedResolution.checkValue(sandbox, method.invoke(context, base, arguments));
     }

@@ -235,22 +235,21 @@ consulted wherever the resolution of the expression reflects, and nowhere else:
   `micronaut-jakarta-el-interpreter-reflection` resolves;
 * a property the resolvers of the specification read reflectively: the property of a bean, including one held
   by an `Optional`, the component of a record, the static field of a class or of a static import;
-* a class the expression names, which the import handler loads by name;
-* every property, when the resolver of the context is not a chain this module built, since what another
-  resolver does cannot be told apart from reflection.
+* a property a resolver the module does not know resolves, a composite of resolvers or a resolver of the
+  application included, and every property when the resolver of the context is not a chain this module built,
+  since what such a resolver does cannot be told apart from reflection.
 
-It is asked about the base object and the member before such an access, and about the value the access produced
-after it, so that reflection neither uses nor hands the expression a type it denies. `ELSandbox.standard()`, the
-default, denies:
+It is asked about the base object before such an access, and about the value the access produced after it, so
+that reflection neither works on nor hands the expression a type it denies. No member is denied by its name:
+`getClass`, `getClassLoader` and every other member that leads to a denied type produce a value of that type,
+and are stopped by it. `ELSandbox.standard()`, the default, denies:
 
 * `java.lang.Class`, `ClassLoader`, `Module`, `ModuleLayer` and `Package`, and every subtype of them;
 * `Runtime`, `Process`, `ProcessBuilder`, `ProcessHandle`, `System`, `Thread` and `ThreadGroup`;
 * `java.io.File`, `java.net.URI`, `java.net.URL`, `java.nio.file.Path` and `java.util.ServiceLoader`;
 * `jakarta.el.ELContext` and `jakarta.el.ELResolver`, through which an expression would widen its own sandbox;
 * everything in `java.lang.reflect`, `java.lang.invoke`, `java.lang.module`, `java.security`, `java.rmi`,
-  `javax.naming`, `javax.script`, `jdk` and `sun`;
-* the members `class`, `getClass`, `getClassLoader`, `getModule`, `getProtectionDomain`, `wait`, `notify` and
-  `notifyAll` of any type.
+  `javax.naming`, `javax.script`, `jdk` and `sun`.
 
 What the application described while it compiled is reached without the sandbox: the properties of its bean
 introspections, the executable methods of its beans, the methods it registered with an `ELMethodContributor`,

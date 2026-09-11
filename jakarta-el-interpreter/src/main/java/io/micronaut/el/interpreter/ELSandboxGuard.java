@@ -19,7 +19,6 @@ import io.micronaut.core.annotation.Internal;
 import io.micronaut.el.ELSandbox;
 import io.micronaut.el.runtime.ELResolution;
 import io.micronaut.el.runtime.ELSandboxedResolution;
-import jakarta.el.ELClass;
 import jakarta.el.ELContext;
 import org.jspecify.annotations.Nullable;
 
@@ -29,9 +28,9 @@ import org.jspecify.annotations.Nullable;
  *
  * <p>An expression that was compiled at compilation time was written by the developer and resolves through
  * {@link ELResolution} directly. An expression parsed at runtime goes through this class instead, which consults
- * the sandbox only where the resolution reflects: a property through {@link ELSandboxedResolution}, before the
- * resolvers that read it reflectively, a method through the {@link SandboxedELMethod} that wraps what a
- * reflective executor resolved, and a class the expression names, since naming one loads it by name.</p>
+ * the sandbox only where the resolution reflects: a property or a static import through
+ * {@link ELSandboxedResolution}, before the resolvers that read it reflectively, and a method through the
+ * {@link SandboxedELMethod} that wraps what a reflective executor resolved.</p>
  *
  * @author Denis Stepanov
  * @since 1.1
@@ -74,18 +73,5 @@ final class ELSandboxGuard {
     @Nullable
     static Class<?> getType(ELContext context, @Nullable Object base, @Nullable Object property) {
         return ELSandboxedResolution.getType(context, base, property);
-    }
-
-    /**
-     * Fails when the sandbox of the context denies a class an expression named. The import handler loads the
-     * class by name, which is reflection before any member of it is reached.
-     *
-     * @param context The context
-     * @param elClass The class
-     * @return The class
-     */
-    static ELClass checkClass(ELContext context, ELClass elClass) {
-        ELSandboxedResolution.checkValue(ELSandbox.of(context), elClass);
-        return elClass;
     }
 }

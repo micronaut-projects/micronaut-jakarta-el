@@ -186,9 +186,10 @@ Every expression the interpreter creates is therefore evaluated under an `ELSand
 the resolution of the expression reflects, and nowhere else: a method, static method, constructor or `FunctionMapper`
 function the reflective executor of `micronaut-jakarta-el-interpreter-reflection` resolves; a property the resolvers
 of the specification read reflectively from a bean (an `Optional` holding one included), a record, a class or a
-static import; a class the expression names; and every property of a context
-whose resolver is not a chain this module built. It is asked about the base object and the member before such an
-access and about the value the access produced after it. `ELSandbox.standard()`, the default, denies the types
+static import; a property a resolver the module does not know resolves; and every property of a context whose
+resolver is not a chain this module built. It is asked about the base object before such an access and about the
+value the access produced after it. No member is denied by its name: `getClass`, `getClassLoader` and every other
+member that leads to a denied type produce a value of that type, and are stopped by it. `ELSandbox.standard()`, the default, denies the types
 through which an expression escapes into arbitrary Java:
 
 | Denied                                                                                                              | Why                                                 |
@@ -198,7 +199,6 @@ through which an expression escapes into arbitrary Java:
 | `java.io.File`, `java.net.URI`, `java.net.URL`, `java.nio.file.Path`, `java.util.ServiceLoader`                      | The file system and the service loading             |
 | `jakarta.el.ELContext`, `jakarta.el.ELResolver`                                                                      | An expression would otherwise widen its own sandbox |
 | `java.lang.reflect`, `java.lang.invoke`, `java.lang.module`, `java.security`, `java.rmi`, `javax.naming`, `javax.script`, `jdk`, `sun` | Reflection and the platform internals |
-| The members `class`, `getClass`, `getClassLoader`, `getModule`, `getProtectionDomain`, `wait`, `notify`, `notifyAll` | The step from an allowed object to a denied one     |
 
 What the application described while it compiled is reached without the sandbox: the properties of its bean
 introspections, the executable methods of its beans, the methods it registered with an `ELMethodContributor`, and
