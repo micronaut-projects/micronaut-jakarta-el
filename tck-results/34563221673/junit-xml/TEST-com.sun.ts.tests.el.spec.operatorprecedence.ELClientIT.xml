@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT" tests="17" skipped="0" failures="0" errors="0" timestamp="SANITIZED" hostname="SANITIZED" time="0">
+  <properties/>
+  <testcase name="elModEqualPreAndTest()" classname="com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT" time="0"/>
+  <testcase name="elModPreBinaryTest()" classname="com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT" time="0"/>
+  <testcase name="elMultiEqualPreCondTest()" classname="com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT" time="0"/>
+  <testcase name="elDivEqualPreOrTest()" classname="com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT" time="0"/>
+  <testcase name="elDivEqualPreAndTest()" classname="com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT" time="0"/>
+  <testcase name="elMultiPreBinaryTest()" classname="com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT" time="0"/>
+  <testcase name="elMultiPreRelationalTest()" classname="com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT" time="0"/>
+  <testcase name="elMultiEqualOrCondTest()" classname="com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT" time="0"/>
+  <testcase name="elDivPreRelationalTest()" classname="com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT" time="0"/>
+  <testcase name="elParenPreBinaryTest()" classname="com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT" time="0"/>
+  <testcase name="functionPrecedenceTest()" classname="com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT" time="0"/>
+  <testcase name="elDivEqualPreCondTest()" classname="com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT" time="0"/>
+  <testcase name="elModPreRelationalTest()" classname="com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT" time="0"/>
+  <testcase name="elMultiEqualPreAndTest()" classname="com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT" time="0"/>
+  <testcase name="elModEqualPreCondTest()" classname="com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT" time="0"/>
+  <testcase name="elModEqualPreOrTest()" classname="com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT" time="0"/>
+  <testcase name="elDivPreBinaryTest()" classname="com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT" time="0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT logStartTest
+INFO: STARTING TEST : elModEqualPreAndTest()
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT logFinishTest
+INFO: FINISHED TEST : elModEqualPreAndTest()
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT cleanup
+INFO: Cleanup method called
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT logStartTest
+INFO: STARTING TEST : elModPreBinaryTest()
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT logFinishTest
+INFO: FINISHED TEST : elModPreBinaryTest()
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT cleanup
+INFO: Cleanup method called
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT logStartTest
+INFO: STARTING TEST : elMultiEqualPreCondTest()
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT logFinishTest
+INFO: FINISHED TEST : elMultiEqualPreCondTest()
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT cleanup
+INFO: Cleanup method called
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT logStartTest
+INFO: STARTING TEST : elDivEqualPreOrTest()
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT logFinishTest
+INFO: FINISHED TEST : elDivEqualPreOrTest()
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT cleanup
+INFO: Cleanup method called
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT logStartTest
+INFO: STARTING TEST : elDivEqualPreAndTest()
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT logFinishTest
+INFO: FINISHED TEST : elDivEqualPreAndTest()
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT cleanup
+INFO: Cleanup method called
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT logStartTest
+INFO: STARTING TEST : elMultiPreBinaryTest()
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT logFinishTest
+INFO: FINISHED TEST : elMultiPreBinaryTest()
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT cleanup
+INFO: Cleanup method called
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT logStartTest
+INFO: STARTING TEST : elMultiPreRelationalTest()
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT logFinishTest
+INFO: FINISHED TEST : elMultiPreRelationalTest()
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT cleanup
+INFO: Cleanup method called
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT logStartTest
+INFO: STARTING TEST : elMultiEqualOrCondTest()
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT logFinishTest
+INFO: FINISHED TEST : elMultiEqualOrCondTest()
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT cleanup
+INFO: Cleanup method called
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT logStartTest
+INFO: STARTING TEST : elDivPreRelationalTest()
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT logFinishTest
+INFO: FINISHED TEST : elDivPreRelationalTest()
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT cleanup
+INFO: Cleanup method called
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT logStartTest
+INFO: STARTING TEST : elParenPreBinaryTest()
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT logFinishTest
+INFO: FINISHED TEST : elParenPreBinaryTest()
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT cleanup
+INFO: Cleanup method called
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT logStartTest
+INFO: STARTING TEST : functionPrecedenceTest()
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT logFinishTest
+INFO: FINISHED TEST : functionPrecedenceTest()
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT cleanup
+INFO: Cleanup method called
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT logStartTest
+INFO: STARTING TEST : elDivEqualPreCondTest()
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT logFinishTest
+INFO: FINISHED TEST : elDivEqualPreCondTest()
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT cleanup
+INFO: Cleanup method called
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT logStartTest
+INFO: STARTING TEST : elModPreRelationalTest()
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT logFinishTest
+INFO: FINISHED TEST : elModPreRelationalTest()
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT cleanup
+INFO: Cleanup method called
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT logStartTest
+INFO: STARTING TEST : elMultiEqualPreAndTest()
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT logFinishTest
+INFO: FINISHED TEST : elMultiEqualPreAndTest()
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT cleanup
+INFO: Cleanup method called
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT logStartTest
+INFO: STARTING TEST : elModEqualPreCondTest()
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT logFinishTest
+INFO: FINISHED TEST : elModEqualPreCondTest()
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT cleanup
+INFO: Cleanup method called
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT logStartTest
+INFO: STARTING TEST : elModEqualPreOrTest()
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT logFinishTest
+INFO: FINISHED TEST : elModEqualPreOrTest()
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT cleanup
+INFO: Cleanup method called
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT logStartTest
+INFO: STARTING TEST : elDivPreBinaryTest()
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT logFinishTest
+INFO: FINISHED TEST : elDivPreBinaryTest()
+Sep 08, 2026 8:15:20 PM com.sun.ts.tests.el.spec.operatorprecedence.ELClientIT cleanup
+INFO: Cleanup method called
+]]></system-err>
+</testsuite>
