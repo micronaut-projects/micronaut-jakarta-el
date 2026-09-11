@@ -21,12 +21,15 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Build Matrix
-        uses: micronaut-projects/github-actions/graalvm/build-matrix@5f587657fc12601ab92d64d077f99a54c3cbdf78 # master
+        uses: micronaut-projects/github-actions/graalvm/build-matrix@23bd738fa73948e51347bb1043dcbfc4b4e0f5e1 # github-actions#58
         id: build-matrix
-        env:
-          DEVELOCITY_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}
         with:
           java-version: '25'
+          # Exchanged for a short-lived token by setup-gradle inside the action; see gradle.yml for the key selection.
+          develocity-access-key: >-
+            ${{ (github.event_name == 'push' && secrets.GRADLE_ENTERPRISE_ACCESS_KEY) ||
+                (github.event_name != 'push' && (secrets.DEVELOCITY_PULL_REQUEST_ACCESS_KEY || secrets.GRADLE_ENTERPRISE_ACCESS_KEY)) ||
+                '' }}
   build:
     needs: build_matrix
     if: github.repository != 'micronaut-projects/micronaut-project-template'
@@ -46,20 +49,23 @@ jobs:
           export PATH=$(echo "$PATH" | tr ':' '\n' | grep -v '/usr/lib/jvm' | paste -sd:)
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Pre-Build Steps
-        uses: micronaut-projects/github-actions/graalvm/pre-build@5f587657fc12601ab92d64d077f99a54c3cbdf78 # master
+        uses: micronaut-projects/github-actions/graalvm/pre-build@23bd738fa73948e51347bb1043dcbfc4b4e0f5e1 # github-actions#58
         id: pre-build
-        env:
-          DEVELOCITY_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}
         with:
+          # Exchanged for a short-lived token that the following steps receive as DEVELOCITY_ACCESS_KEY and
+          # GRADLE_ENTERPRISE_ACCESS_KEY. Do not set either variable on later steps: it would replace the token.
+          develocity-access-key: >-
+            ${{ (github.event_name == 'push' && secrets.GRADLE_ENTERPRISE_ACCESS_KEY) ||
+                (github.event_name != 'push' && (secrets.DEVELOCITY_PULL_REQUEST_ACCESS_KEY || secrets.GRADLE_ENTERPRISE_ACCESS_KEY)) ||
+                '' }}
           distribution: 'graalvm'
           gradle-java: '25'
           java: ${{ matrix.java }}
           nativeTestTask: ${{ matrix.native_test_task }}
       - name: Build Steps
-        uses: micronaut-projects/github-actions/graalvm/build@5f587657fc12601ab92d64d077f99a54c3cbdf78 # master
+        uses: micronaut-projects/github-actions/graalvm/build@23bd738fa73948e51347bb1043dcbfc4b4e0f5e1 # github-actions#58
         id: build
         env:
-          DEVELOCITY_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}
           GH_TOKEN_PUBLIC_REPOS_READONLY: ${{ secrets.GH_TOKEN_PUBLIC_REPOS_READONLY }}
           GH_USERNAME: ${{ secrets.GH_USERNAME }}
           GRAALVM_QUICK_BUILD: true
@@ -67,9 +73,7 @@ jobs:
         with:
           nativeTestTask: ${{ matrix.native_test_task }}
       - name: Post-Build Steps
-        uses: micronaut-projects/github-actions/graalvm/post-build@5f587657fc12601ab92d64d077f99a54c3cbdf78 # master
+        uses: micronaut-projects/github-actions/graalvm/post-build@23bd738fa73948e51347bb1043dcbfc4b4e0f5e1 # github-actions#58
         id: post-build
-        env:
-          DEVELOCITY_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}
         with:
           java: ${{ matrix.java }}
