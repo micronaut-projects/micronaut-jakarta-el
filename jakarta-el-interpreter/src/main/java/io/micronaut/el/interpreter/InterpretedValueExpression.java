@@ -17,7 +17,6 @@ package io.micronaut.el.interpreter;
 
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.el.ELMethod;
-import io.micronaut.el.ELSandbox;
 import io.micronaut.el.parser.ELParser;
 import io.micronaut.el.parser.ELNodes;
 import io.micronaut.el.parser.ast.ELNode;
@@ -46,11 +45,6 @@ final class InterpretedValueExpression extends ValueExpression implements ELExpr
 
     private final String expressionString;
     private final Class<?> expectedType;
-    /**
-     * Whether the value has to be checked against the sandbox, which a coercion to a string, a boolean, a
-     * character, a number or an enum answers on its own.
-     */
-    private final boolean checkedResult;
     private final Map<String, ELMethod> functions;
     private transient @Nullable ELNode node;
     private transient @Nullable ELInterpreter interpreter;
@@ -63,7 +57,6 @@ final class InterpretedValueExpression extends ValueExpression implements ELExpr
                                ELInterpreter interpreter) {
         this.expressionString = Objects.requireNonNull(expressionString, "expressionString");
         this.expectedType = Objects.requireNonNull(expectedType, "expectedType");
-        this.checkedResult = ELSandbox.checksResultOf(expectedType);
         this.functions = Map.copyOf(functions);
         this.node = Objects.requireNonNull(node, "node");
         this.interpreter = Objects.requireNonNull(interpreter, "interpreter");
@@ -77,7 +70,7 @@ final class InterpretedValueExpression extends ValueExpression implements ELExpr
         Object value = interpreter().evaluateRoot(context, node());
         T result = (T) ELSupport.coerceToType(context, value, expectedType);
         context.notifyAfterEvaluation(expressionString);
-        return checkedResult ? ELSandboxGuard.checkResult(context, result) : result;
+        return result;
     }
 
     @Override

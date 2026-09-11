@@ -182,10 +182,14 @@ is not, and the specification resolves properties, methods, static members and c
 Adding the interpreter module to the classpath must not turn `ExpressionFactory.createValueExpression` into a
 way to run arbitrary code.
 
-Every expression the interpreter creates is therefore evaluated under an `ELSandbox`, which is consulted for the
-base object of every property access and method invocation, for the class of every static reference and for the
-class of every constructor reference. `ELSandbox.standard()`, the default, denies the types through which an
-expression escapes into arbitrary Java:
+Every expression the interpreter creates is therefore evaluated under an `ELSandbox`, which is consulted wherever
+the resolution of the expression reflects, and nowhere else: a method, static method, constructor or `FunctionMapper`
+function the reflective executor of `micronaut-jakarta-el-interpreter-reflection` resolves; a property the resolvers
+of the specification read reflectively from a bean (an `Optional` holding one included), a record, a class or a
+static import; a class the expression names; and every property of a context
+whose resolver is not a chain this module built. It is asked about the base object and the member before such an
+access and about the value the access produced after it. `ELSandbox.standard()`, the default, denies the types
+through which an expression escapes into arbitrary Java:
 
 | Denied                                                                                                              | Why                                                 |
 |---------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------|
@@ -196,24 +200,25 @@ expression escapes into arbitrary Java:
 | `java.lang.reflect`, `java.lang.invoke`, `java.lang.module`, `java.security`, `java.rmi`, `javax.naming`, `javax.script`, `jdk`, `sun` | Reflection and the platform internals |
 | The members `class`, `getClass`, `getClassLoader`, `getModule`, `getProtectionDomain`, `wait`, `notify`, `notifyAll` | The step from an allowed object to a denied one     |
 
-Everything else the language offers is untouched: the operators, the coercions, the collection operations, the
-lambdas, and the properties and methods of the beans of the application. `com.sun` is deliberately **not**
-denied: it is not reserved for the platform, and the TCK publishes its own beans under it. The TCK passes with
-the sandbox in place.
+What the application described while it compiled is reached without the sandbox: the properties of its bean
+introspections, the executable methods of its beans, the methods it registered with an `ELMethodContributor`, and
+the maps, lists and arrays an expression indexes. `${book.type}` returns the `Class` an introspected `Book`
+exposes; `${book.type.name}`, which reads the `Class` reflectively, is denied. The operators, the coercions, the
+collection operations and the lambdas are untouched. `com.sun` is deliberately **not** denied: it is not reserved
+for the platform, and the TCK publishes its own beans under it. The TCK passes with the sandbox in place.
 
 An expression that reaches a denied type fails with an `ELSandboxException`. Compiled expressions do not go
-through the sandbox at all. Register another one, `ELSandbox.UNRESTRICTED` included, on the context:
+through the sandbox at all, even where they resolve a member reflectively. Register another one,
+`ELSandbox.UNRESTRICTED` included, on the context:
 
 ```java
 context.putContext(ELSandbox.class, ELSandbox.UNRESTRICTED);
 ```
 
-An expression only reaches a denied type through a bean of the application that exposes one, since the members
-that lead to one from any object are denied. Reaching one is not the same as returning it, so the value an
-expression hands back is checked too, as coerced to the expected type: `${bean.type}` requested as `Object`
-fails, while requested as `String` it yields the coercion, through which nothing of the denied type escapes.
-Only the value itself is examined; a denied object the application put inside a collection it exposes is not
-searched for.
+A value reflection produced is checked where it was produced, before the expression does anything with it: on a
+bean without an introspection, `${bean.type}` fails whether it is returned, passed as an argument, put in a list
+or coerced to a string. A denied object that reached the expression without reflection, from an introspection or
+a collection of the application, is handed over as the application exposed it.
 
 The sandbox bounds what an expression reaches, not what the beans it reaches then do, and an argument the
 application's own method chose to accept is its own business. It keeps a runtime expression from escaping the

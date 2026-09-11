@@ -63,6 +63,18 @@ public final class ELResolution {
      */
     @Nullable
     public static Object resolveIdentifier(ELContext context, String name) {
+        return resolveIdentifier(context, name, false);
+    }
+
+    /**
+     * @param context   The context
+     * @param name      The identifier
+     * @param sandboxed Whether the identifier belongs to an expression parsed at runtime, whose static imports
+     *                  are read reflectively under its sandbox
+     * @return The value of the identifier
+     */
+    @Nullable
+    static Object resolveIdentifier(ELContext context, String name, boolean sandboxed) {
         if (context instanceof CompiledELContext compiled) {
             // the bean of the context, unless a lambda argument or a variable shadows it, which resolveBean checks
             Object bean = compiled.resolveBean(name);
@@ -89,7 +101,10 @@ public final class ELResolution {
         if (importHandler != null) {
             Class<?> staticFieldClass = importHandler.resolveStatic(name);
             if (staticFieldClass != null) {
-                return getValueRequired(context, new ELClass(staticFieldClass), name);
+                // the field of a static import is read reflectively
+                return sandboxed
+                    ? ELSandboxedResolution.getValue(context, new ELClass(staticFieldClass), name)
+                    : getValueRequired(context, new ELClass(staticFieldClass), name);
             }
             Class<?> resolvedClass = importHandler.resolveClass(name);
             if (resolvedClass != null) {
@@ -609,7 +624,7 @@ public final class ELResolution {
             + " provider with ELContext.putContext(ELBeanProvider.class, provider)");
     }
 
-    private static PropertyNotFoundException propertyNotFound(@Nullable Object base, @Nullable Object property) {
+    static PropertyNotFoundException propertyNotFound(@Nullable Object base, @Nullable Object property) {
         if (base == null) {
             return new PropertyNotFoundException("Cannot resolve the property '" + property + "' of a null base object");
         }

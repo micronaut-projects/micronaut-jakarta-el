@@ -26,13 +26,25 @@ import org.jspecify.annotations.Nullable;
  *
  * <p>Implementations are discovered as services by the interpreter. A provider can use generated code, a
  * registry, or another direct dispatch mechanism. Reflection is intentionally not part of this contract; it is
- * supplied separately by the optional interpreter-reflection module.</p>
+ * supplied separately by the optional interpreter-reflection module, whose executor says so with
+ * {@link #isReflective()}.</p>
  *
  * @author Denis Stepanov
  * @since 1.1
  */
 @Experimental
 public interface ELMethodExecutor extends Ordered {
+
+    /**
+     * Whether the executor reaches the methods it resolves reflectively, rather than through what was generated
+     * or registered while the application compiled. The {@link ELSandbox} of an expression parsed at runtime is
+     * consulted for the methods such an executor resolves, and only for them.
+     *
+     * @return Whether the executor reflects, {@code false} by default
+     */
+    default boolean isReflective() {
+        return false;
+    }
 
     /**
      * Returns the executor order. Lower values run first, following the Micronaut {@link Ordered} contract, so

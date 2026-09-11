@@ -15,20 +15,25 @@
  */
 package io.micronaut.el.interpreter;
 
+import io.micronaut.core.annotation.Introspected;
 import io.micronaut.el.CompiledELContext;
 import io.micronaut.el.CompiledExpressionFactory;
 import io.micronaut.el.ELSandbox;
 import io.micronaut.el.ELSandboxException;
 import jakarta.el.ELContext;
+import jakarta.el.ELManager;
 import jakarta.el.ExpressionFactory;
+import jakarta.el.FunctionMapper;
 import jakarta.el.MethodExpression;
 import jakarta.el.ValueExpression;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -37,8 +42,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * An expression string built at runtime is untrusted input, and the specification resolves properties,
- * methods, static members and constructors dynamically. These are the paths through which it would otherwise
- * reach arbitrary Java.
+ * methods, static members and constructors dynamically. Where that resolution reflects, these are the paths
+ * through which it would otherwise reach arbitrary Java; where it does not, the application described what it
+ * reaches and the sandbox stays out of the way.
  */
 class ELSandboxTest {
 
@@ -93,7 +99,7 @@ class ELSandboxTest {
             Object.class, new Class<?>[0]);
 
         assertThrows(ELSandboxException.class, () -> expression.invoke(context, new Object[0]));
-        // the metadata of the method is the method: naming a denied member is denied whichever way it is read
+        // the metadata of a method found reflectively is read reflectively, whichever way it is asked for
         assertThrows(ELSandboxException.class, () -> expression.getMethodInfo(context));
         assertThrows(ELSandboxException.class, () -> expression.getMethodReference(context));
     }
@@ -105,7 +111,8 @@ class ELSandboxTest {
         MethodExpression expression = factory.createMethodExpression(context,
             "${list.contains(holder.type)}", Object.class, new Class<?>[0]);
 
-        // the base and the member are both allowed, so the denied object travels as an evaluated parameter
+        // the base and the method are both allowed, and the argument is read reflectively, which is where the
+        // denied object is stopped
         assertThrows(ELSandboxException.class, () -> expression.getMethodReference(context));
     }
 
@@ -122,8 +129,8 @@ class ELSandboxTest {
 
     @Test
     void everyOperationOfAnExpressionThatReachesADeniedTypeIsDenied() {
-        // getValueReference names the base and the property of an lvalue, the same access getType and
-        // isReadOnly make, so it must not be the one operation that hands the base back
+        // getValueReference names the base and the property of an lvalue, and the base is read reflectively
+        // like it is for getType and isReadOnly, so no operation is the one that hands it back
         ELContext context = context().setBean("holder", new Holder());
         ValueExpression expression =
             factory.createValueExpression(context, "${holder.type.name}", Object.class);
@@ -134,17 +141,88 @@ class ELSandboxTest {
     }
 
     @Test
-    void aDeniedTypeIsNotHandedBackAsTheValueOfTheExpression() {
-        // a bean of the application can expose one, and reaching it is not the same as returning it
+    void aDeniedTypeReflectionProducedIsNotHandedBack() {
+        // the bean has no introspection, so its property is read reflectively and the value is checked where the
+        // read produced it: whatever the expression goes on to do with it, returning it included
         ELContext context = context().setBean("holder", new Holder());
         ValueExpression asObject = factory.createValueExpression(context, "${holder.type}", Object.class);
         assertThrows(ELSandboxException.class, () -> asObject.getValue(context));
         MethodExpression method =
             factory.createMethodExpression(context, "${holder.getType}", Object.class, new Class<?>[0]);
         assertThrows(ELSandboxException.class, () -> method.invoke(context, new Object[0]));
-        // coerced to a string nothing of the denied type escapes, so the coercion is what is checked
-        assertEquals("class java.lang.String",
-            factory.createValueExpression(context, "${holder.type}", String.class).getValue(context));
+        ValueExpression asString = factory.createValueExpression(context, "${holder.type}", String.class);
+        assertThrows(ELSandboxException.class, () -> asString.getValue(context));
+        assertDenied(context, "${[holder.type]}");
+    }
+
+    @Test
+    void whatTheApplicationDescribedIsNotSandboxed() {
+        // a bean introspection, a map and a list lead only where the application chose to lead: nothing is
+        // reflected on, so the sandbox is not consulted even for a type it denies
+        CompiledELContext context = context()
+            .setBean("described", new DescribedHolder())
+            .setBean("types", new LinkedHashMap<>(Map.of("class", String.class)))
+            .setBean("typeList", List.of(String.class));
+        assertEquals(String.class, evaluate(context, "${described.type}"));
+        assertEquals(List.of(String.class), evaluate(context, "${[described.type]}"));
+        assertEquals(String.class, evaluate(context, "${types['class']}"));
+        assertEquals(String.class, evaluate(context, "${types.class}"));
+        assertEquals(String.class, evaluate(context, "${typeList[0]}"));
+    }
+
+    @Test
+    void aDescribedDeniedTypeIsStillDeniedToReflection() {
+        // the introspection hands the class over, and reading anything of the class itself is reflection
+        CompiledELContext context = context().setBean("described", new DescribedHolder());
+        assertDenied(context, "${described.type.name}");
+        assertDenied(context, "${described.type.getName()}");
+        assertDenied(context, "${described.type.forName('java.lang.Runtime')}");
+    }
+
+    @Test
+    void aContextWhoseResolverTheModuleDidNotBuildIsCheckedOnEveryProperty() {
+        // what another resolver does cannot be told apart from reflection, so every property it resolves is
+        // treated as a reflective one; the methods still go through the executors of the interpreter
+        ELManager manager = new ELManager();
+        manager.defineBean("bean", "hello");
+        manager.defineBean("types", new LinkedHashMap<>(Map.of("k", String.class)));
+        ELContext context = manager.getELContext();
+        assertDenied(context, "${bean.class}");
+        assertDenied(context, "${types.k}");
+        assertEquals("HELLO", evaluate(context, "${bean.toUpperCase()}"));
+    }
+
+    @Test
+    void thePropertyOfTheValueAnOptionalHoldsIsResolvedUnderTheSandbox() {
+        // the resolver of the specification hands the property of the value on to the resolver of the context,
+        // which must not be where the sandbox is left behind
+        CompiledELContext context = context().setBean("optional", Optional.of("hello"));
+        assertDenied(context, "${optional.class}");
+    }
+
+    @Test
+    void theFieldOfAStaticImportIsReadUnderTheSandbox() {
+        CompiledELContext context = context();
+        context.getImportHandler().importStatic("java.lang.Integer.TYPE");
+        assertDenied(context, "${TYPE}");
+    }
+
+    @Test
+    void aFunctionTheFunctionMapperBindsIsInvokedUnderTheSandbox() throws NoSuchMethodException {
+        // the reflective executor binds the functions of the mapper and invokes them reflectively
+        Method runtime = Runtime.class.getMethod("getRuntime");
+        CompiledELContext context = new CompiledELContext() {
+            @Override
+            public FunctionMapper getFunctionMapper() {
+                return new FunctionMapper() {
+                    @Override
+                    public Method resolveFunction(String prefix, String localName) {
+                        return "runtime".equals(localName) ? runtime : null;
+                    }
+                };
+            }
+        };
+        assertDenied(context, "${f:runtime()}");
     }
 
     @Test
@@ -201,13 +279,17 @@ class ELSandboxTest {
     @Test
     void aCompiledExpressionIsNotSandboxed() {
         // the sandbox is applied by the interpreter, which only creates the expressions that were not
-        // compiled: an expression declared with @ELExpression is source of the application
+        // compiled: an expression declared with @ELExpression is source of the application, even where it
+        // resolves a member reflectively
         CompiledELContext context = context();
         assertEquals("java.lang.String", new StringClassName().getValue(context));
     }
 
     private void assertDenied(String expression) {
-        ELContext context = context();
+        assertDenied(context(), expression);
+    }
+
+    private void assertDenied(ELContext context, String expression) {
         ValueExpression valueExpression = factory.createValueExpression(context, expression, Object.class);
         assertThrows(ELSandboxException.class, () -> valueExpression.getValue(context), expression);
     }
@@ -233,9 +315,21 @@ class ELSandboxTest {
     }
 
     /**
-     * A bean of the application exposing a denied type, which is the only way an expression reaches one.
+     * A bean of the application exposing a denied type, which it did not describe: an expression reads it
+     * reflectively.
      */
     public static final class Holder {
+
+        public Class<?> getType() {
+            return String.class;
+        }
+    }
+
+    /**
+     * The same bean described by a bean introspection: an expression reads it without reflection.
+     */
+    @Introspected
+    public static final class DescribedHolder {
 
         public Class<?> getType() {
             return String.class;

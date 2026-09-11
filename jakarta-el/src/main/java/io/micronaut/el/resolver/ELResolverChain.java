@@ -16,9 +16,13 @@
 package io.micronaut.el.resolver;
 
 import io.micronaut.core.annotation.Experimental;
+import io.micronaut.core.annotation.Internal;
+import io.micronaut.el.ELSandbox;
+import io.micronaut.el.runtime.ELSandboxedResolution;
 import jakarta.el.ArrayELResolver;
 import jakarta.el.BeanELResolver;
 import jakarta.el.CompositeELResolver;
+import jakarta.el.ELClass;
 import jakarta.el.ELContext;
 import jakarta.el.ELResolver;
 import jakarta.el.ListELResolver;
@@ -30,6 +34,7 @@ import jakarta.el.StaticFieldELResolver;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -94,7 +99,26 @@ public final class ELResolverChain extends CompositeELResolver {
         StaticFieldELResolver.class, MapELResolver.class, ResourceBundleELResolver.class, ListELResolver.class,
         ArrayELResolver.class, RecordELResolver.class, OptionalELResolver.class, BeanELResolver.class);
 
+    /**
+     * How a resolver reaches the members of a base object reflectively, which is what the {@link ELSandbox} of
+     * an expression parsed at runtime is consulted for: the resolvers of the specification that read the static
+     * fields of a class, the components of a record and the properties of a bean. The other resolvers of the
+     * standard chain read what was generated while the application compiled, or index a map, a list or an
+     * array, and a resolver an application adds is its own code.
+     */
+    private static final int NO_REFLECTION = 0;
+    private static final int STATIC_FIELDS = 1;
+    private static final int RECORD_COMPONENTS = 2;
+    private static final int BEAN_PROPERTIES = 3;
+    /**
+     * The resolver of the specification that reads the property of the value an {@link Optional} holds, through
+     * the resolver of the context: it reflects on nothing itself, and hands the property on where the sandbox
+     * would not follow it.
+     */
+    private static final int OPTIONAL_VALUES = 4;
+
     private ELResolver[] resolvers = new ELResolver[0];
+    private int[] reflection = new int[0];
     private ELResolver[] identifiers = new ELResolver[0];
     private ELResolver[] converters = new ELResolver[0];
     private ELResolver[] invokers = new ELResolver[0];
@@ -157,6 +181,8 @@ public final class ELResolverChain extends CompositeELResolver {
         }
         super.add(elResolver);
         resolvers = concat(resolvers, new ELResolver[] {elResolver});
+        reflection = Arrays.copyOf(reflection, reflection.length + 1);
+        reflection[reflection.length - 1] = reflectionOf(elResolver);
         if (!BASE_REQUIRED.contains(elResolver.getClass())) {
             identifiers = concat(identifiers, new ELResolver[] {elResolver});
         }
@@ -192,6 +218,131 @@ public final class ELResolverChain extends CompositeELResolver {
         return null;
     }
 
+    /**
+     * Resolves a property of a base object for an expression parsed at runtime. The resolvers are consulted as
+     * {@link #getValue} consults them, and the {@link ELSandbox} of the context is asked about the base object
+     * and the property before the first resolver that would read them reflectively, and about the value such a
+     * resolver produced. The resolvers before it are not held up by the sandbox at all.
+     *
+     * @param context  The context
+     * @param base     The base object
+     * @param property The property
+     * @return The value, when a resolver resolved it
+     */
+    @Internal
+    @Nullable
+    public Object getValueSandboxed(ELContext context, Object base, @Nullable Object property) {
+        context.setPropertyResolved(false);
+        ELSandbox sandbox = null;
+        for (int i = 0; i < resolvers.length; i++) {
+            if (reflection[i] == OPTIONAL_VALUES && base instanceof Optional<?> optional) {
+                return optionalValue(context, optional, property);
+            }
+            boolean reflective = reflectsOn(reflection[i], base);
+            if (reflective && sandbox == null) {
+                sandbox = checkAccess(context, base, property);
+            }
+            Object value = resolvers[i].getValue(context, base, property);
+            if (context.isPropertyResolved()) {
+                return reflective && sandbox != null ? ELSandboxedResolution.checkValue(sandbox, value) : value;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Resolves the property of an {@link Optional} as {@link OptionalELResolver#getValue} does, except that the
+     * property of the value it holds is resolved under the sandbox: the resolver of the specification resolves it
+     * through the resolver of the context, which is not the sandboxed resolution.
+     */
+    @Nullable
+    private static Object optionalValue(ELContext context, Optional<?> optional, @Nullable Object property) {
+        context.setPropertyResolved(optional, property);
+        if (optional.isEmpty() || property == null) {
+            return optional.orElse(null);
+        }
+        return ELSandboxedResolution.resolveValue(context, optional.get(), property);
+    }
+
+    /**
+     * Assigns a property of a base object for an expression parsed at runtime, consulting the
+     * {@link ELSandbox} of the context as {@link #getValueSandboxed} does.
+     *
+     * @param context  The context
+     * @param base     The base object
+     * @param property The property
+     * @param value    The value
+     */
+    @Internal
+    public void setValueSandboxed(ELContext context, Object base, @Nullable Object property, @Nullable Object value) {
+        context.setPropertyResolved(false);
+        boolean checked = false;
+        for (int i = 0; i < resolvers.length; i++) {
+            if (!checked && reflectsOn(reflection[i], base)) {
+                checkAccess(context, base, property);
+                checked = true;
+            }
+            resolvers[i].setValue(context, base, property, value);
+            if (context.isPropertyResolved()) {
+                return;
+            }
+        }
+    }
+
+    /**
+     * Resolves the type of a property of a base object for an expression parsed at runtime, consulting the
+     * {@link ELSandbox} of the context as {@link #getValueSandboxed} does. The type is not a value the
+     * property holds, so it is not checked.
+     *
+     * @param context  The context
+     * @param base     The base object
+     * @param property The property
+     * @return The type, when a resolver resolved it
+     */
+    @Internal
+    @Nullable
+    public Class<?> getTypeSandboxed(ELContext context, Object base, @Nullable Object property) {
+        context.setPropertyResolved(false);
+        boolean checked = false;
+        for (int i = 0; i < resolvers.length; i++) {
+            if (!checked && reflectsOn(reflection[i], base)) {
+                checkAccess(context, base, property);
+                checked = true;
+            }
+            Class<?> type = resolvers[i].getType(context, base, property);
+            if (context.isPropertyResolved()) {
+                return type;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Resolves whether a property of a base object is read only for an expression parsed at runtime,
+     * consulting the {@link ELSandbox} of the context as {@link #getValueSandboxed} does.
+     *
+     * @param context  The context
+     * @param base     The base object
+     * @param property The property
+     * @return Whether the property is read only, when a resolver resolved it
+     */
+    @Internal
+    public boolean isReadOnlySandboxed(ELContext context, Object base, @Nullable Object property) {
+        context.setPropertyResolved(false);
+        boolean checked = false;
+        for (int i = 0; i < resolvers.length; i++) {
+            if (!checked && reflectsOn(reflection[i], base)) {
+                checkAccess(context, base, property);
+                checked = true;
+            }
+            boolean readOnly = resolvers[i].isReadOnly(context, base, property);
+            if (context.isPropertyResolved()) {
+                return readOnly;
+            }
+        }
+        return false;
+    }
+
     @Override
     @Nullable
     public <T> T convertToType(ELContext context, @Nullable Object obj, @Nullable Class<T> targetType) {
@@ -221,6 +372,41 @@ public final class ELResolverChain extends CompositeELResolver {
             }
         }
         return null;
+    }
+
+    private static int reflectionOf(ELResolver resolver) {
+        if (resolver instanceof StaticFieldELResolver) {
+            return STATIC_FIELDS;
+        }
+        if (resolver instanceof RecordELResolver) {
+            return RECORD_COMPONENTS;
+        }
+        if (resolver instanceof BeanELResolver) {
+            return BEAN_PROPERTIES;
+        }
+        if (resolver instanceof OptionalELResolver) {
+            return OPTIONAL_VALUES;
+        }
+        return NO_REFLECTION;
+    }
+
+    /**
+     * Whether the resolver would reach a member of the base object reflectively: each of the reflective
+     * resolvers of the specification only reads the base objects it was written for.
+     */
+    private static boolean reflectsOn(int reflection, Object base) {
+        return switch (reflection) {
+            case STATIC_FIELDS -> base instanceof ELClass;
+            case RECORD_COMPONENTS -> base.getClass().isRecord();
+            case BEAN_PROPERTIES -> true;
+            default -> false;
+        };
+    }
+
+    private static ELSandbox checkAccess(ELContext context, Object base, @Nullable Object property) {
+        ELSandbox sandbox = ELSandbox.of(context);
+        ELSandboxedResolution.checkAccess(sandbox, base, property);
+        return sandbox;
     }
 
     /**

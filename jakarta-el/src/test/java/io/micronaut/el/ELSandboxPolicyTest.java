@@ -17,6 +17,7 @@ package io.micronaut.el;
 
 import org.junit.jupiter.api.Test;
 
+import java.nio.file.Path;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -29,7 +30,7 @@ class ELSandboxPolicyTest {
     @Test
     void theFastMemberCheckAgreesWithTheDeclaredList() {
         // allowsMember switches on the length of the name rather than reading the set, because it is asked
-        // of every property an expression reads. The set stays the declaration of what is denied.
+        // of every property reflection reads. The set stays the declaration of what is denied.
         for (String denied : ELSandbox.StandardELSandbox.DENIED_MEMBERS) {
             assertFalse(sandbox.allowsMember(Object.class, denied), denied);
         }
@@ -41,16 +42,23 @@ class ELSandboxPolicyTest {
     }
 
     @Test
-    void theResultOfAnExpressionIsOnlyCheckedWhenItCanHoldADeniedType() {
-        // a coercion to one of these produces an instance of the target type, and none of them is denied
-        for (Class<?> safe : List.of(String.class, Boolean.class, boolean.class, Character.class, char.class,
-            Integer.class, int.class, Long.class, Double.class, Number.class, java.math.BigDecimal.class)) {
-            assertFalse(ELSandbox.checksResultOf(safe), safe.getName());
-        }
-        // every other target hands the value back as it is
-        for (Class<?> checked : List.of(Object.class, Comparable.class, java.util.List.class, Class.class,
-            Object[].class, Runnable.class)) {
-            assertTrue(ELSandbox.checksResultOf(checked), checked.getName());
-        }
+    void aSubtypeOfADeniedTypeIsDeniedWhereverItImplementsIt() {
+        // the check compares with the denied types rather than walking the interfaces of the class, so an
+        // interface a superclass implements is found as surely as one the class names itself
+        assertFalse(sandbox.allowsType(AbstractPath.class));
+        assertFalse(sandbox.allowsType(ExtendsAbstractPath.class));
+        assertFalse(sandbox.allowsType(SecureLoader.class));
+        assertFalse(sandbox.allowsType(ExtendsAbstractPath[][].class));
+        assertTrue(sandbox.allowsType(String.class));
+        assertTrue(sandbox.allowsType(int[].class));
+    }
+
+    private abstract static class AbstractPath implements Path {
+    }
+
+    private abstract static class ExtendsAbstractPath extends AbstractPath {
+    }
+
+    private static final class SecureLoader extends java.security.SecureClassLoader {
     }
 }

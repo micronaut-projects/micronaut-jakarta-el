@@ -18,7 +18,6 @@ package io.micronaut.el.interpreter;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.type.Argument;
 import io.micronaut.el.ELMethod;
-import io.micronaut.el.ELSandbox;
 import io.micronaut.el.parser.ELParser;
 import io.micronaut.el.parser.ELNodes;
 import io.micronaut.el.parser.ast.ELNode;
@@ -79,7 +78,7 @@ final class InterpretedMethodExpression extends MethodExpression implements ELEx
         Object result = doInvoke(context, params);
         Object coerced = expectedReturnType == void.class ? null : ELSupport.coerceToType(context, result, expectedReturnType);
         context.notifyAfterEvaluation(expressionString);
-        return ELSandbox.checksResultOf(expectedReturnType) ? ELSandboxGuard.checkResult(context, coerced) : coerced;
+        return coerced;
     }
 
     @Override
@@ -104,9 +103,6 @@ final class InterpretedMethodExpression extends MethodExpression implements ELEx
         MethodExpression identifier = identifierMethodExpression(context);
         if (identifier != null) {
             MethodReference reference = identifier.getMethodReference(context);
-            // the reference comes from another expression, but it leaves through this one, so what it
-            // carries is checked here too
-            checkReference(context, reference);
             context.notifyAfterEvaluation(expressionString);
             return reference;
         }
@@ -119,10 +115,7 @@ final class InterpretedMethodExpression extends MethodExpression implements ELEx
             : interpreter().evaluateArguments(context, providedInvocation.arguments());
         ELMethod method = findMethod(context, target, arguments);
         MethodInfo methodInfo = methodInfo(method);
-        // the reference carries the arguments as well as the base, so a denied object reached through one of
-        // them leaves the expression the same way: what the sandbox denies, it denies whatever holds it
         MethodReference reference = new MethodReference(base, methodInfo, method.synthesizeAnnotations(), arguments);
-        checkReference(context, reference);
         context.notifyAfterEvaluation(expressionString);
         return reference;
     }
@@ -233,20 +226,6 @@ final class InterpretedMethodExpression extends MethodExpression implements ELEx
         throw new MethodNotFoundException("The expression '" + expressionString + "' does not resolve to a method expression");
     }
 
-    /**
-     * Fails when a method reference carries an object the sandbox denies. The reference holds the base and
-     * the evaluated arguments, so a denied object reached through either leaves the expression inside it.
-     */
-    private static void checkReference(ELContext context, MethodReference reference) {
-        ELSandboxGuard.checkResult(context, reference.getBase());
-        Object[] parameters = reference.getEvaluatedParameters();
-        if (parameters != null) {
-            for (Object parameter : parameters) {
-                ELSandboxGuard.checkResult(context, parameter);
-            }
-        }
-    }
-
     private ELMethod findMethod(ELContext context,
                                 ELInterpreter.@Nullable Target target,
                                 Object @Nullable [] arguments) {
@@ -258,12 +237,15 @@ final class InterpretedMethodExpression extends MethodExpression implements ELEx
             throw new MethodNotFoundException("Cannot resolve the method of the expression '"
                 + expressionString + "'");
         }
-        // the metadata of a method is the method: `getMethodInfo` and `getMethodReference` reach it without
-        // invoking it, and the second hands the base object back, so the sandbox applies here as it does to
-        // the invocation
-        ELSandboxGuard.check(context, target.base(), target.property());
         Class<?>[] paramTypes = arguments == null ? expectedParamTypes : null;
-        return ELInterpreter.resolveMethod(context, executors(), target.base(), target.property(), paramTypes, arguments);
+        ELMethod method = ELInterpreter.resolveMethod(context, executors(), target.base(), target.property(), paramTypes, arguments);
+        if (method instanceof SandboxedELMethod sandboxed) {
+            // the metadata of a method found reflectively is read reflectively: `getMethodInfo` and
+            // `getMethodReference` reach it without invoking it, so the sandbox applies here as it does to the
+            // invocation
+            sandboxed.checkAccess(context, target.base());
+        }
+        return method;
     }
 
     private java.util.List<io.micronaut.el.ELMethodExecutor> executors() {
