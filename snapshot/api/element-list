@@ -2,7 +2,6 @@ io.micronaut.el
 io.micronaut.el.annotation
 io.micronaut.el.info
 io.micronaut.el.interpreter
-io.micronaut.el.interpreter.reflection
 io.micronaut.el.parser
 io.micronaut.el.parser.ast
 io.micronaut.el.processor.compiler
