@@ -660,9 +660,8 @@ final class ELInterpreter {
         if (target == null) {
             return null;
         }
-        // the reference names the base and the property of an lvalue, so it is the same access as getType and
-        // isReadOnly and the sandbox has the same say over it
-        ELSandboxGuard.check(context, target.base(), target.property());
+        // the reference names the base and the property without reading the property, and the base was checked
+        // where reflection produced it, if it did
         return new ValueReference(target.base(), target.property());
     }
 
@@ -803,7 +802,6 @@ final class ELInterpreter {
         if (base == null || method == null) {
             throw new PropertyNotFoundException("Cannot resolve a method on a null base object");
         }
-        ELSandboxGuard.check(context, base, method);
         ELMethod resolved = resolveMethod(context, executors, base, method, paramTypes, arguments);
         return resolved.invoke(context, base, arguments);
     }
@@ -818,7 +816,6 @@ final class ELInterpreter {
 
     @Nullable
     private Object invokeCallable(ELContext context, @Nullable Object target, Object... arguments) {
-        ELSandboxGuard.check(context, target, null);
         if (target instanceof LambdaExpression lambda) {
             lambda.setELContext(context);
             return lambda.invoke(context, arguments);
@@ -841,7 +838,10 @@ final class ELInterpreter {
         for (ELMethodExecutor executor : executors) {
             ELMethod resolved = executor.resolve(context, base, method, ELArguments.of(paramTypes), arguments);
             if (resolved != null) {
-                return resolved;
+                // what an executor reaches reflectively is what the sandbox of an expression parsed at runtime is
+                // for, and all it is for: a method generated or registered while the application compiled is not
+                // held up by it
+                return executor.isReflective() ? new SandboxedELMethod(resolved) : resolved;
             }
         }
         // the executors that were consulted are what says which of the remedies applies: the reflective one is
@@ -857,7 +857,8 @@ final class ELInterpreter {
         for (ELMethodExecutor executor : executors) {
             ELMethod resolved = executor.resolveFunction(context, prefix, localName);
             if (resolved != null) {
-                return resolved;
+                // a function a reflective executor binds is invoked reflectively, so what it returns is checked
+                return executor.isReflective() ? new SandboxedELMethod(resolved) : resolved;
             }
         }
         return null;
@@ -952,8 +953,8 @@ final class ELInterpreter {
      * from the runtime types of the arguments is resolved anew on every evaluation, because other arguments
      * could select another overload.</p>
      *
-     * <p>The cache is a single field read without synchronization: a race recomputes the same answer, and the
-     * sandbox is consulted on every evaluation, before the cache is.</p>
+     * <p>The cache is a single field read without synchronization: a race recomputes the same answer, and a
+     * method found reflectively carries the sandbox into every invocation, cached or not.</p>
      */
     static final class MethodCallSite {
 
@@ -968,7 +969,6 @@ final class ELInterpreter {
                       Object base,
                       Object method,
                       Object @Nullable [] arguments) {
-            ELSandboxGuard.check(context, base, method);
             Class<?> type = base instanceof ELClass elClass ? elClass.getKlass() : base.getClass();
             Resolved cached = resolved;
             if (cached != null && cached.type() == type && cached.name().equals(method)) {

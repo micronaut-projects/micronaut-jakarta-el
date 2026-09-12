@@ -2,6 +2,11 @@ plugins {
     id "io.micronaut.build.internal.jakarta-el-module"
 }
 
+noReflection {
+    // the method executors reach the interpreter as services, which a native image loads without further metadata
+    allow 'SERVICE_LOADING'
+}
+
 dependencies {
     api projects.micronautJakartaEl
     api projects.micronautJakartaElParser

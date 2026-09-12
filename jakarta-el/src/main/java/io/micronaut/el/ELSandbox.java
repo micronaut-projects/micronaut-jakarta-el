@@ -18,18 +18,36 @@ package io.micronaut.el;
 import io.micronaut.core.annotation.Experimental;
 import org.jspecify.annotations.Nullable;
 import jakarta.el.ELContext;
+import jakarta.el.ELResolver;
 
+import java.io.File;
+import java.io.FileDescriptor;
+import java.net.URI;
+import java.net.URL;
+import java.nio.file.Path;
 import java.util.List;
-import java.util.Set;
+import java.util.ServiceLoader;
 
 /**
- * The types and members an expression parsed at runtime may reach.
+ * What an expression parsed at runtime may reach through reflection.
  *
  * <p>An expression declared with {@code io.micronaut.el.annotation.ELExpression} is written by the developer
  * and compiled, so it is as trusted as the rest of the source. An expression string built at runtime is not:
- * the specification resolves properties, methods, static members and constructors dynamically, so an
- * expression that reaches {@code java.lang.Runtime}, a {@code java.lang.Class} or the reflection API can run
- * whatever the process can. A sandbox closes those paths while leaving the language intact.</p>
+ * the specification resolves properties, methods, static members and constructors dynamically, and where that
+ * resolution reflects, an expression that reaches {@code java.lang.Runtime}, a {@code java.lang.Class} or the
+ * reflection API can run whatever the process can. A sandbox closes those paths while leaving the language
+ * intact.</p>
+ *
+ * <p>The sandbox is consulted where the resolution of such an expression reflects, and nowhere else: a method,
+ * a constructor, a static member or a function an {@link ELMethodExecutor#isReflective() executor resolves
+ * reflectively}, and a property a resolver reads that is not known to read it without reflection - the resolvers
+ * of the specification that read a bean (an {@code Optional} holding one included), a record, a class or a static
+ * import, and any resolver the module does not know. It is asked about the base object before the access and about
+ * the value the access produced after it, so reflection neither works on nor hands the expression a type it denies.
+ * What the application described while it compiled - its bean introspections, the executable methods of its beans,
+ * the methods it registered - and the maps, lists and arrays an expression indexes are reached without it: they
+ * lead only where the application already chose to lead. An expression compiled at compilation time never
+ * consults it.</p>
  *
  * <p>{@link #standard()} is applied to every expression the
  * {@code micronaut-jakarta-el-interpreter} module creates. Register another one, {@link #UNRESTRICTED}
@@ -37,8 +55,8 @@ import java.util.Set;
  *
  * <pre>{@code context.putContext(ELSandbox.class, ELSandbox.UNRESTRICTED);}</pre>
  *
- * <p>A sandbox is not a security boundary on its own: it bounds what an expression reaches, not what the
- * beans it reaches then do. Treat an expression string from an untrusted source as untrusted input.</p>
+ * <p>A sandbox is not a security boundary on its own: it bounds what reflection reaches, not what the beans
+ * an expression reaches then do. Treat an expression string from an untrusted source as untrusted input.</p>
  *
  * @author Denis Stepanov
  * @since 1.1
@@ -54,11 +72,6 @@ public interface ELSandbox {
 
         @Override
         public boolean allowsType(Class<?> type) {
-            return true;
-        }
-
-        @Override
-        public boolean allowsMember(Class<?> type, String member) {
             return true;
         }
 
@@ -92,29 +105,11 @@ public interface ELSandbox {
     }
 
     /**
-     * Whether a value coerced to the given type can be an instance of a type a sandbox denies, which decides
-     * whether the value an expression returns has to be checked at all.
+     * Whether reflection may reach the members of a type, which is asked of the base object of every reflective
+     * access and of the value every reflective access produces.
      *
-     * <p>The coercions of the section 1.25 to a string, to a boolean, to a character, to a number and to an
-     * enum all produce an instance of the target type, and none of those is ever denied. Every other target,
-     * {@link Object} first among them, hands the value back as it is.</p>
-     *
-     * @param expectedType The type the result of an expression is coerced to
-     * @return Whether the coerced value has to be checked
-     */
-    static boolean checksResultOf(Class<?> expectedType) {
-        return !(expectedType == String.class
-            || expectedType == Boolean.class || expectedType == boolean.class
-            || expectedType == Character.class || expectedType == char.class
-            || expectedType.isEnum()
-            || expectedType.isPrimitive()
-            || Number.class.isAssignableFrom(expectedType));
-    }
-
-    /**
-     * Whether an expression may read the properties of a type and invoke its methods, which is asked of the
-     * base object of every property access and method invocation, of the class of every static reference and
-     * of the class of every constructor reference.
+     * <p>No member is denied by its name: every member that leads from an allowed object to a denied one, such as
+     * {@code getClass} or {@code getClassLoader}, produces a value of a denied type, and is stopped by that.</p>
      *
      * @param type The type the expression reached
      * @return Whether the expression may use it
@@ -122,21 +117,10 @@ public interface ELSandbox {
     boolean allowsType(Class<?> type);
 
     /**
-     * Whether an expression may read a property of a type or invoke a method of it, asked once the type
-     * itself is allowed.
-     *
-     * @param type   The type of the base object
-     * @param member The name of the property or of the method
-     * @return Whether the expression may use it
-     */
-    boolean allowsMember(Class<?> type, String member);
-
-    /**
      * The default deny list.
      *
-     * <p>Types are denied by their own name, by the name of one of their supertypes, and by package: a
-     * subclass of a denied type is denied, so a custom class loader does not slip through the check on
-     * {@link ClassLoader}.</p>
+     * <p>Types are denied together with their subtypes, and by package: a subclass of a denied type is denied,
+     * so a custom class loader does not slip through the check on {@link ClassLoader}.</p>
      */
     final class StandardELSandbox implements ELSandbox {
 
@@ -144,29 +128,30 @@ public interface ELSandbox {
 
         /**
          * The types that hand an expression the process, the class loaders or the reflection API. Every
-         * subtype of one of them is denied too.
+         * subtype of one of them is denied too, which {@link Class#isAssignableFrom} answers from the class
+         * itself, without asking it for its interfaces.
          */
-        static final Set<String> DENIED_TYPES = Set.of(
-            "java.lang.Class",
-            "java.lang.ClassLoader",
-            "java.lang.Module",
-            "java.lang.ModuleLayer",
-            "java.lang.Package",
-            "java.lang.Process",
-            "java.lang.ProcessBuilder",
-            "java.lang.ProcessHandle",
-            "java.lang.Runtime",
-            "java.lang.System",
-            "java.lang.Thread",
-            "java.lang.ThreadGroup",
-            "java.io.File",
-            "java.io.FileDescriptor",
-            "java.net.URI",
-            "java.net.URL",
-            "java.nio.file.Path",
-            "java.util.ServiceLoader",
-            "jakarta.el.ELContext",
-            "jakarta.el.ELResolver"
+        static final List<Class<?>> DENIED_TYPES = List.of(
+            Class.class,
+            ClassLoader.class,
+            Module.class,
+            ModuleLayer.class,
+            Package.class,
+            Process.class,
+            ProcessBuilder.class,
+            ProcessHandle.class,
+            Runtime.class,
+            System.class,
+            Thread.class,
+            ThreadGroup.class,
+            File.class,
+            FileDescriptor.class,
+            URI.class,
+            URL.class,
+            Path.class,
+            ServiceLoader.class,
+            ELContext.class,
+            ELResolver.class
         );
 
         /**
@@ -187,29 +172,8 @@ public interface ELSandbox {
         );
 
         /**
-         * The members that hand an expression a denied type from a type that is allowed. The type of the
-         * value they return is denied too, so these only make the failure name what the expression did.
-         *
-         * <p>{@link #allowsMember} does not read this set, it switches on the length of the name instead.
-         * The two are held together by a test.</p>
-         */
-        static final Set<String> DENIED_MEMBERS = Set.of(
-            "class",
-            "getClass",
-            "classLoader",
-            "getClassLoader",
-            "module",
-            "getModule",
-            "protectionDomain",
-            "getProtectionDomain",
-            "wait",
-            "notify",
-            "notifyAll"
-        );
-
-        /**
-         * The verdict per class, computed once: the walk of the supertypes is not worth repeating for every
-         * property of every object an expression reaches.
+         * The verdict per class, computed once: the comparison with every denied type is not worth repeating
+         * for every access an expression makes.
          */
         private static final ClassValue<Boolean> ALLOWED = new ClassValue<>() {
             @Override
@@ -224,24 +188,6 @@ public interface ELSandbox {
         @Override
         public boolean allowsType(Class<?> type) {
             return ALLOWED.get(type);
-        }
-
-        @Override
-        public boolean allowsMember(Class<?> type, String member) {
-            // this is asked of every property an expression reads, and the answer is almost always yes: a
-            // switch on the length reaches at most two comparisons, where hashing the name costs more
-            return switch (member.length()) {
-                case 4 -> !member.equals("wait");
-                case 5 -> !member.equals("class");
-                case 6 -> !(member.equals("module") || member.equals("notify"));
-                case 8 -> !member.equals("getClass");
-                case 9 -> !(member.equals("getModule") || member.equals("notifyAll"));
-                case 11 -> !member.equals("classLoader");
-                case 14 -> !member.equals("getClassLoader");
-                case 16 -> !member.equals("protectionDomain");
-                case 19 -> !member.equals("getProtectionDomain");
-                default -> true;
-            };
         }
 
         @Override
@@ -263,22 +209,12 @@ public interface ELSandbox {
                     return false;
                 }
             }
-            for (Class<?> supertype = component; supertype != null; supertype = supertype.getSuperclass()) {
-                if (DENIED_TYPES.contains(supertype.getName())) {
+            for (Class<?> denied : DENIED_TYPES) {
+                if (denied.isAssignableFrom(component)) {
                     return false;
                 }
             }
-            return !implementsDenied(component);
-        }
-
-        private static boolean implementsDenied(Class<?> type) {
-            for (Class<?> anInterface : type.getInterfaces()) {
-                if (DENIED_TYPES.contains(anInterface.getName()) || implementsDenied(anInterface)) {
-                    return true;
-                }
-            }
-            Class<?> superclass = type.getSuperclass();
-            return superclass != null && implementsDenied(superclass);
+            return true;
         }
     }
 }

@@ -32,12 +32,14 @@ dispatch instead;
 * any runtime-parsed method for which no direct executor is registered and the reflection executor is absent simply
   fails to resolve; it does not silently fall back to reflection.
 
-The boundary is checked rather than described: `./gradlew check` runs a `checkstyleReflection` task over
-`micronaut-jakarta-el`, `micronaut-jakarta-el-parser`, `micronaut-jakarta-el-interpreter` and
-`micronaut-jakarta-el-annotations` that rejects an import of `java.lang.reflect` or `java.lang.invoke`, the
-same names written out, and the calls that read a class for a member without naming either package. The rules
-are in `gradle/checkstyle/reflection.xml`, with every exception listed in the suppressions next to it: the two
-signatures the Jakarta EL API dictates, and the sandbox, which names the packages in order to deny them.
+The boundary is checked rather than described: every module compiles with the `NoReflection` check of
+https://github.com/micronaut-projects/errorprone-no-reflection[errorprone-no-reflection], which fails the
+compilation on a call that reaches for reflection and names the kind it is. The check matches the method a call
+resolves to rather than how the source spells it, so it also catches what does not look like reflection, such as
+synthesizing an annotation, coercing to an enum by name or reading the interfaces of a class.
+`micronaut-jakarta-el-interpreter-reflection` and `micronaut-jakarta-el-processor` are allowed it in their builds,
+and the modules that load the services the runtime is extended with are allowed that. Every other exception is a
+`@SuppressWarnings("NoReflection")` on the variable holding the result of the call, with the reason next to it.
 
 Even these are served through a per-class method cache, so they stay fast — the `staticMethod` and
 `stringMethods` benchmarks run them — but a native image needs the involved types registered for reflection.

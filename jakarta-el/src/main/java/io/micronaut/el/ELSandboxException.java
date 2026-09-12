@@ -17,10 +17,10 @@ package io.micronaut.el;
 
 import io.micronaut.core.annotation.Experimental;
 import jakarta.el.ELException;
-import org.jspecify.annotations.Nullable;
 
 /**
- * Raised when an expression parsed at runtime reaches a type or a member its {@link ELSandbox} denies.
+ * Raised when reflection would work on, or hand an expression parsed at runtime, a type its {@link ELSandbox}
+ * denies.
  *
  * @author Denis Stepanov
  * @since 1.1
@@ -32,16 +32,15 @@ public final class ELSandboxException extends ELException {
     private static final long serialVersionUID = 1L;
 
     private final transient Class<?> type;
-    private final transient @Nullable String member;
 
     /**
-     * @param type   The type the expression reached
-     * @param member The property or method it reached, {@code null} when the type itself is denied
+     * @param type The type the expression reached
      */
-    public ELSandboxException(Class<?> type, @Nullable String member) {
-        super(message(type, member));
+    public ELSandboxException(Class<?> type) {
+        super("An expression parsed at runtime is not allowed to reach the type " + type.getName()
+            + ". Declare the expression with @ELExpression so that it is compiled, or widen the sandbox with"
+            + " ELContext.putContext(ELSandbox.class, sandbox).");
         this.type = type;
-        this.member = member;
     }
 
     /**
@@ -49,22 +48,5 @@ public final class ELSandboxException extends ELException {
      */
     public Class<?> getType() {
         return type;
-    }
-
-    /**
-     * @return The property or method the expression reached, {@code null} when the type itself is denied
-     */
-    @Nullable
-    public String getMember() {
-        return member;
-    }
-
-    private static String message(Class<?> type, @Nullable String member) {
-        String reached = member == null
-            ? "the type " + type.getName()
-            : "'" + member + "' of " + type.getName();
-        return "An expression parsed at runtime is not allowed to reach " + reached
-            + ". Declare the expression with @ELExpression so that it is compiled, or widen the sandbox with"
-            + " ELContext.putContext(ELSandbox.class, sandbox).";
     }
 }
