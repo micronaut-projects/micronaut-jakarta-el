@@ -1,7 +1,7 @@
 [versions]
 managed-jakarta-el = "6.0.1"
 
-micronaut = "5.2.0"
+micronaut = "5.2.1"
 micronaut-sourcegen = "2.1.0"
 
 junit = "5.14.4"
