@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.sun.ts.tests.el.spec.collectionoperators.ELClientIT" tests="18" skipped="0" failures="0" errors="0" timestamp="SANITIZED" hostname="SANITIZED" time="0">
+  <properties/>
+  <testcase name="elCollectionSubStreamTest()" classname="com.sun.ts.tests.el.spec.collectionoperators.ELClientIT" time="0"/>
+  <testcase name="elCollectionReduceTest()" classname="com.sun.ts.tests.el.spec.collectionoperators.ELClientIT" time="0"/>
+  <testcase name="elCollectionMapLiteralTest()" classname="com.sun.ts.tests.el.spec.collectionoperators.ELClientIT" time="0"/>
+  <testcase name="elCollectionFindFirstTest()" classname="com.sun.ts.tests.el.spec.collectionoperators.ELClientIT" time="0"/>
+  <testcase name="elCollectionSetLiteralTest()" classname="com.sun.ts.tests.el.spec.collectionoperators.ELClientIT" time="0"/>
+  <testcase name="elCollectionSumTest()" classname="com.sun.ts.tests.el.spec.collectionoperators.ELClientIT" time="0"/>
+  <testcase name="elCollectionForEachTest()" classname="com.sun.ts.tests.el.spec.collectionoperators.ELClientIT" time="0"/>
+  <testcase name="elCollectionDistinctTest()" classname="com.sun.ts.tests.el.spec.collectionoperators.ELClientIT" time="0"/>
+  <testcase name="elCollectionFlatMapTest()" classname="com.sun.ts.tests.el.spec.collectionoperators.ELClientIT" time="0"/>
+  <testcase name="elCollectionPeekTest()" classname="com.sun.ts.tests.el.spec.collectionoperators.ELClientIT" time="0"/>
+  <testcase name="elCollectionCountTest()" classname="com.sun.ts.tests.el.spec.collectionoperators.ELClientIT" time="0"/>
+  <testcase name="elCollectionListLiteralTest()" classname="com.sun.ts.tests.el.spec.collectionoperators.ELClientIT" time="0"/>
+  <testcase name="elCollectionLimitTest()" classname="com.sun.ts.tests.el.spec.collectionoperators.ELClientIT" time="0"/>
+  <testcase name="elCollectionMapFilterTest()" classname="com.sun.ts.tests.el.spec.collectionoperators.ELClientIT" time="0"/>
+  <testcase name="elCollectionMaxTest()" classname="com.sun.ts.tests.el.spec.collectionoperators.ELClientIT" time="0"/>
+  <testcase name="elCollectionMinTest()" classname="com.sun.ts.tests.el.spec.collectionoperators.ELClientIT" time="0"/>
+  <testcase name="elCollectionToArrayTest()" classname="com.sun.ts.tests.el.spec.collectionoperators.ELClientIT" time="0"/>
+  <testcase name="elCollectionAverageTest()" classname="com.sun.ts.tests.el.spec.collectionoperators.ELClientIT" time="0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logStartTest
+INFO: STARTING TEST : elCollectionSubStreamTest()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: === Testing substream-one ===
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: [0,1,2,3,4].stream().substream(2).toList()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  = returns =
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  2
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  3
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  4
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: === Testing substream-two ===
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: [0,1,2,3,4,5,6].stream().substream(2,5).toList()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  = returns =
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  2
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  3
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  4
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logFinishTest
+INFO: FINISHED TEST : elCollectionSubStreamTest()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT cleanup
+INFO: Cleanup method called
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logStartTest
+INFO: STARTING TEST : elCollectionReduceTest()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: === Testing reduce-one ===
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: EL Quuery String: '[1,2,3,4,5].stream().reduce(0, (l,r)->l+r)' -returns: 15(class java.lang.Long)
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: === Testing reduce-two ===
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: EL Quuery String: '[1,2,3,4,5].stream().reduce((l,r)->l+r).get()' -returns: 15(class java.lang.Long)
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: === Testing reduce-three ===
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: EL Quuery String: '[].stream().reduce((l,r)->l+r).orElse(101)' -returns: 101(class java.lang.Long)
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: === Testing reduce-four ===
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: EL Quuery String: '[].stream().reduce((l,r)->l+r).orElseGet(()->101)' -returns: 101(class java.lang.Long)
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: === Testing reduce-five ===
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: EL Quuery String: 'c = 0; [1,2,3,4,5,6].stream().reduce(0, (l,r)->(c = c+1; c % 2 == 0? l+r: l-r))' -returns: 3(class java.lang.Long)
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logFinishTest
+INFO: FINISHED TEST : elCollectionReduceTest()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT cleanup
+INFO: Cleanup method called
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logStartTest
+INFO: STARTING TEST : elCollectionMapLiteralTest()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logFinishTest
+INFO: FINISHED TEST : elCollectionMapLiteralTest()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT cleanup
+INFO: Cleanup method called
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logStartTest
+INFO: STARTING TEST : elCollectionFindFirstTest()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: === Testing findFirst ===
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: products.stream().sorted(p->p.unitPrice).findFirst().get()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  = returns =
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  Product: 200, Eagle, book, 12.5, 100
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logFinishTest
+INFO: FINISHED TEST : elCollectionFindFirstTest()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT cleanup
+INFO: Cleanup method called
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logStartTest
+INFO: STARTING TEST : elCollectionSetLiteralTest()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logFinishTest
+INFO: FINISHED TEST : elCollectionSetLiteralTest()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT cleanup
+INFO: Cleanup method called
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logStartTest
+INFO: STARTING TEST : elCollectionSumTest()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: === Testing sum ===
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: ['10', '12', '13'].stream().sum()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  = returns =
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  35
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: === Testing sum_Empty ===
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: [].stream().sum()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  = returns =
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  0
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logFinishTest
+INFO: FINISHED TEST : elCollectionSumTest()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT cleanup
+INFO: Cleanup method called
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logStartTest
+INFO: STARTING TEST : elCollectionForEachTest()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: === Testing forEach ===
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: lst = []; products.stream().forEach(p->lst.add(p.name)); lst
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  = returns =
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  Eagle
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  Coming Home
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  Greatest Hits
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  History of Golf
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  Toy Story
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  iSee
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logFinishTest
+INFO: FINISHED TEST : elCollectionForEachTest()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT cleanup
+INFO: Cleanup method called
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logStartTest
+INFO: STARTING TEST : elCollectionDistinctTest()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: === Testing distinct ===
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  ['a', 'b', 'b', 'c'].stream().distinct().toList()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  = returns =
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  a
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  b
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  c
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logFinishTest
+INFO: FINISHED TEST : elCollectionDistinctTest()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT cleanup
+INFO: Cleanup method called
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logStartTest
+INFO: STARTING TEST : elCollectionFlatMapTest()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: === Testing flatMap ===
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: customers.stream().filter(c->c.country=='USA').flatMap(c->c.orders.stream()).toList()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  = returns =
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  Order: 10, 100, 2/18/2010, 20.8
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  Order: 11, 100, 5/3/2011, 34.5
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  Order: 12, 100, 8/2/2011, 210.75
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  Order: 13, 101, 1/15/2011, 50.23
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  Order: 14, 101, 1/3/2012, 126.77
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logFinishTest
+INFO: FINISHED TEST : elCollectionFlatMapTest()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT cleanup
+INFO: Cleanup method called
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logStartTest
+INFO: STARTING TEST : elCollectionPeekTest()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: === Testing peek-one ===
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: lst = []; [1,2,3,4].stream().peek(i->lst.add(i)).toList()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  = returns =
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  1
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  2
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  3
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  4
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: === Testing peek-two ===
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: lst.stream().toList()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  = returns =
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  1
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  2
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  3
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  4
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logFinishTest
+INFO: FINISHED TEST : elCollectionPeekTest()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT cleanup
+INFO: Cleanup method called
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logStartTest
+INFO: STARTING TEST : elCollectionCountTest()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: === Testing count ===
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: [1,2,3,4,5].stream().count()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  = returns =
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  5
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logFinishTest
+INFO: FINISHED TEST : elCollectionCountTest()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT cleanup
+INFO: Cleanup method called
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logStartTest
+INFO: STARTING TEST : elCollectionListLiteralTest()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logFinishTest
+INFO: FINISHED TEST : elCollectionListLiteralTest()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT cleanup
+INFO: Cleanup method called
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logStartTest
+INFO: STARTING TEST : elCollectionLimitTest()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: === Testing limit ===
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: products.stream().sorted((p,q)->p.unitPrice-q.unitPrice).limit(1).toList()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  = returns =
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  [Product: 202, Greatest Hits, cd, 6.5, 200]
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: === Testing limit ===
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: products.stream().sorted((p,q)->p.unitPrice-q.unitPrice).limit(2).toList()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  = returns =
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  Product: 202, Greatest Hits, cd, 6.5, 200
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  Product: 201, Coming Home, dvd, 8.0, 50
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logFinishTest
+INFO: FINISHED TEST : elCollectionLimitTest()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT cleanup
+INFO: Cleanup method called
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logStartTest
+INFO: STARTING TEST : elCollectionMapFilterTest()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: === Testing map-filter-one ===
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: products.stream().filter(p->p.unitPrice >= 10 && p.unitPrice < 12).sorted((p,q)->p.unitPrice-q.unitPrice).map(p->[p.name,p.unitPrice]).toList()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  = returns =
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  [Toy Story, 10.0]
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  [History of Golf, 11.0]
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: === Testing map-filter-two ===
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: [1,2,3,4].stream().filter(i->i > 1).map(i->i*10).toList()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  = returns =
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  20
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  30
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  40
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logFinishTest
+INFO: FINISHED TEST : elCollectionMapFilterTest()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT cleanup
+INFO: Cleanup method called
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logStartTest
+INFO: STARTING TEST : elCollectionMaxTest()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: === Testing max ===
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: EL Quuery String: '[2,3,1,5].stream().max().get()' -returns: 5(class java.lang.Long)
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: === Testing max ===
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: EL Quuery String: '['xy', 'xyz', 'abc'].stream().max().get()' -returns: xyz(class java.lang.String)
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: === Testing max ===
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: EL Quuery String: '[2].stream().max((i,j)->i-j).get()' -returns: 2(class java.lang.Long)
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: === Testing max ===
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: EL Quuery String: 'customers.stream().max((x,y)->x.orders.size()-y.orders.size()).get().name' -returns: John Doe(class java.lang.String)
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: === Testing max ===
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: EL Quuery String: 'customers.stream().max(comparing(c->c.orders.size())).get().name' -returns: John Doe(class java.lang.String)
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logFinishTest
+INFO: FINISHED TEST : elCollectionMaxTest()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT cleanup
+INFO: Cleanup method called
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logStartTest
+INFO: STARTING TEST : elCollectionMinTest()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: === Testing min ===
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: EL Quuery String: '[2,3,1,5].stream().min().get()' -returns: 1(class java.lang.Long)
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: === Testing min ===
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: EL Quuery String: '[3,2,1].stream().min((i,j)->i-j).get()' -returns: 1(class java.lang.Long)
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: === Testing min ===
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: EL Quuery String: 'customers.stream().min((x,y)->x.orders.size()-y.orders.size()).get().name' -returns: Charlie Yeh(class java.lang.String)
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: === Testing min ===
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: EL Quuery String: 'customers.stream().min(comparing(c->c.orders.size())).get().name' -returns: Charlie Yeh(class java.lang.String)
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logFinishTest
+INFO: FINISHED TEST : elCollectionMinTest()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT cleanup
+INFO: Cleanup method called
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logStartTest
+INFO: STARTING TEST : elCollectionToArrayTest()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: === Test toArray===
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: products.stream().sorted(p->p.unitPrice).toArray()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO:  = returns =
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logFinishTest
+INFO: FINISHED TEST : elCollectionToArrayTest()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT cleanup
+INFO: Cleanup method called
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logStartTest
+INFO: STARTING TEST : elCollectionAverageTest()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: === Testing average_ints ===
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logLine
+INFO: EL Quuery String: 'ints.stream().average().get()' -returns: 4.5(class java.lang.Double)
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT logFinishTest
+INFO: FINISHED TEST : elCollectionAverageTest()
+Sep 11, 2026 11:26:11 AM com.sun.ts.tests.el.spec.collectionoperators.ELClientIT cleanup
+INFO: Cleanup method called
+]]></system-err>
+</testsuite>
