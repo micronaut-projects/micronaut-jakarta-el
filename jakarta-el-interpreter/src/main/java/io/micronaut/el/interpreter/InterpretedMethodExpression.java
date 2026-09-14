@@ -229,7 +229,8 @@ final class InterpretedMethodExpression extends MethodExpression implements ELEx
     private ELMethod findMethod(ELContext context,
                                 ELInterpreter.@Nullable Target target,
                                 Object @Nullable [] arguments) {
-        if (target == null || target.base() == null) {
+        Object base = target == null ? null : target.base();
+        if (target == null || base == null) {
             throw new PropertyNotFoundException("Cannot resolve the base object of the expression '"
                 + expressionString + "'");
         }
@@ -238,12 +239,12 @@ final class InterpretedMethodExpression extends MethodExpression implements ELEx
                 + expressionString + "'");
         }
         Class<?>[] paramTypes = arguments == null ? expectedParamTypes : null;
-        ELMethod method = ELInterpreter.resolveMethod(context, executors(), target.base(), target.property(), paramTypes, arguments);
+        ELMethod method = ELInterpreter.resolveMethod(context, executors(), base, target.property(), paramTypes, arguments);
         if (method instanceof SandboxedELMethod sandboxed) {
             // the metadata of a method found reflectively is read reflectively: `getMethodInfo` and
             // `getMethodReference` reach it without invoking it, so the sandbox applies here as it does to the
             // invocation
-            sandboxed.checkAccess(context, target.base());
+            sandboxed.checkAccess(context, base);
         }
         return method;
     }

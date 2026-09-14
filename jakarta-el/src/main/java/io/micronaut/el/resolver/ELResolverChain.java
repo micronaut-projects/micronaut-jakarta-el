@@ -247,13 +247,17 @@ public final class ELResolverChain extends CompositeELResolver {
             if (reflection[i] == OPTIONAL_VALUES && base instanceof Optional<?> optional) {
                 return optionalValue(context, optional, property);
             }
-            boolean reflective = reflectsOn(reflection[i], base);
-            if (reflective && sandbox == null) {
-                sandbox = checkAccess(context, base);
+            // the sandbox the value of this resolver is checked with, when the resolver reflects
+            ELSandbox checked = null;
+            if (reflectsOn(reflection[i], base)) {
+                if (sandbox == null) {
+                    sandbox = checkAccess(context, base);
+                }
+                checked = sandbox;
             }
             Object value = resolvers[i].getValue(context, base, property);
             if (context.isPropertyResolved()) {
-                return reflective && sandbox != null ? ELSandboxedResolution.checkValue(sandbox, value) : value;
+                return checked == null ? value : ELSandboxedResolution.checkValue(checked, value);
             }
         }
         return null;
