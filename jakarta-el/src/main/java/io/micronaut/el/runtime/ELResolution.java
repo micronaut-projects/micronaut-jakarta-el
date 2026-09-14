@@ -97,6 +97,19 @@ public final class ELResolution {
         if (context.isPropertyResolved()) {
             return value;
         }
+        return resolveImport(context, name, sandboxed);
+    }
+
+    /**
+     * The last step of the section 1.5.1: the static field or the class the imports of the context name.
+     *
+     * @param context   The context
+     * @param name      The identifier
+     * @param sandboxed Whether the field of a static import is read under the sandbox
+     * @return The value of the static field, or the class
+     */
+    @Nullable
+    private static Object resolveImport(ELContext context, String name, boolean sandboxed) {
         ImportHandler importHandler = context.getImportHandler();
         if (importHandler != null) {
             Class<?> staticFieldClass = importHandler.resolveStatic(name);
