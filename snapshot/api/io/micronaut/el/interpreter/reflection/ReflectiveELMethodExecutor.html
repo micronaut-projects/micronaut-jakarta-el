@@ -64,6 +64,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
 <ol class="toc-list">
 <li><a href="#getOrder()" tabindex="0">getOrder()</a></li>
+<li><a href="#isReflective()" tabindex="0">isReflective()</a></li>
 <li><a href="#resolve(jakarta.el.ELContext,java.lang.Object,java.lang.Object,io.micronaut.core.type.Argument%5B%5D,java.lang.Object%5B%5D)" tabindex="0">resolve(ELContext, Object, Object, Argument[], Object[])</a></li>
 <li><a href="#resolveFunction(jakarta.el.ELContext,java.lang.String,java.lang.String)" tabindex="0">resolveFunction(ELContext, String, String)</a></li>
 </ol>
@@ -142,20 +143,26 @@ otherwise direct executors can omit it.</p></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the executor order.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@Nullable <a href="../../ELMethod.html" title="interface in io.micronaut.el">ELMethod</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#resolve(jakarta.el.ELContext,java.lang.Object,java.lang.Object,io.micronaut.core.type.Argument%5B%5D,java.lang.Object%5B%5D)" class="member-name-link">resolve</a><wbr>(jakarta.el.ELContext&nbsp;context,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isReflective()" class="member-name-link">isReflective</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Whether the executor reaches the methods it resolves reflectively, rather than through what was generated
+or registered while the application compiled.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@Nullable <a href="../../ELMethod.html" title="interface in io.micronaut.el">ELMethod</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#resolve(jakarta.el.ELContext,java.lang.Object,java.lang.Object,io.micronaut.core.type.Argument%5B%5D,java.lang.Object%5B%5D)" class="member-name-link">resolve</a><wbr>(jakarta.el.ELContext&nbsp;context,
  @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;base,
  @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;method,
  io.micronaut.core.type.Argument&lt;?&gt; @Nullable []&nbsp;argumentTypes,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a> @Nullable []&nbsp;arguments)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Resolves an instance or static method, or a constructor represented by <code>&lt;init&gt;</code>.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@Nullable <a href="../../ELMethod.html" title="interface in io.micronaut.el">ELMethod</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#resolveFunction(jakarta.el.ELContext,java.lang.String,java.lang.String)" class="member-name-link">resolveFunction</a><wbr>(jakarta.el.ELContext&nbsp;context,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@Nullable <a href="../../ELMethod.html" title="interface in io.micronaut.el">ELMethod</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#resolveFunction(jakarta.el.ELContext,java.lang.String,java.lang.String)" class="member-name-link">resolveFunction</a><wbr>(jakarta.el.ELContext&nbsp;context,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;prefix,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;localName)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Resolves a function bound by the expression context.</div>
 </div>
 </div>
@@ -206,6 +213,24 @@ direct/generated implementations can take precedence over a general fallback suc
 <dd><code>getOrder</code>&nbsp;in interface&nbsp;<code>io.micronaut.core.order.Ordered</code></dd>
 <dt>Returns:</dt>
 <dd>The order, zero by default</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="isReflective()">
+<h3>isReflective</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isReflective</span>()</div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../ELMethodExecutor.html#isReflective()">ELMethodExecutor</a></code></span></div>
+<div class="block">Whether the executor reaches the methods it resolves reflectively, rather than through what was generated
+or registered while the application compiled. The <a href="../../ELSandbox.html" title="interface in io.micronaut.el"><code>ELSandbox</code></a> of an expression parsed at runtime is
+consulted for the methods such an executor resolves, and only for them.</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../../ELMethodExecutor.html#isReflective()">isReflective</a></code>&nbsp;in interface&nbsp;<code><a href="../../ELMethodExecutor.html" title="interface in io.micronaut.el">ELMethodExecutor</a></code></dd>
+<dt>Returns:</dt>
+<dd>Whether the executor reflects, <code>false</code> by default</dd>
 </dl>
 </div>
 </section>

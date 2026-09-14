@@ -60,7 +60,6 @@ loadScripts(document, 'script');</script>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
 <ol class="toc-list">
 <li><a href="#allowsType(java.lang.Class)" tabindex="0">allowsType(Class)</a></li>
-<li><a href="#allowsMember(java.lang.Class,java.lang.String)" tabindex="0">allowsMember(Class, String)</a></li>
 <li><a href="#toString()" tabindex="0">toString()</a></li>
 </ol>
 </li>
@@ -90,9 +89,8 @@ loadScripts(document, 'script');</script>
 implements <a href="ELSandbox.html" title="interface in io.micronaut.el">ELSandbox</a></span></div>
 <div class="block">The default deny list.
 
-<p>Types are denied by their own name, by the name of one of their supertypes, and by package: a
-subclass of a denied type is denied, so a custom class loader does not slip through the check on
-<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/ClassLoader.html" title="class or interface in java.lang" class="external-link"><code>ClassLoader</code></a>.</p></div>
+<p>Types are denied together with their subtypes, and by package: a subclass of a denied type is denied,
+so a custom class loader does not slip through the check on <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/ClassLoader.html" title="class or interface in java.lang" class="external-link"><code>ClassLoader</code></a>.</p></div>
 <dl class="notes">
 <dt>Since:</dt>
 <dd>1.1</dd>
@@ -133,22 +131,14 @@ subclass of a denied type is denied, so a custom class loader does not slip thro
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#allowsMember(java.lang.Class,java.lang.String)" class="member-name-link">allowsMember</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;type,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;member)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#allowsType(java.lang.Class)" class="member-name-link">allowsType</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;type)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Whether an expression may read a property of a type or invoke a method of it, asked once the type
-itself is allowed.</div>
+<div class="block">Whether reflection may reach the members of a type, which is asked of the base object of every reflective
+access and of the value every reflective access produces.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#allowsType(java.lang.Class)" class="member-name-link">allowsType</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;type)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Whether an expression may read the properties of a type and invoke its methods, which is asked of the
-base object of every property access and method invocation, of the class of every static reference and
-of the class of every constructor reference.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toString()" class="member-name-link">toString</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toString()" class="member-name-link">toString</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
 </div>
@@ -172,35 +162,16 @@ of the class of every constructor reference.</div>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">allowsType</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;type)</span></div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="ELSandbox.html#allowsType(java.lang.Class)">ELSandbox</a></code></span></div>
-<div class="block">Whether an expression may read the properties of a type and invoke its methods, which is asked of the
-base object of every property access and method invocation, of the class of every static reference and
-of the class of every constructor reference.</div>
+<div class="block">Whether reflection may reach the members of a type, which is asked of the base object of every reflective
+access and of the value every reflective access produces.
+
+<p>No member is denied by its name: every member that leads from an allowed object to a denied one, such as
+<code>getClass</code> or <code>getClassLoader</code>, produces a value of a denied type, and is stopped by that.</p></div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="ELSandbox.html#allowsType(java.lang.Class)">allowsType</a></code>&nbsp;in interface&nbsp;<code><a href="ELSandbox.html" title="interface in io.micronaut.el">ELSandbox</a></code></dd>
 <dt>Parameters:</dt>
 <dd><code>type</code> - The type the expression reached</dd>
-<dt>Returns:</dt>
-<dd>Whether the expression may use it</dd>
-</dl>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="allowsMember(java.lang.Class,java.lang.String)">
-<h3>allowsMember</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">allowsMember</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;type,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;member)</span></div>
-<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="ELSandbox.html#allowsMember(java.lang.Class,java.lang.String)">ELSandbox</a></code></span></div>
-<div class="block">Whether an expression may read a property of a type or invoke a method of it, asked once the type
-itself is allowed.</div>
-<dl class="notes">
-<dt>Specified by:</dt>
-<dd><code><a href="ELSandbox.html#allowsMember(java.lang.Class,java.lang.String)">allowsMember</a></code>&nbsp;in interface&nbsp;<code><a href="ELSandbox.html" title="interface in io.micronaut.el">ELSandbox</a></code></dd>
-<dt>Parameters:</dt>
-<dd><code>type</code> - The type of the base object</dd>
-<dd><code>member</code> - The name of the property or of the method</dd>
 <dt>Returns:</dt>
 <dd>Whether the expression may use it</dd>
 </dl>

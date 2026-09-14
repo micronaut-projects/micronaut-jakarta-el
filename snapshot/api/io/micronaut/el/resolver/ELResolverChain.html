@@ -66,6 +66,10 @@ loadScripts(document, 'script');</script>
 <li><a href="#add(jakarta.el.ELResolver)" tabindex="0">add(ELResolver)</a></li>
 <li><a href="#converts()" tabindex="0">converts()</a></li>
 <li><a href="#getValue(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" tabindex="0">getValue(ELContext, Object, Object)</a></li>
+<li><a href="#getValueSandboxed(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" tabindex="0">getValueSandboxed(ELContext, Object, Object)</a></li>
+<li><a href="#setValueSandboxed(jakarta.el.ELContext,java.lang.Object,java.lang.Object,java.lang.Object)" tabindex="0">setValueSandboxed(ELContext, Object, Object, Object)</a></li>
+<li><a href="#getTypeSandboxed(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" tabindex="0">getTypeSandboxed(ELContext, Object, Object)</a></li>
+<li><a href="#isReadOnlySandboxed(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" tabindex="0">isReadOnlySandboxed(ELContext, Object, Object)</a></li>
 <li><a href="#convertToType(jakarta.el.ELContext,java.lang.Object,java.lang.Class)" tabindex="0">convertToType(ELContext, Object, Class)</a></li>
 <li><a href="#invoke(jakarta.el.ELContext,java.lang.Object,java.lang.Object,java.lang.Class%5B%5D,java.lang.Object%5B%5D)" tabindex="0">invoke(ELContext, Object, Object, Class[], Object[])</a></li>
 </ol>
@@ -150,11 +154,26 @@ order until one sets <code>propertyResolved</code>.</p></div>
  @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;obj,
  @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;targetType)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getValue(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">getValue</a><wbr>(jakarta.el.ELContext&nbsp;context,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a><wbr>&lt;?&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getTypeSandboxed(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">getTypeSandboxed</a><wbr>(jakarta.el.ELContext&nbsp;context,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;base,
+ @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;property)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Resolves the type of a property of a base object for an expression parsed at runtime, consulting the
+<a href="../ELSandbox.html" title="interface in io.micronaut.el"><code>ELSandbox</code></a> of the context about the base object as <a href="#getValueSandboxed(jakarta.el.ELContext,java.lang.Object,java.lang.Object)"><code>getValueSandboxed(ELContext, Object, Object)</code></a> does.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getValue(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">getValue</a><wbr>(jakarta.el.ELContext&nbsp;context,
  @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;base,
  @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;property)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getValueSandboxed(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">getValueSandboxed</a><wbr>(jakarta.el.ELContext&nbsp;context,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;base,
+ @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;property)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Resolves a property of a base object for an expression parsed at runtime.</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#invoke(jakarta.el.ELContext,java.lang.Object,java.lang.Object,java.lang.Class%5B%5D,java.lang.Object%5B%5D)" class="member-name-link">invoke</a><wbr>(jakarta.el.ELContext&nbsp;context,
  @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;base,
@@ -162,6 +181,23 @@ order until one sets <code>propertyResolved</code>.</p></div>
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt; @Nullable []&nbsp;paramTypes,
  @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>[]&nbsp;params)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isReadOnlySandboxed(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">isReadOnlySandboxed</a><wbr>(jakarta.el.ELContext&nbsp;context,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;base,
+ @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;property)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Resolves whether a property of a base object is read only for an expression parsed at runtime,
+consulting the <a href="../ELSandbox.html" title="interface in io.micronaut.el"><code>ELSandbox</code></a> of the context about the base object as <a href="#getValueSandboxed(jakarta.el.ELContext,java.lang.Object,java.lang.Object)"><code>getValueSandboxed(ELContext, Object, Object)</code></a> does.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setValueSandboxed(jakarta.el.ELContext,java.lang.Object,java.lang.Object,java.lang.Object)" class="member-name-link">setValueSandboxed</a><wbr>(jakarta.el.ELContext&nbsp;context,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;base,
+ @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;property,
+ @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;value)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Assigns a property of a base object for an expression parsed at runtime, consulting the
+<a href="../ELSandbox.html" title="interface in io.micronaut.el"><code>ELSandbox</code></a> of the context about the base object as <a href="#getValueSandboxed(jakarta.el.ELContext,java.lang.Object,java.lang.Object)"><code>getValueSandboxed(ELContext, Object, Object)</code></a> does.</div>
+</div>
 </div>
 </div>
 </div>
@@ -250,6 +286,93 @@ order until one sets <code>propertyResolved</code>.</p></div>
 <dl class="notes">
 <dt>Overrides:</dt>
 <dd><code>getValue</code>&nbsp;in class&nbsp;<code>jakarta.el.CompositeELResolver</code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getValueSandboxed(jakarta.el.ELContext,java.lang.Object,java.lang.Object)">
+<h3>getValueSandboxed</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="annotations">@Internal
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">@Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span>&nbsp;<span class="element-name">getValueSandboxed</span><wbr><span class="parameters">(jakarta.el.ELContext&nbsp;context,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;base,
+ @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;property)</span></div>
+<div class="block">Resolves a property of a base object for an expression parsed at runtime. The resolvers are consulted as
+<a href="#getValue(jakarta.el.ELContext,java.lang.Object,java.lang.Object)"><code>getValue(ELContext, Object, Object)</code></a> consults them, and the <a href="../ELSandbox.html" title="interface in io.micronaut.el"><code>ELSandbox</code></a> of the context is asked about the base object
+before the first resolver that is not known to read it without reflection, and about the value such a
+resolver produced. The resolvers known to read without reflection are not held up by the sandbox at all.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>context</code> - The context</dd>
+<dd><code>base</code> - The base object</dd>
+<dd><code>property</code> - The property</dd>
+<dt>Returns:</dt>
+<dd>The value, when a resolver resolved it</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="setValueSandboxed(jakarta.el.ELContext,java.lang.Object,java.lang.Object,java.lang.Object)">
+<h3>setValueSandboxed</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="annotations">@Internal
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setValueSandboxed</span><wbr><span class="parameters">(jakarta.el.ELContext&nbsp;context,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;base,
+ @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;property,
+ @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;value)</span></div>
+<div class="block">Assigns a property of a base object for an expression parsed at runtime, consulting the
+<a href="../ELSandbox.html" title="interface in io.micronaut.el"><code>ELSandbox</code></a> of the context about the base object as <a href="#getValueSandboxed(jakarta.el.ELContext,java.lang.Object,java.lang.Object)"><code>getValueSandboxed(ELContext, Object, Object)</code></a> does.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>context</code> - The context</dd>
+<dd><code>base</code> - The base object</dd>
+<dd><code>property</code> - The property</dd>
+<dd><code>value</code> - The value</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getTypeSandboxed(jakarta.el.ELContext,java.lang.Object,java.lang.Object)">
+<h3>getTypeSandboxed</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="annotations">@Internal
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">@Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;</span>&nbsp;<span class="element-name">getTypeSandboxed</span><wbr><span class="parameters">(jakarta.el.ELContext&nbsp;context,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;base,
+ @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;property)</span></div>
+<div class="block">Resolves the type of a property of a base object for an expression parsed at runtime, consulting the
+<a href="../ELSandbox.html" title="interface in io.micronaut.el"><code>ELSandbox</code></a> of the context about the base object as <a href="#getValueSandboxed(jakarta.el.ELContext,java.lang.Object,java.lang.Object)"><code>getValueSandboxed(ELContext, Object, Object)</code></a> does. The type is not
+a value the property holds, so it is not checked.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>context</code> - The context</dd>
+<dd><code>base</code> - The base object</dd>
+<dd><code>property</code> - The property</dd>
+<dt>Returns:</dt>
+<dd>The type, when a resolver resolved it</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="isReadOnlySandboxed(jakarta.el.ELContext,java.lang.Object,java.lang.Object)">
+<h3>isReadOnlySandboxed</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="annotations">@Internal
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isReadOnlySandboxed</span><wbr><span class="parameters">(jakarta.el.ELContext&nbsp;context,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;base,
+ @Nullable <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;property)</span></div>
+<div class="block">Resolves whether a property of a base object is read only for an expression parsed at runtime,
+consulting the <a href="../ELSandbox.html" title="interface in io.micronaut.el"><code>ELSandbox</code></a> of the context about the base object as <a href="#getValueSandboxed(jakarta.el.ELContext,java.lang.Object,java.lang.Object)"><code>getValueSandboxed(ELContext, Object, Object)</code></a> does.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>context</code> - The context</dd>
+<dd><code>base</code> - The base object</dd>
+<dd><code>property</code> - The property</dd>
+<dt>Returns:</dt>
+<dd>Whether the property is read only, when a resolver resolved it</dd>
 </dl>
 </div>
 </section>

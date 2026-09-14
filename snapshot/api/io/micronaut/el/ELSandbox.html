@@ -65,9 +65,7 @@ loadScripts(document, 'script');</script>
 <ol class="toc-list">
 <li><a href="#standard()" tabindex="0">standard()</a></li>
 <li><a href="#of(jakarta.el.ELContext)" tabindex="0">of(ELContext)</a></li>
-<li><a href="#checksResultOf(java.lang.Class)" tabindex="0">checksResultOf(Class)</a></li>
 <li><a href="#allowsType(java.lang.Class)" tabindex="0">allowsType(Class)</a></li>
-<li><a href="#allowsMember(java.lang.Class,java.lang.String)" tabindex="0">allowsMember(Class, String)</a></li>
 </ol>
 </li>
 </ol>
@@ -85,13 +83,25 @@ loadScripts(document, 'script');</script>
 <hr>
 <div class="horizontal-scroll">
 <div class="type-signature"><span class="modifiers">public interface </span><span class="element-name type-name-label">ELSandbox</span></div>
-<div class="block">The types and members an expression parsed at runtime may reach.
+<div class="block">What an expression parsed at runtime may reach through reflection.
 
 <p>An expression declared with <code>io.micronaut.el.annotation.ELExpression</code> is written by the developer
 and compiled, so it is as trusted as the rest of the source. An expression string built at runtime is not:
-the specification resolves properties, methods, static members and constructors dynamically, so an
-expression that reaches <code>java.lang.Runtime</code>, a <code>java.lang.Class</code> or the reflection API can run
-whatever the process can. A sandbox closes those paths while leaving the language intact.</p>
+the specification resolves properties, methods, static members and constructors dynamically, and where that
+resolution reflects, an expression that reaches <code>java.lang.Runtime</code>, a <code>java.lang.Class</code> or the
+reflection API can run whatever the process can. A sandbox closes those paths while leaving the language
+intact.</p>
+
+<p>The sandbox is consulted where the resolution of such an expression reflects, and nowhere else: a method,
+a constructor, a static member or a function an <a href="ELMethodExecutor.html#isReflective()"><code>executor resolves
+reflectively</code></a>, and a property a resolver reads that is not known to read it without reflection - the resolvers
+of the specification that read a bean (an <code>Optional</code> holding one included), a record, a class or a static
+import, and any resolver the module does not know. It is asked about the base object before the access and about
+the value the access produced after it, so reflection neither works on nor hands the expression a type it denies.
+What the application described while it compiled - its bean introspections, the executable methods of its beans,
+the methods it registered - and the maps, lists and arrays an expression indexes are reached without it: they
+lead only where the application already chose to lead. An expression compiled at compilation time never
+consults it.</p>
 
 <p><a href="#standard()"><code>standard()</code></a> is applied to every expression the
 <code>micronaut-jakarta-el-interpreter</code> module creates. Register another one, <a href="#UNRESTRICTED"><code>UNRESTRICTED</code></a>
@@ -99,8 +109,8 @@ included, on the context the expression is evaluated with:</p>
 
 <pre><code>context.putContext(ELSandbox.class, ELSandbox.UNRESTRICTED);</code></pre>
 
-<p>A sandbox is not a security boundary on its own: it bounds what an expression reaches, not what the
-beans it reaches then do. Treat an expression string from an untrusted source as untrusted input.</p></div>
+<p>A sandbox is not a security boundary on its own: it bounds what reflection reaches, not what the beans
+an expression reaches then do. Treat an expression string from an untrusted source as untrusted input.</p></div>
 <dl class="notes">
 <dt>Since:</dt>
 <dd>1.1</dd>
@@ -163,24 +173,10 @@ beans it reaches then do. Treat an expression string from an untrusted source as
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#allowsMember(java.lang.Class,java.lang.String)" class="member-name-link">allowsMember</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;type,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;member)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#allowsType(java.lang.Class)" class="member-name-link">allowsType</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;type)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Whether an expression may read a property of a type or invoke a method of it, asked once the type
-itself is allowed.</div>
-</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#allowsType(java.lang.Class)" class="member-name-link">allowsType</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;type)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Whether an expression may read the properties of a type and invoke its methods, which is asked of the
-base object of every property access and method invocation, of the class of every static reference and
-of the class of every constructor reference.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1"><code>static boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1"><code><a href="#checksResultOf(java.lang.Class)" class="member-name-link">checksResultOf</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;expectedType)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1">
-<div class="block">Whether a value coerced to the given type can be an instance of a type a sandbox denies, which decides
-whether the value an expression returns has to be checked at all.</div>
+<div class="block">Whether reflection may reach the members of a type, which is asked of the base object of every reflective
+access and of the value every reflective access produces.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1"><code>static <a href="ELSandbox.html" title="interface in io.micronaut.el">ELSandbox</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab1"><code><a href="#of(jakarta.el.ELContext)" class="member-name-link">of</a><wbr>(@Nullable jakarta.el.ELContext&nbsp;context)</code></div>
@@ -258,54 +254,18 @@ expression escapes into arbitrary Java, and lets everything else through.</div>
 </section>
 </li>
 <li>
-<section class="detail" id="checksResultOf(java.lang.Class)">
-<h3>checksResultOf</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">static</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">checksResultOf</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;expectedType)</span></div>
-<div class="block">Whether a value coerced to the given type can be an instance of a type a sandbox denies, which decides
-whether the value an expression returns has to be checked at all.
-
-<p>The coercions of the section 1.25 to a string, to a boolean, to a character, to a number and to an
-enum all produce an instance of the target type, and none of those is ever denied. Every other target,
-<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link"><code>Object</code></a> first among them, hands the value back as it is.</p></div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>expectedType</code> - The type the result of an expression is coerced to</dd>
-<dt>Returns:</dt>
-<dd>Whether the coerced value has to be checked</dd>
-</dl>
-</div>
-</section>
-</li>
-<li>
 <section class="detail" id="allowsType(java.lang.Class)">
 <h3>allowsType</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="return-type">boolean</span>&nbsp;<span class="element-name">allowsType</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;type)</span></div>
-<div class="block">Whether an expression may read the properties of a type and invoke its methods, which is asked of the
-base object of every property access and method invocation, of the class of every static reference and
-of the class of every constructor reference.</div>
+<div class="block">Whether reflection may reach the members of a type, which is asked of the base object of every reflective
+access and of the value every reflective access produces.
+
+<p>No member is denied by its name: every member that leads from an allowed object to a denied one, such as
+<code>getClass</code> or <code>getClassLoader</code>, produces a value of a denied type, and is stopped by that.</p></div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>type</code> - The type the expression reached</dd>
-<dt>Returns:</dt>
-<dd>Whether the expression may use it</dd>
-</dl>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="allowsMember(java.lang.Class,java.lang.String)">
-<h3>allowsMember</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="return-type">boolean</span>&nbsp;<span class="element-name">allowsMember</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;type,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;member)</span></div>
-<div class="block">Whether an expression may read a property of a type or invoke a method of it, asked once the type
-itself is allowed.</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>type</code> - The type of the base object</dd>
-<dd><code>member</code> - The name of the property or of the method</dd>
 <dt>Returns:</dt>
 <dd>Whether the expression may use it</dd>
 </dl>

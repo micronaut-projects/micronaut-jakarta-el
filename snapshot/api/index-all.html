@@ -82,18 +82,10 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/stream/ELStream.html#allMatch(java.util.function.Predicate)" class="member-name-link">allMatch(Predicate)</a> - Method in class io.micronaut.el.stream.<a href="io/micronaut/el/stream/ELStream.html" title="class in io.micronaut.el.stream">ELStream</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="io/micronaut/el/ELSandbox.html#allowsMember(java.lang.Class,java.lang.String)" class="member-name-link">allowsMember(Class, String)</a> - Method in interface io.micronaut.el.<a href="io/micronaut/el/ELSandbox.html" title="interface in io.micronaut.el">ELSandbox</a></dt>
-<dd>
-<div class="block">Whether an expression may read a property of a type or invoke a method of it, asked once the type
-itself is allowed.</div>
-</dd>
-<dt><a href="io/micronaut/el/ELSandbox.StandardELSandbox.html#allowsMember(java.lang.Class,java.lang.String)" class="member-name-link">allowsMember(Class, String)</a> - Method in class io.micronaut.el.<a href="io/micronaut/el/ELSandbox.StandardELSandbox.html" title="class in io.micronaut.el">ELSandbox.StandardELSandbox</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/ELSandbox.html#allowsType(java.lang.Class)" class="member-name-link">allowsType(Class)</a> - Method in interface io.micronaut.el.<a href="io/micronaut/el/ELSandbox.html" title="interface in io.micronaut.el">ELSandbox</a></dt>
 <dd>
-<div class="block">Whether an expression may read the properties of a type and invoke its methods, which is asked of the
-base object of every property access and method invocation, of the class of every static reference and
-of the class of every constructor reference.</div>
+<div class="block">Whether reflection may reach the members of a type, which is asked of the base object of every reflective
+access and of the value every reflective access produces.</div>
 </dd>
 <dt><a href="io/micronaut/el/ELSandbox.StandardELSandbox.html#allowsType(java.lang.Class)" class="member-name-link">allowsType(Class)</a> - Method in class io.micronaut.el.<a href="io/micronaut/el/ELSandbox.StandardELSandbox.html" title="class in io.micronaut.el">ELSandbox.StandardELSandbox</a></dt>
 <dd>&nbsp;</dd>
@@ -134,6 +126,10 @@ the specification.</div>
 <dd>
 <div class="block">Assigns a value to a property and returns the assigned value, as described in the section 1.13 of the
 specification.</div>
+</dd>
+<dt><a href="io/micronaut/el/runtime/ELSandboxedResolution.html#assignProperty(jakarta.el.ELContext,java.lang.Object,java.lang.Object,java.lang.Object)" class="member-name-link">assignProperty(ELContext, Object, Object, Object)</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELSandboxedResolution.html" title="class in io.micronaut.el.runtime">ELSandboxedResolution</a></dt>
+<dd>
+<div class="block">Assigns a value to a property and returns the assigned value, as <a href="io/micronaut/el/runtime/ELResolution.html#assignProperty(jakarta.el.ELContext,java.lang.Object,java.lang.Object,java.lang.Object)"><code>ELResolution.assignProperty(ELContext, Object, Object, Object)</code></a> does.</div>
 </dd>
 <dt><a href="io/micronaut/el/stream/ELStream.html#average()" class="member-name-link">average()</a> - Method in class io.micronaut.el.stream.<a href="io/micronaut/el/stream/ELStream.html" title="class in io.micronaut.el.stream">ELStream</a></dt>
 <dd>&nbsp;</dd>
@@ -266,10 +262,14 @@ bound to them as required by the Jakarta EL expression equality contract.</div>
 <dd>
 <div class="block">Renders the canonical form while replacing mapped function names with their bound-method identities.</div>
 </dd>
-<dt><a href="io/micronaut/el/ELSandbox.html#checksResultOf(java.lang.Class)" class="member-name-link">checksResultOf(Class)</a> - Static method in interface io.micronaut.el.<a href="io/micronaut/el/ELSandbox.html" title="interface in io.micronaut.el">ELSandbox</a></dt>
+<dt><a href="io/micronaut/el/runtime/ELSandboxedResolution.html#checkAccess(io.micronaut.el.ELSandbox,java.lang.Object)" class="member-name-link">checkAccess(ELSandbox, Object)</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELSandboxedResolution.html" title="class in io.micronaut.el.runtime">ELSandboxedResolution</a></dt>
 <dd>
-<div class="block">Whether a value coerced to the given type can be an instance of a type a sandbox denies, which decides
-whether the value an expression returns has to be checked at all.</div>
+<div class="block">Fails when the sandbox denies the base object of a reflective access.</div>
+</dd>
+<dt><a href="io/micronaut/el/runtime/ELSandboxedResolution.html#checkValue(io.micronaut.el.ELSandbox,T)" class="member-name-link">checkValue(ELSandbox, T)</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELSandboxedResolution.html" title="class in io.micronaut.el.runtime">ELSandboxedResolution</a></dt>
+<dd>
+<div class="block">Fails when the value a reflective access produced is of a type the sandbox denies, so that reflection
+never hands an expression what it would not let the expression use.</div>
 </dd>
 <dt><a href="io/micronaut/el/processor/writer/ExpressionSourceWriter.CompiledMethod.html#className()" class="member-name-link">className()</a> - Method in record class io.micronaut.el.processor.writer.<a href="io/micronaut/el/processor/writer/ExpressionSourceWriter.CompiledMethod.html" title="class in io.micronaut.el.processor.writer">ExpressionSourceWriter.CompiledMethod</a></dt>
 <dd>
@@ -966,17 +966,23 @@ the resolvers that implement it.</div>
 </dd>
 <dt><a href="io/micronaut/el/ELSandbox.html" class="type-name-link" title="interface in io.micronaut.el">ELSandbox</a> - Interface in <a href="io/micronaut/el/package-summary.html">io.micronaut.el</a></dt>
 <dd>
-<div class="block">The types and members an expression parsed at runtime may reach.</div>
+<div class="block">What an expression parsed at runtime may reach through reflection.</div>
 </dd>
 <dt><a href="io/micronaut/el/ELSandbox.StandardELSandbox.html" class="type-name-link" title="class in io.micronaut.el">ELSandbox.StandardELSandbox</a> - Class in <a href="io/micronaut/el/package-summary.html">io.micronaut.el</a></dt>
 <dd>
 <div class="block">The default deny list.</div>
 </dd>
+<dt><a href="io/micronaut/el/runtime/ELSandboxedResolution.html" class="type-name-link" title="class in io.micronaut.el.runtime">ELSandboxedResolution</a> - Class in <a href="io/micronaut/el/runtime/package-summary.html">io.micronaut.el.runtime</a></dt>
+<dd>
+<div class="block">The resolution of the properties of an expression parsed at runtime, under the <a href="io/micronaut/el/ELSandbox.html" title="interface in io.micronaut.el"><code>ELSandbox</code></a> of its
+context where the resolution reflects.</div>
+</dd>
 <dt><a href="io/micronaut/el/ELSandboxException.html" class="type-name-link" title="class in io.micronaut.el">ELSandboxException</a> - Exception Class in <a href="io/micronaut/el/package-summary.html">io.micronaut.el</a></dt>
 <dd>
-<div class="block">Raised when an expression parsed at runtime reaches a type or a member its <a href="io/micronaut/el/ELSandbox.html" title="interface in io.micronaut.el"><code>ELSandbox</code></a> denies.</div>
+<div class="block">Raised when reflection would work on, or hand an expression parsed at runtime, a type its <a href="io/micronaut/el/ELSandbox.html" title="interface in io.micronaut.el"><code>ELSandbox</code></a>
+denies.</div>
 </dd>
-<dt><a href="io/micronaut/el/ELSandboxException.html#%3Cinit%3E(java.lang.Class,java.lang.String)" class="member-name-link">ELSandboxException(Class, String)</a> - Constructor for exception class io.micronaut.el.<a href="io/micronaut/el/ELSandboxException.html" title="class in io.micronaut.el">ELSandboxException</a></dt>
+<dt><a href="io/micronaut/el/ELSandboxException.html#%3Cinit%3E(java.lang.Class)" class="member-name-link">ELSandboxException(Class)</a> - Constructor for exception class io.micronaut.el.<a href="io/micronaut/el/ELSandboxException.html" title="class in io.micronaut.el">ELSandboxException</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/stream/ELStream.html" class="type-name-link" title="class in io.micronaut.el.stream">ELStream&lt;T&gt;</a> - Class in <a href="io/micronaut/el/stream/package-summary.html">io.micronaut.el.stream</a></dt>
 <dd>
@@ -1446,8 +1452,6 @@ type, or the one the <a href="io/micronaut/el/ELBeanProvider.html" title="interf
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/CompiledExpressionFactory.html#getInitFunctionMap()" class="member-name-link">getInitFunctionMap()</a> - Method in class io.micronaut.el.<a href="io/micronaut/el/CompiledExpressionFactory.html" title="class in io.micronaut.el">CompiledExpressionFactory</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="io/micronaut/el/ELSandboxException.html#getMember()" class="member-name-link">getMember()</a> - Method in exception class io.micronaut.el.<a href="io/micronaut/el/ELSandboxException.html" title="class in io.micronaut.el">ELSandboxException</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/runtime/CompiledMethodExpression.html#getMethodInfo(jakarta.el.ELContext)" class="member-name-link">getMethodInfo(ELContext)</a> - Method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/CompiledMethodExpression.html" title="class in io.micronaut.el.runtime">CompiledMethodExpression</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/runtime/LiteralMethodExpression.html#getMethodInfo(jakarta.el.ELContext)" class="member-name-link">getMethodInfo(ELContext)</a> - Method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/LiteralMethodExpression.html" title="class in io.micronaut.el.runtime">LiteralMethodExpression</a></dt>
@@ -1512,8 +1516,15 @@ type, or the one the <a href="io/micronaut/el/ELBeanProvider.html" title="interf
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/runtime/ELResolution.html#getType(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">getType(ELContext, Object, Object)</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELResolution.html" title="class in io.micronaut.el.runtime">ELResolution</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/runtime/ELSandboxedResolution.html#getType(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">getType(ELContext, Object, Object)</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELSandboxedResolution.html" title="class in io.micronaut.el.runtime">ELSandboxedResolution</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/resolver/StreamELResolver.html#getType(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">getType(ELContext, Object, Object)</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/StreamELResolver.html" title="class in io.micronaut.el.resolver">StreamELResolver</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/resolver/ELResolverChain.html#getTypeSandboxed(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">getTypeSandboxed(ELContext, Object, Object)</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/ELResolverChain.html" title="class in io.micronaut.el.resolver">ELResolverChain</a></dt>
+<dd>
+<div class="block">Resolves the type of a property of a base object for an expression parsed at runtime, consulting the
+<a href="io/micronaut/el/ELSandbox.html" title="interface in io.micronaut.el"><code>ELSandbox</code></a> of the context about the base object as <a href="io/micronaut/el/resolver/ELResolverChain.html#getValueSandboxed(jakarta.el.ELContext,java.lang.Object,java.lang.Object)"><code>ELResolverChain.getValueSandboxed(ELContext, Object, Object)</code></a> does.</div>
+</dd>
 <dt><a href="io/micronaut/el/runtime/CompiledValueExpression.html#getValue(jakarta.el.ELContext)" class="member-name-link">getValue(ELContext)</a> - Method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/CompiledValueExpression.html" title="class in io.micronaut.el.runtime">CompiledValueExpression</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/runtime/ObjectValueExpression.html#getValue(jakarta.el.ELContext)" class="member-name-link">getValue(ELContext)</a> - Method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ObjectValueExpression.html" title="class in io.micronaut.el.runtime">ObjectValueExpression</a></dt>
@@ -1533,11 +1544,19 @@ type, or the one the <a href="io/micronaut/el/ELBeanProvider.html" title="interf
 <div class="block">Resolves a property of a base object, returning <code>null</code> when the base or the property is
 <code>null</code> as described for the <code>getValue</code> evaluation of the section 1.6 of the specification.</div>
 </dd>
+<dt><a href="io/micronaut/el/runtime/ELSandboxedResolution.html#getValue(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">getValue(ELContext, Object, Object)</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELSandboxedResolution.html" title="class in io.micronaut.el.runtime">ELSandboxedResolution</a></dt>
+<dd>
+<div class="block">Resolves a property of a base object as <a href="io/micronaut/el/runtime/ELResolution.html#getValue(jakarta.el.ELContext,java.lang.Object,java.lang.Object)"><code>ELResolution.getValue(ELContext, Object, Object)</code></a> does.</div>
+</dd>
 <dt><a href="io/micronaut/el/resolver/StreamELResolver.html#getValue(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">getValue(ELContext, Object, Object)</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/StreamELResolver.html" title="class in io.micronaut.el.resolver">StreamELResolver</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/runtime/ELResolution.html#getValueRequired(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">getValueRequired(ELContext, Object, Object)</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELResolution.html" title="class in io.micronaut.el.runtime">ELResolution</a></dt>
 <dd>
 <div class="block">Resolves a property of a base object, failing when the base or the property is <code>null</code>.</div>
+</dd>
+<dt><a href="io/micronaut/el/resolver/ELResolverChain.html#getValueSandboxed(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">getValueSandboxed(ELContext, Object, Object)</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/ELResolverChain.html" title="class in io.micronaut.el.resolver">ELResolverChain</a></dt>
+<dd>
+<div class="block">Resolves a property of a base object for an expression parsed at runtime.</div>
 </dd>
 <dt><a href="io/micronaut/el/CompiledELContext.html#getVariableMapper()" class="member-name-link">getVariableMapper()</a> - Method in class io.micronaut.el.<a href="io/micronaut/el/CompiledELContext.html" title="class in io.micronaut.el">CompiledELContext</a></dt>
 <dd>&nbsp;</dd>
@@ -2013,7 +2032,21 @@ specification restrict to actual <a href="https://docs.oracle.com/en/java/javase
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/runtime/ELResolution.html#isReadOnly(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">isReadOnly(ELContext, Object, Object)</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELResolution.html" title="class in io.micronaut.el.runtime">ELResolution</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/runtime/ELSandboxedResolution.html#isReadOnly(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">isReadOnly(ELContext, Object, Object)</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELSandboxedResolution.html" title="class in io.micronaut.el.runtime">ELSandboxedResolution</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/resolver/StreamELResolver.html#isReadOnly(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">isReadOnly(ELContext, Object, Object)</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/StreamELResolver.html" title="class in io.micronaut.el.resolver">StreamELResolver</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/resolver/ELResolverChain.html#isReadOnlySandboxed(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">isReadOnlySandboxed(ELContext, Object, Object)</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/ELResolverChain.html" title="class in io.micronaut.el.resolver">ELResolverChain</a></dt>
+<dd>
+<div class="block">Resolves whether a property of a base object is read only for an expression parsed at runtime,
+consulting the <a href="io/micronaut/el/ELSandbox.html" title="interface in io.micronaut.el"><code>ELSandbox</code></a> of the context about the base object as <a href="io/micronaut/el/resolver/ELResolverChain.html#getValueSandboxed(jakarta.el.ELContext,java.lang.Object,java.lang.Object)"><code>ELResolverChain.getValueSandboxed(ELContext, Object, Object)</code></a> does.</div>
+</dd>
+<dt><a href="io/micronaut/el/ELMethodExecutor.html#isReflective()" class="member-name-link">isReflective()</a> - Method in interface io.micronaut.el.<a href="io/micronaut/el/ELMethodExecutor.html" title="interface in io.micronaut.el">ELMethodExecutor</a></dt>
+<dd>
+<div class="block">Whether the executor reaches the methods it resolves reflectively, rather than through what was generated
+or registered while the application compiled.</div>
+</dd>
+<dt><a href="io/micronaut/el/interpreter/reflection/ReflectiveELMethodExecutor.html#isReflective()" class="member-name-link">isReflective()</a> - Method in class io.micronaut.el.interpreter.reflection.<a href="io/micronaut/el/interpreter/reflection/ReflectiveELMethodExecutor.html" title="class in io.micronaut.el.interpreter.reflection">ReflectiveELMethodExecutor</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/ELMethod.html#isReusable()" class="member-name-link">isReusable()</a> - Method in interface io.micronaut.el.<a href="io/micronaut/el/ELMethod.html" title="interface in io.micronaut.el">ELMethod</a></dt>
 <dd>
@@ -2636,6 +2669,11 @@ variable.</div>
 <dd>
 <div class="block">Evaluates an identifier as described in the section 1.5.1 of the specification.</div>
 </dd>
+<dt><a href="io/micronaut/el/runtime/ELSandboxedResolution.html#resolveIdentifier(jakarta.el.ELContext,java.lang.String)" class="member-name-link">resolveIdentifier(ELContext, String)</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELSandboxedResolution.html" title="class in io.micronaut.el.runtime">ELSandboxedResolution</a></dt>
+<dd>
+<div class="block">Resolves an identifier as <a href="io/micronaut/el/runtime/ELResolution.html#resolveIdentifier(jakarta.el.ELContext,java.lang.String)"><code>ELResolution.resolveIdentifier(ELContext, String)</code></a> does, reading the field of a static import
+under the sandbox.</div>
+</dd>
 <dt><a href="io/micronaut/el/processor/compiler/CompilationContext.html#resolveStaticField(java.lang.String)" class="member-name-link">resolveStaticField(String)</a> - Method in class io.micronaut.el.processor.compiler.<a href="io/micronaut/el/processor/compiler/CompilationContext.html" title="class in io.micronaut.el.processor.compiler">CompilationContext</a></dt>
 <dd>
 <div class="block">Resolves a static field imported statically, as described in the section 1.24.2 of the specification.</div>
@@ -2645,6 +2683,11 @@ variable.</div>
 <dt><a href="io/micronaut/el/processor/compiler/CompilationContext.html#resolveStaticMethod(java.lang.String,int)" class="member-name-link">resolveStaticMethod(String, int)</a> - Method in class io.micronaut.el.processor.compiler.<a href="io/micronaut/el/processor/compiler/CompilationContext.html" title="class in io.micronaut.el.processor.compiler">CompilationContext</a></dt>
 <dd>
 <div class="block">Resolves a static method imported statically, as described in the section 1.24.2 of the specification.</div>
+</dd>
+<dt><a href="io/micronaut/el/runtime/ELSandboxedResolution.html#resolveValue(jakarta.el.ELContext,java.lang.Object,java.lang.Object)" class="member-name-link">resolveValue(ELContext, Object, Object)</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELSandboxedResolution.html" title="class in io.micronaut.el.runtime">ELSandboxedResolution</a></dt>
+<dd>
+<div class="block">Resolves a property of a base object through the resolver of the context, leaving it to
+<code>propertyResolved</code> to say whether a resolver resolved it.</div>
 </dd>
 <dt><a href="io/micronaut/el/runtime/ELResolution.html#resolveVariable(jakarta.el.ELContext,java.lang.String)" class="member-name-link">resolveVariable(ELContext, String)</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELResolution.html" title="class in io.micronaut.el.runtime">ELResolution</a></dt>
 <dd>
@@ -2733,8 +2776,17 @@ and the resolvers, without the static imports, which the compiler resolves itsel
 <dd>
 <div class="block">Assigns a value to a property of a base object.</div>
 </dd>
+<dt><a href="io/micronaut/el/runtime/ELSandboxedResolution.html#setValue(jakarta.el.ELContext,java.lang.Object,java.lang.Object,java.lang.Object)" class="member-name-link">setValue(ELContext, Object, Object, Object)</a> - Static method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/ELSandboxedResolution.html" title="class in io.micronaut.el.runtime">ELSandboxedResolution</a></dt>
+<dd>
+<div class="block">Assigns a value to a property of a base object as <a href="io/micronaut/el/runtime/ELResolution.html#setValue(jakarta.el.ELContext,java.lang.Object,java.lang.Object,java.lang.Object)"><code>ELResolution.setValue(ELContext, Object, Object, Object)</code></a> does.</div>
+</dd>
 <dt><a href="io/micronaut/el/resolver/StreamELResolver.html#setValue(jakarta.el.ELContext,java.lang.Object,java.lang.Object,java.lang.Object)" class="member-name-link">setValue(ELContext, Object, Object, Object)</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/StreamELResolver.html" title="class in io.micronaut.el.resolver">StreamELResolver</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/el/resolver/ELResolverChain.html#setValueSandboxed(jakarta.el.ELContext,java.lang.Object,java.lang.Object,java.lang.Object)" class="member-name-link">setValueSandboxed(ELContext, Object, Object, Object)</a> - Method in class io.micronaut.el.resolver.<a href="io/micronaut/el/resolver/ELResolverChain.html" title="class in io.micronaut.el.resolver">ELResolverChain</a></dt>
+<dd>
+<div class="block">Assigns a property of a base object for an expression parsed at runtime, consulting the
+<a href="io/micronaut/el/ELSandbox.html" title="interface in io.micronaut.el"><code>ELSandbox</code></a> of the context about the base object as <a href="io/micronaut/el/resolver/ELResolverChain.html#getValueSandboxed(jakarta.el.ELContext,java.lang.Object,java.lang.Object)"><code>ELResolverChain.getValueSandboxed(ELContext, Object, Object)</code></a> does.</div>
+</dd>
 <dt><a href="io/micronaut/el/runtime/MapVariableMapper.html#setVariable(java.lang.String,jakarta.el.ValueExpression)" class="member-name-link">setVariable(String, ValueExpression)</a> - Method in class io.micronaut.el.runtime.<a href="io/micronaut/el/runtime/MapVariableMapper.html" title="class in io.micronaut.el.runtime">MapVariableMapper</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/el/ELContributions.html#shared()" class="member-name-link">shared()</a> - Static method in class io.micronaut.el.<a href="io/micronaut/el/ELContributions.html" title="class in io.micronaut.el">ELContributions</a></dt>
