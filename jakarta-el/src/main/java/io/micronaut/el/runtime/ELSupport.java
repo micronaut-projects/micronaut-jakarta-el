@@ -134,6 +134,9 @@ public final class ELSupport {
             return (T) value;
         }
         if (value instanceof String string) {
+            // the specification coerces a String to any other type through the PropertyEditor of that type, which
+            // the editor manager finds among the registered editors or loads by the name of the type
+            @SuppressWarnings("NoReflection")
             PropertyEditor editor = PropertyEditorManager.findEditor(type);
             if (editor == null) {
                 if (string.isEmpty()) {
@@ -354,7 +357,11 @@ public final class ELSupport {
         }
         if (value instanceof String string) {
             try {
-                return Enum.valueOf(type, string);
+                // the specification coerces a String to an enum by the name of its constant, and a Class<T> of
+                // an enum the source does not name offers no values() to search instead
+                @SuppressWarnings("NoReflection")
+                T constant = Enum.valueOf(type, string);
+                return constant;
             } catch (IllegalArgumentException e) {
                 throw cannotCoerce(value, type);
             }

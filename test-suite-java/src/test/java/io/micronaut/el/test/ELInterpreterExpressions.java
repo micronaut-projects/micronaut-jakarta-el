@@ -10,6 +10,7 @@ import jakarta.el.LambdaExpression;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Compile-time counterparts of the interpreter regression expressions that share this environment.
@@ -35,7 +36,10 @@ import java.util.List;
         @ELVariable(name = "counter", type = EvaluationCounter.class),
         @ELVariable(name = "shadow", type = LambdaExpression.class),
         @ELVariable(name = "twice", type = Long.class),
-        @ELVariable(name = "target", type = MethodExpression.class)
+        @ELVariable(name = "target", type = MethodExpression.class),
+        @ELVariable(name = "described", type = TypeHolder.class),
+        @ELVariable(name = "types", type = Map.class),
+        @ELVariable(name = "typeList", type = List.class)
     },
     imports = {Varargs.class, VarargsConstructor.class},
     functions = {
@@ -149,6 +153,11 @@ import java.util.List;
 @ELExpression(value = "${varargs.reject(value -> value)}", expectedType = Object.class, name = "nonFunctionalInterface")
 @ELExpression(value = "${varargs.rejectSealed(value -> value)}", expectedType = Object.class, name = "sealedInterface")
 @ELExpression(value = "${'1'}", expectedType = Integer.class, name = "coercionListenerValue")
+@ELExpression(value = "${described.type}", name = "describedType")
+@ELExpression(value = "${[described.type]}", name = "describedTypeInList")
+@ELExpression(value = "${types['class']}", name = "typeMapIndex")
+@ELExpression(value = "${types.class}", name = "typeMapProperty")
+@ELExpression(value = "${typeList[0]}", name = "typeListIndex")
 @ELMethodExpression(value = "#{xs.size}", expectedReturnType = Object.class, name = "listSizeMethod")
 @ELMethodExpression(value = "#{xs.size}", expectedReturnType = String.class, name = "listSizeStringMethod")
 @ELMethodExpression(value = "#{Integer.valueOf}", expectedReturnType = Integer.class,

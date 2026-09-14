@@ -59,6 +59,11 @@ public final class ReflectiveELMethodExecutor implements ELMethodExecutor {
     }
 
     @Override
+    public boolean isReflective() {
+        return true;
+    }
+
+    @Override
     @Nullable
     public ELMethod resolve(ELContext context,
                             @Nullable Object base,

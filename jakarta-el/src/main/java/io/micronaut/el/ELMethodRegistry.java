@@ -763,7 +763,7 @@ public final class ELMethodRegistry {
                 @Override
                 protected Map<String, List<ELMethods.Candidate<RegisteredMethod>>> computeValue(Class<?> type) {
                     Map<String, List<Registration>> inherited = new HashMap<>();
-                    collect(type, inherited, true);
+                    collect(type, inherited);
                     Map<String, List<ELMethods.Candidate<RegisteredMethod>>> byName = new HashMap<>();
                     inherited.forEach((name, list) -> {
                         boolean reusable = list.size() == 1;
@@ -845,38 +845,47 @@ public final class ELMethodRegistry {
             return declared != inherited && inherited.isAssignableFrom(declared);
         }
 
-        private void collect(Class<?> type, Map<String, List<Registration>> into, boolean declaringType) {
-            Map<String, List<Registration>> declared = declarations.get(type);
-            if (declared != null) {
-                declared.forEach((name, list) -> {
-                    // a constructor is not inherited: `Child(...)` must not select the constructor registered
-                    // for `Parent`, which would construct a `Parent` instead
-                    if (!declaringType && CONSTRUCTOR.equals(name)) {
-                        return;
+        /**
+         * Collects the registrations that apply to a type: its own, then those of every registered type it is
+         * assignable to, in the order they were registered. {@link Class#isAssignableFrom} answers which without
+         * asking the type for its superclasses and interfaces.
+         */
+        private void collect(Class<?> type, Map<String, List<Registration>> into) {
+            Map<String, List<Registration>> own = declarations.get(type);
+            if (own != null) {
+                merge(own, into, true);
+            }
+            declarations.forEach((declaring, declared) -> {
+                if (declaring != type && declaring.isAssignableFrom(type)) {
+                    merge(declared, into, false);
+                }
+            });
+        }
+
+        private static void merge(Map<String, List<Registration>> declared,
+                                  Map<String, List<Registration>> into,
+                                  boolean declaringType) {
+            declared.forEach((name, list) -> {
+                // a constructor is not inherited: `Child(...)` must not select the constructor registered
+                // for `Parent`, which would construct a `Parent` instead
+                if (!declaringType && CONSTRUCTOR.equals(name)) {
+                    return;
+                }
+                List<Registration> merged =
+                    into.computeIfAbsent(name, ignored -> new ArrayList<>(list.size()));
+                for (Registration registration : list) {
+                    // a registration overrides the same signature declared by a supertype, the way an
+                    // override does: each carries its own code, so both would otherwise be candidates of
+                    // one call. The nearest declaration wins, whichever order they were collected in, so two
+                    // interfaces of a type do not dispatch by the order they are implemented
+                    int existing = signatureOf(merged, registration);
+                    if (existing < 0) {
+                        merged.add(registration);
+                    } else if (overrides(registration, merged.get(existing))) {
+                        merged.set(existing, registration);
                     }
-                    List<Registration> merged =
-                        into.computeIfAbsent(name, ignored -> new ArrayList<>(list.size()));
-                    for (Registration registration : list) {
-                        // a registration overrides the same signature declared by a supertype, the way an
-                        // override does: each carries its own code, so both would otherwise be candidates of
-                        // one call. The nearest declaration wins, whichever order the traversal reached them
-                        // in, so two interfaces of a type do not dispatch by the order they are implemented
-                        int existing = signatureOf(merged, registration);
-                        if (existing < 0) {
-                            merged.add(registration);
-                        } else if (overrides(registration, merged.get(existing))) {
-                            merged.set(existing, registration);
-                        }
-                    }
-                });
-            }
-            for (Class<?> anInterface : type.getInterfaces()) {
-                collect(anInterface, into, false);
-            }
-            Class<?> superclass = type.getSuperclass();
-            if (superclass != null) {
-                collect(superclass, into, false);
-            }
+                }
+            });
         }
 
         @Override

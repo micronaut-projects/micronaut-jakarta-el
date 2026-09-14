@@ -49,7 +49,10 @@ class ELInterpreterExpressionsTest {
         .setBean("large", 9007199254740993L)
         .setBean("counter", new EvaluationCounter())
         .setBean("twice", 42L)
-        .setBean("target", ELInterpreterExpressions$ELExpressions.LIST_SIZE_METHOD);
+        .setBean("target", ELInterpreterExpressions$ELExpressions.LIST_SIZE_METHOD)
+        .setBean("described", new TypeHolder())
+        .setBean("types", Map.of("class", String.class))
+        .setBean("typeList", List.of(String.class));
 
     {
         ((CompiledELContext) context).setBean("shadow", ELLambdas.create(context, List.of("value"),
@@ -273,6 +276,17 @@ class ELInterpreterExpressionsTest {
         assertEquals(ELInterpreterExpressions$ELExpressions.LIST_SIZE_METHOD.hashCode(),
             ELInterpreterExpressions$ELExpressions.LIST_SIZE_STRING_METHOD.hashCode());
 
+    }
+
+    @Test
+    void aDeniedTypeTheApplicationDescribedIsReachedWithoutReflection() {
+        // the interpreted counterparts in ELSandboxTest reach the same values through an introspection, a map and a
+        // list, where nothing reflects and the sandbox of the interpreter is not consulted, so both modes agree
+        assertEquals(String.class, value(ELInterpreterExpressions$ELExpressions.DESCRIBED_TYPE));
+        assertEquals(List.of(String.class), value(ELInterpreterExpressions$ELExpressions.DESCRIBED_TYPE_IN_LIST));
+        assertEquals(String.class, value(ELInterpreterExpressions$ELExpressions.TYPE_MAP_INDEX));
+        assertEquals(String.class, value(ELInterpreterExpressions$ELExpressions.TYPE_MAP_PROPERTY));
+        assertEquals(String.class, value(ELInterpreterExpressions$ELExpressions.TYPE_LIST_INDEX));
     }
 
     private Object value(ValueExpression expression) {

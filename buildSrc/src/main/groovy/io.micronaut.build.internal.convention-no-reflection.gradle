@@ -1,0 +1,8 @@
+// The reflection boundary of the runtime, checked while the main sources compile. Expressions are compiled at
+// build time and evaluated without reading a class, so a module reflects only where its build allows it, and a
+// report names the kind of reflection the call reaches for. The tests are not checked: a test that holds the
+// runtime to what the classes actually do has to read them.
+plugins {
+    id 'io.micronaut.build.internal.convention-nullaway'
+    id 'io.micronaut.errorprone.no-reflection'
+}
