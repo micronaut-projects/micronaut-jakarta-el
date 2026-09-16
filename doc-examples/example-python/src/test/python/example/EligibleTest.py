@@ -8,6 +8,7 @@ from org.junit.jupiter.api import Test
 from example.Customer import Customer
 from example.RegistrationService import RegistrationService
 
+# TODO(python): the generated registry cannot be imported, its name holding a `$`
 RegistrationService_ELExpressions = java.type("example.RegistrationService$ELExpressions")
 # TODO(python): the exception raised by the Python interceptor reaches the caller as the Java class generated for it
 NotEligibleException = java.type("example.NotEligibleException")

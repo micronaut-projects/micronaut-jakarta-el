@@ -1,18 +1,16 @@
-import java
+from java.lang import Boolean, String
 from jakarta.el import ELManager
 from jakarta.inject import Singleton
 from micronaut.aop import InterceptorBean, MethodInterceptor, MethodInvocationContext
 from micronaut.el import CompiledELContext
-from micronaut.el.example.eligible import ConstraintMessages, Eligible, MinAmount
+from micronaut.el.example.eligible import ConstraintMessages, Eligible
 
 from example.NotEligibleException import NotEligibleException
 
-# TODO(python): java.type("io.micronaut.el.example.eligible.Eligible") is the decorator generated for the annotation,
-# not its Java class, so the metadata is read under the names of the annotations
+# TODO(python): the imported Eligible (and MinAmount) are the decorators generated for the annotations, not their Java
+# classes, so the metadata is read under the names of the annotations
 ELIGIBLE = "io.micronaut.el.example.eligible.Eligible"
 MIN_AMOUNT = "io.micronaut.el.example.eligible.MinAmount"
-Boolean = java.type("java.lang.Boolean")
-String = java.type("java.lang.String")
 
 
 @Singleton

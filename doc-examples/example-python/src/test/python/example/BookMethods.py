@@ -1,16 +1,15 @@
 import java
-from java.lang import Math
+from java.lang import Double, Long, Math, String
 from micronaut.el import ELMethodContributor, ELMethodRegistry
 
 from example.TextFunctions import TextFunctions
 
-Book = java.type("example.Book")
-String = java.type("java.lang.String")
+from example.Book import Book
+
+# TODO(python): the primitive and array class literals have no import form
 StringArray = java.type("java.lang.String[]")
-Double = java.type("java.lang.Double")
 double = java.type("double")
 long = java.type("long")
-Long = java.type("java.lang.Long")
 
 
 class BookMethods(ELMethodContributor):  # <1>

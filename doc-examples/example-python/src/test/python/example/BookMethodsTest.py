@@ -1,16 +1,12 @@
-import java
+from java.lang import Object
 from java.util import List
-from micronaut.el import CompiledELContext
+from micronaut.el import CompiledELContext, CompiledExpressionFactory, ContributedELMethodExecutor
+from micronaut.el.interpreter import InterpretingELExpressionParser
 from micronaut.test.extensions.junit5.annotation import MicronautTest
 from org.junit.jupiter.api import Disabled, Test
 
 from example.Book import Book
 from example.BookMethods import BookMethods
-
-Object = java.type("java.lang.Object")
-CompiledExpressionFactory = java.type("io.micronaut.el.CompiledExpressionFactory")
-ContributedELMethodExecutor = java.type("io.micronaut.el.ContributedELMethodExecutor")
-InterpretingELExpressionParser = java.type("io.micronaut.el.interpreter.InterpretingELExpressionParser")
 
 
 @MicronautTest

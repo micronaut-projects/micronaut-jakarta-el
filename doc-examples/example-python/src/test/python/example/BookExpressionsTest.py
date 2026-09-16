@@ -1,4 +1,5 @@
 import java
+from java.lang import Double, String
 from jakarta.el import ELManager
 from micronaut.el import CompiledELContext
 from micronaut.test.extensions.junit5.annotation import MicronautTest
@@ -6,9 +7,9 @@ from org.junit.jupiter.api import Test
 
 from example.Book import Book
 
+# TODO(python): an imported Micronaut class is not usable as a runtime type argument (isinstance, a Class parameter)
 CompiledExpression = java.type("io.micronaut.el.runtime.CompiledExpression")
-String = java.type("java.lang.String")
-Double = java.type("java.lang.Double")
+# TODO(python): the generated registry cannot be imported, its name holding a `$`
 BookExpressions_ELExpressions = java.type("example.BookExpressions$ELExpressions")
 
 

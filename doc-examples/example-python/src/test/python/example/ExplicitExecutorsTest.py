@@ -1,4 +1,4 @@
-import java
+from java.lang import Object
 from java.util import List
 from jakarta.el import MethodNotFoundException
 from micronaut.el import CompiledELContext, CompiledExpressionFactory, ContributedELMethodExecutor
@@ -8,8 +8,6 @@ from org.junit.jupiter.api import Test
 
 from example.Book import Book
 from example.BookMethods import BookMethods
-
-Object = java.type("java.lang.Object")
 
 
 @MicronautTest

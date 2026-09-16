@@ -28,6 +28,18 @@ The Python examples are compiled by every build and their tests run with
   class, so a `@ELFunction` function, static or on a bean, also carries `@Executable`; without it the compiled
   expression fails at runtime with `NoSuchMethodError`.
 - Java `Class` objects are compared by name (`getExpectedType().getName()`), not with `==`.
+- Java classes are imported (`from java.lang import String, Double, Object, RuntimeException`,
+  `from java.util import List`, `from micronaut.el import CompiledExpressionFactory`); the imported form also
+  works as a `Class` argument for `java.lang` types and for the Python classes of the examples
+  (`putContext(PricingService, ...)`). `java.type(...)` is used only where the import form fails, each use marked
+  `TODO(python)`:
+  - the generated registries (`example.BookExpressions$ELExpressions`, ...): a name holding `$` cannot be imported;
+  - an imported Micronaut class as a runtime type argument: `isinstance(x, CompiledExpression)` is always false
+    with the imported `micronaut.el.runtime.CompiledExpression`, and `putContext(ELSandbox, ...)`,
+    `putContext(BeanDefinitionRegistry, ...)`, `putContext(ELBeanProvider, ...)` with the imported classes fail with
+    `TypeError: invalid instantiation of foreign object`;
+  - primitive and array class literals (`double`, `long`, `String[]`) in `BookMethods`, which have no import form;
+  - the Java class generated for a Python exception (`java.type("example.NotEligibleException")`), see below.
 - `java.type("io.micronaut.el.example.eligible.MinAmount")` is the decorator generated for the annotation, not its
   Java class, so annotation metadata is read by annotation name (`getAnnotation("io.micronaut...MinAmount")`,
   `stringValue("io.micronaut...Eligible")`); a decorator passed where a `Class` is expected fails with

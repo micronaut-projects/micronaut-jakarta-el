@@ -5,6 +5,7 @@ from org.junit.jupiter.api import Test
 
 from example.Book import Book
 
+# TODO(python): the generated registry cannot be imported, its name holding a `$`
 CatalogExpressions_ELExpressions = java.type("example.CatalogExpressions$ELExpressions")
 
 

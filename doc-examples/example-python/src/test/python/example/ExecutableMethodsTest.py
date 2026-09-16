@@ -1,8 +1,9 @@
 from typing import Annotated
 
-import java
+from java.lang import String
 from jakarta.el import ELManager
 from jakarta.inject import Inject
+import java
 from micronaut.context import ApplicationContext
 from micronaut.el import CompiledELContext
 from micronaut.test.extensions.junit5.annotation import MicronautTest
@@ -10,8 +11,8 @@ from org.junit.jupiter.api import Test
 
 from example.Greeter import Greeter
 
+# TODO(python): an imported Micronaut class is not usable as a runtime type argument (isinstance, a Class parameter)
 BeanDefinitionRegistry = java.type("io.micronaut.context.BeanDefinitionRegistry")
-String = java.type("java.lang.String")
 
 
 @MicronautTest

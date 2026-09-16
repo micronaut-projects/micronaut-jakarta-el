@@ -1,6 +1,4 @@
-import java
-
-RuntimeException = java.type("java.lang.RuntimeException")
+from java.lang import RuntimeException
 
 
 class NotEligibleException(RuntimeException):
