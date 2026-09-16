@@ -37,6 +37,12 @@ specification defines in terms of `java.lang.reflect.Method`.
 coercion that cannot be resolved while compiling.
 <11> The order contributors are consulted in, following the Micronaut `Ordered` contract.
 
+[.lang-python]
+NOTE: A Python class cannot declare a Java interface, so the `Summary` functional interface of the application,
+the `summarised` method taking it and the `functionalInterface` registration saying how a lambda expression
+becomes one (callouts 6 and 10) have no Python counterpart. A lambda expression passed to a method whose
+parameter is a functional interface of the platform is coerced without any registration.
+
 Every registration has the same shape — the declared signature, then the code that runs it:
 
 |===
@@ -110,11 +116,14 @@ per call.
 To leave an executor out altogether — a deployment that must not reach a method reflectively, whatever a
 transitive dependency put on the classpath — construct the parser with the executors it may use:
 
-[source,java]
-----
-new CompiledExpressionFactory(List.of(),
-    new InterpretingELExpressionParser(List.of(new ContributedELMethodExecutor(List.of(new BookMethods())))));
-----
+snippet::example.ExplicitExecutorsTest[project-base="doc-examples/example", title="ExplicitExecutorsTest"]
+
+<1> A factory over the generated expressions, with the parser it hands the strings no generated source provides.
+<2> The parser is built with the executors it may use: here the one dispatching what `BookMethods` registered,
+and nothing else.
+<3> A registered method resolves.
+<4> A public method the application did not register is not looked up reflectively, whatever the classpath
+holds.
 
 WARNING: Runtime expressions are executable application code, not sandboxed data. When the reflection executor is
 present, the standard Jakarta EL context can construct imported classes and invoke their public static and instance
@@ -170,16 +179,21 @@ before the reflective executor, which stays the last resort. A type that is neit
 the context is left exactly where it was.
 
 Unlike an introspection, an executable method is reached through a bean context, and an application may run
-more than one, so the executor reads the context of each call rather than a static holder. Register it on the
-`ELContext` the expression is evaluated with:
+more than one, so the executor reads the context of each call rather than a static holder. Given a bean that
+declares an executable method:
 
-[source,java]
-----
-context.putContext(BeanDefinitionRegistry.class, beanContext); // <1>
-----
+snippet::example.Greeter[project-base="doc-examples/example", title="Greeter"]
+
+<1> An executable method of a bean, which is compiled into its `BeanDefinition`; the bean carries no
+introspection.
+
+Register the bean context on the `ELContext` the expression is evaluated with:
+
+snippet::example.ExecutableMethodsTest[project-base="doc-examples/example", title="ExecutableMethodsTest"]
 
 <1> `BeanContext.class` works as the key as well; `BeanContext` is a `BeanDefinitionRegistry`, which is all the
 executor needs — it reads definitions and never looks a bean up or creates one.
+<2> The method is invoked through the generated metadata of the bean definition.
 
 `new CompiledELContext(beanContext)` does this for you, and additionally puts the executor into the resolver
 chain, so expressions compiled at compilation time resolve the same methods the same way. A context that
@@ -268,10 +282,11 @@ author wrote, including where it resolves a member reflectively.
 
 To widen, narrow or remove the sandbox, register one on the context the expression is evaluated with:
 
-[source,java]
-----
-context.putContext(ELSandbox.class, ELSandbox.UNRESTRICTED);
-----
+snippet::example.SandboxTest[project-base="doc-examples/example", title="SandboxTest"]
+
+<1> The class of a bean is read reflectively by the resolvers of the specification.
+<2> Under the standard sandbox the read is denied.
+<3> The unrestricted sandbox, registered on the context, lets the same expression through.
 
 A value reflection produced is checked where it was produced, before the expression does anything with it: on
 a bean without an introspection, `${bean.type}` fails whether it is returned, passed as an argument, put in a

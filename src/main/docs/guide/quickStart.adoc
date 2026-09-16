@@ -37,5 +37,6 @@ in the registries, not a parse.
 <3> What the factory returns is the class generated at compilation time.
 <4> A method expression is invoked the same way; the parameters are the ones written in the expression.
 <5> In Java and Kotlin the generated registry, `BookExpressions$ELExpressions`, also exposes each expression
-under the name it was declared with. The Groovy compiler resolves the names of a class before the registry is
-generated, so Groovy code reaches the expressions through the factory.
+under the name it was declared with, and Python reaches it with `java.type("example.BookExpressions$ELExpressions")`.
+The Groovy compiler resolves the names of a class before the registry is generated, so Groovy code reaches the
+expressions through the factory.

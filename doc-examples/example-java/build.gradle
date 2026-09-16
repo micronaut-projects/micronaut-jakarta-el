@@ -17,8 +17,9 @@ dependencies {
     testImplementation mn.micronaut.inject
     testImplementation mn.micronaut.aop
     testRuntimeOnly mn.micronaut.context
-    // only the example of parsing at runtime needs the interpreter
-    testRuntimeOnly projects.micronautJakartaElInterpreter
+    // only the examples of parsing at runtime need the interpreter; the one constructing the parser explicitly
+    // compiles against it
+    testImplementation projects.micronautJakartaElInterpreter
     testRuntimeOnly projects.micronautJakartaElInterpreterReflection
     testImplementation platform(libs.junit.bom)
     testImplementation libs.junit.jupiter

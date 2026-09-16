@@ -1,0 +1,37 @@
+plugins {
+    id "io.micronaut.build.internal.jakarta-el-test-suite"
+    id "io.micronaut.build.internal.python"
+}
+
+// The examples of the guide, in Python, compiled by the Python compiler (micronaut-inject-python). The compiler takes
+// the compile classpath as its annotation processor path, so the annotation processors, this project's and the
+// custom annotation's, are regular test dependencies rather than annotation processor ones.
+dependencies {
+    testImplementation platform(libs.micronaut.core)
+    testImplementation projects.micronautJakartaElProcessor
+    testImplementation projects.testSuiteCustomAnnotation
+    testImplementation mn.micronaut.inject.python
+    testImplementation mn.micronaut.inject.python.test
+    testImplementation mn.micronaut.context.python
+
+    testImplementation projects.micronautJakartaEl
+    testImplementation mn.micronaut.core
+    testImplementation mn.micronaut.inject
+    testImplementation mn.micronaut.aop
+    testImplementation mn.micronaut.context
+    // only the examples of parsing at runtime need the interpreter; the one constructing the parser explicitly
+    // compiles against it
+    testImplementation projects.micronautJakartaElInterpreter
+    testRuntimeOnly projects.micronautJakartaElInterpreterReflection
+    testImplementation mnTest.micronaut.test.junit5
+    testImplementation platform(libs.junit.bom)
+    testImplementation libs.junit.jupiter
+    testRuntimeOnly libs.junit.jupiter.engine
+    testRuntimeOnly mnLogging.logback.classic
+}
+
+tasks.withType(Test).configureEach {
+    systemProperty "micronaut.python.pool.enabled", "false"
+    // a Truffle host-interop assertion trips on varargs overloads
+    enableAssertions = false
+}

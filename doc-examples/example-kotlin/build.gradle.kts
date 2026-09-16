@@ -18,7 +18,7 @@ dependencies {
     testImplementation(mn.micronaut.inject)
     testImplementation(mn.micronaut.aop)
     testRuntimeOnly(mn.micronaut.context)
-    testRuntimeOnly(projects.micronautJakartaElInterpreter)
+    testImplementation(projects.micronautJakartaElInterpreter)
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.junit.jupiter)
     testRuntimeOnly(libs.junit.jupiter.engine)

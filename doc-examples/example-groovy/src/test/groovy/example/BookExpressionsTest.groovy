@@ -28,6 +28,6 @@ class BookExpressionsTest {
             factory.createMethodExpression(context, '${book.discounted(10)}', double, new Class[0]).invoke(context, null)) // <4>
 
         assertEquals("expensive",
-            factory.createValueExpression(context, "\${book.unitPrice > 15 ? 'expensive' : 'cheap'}", String).getValue(context))
+            factory.createValueExpression(context, "\${book.unitPrice > 15 ? 'expensive' : 'cheap'}", String).getValue(context)) // <5>
     }
 }
