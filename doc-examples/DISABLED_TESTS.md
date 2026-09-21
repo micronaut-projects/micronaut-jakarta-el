@@ -46,7 +46,9 @@ The Python examples are compiled by every build and their tests run with
 
 ## Active `@Disabled` Tests
 
-None.
+| Test | Reason |
+| --- | --- |
+| `example.BookMethodsTest.test_a_lambda_reaches_the_application_interface_without_a_proxy` | The coercion of a lambda expression to `Summary` is resolved by `ELSupport.functionalInterface` through the JVM-wide `ELContributions.shared()` registry, not through the `ContributedELMethodExecutor` the test hands the parser. That registry keeps the `BookMethods` instance the service loader created in the GraalPy context of the first test class that touched it, so with another class order (as on CI) the coercion fails with `org.graalvm.polyglot.PolyglotException: Context execution was cancelled`. The `summarised` method and the `functionalInterface` registration compile and work in an application, which has one context; the registry needs a per-application rebuild (module follow-up). |
 
 ## Commented Unsupported Snippet Ports
 
