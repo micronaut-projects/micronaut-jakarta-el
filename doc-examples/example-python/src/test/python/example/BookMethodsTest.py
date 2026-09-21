@@ -3,7 +3,7 @@ from java.util import List
 from micronaut.el import CompiledELContext, CompiledExpressionFactory, ContributedELMethodExecutor
 from micronaut.el.interpreter import InterpretingELExpressionParser
 from micronaut.test.extensions.junit5.annotation import MicronautTest
-from org.junit.jupiter.api import Disabled, Test
+from org.junit.jupiter.api import Test
 
 from example.Book import Book
 from example.BookMethods import BookMethods
@@ -13,10 +13,11 @@ from example.BookMethods import BookMethods
 class BookMethodsTest:
 
     def __init__(self):
-        # TODO(python): the contributor is also named in META-INF/services/io.micronaut.el.ELMethodContributor, but the
-        # service is loaded once per JVM and every Python test class runs in a GraalPy context of its own, so the
-        # instance the service loader created in the context of an earlier test cannot run here: this test hands
-        # the parser the contributor explicitly, the way the guide shows for leaving executors out.
+        # TODO(python): the contributor is also named in META-INF/services/io.micronaut.el.ELMethodContributor, but
+        # ELContributions loads the services once per JVM and keeps the registrations: the lambdas BookMethods
+        # registered belong to the GraalPy context of the first test class that touched the factory and are unusable
+        # here ("Context execution was cancelled"), so this test hands the parser the contributor explicitly, the way
+        # the guide shows for leaving executors out.
         self.factory = CompiledExpressionFactory(List.of(),
             InterpretingELExpressionParser(List.of(ContributedELMethodExecutor(List.of(BookMethods())))))
         self.context = CompiledELContext().setBean("book", Book("Jakarta EL", "reference", 20.0))
@@ -34,6 +35,5 @@ class BookMethodsTest:
         assert self.evaluate("${fmt:shout('hi')}") == "HI!"
 
     @Test
-    @Disabled("TODO(python): a Python class cannot declare the Java functional interface a lambda expression is coerced to")
     def test_a_lambda_reaches_the_application_interface_without_a_proxy(self):
         assert self.evaluate("${book.summarised(b -> b.title())}") == "Jakarta EL"

@@ -8,7 +8,7 @@ from org.junit.jupiter.api import Test
 from example.BusinessRules import BusinessRules
 from example.Customer import Customer
 
-# TODO(python): the exception raised by the Python interceptor reaches the caller as the Java class generated for it
+# once the exception raised by the interceptor has crossed into Java it is the Java class generated for it
 NotEligibleException = java.type("example.NotEligibleException")
 
 

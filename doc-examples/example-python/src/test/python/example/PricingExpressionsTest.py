@@ -11,8 +11,6 @@ from org.junit.jupiter.api import Test
 from example.Book import Book
 from example.PricingService import PricingService
 
-# TODO(python): an imported Micronaut class is not usable as a runtime type argument (isinstance, a Class parameter)
-ELBeanProviderType = java.type("io.micronaut.el.ELBeanProvider")
 # TODO(python): the generated registry cannot be imported, its name holding a `$`
 PricingExpressions_ELExpressions = java.type("example.PricingExpressions$ELExpressions")
 
@@ -38,7 +36,7 @@ class PricingExpressionsTest:
     @Test
     def test_the_function_is_invoked_on_the_bean(self):
         context = CompiledELContext().setBean("book", self.book)
-        context.putContext(ELBeanProviderType, ContextBeanProvider(self.application_context))  # <1>
+        context.putContext(ELBeanProvider, ContextBeanProvider(self.application_context))  # <1>
 
         assert PricingExpressions_ELExpressions.QUOTE.getValue(context) == 54.0  # <2>
         assert PricingExpressions_ELExpressions.PRICED.getValue(context) == "54.0 EUR"

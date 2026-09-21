@@ -24,46 +24,37 @@ The Python examples are compiled by every build and their tests run with
   or in the test method.
 - Class-valued annotation members take Java types: `expectedType=str` / `float` map to `String` / `double`, a
   `List` is `java.util.List` (`list` does not resolve), `Math` is `java.lang.Math`.
-- Only a method annotated `@Executable` (or the methods of a `@MicronautTest`) is bridged to the generated Java
-  class, so a `@ELFunction` function, static or on a bean, also carries `@Executable`; without it the compiled
-  expression fails at runtime with `NoSuchMethodError`.
 - Java `Class` objects are compared by name (`getExpectedType().getName()`), not with `==`.
 - Java classes are imported (`from java.lang import String, Double, Object, RuntimeException`,
-  `from java.util import List`, `from micronaut.el import CompiledExpressionFactory`); the imported form also
-  works as a `Class` argument for `java.lang` types and for the Python classes of the examples
-  (`putContext(PricingService, ...)`). `java.type(...)` is used only where the import form fails, each use marked
-  `TODO(python)`:
-  - the generated registries (`example.BookExpressions$ELExpressions`, ...): a name holding `$` cannot be imported;
-  - an imported Micronaut class as a runtime type argument: `isinstance(x, CompiledExpression)` is always false
-    with the imported `micronaut.el.runtime.CompiledExpression`, and `putContext(ELSandbox, ...)`,
-    `putContext(BeanDefinitionRegistry, ...)`, `putContext(ELBeanProvider, ...)` with the imported classes fail with
-    `TypeError: invalid instantiation of foreign object`;
-  - primitive and array class literals (`double`, `long`, `String[]`) in `BookMethods`, which have no import form;
-  - the Java class generated for a Python exception (`java.type("example.NotEligibleException")`), see below.
-- `java.type("io.micronaut.el.example.eligible.MinAmount")` is the decorator generated for the annotation, not its
-  Java class, so annotation metadata is read by annotation name (`getAnnotation("io.micronaut...MinAmount")`,
-  `stringValue("io.micronaut...Eligible")`); a decorator passed where a `Class` is expected fails with
-  `TypeError: invalid instantiation of foreign object`.
-- A Python exception extends `java.type("java.lang.RuntimeException")`; the class generated for it does not pass
-  the message to `RuntimeException`, so the message is kept in a `message: str` attribute, which the generated
-  class serves as `getMessage()`. Code catching it after it crossed Java (an intercepted call) catches the
-  generated Java class (`java.type("example.NotEligibleException")`), not the Python class.
+  `from java.util import List`, `from micronaut.el import CompiledExpressionFactory, ELSandbox, ELBeanProvider`,
+  `from micronaut.el.runtime import CompiledExpression`, `from micronaut.context import BeanDefinitionRegistry`);
+  the imported form also works as a runtime type argument (`isinstance(x, CompiledExpression)`,
+  `putContext(ELSandbox, ...)`, `putContext(PricingService, ...)`) and imported annotations as annotation metadata
+  keys (`getAnnotation(MinAmount)`, `stringValue(Eligible)`). `java.type(...)` is used only where there is no import
+  form:
+  - the generated registries (`example.BookExpressions$ELExpressions`, ...): a name holding `$` cannot be imported
+    (marked `TODO(python)`);
+  - primitive and array class literals (`double`, `long`, `String[]`) in `BookMethods`;
+  - the Java class generated for a Python exception (`java.type("example.NotEligibleException")`): once the
+    exception raised by the interceptor has crossed into Java it is the generated Java class, which is what a Python
+    caller of the intercepted method catches (as documented by the Python guide of Micronaut).
+- A Python exception extends `RuntimeException`; the arguments of its `super().__init__(message)` call are forwarded
+  to the Java constructor, so `getMessage()` is the message.
+- `Summary`, the functional interface of the application, is an abstract class with one abstract method, which the
+  Python compiler compiles to a Java interface; `functionalInterface(Summary, ...)` returns a Python class
+  implementing it.
 
 ## Active `@Disabled` Tests
 
-| Test | Reason |
-| --- | --- |
-| `example.BookMethodsTest.test_a_lambda_reaches_the_application_interface_without_a_proxy` | A Python class cannot declare a Java interface: the class generated for the Python `Summary` is a concrete class, so `ELMethodRegistry.functionalInterface(Summary, ...)` rejects it and the `summarised` method taking a `Summary` cannot be registered (callouts 6 and 10 of `BookMethods`). |
+None.
 
 ## Commented Unsupported Snippet Ports
 
-| Snippet | Reason |
-| --- | --- |
-| `example.BookMethods` callouts 6 and 10 (`summarised`, `functionalInterface(Summary, ...)`) | See above; the two registrations are left out of the Python contributor with a `TODO(python)` comment. |
+None.
 
 ## Workarounds In Place
 
 | Where | Reason |
 | --- | --- |
-| `example.BookMethodsTest` builds its `ExpressionFactory` explicitly with the contributor | `ELContributions` loads the `META-INF/services/io.micronaut.el.ELMethodContributor` services once per JVM; the Python `BookMethods` instance it creates belongs to the GraalPy context of the first test class that touched the factory, and is unusable ("Context execution was cancelled") once that context is closed. An application runs one context, so the service registration works there. |
+| `example.BookMethodsTest` builds its `ExpressionFactory` explicitly with the contributor | `ELContributions` loads the `META-INF/services/io.micronaut.el.ELMethodContributor` services once per JVM and keeps their registrations: the lambdas the Python `BookMethods` registers belong to the GraalPy context of the first test class that touched the factory, and are unusable (`jakarta.el.ELException: org.graalvm.polyglot.PolyglotException: Context execution was cancelled`) once that context is closed. An application runs one context, so the service registration works there; the registry would need a per-application rebuild for several contexts in one JVM. |
 | `example.PricingExpressionsTest.ContextBeanProvider` | `ELBeanProvider` is a Java functional interface; a Python lambda cannot be handed to `ELContext.putContext(Class, Object)`, so a Python class implements the interface. |

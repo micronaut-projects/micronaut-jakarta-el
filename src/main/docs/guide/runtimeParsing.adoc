@@ -38,10 +38,9 @@ coercion that cannot be resolved while compiling.
 <11> The order contributors are consulted in, following the Micronaut `Ordered` contract.
 
 [.lang-python]
-NOTE: A Python class cannot declare a Java interface, so the `Summary` functional interface of the application,
-the `summarised` method taking it and the `functionalInterface` registration saying how a lambda expression
-becomes one (callouts 6 and 10) have no Python counterpart. A lambda expression passed to a method whose
-parameter is a functional interface of the platform is coerced without any registration.
+NOTE: In Python the `Summary` functional interface of the application is an abstract class with a single abstract
+method, which the Python compiler compiles to a Java interface; the `functionalInterface` registration (callout 10)
+returns a Python class implementing it that invokes the lambda expression.
 
 Every registration has the same shape — the declared signature, then the code that runs it:
 

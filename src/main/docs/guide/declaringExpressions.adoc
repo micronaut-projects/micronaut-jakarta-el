@@ -63,11 +63,6 @@ static methods, when listed with `@ELFunctions`.
 <2> `@ELFunction` can give a function another name, with `name`, an alias of `value`, and a namespace prefix of
 its own.
 
-[.lang-python]
-NOTE: The Python compiler only bridges a method to the class it generates when the method is annotated
-api:context.annotation.Executable[], so a function of a Python class carries `@Executable` next to `@ELFunction`:
-the compiled expression invokes the bridged method.
-
 === Functions on beans
 
 A function does not have to be static. The public instance methods a class declares are functions too, invoked
