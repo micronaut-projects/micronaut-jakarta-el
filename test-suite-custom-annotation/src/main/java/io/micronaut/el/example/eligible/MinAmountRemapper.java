@@ -30,12 +30,14 @@ public final class MinAmountRemapper implements AnnotationRemapper {
         if (!annotation.getAnnotationName().equals(MinAmount.class.getName())) {
             return List.of(annotation);
         }
-        String message = textOf(annotation.getValues().get("message"));
+        // the defaults of the annotation apply when a member is left out
+        String message = textOf(annotation.getValues().getOrDefault("message", MinAmount.DEFAULT_MESSAGE));
         if (message == null) {
             return List.of(annotation);
         }
         Map<CharSequence, Object> values = new LinkedHashMap<>(annotation.getValues());
         values.put("message", message);
+        values.putIfAbsent("inclusive", false);
         List<AnnotationValue<?>> remapped = new ArrayList<>();
         remapped.add(new AnnotationValue<>(MinAmount.class.getName(), values));
         for (String segment : ConstraintMessages.segmentsOf(message)) { // <1>

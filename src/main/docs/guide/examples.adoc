@@ -1,5 +1,5 @@
 Jakarta Expression Language earns its place wherever your application wants a little logic as data: readable at
-the declaration, changeable without touching the surrounding Java, and — with this module — compiled and
+the declaration, changeable without touching the surrounding code, and — with this module — compiled and
 type-checked at build time, so a typo fails the build instead of a request, and evaluated in nanoseconds without
 parsing or reflection. Some places it fits:
 
@@ -8,12 +8,7 @@ parsing or reflection. Some places it fits:
 Guard an operation with the rule written right where the operation is declared: a customer must be an adult and
 live in Europe before registering, an order must stay under a credit limit, a discount only applies on weekdays.
 
-[source,java]
-----
-@Eligible(value = "#{ fn:adult(customer.age) && fn:inEurope(customer.country) }",
-          otherwise = "#{ customer.name += ' must be an adult in Europe' }")
-public String register(Customer customer) { ... }
-----
+snippet::example.BusinessRules[project-base="doc-examples/example", tags="register", indent=0]
 
 The parameters of the method are the variables of the expressions; the functions under `fn:` come from a shared
 library of the rules of the domain.
@@ -23,12 +18,7 @@ library of the rules of the domain.
 A constraint in the style of Jakarta Validation, whose message is a template over the attributes of the
 constraint and the validated value:
 
-[source,java]
-----
-@MinAmount(value = 100)
-long amount
-// its default message: "Must be greater than ${inclusive == true ? 'or equal to ' : ''}{value}"
-----
+snippet::example.BusinessRules[project-base="doc-examples/example", tags="deposit", indent=0]
 
 The `{value}` attribute interpolates first, the expression sees `inclusive` and `validatedValue` as typed
 variables, and each segment of the template is compiled at build time.
@@ -38,10 +28,32 @@ variables, and each segment of the template is compiled at build time.
 Any annotation that decides something can carry the decision as an expression — which customers see a feature,
 which handler takes a message, what gets audited:
 
+[.lang-java]
 [source,java]
 ----
 @FeatureFlag("#{ customer.plan == 'PRO' or fn:betaTester(customer.id) }")
 public Dashboard newDashboard(Customer customer) { ... }
+----
+
+[.lang-kotlin]
+[source,kotlin]
+----
+@FeatureFlag("#{ customer.plan == 'PRO' or fn:betaTester(customer.id) }")
+fun newDashboard(customer: Customer): Dashboard { ... }
+----
+
+[.lang-groovy]
+[source,groovy]
+----
+@FeatureFlag("#{ customer.plan == 'PRO' or fn:betaTester(customer.id) }")
+Dashboard newDashboard(Customer customer) { ... }
+----
+
+[.lang-python]
+[source,python]
+----
+@FeatureFlag("#{ customer.plan == 'PRO' or fn:betaTester(customer.id) }")
+def new_dashboard(self, customer: Customer) -> Dashboard: ...
 ----
 
 ==== Rules that only exist at runtime
@@ -57,6 +69,11 @@ must be fully trusted because runtime expressions are executable application cod
 of this chapter walks through building them. Everything shown exists as working code — the
 `test-suite-custom-annotation` module of the repository is the library declaring them, and the `doc-examples`
 modules use it.
+
+NOTE: The library is written in Java whatever the language of the application using it: the annotation processor
+it declares runs inside the compiler, for a Java, Kotlin, Groovy or Python build alike, so the sources of this
+section are shown in Java only. The beans declaring the expressions and the interceptor evaluating them are
+application code, and are shown in every language.
 
 ==== The annotation
 
@@ -176,5 +193,5 @@ snippet::example.EligibleTest[project-base="doc-examples/example", title="Eligib
 <1> The condition holds and the method runs.
 <2> The condition does not hold and the message is the evaluation of the second expression.
 <4> The constraint is violated and its message is interpolated: `Must be greater than or equal to 100`.
-<3> The compiled expressions carry the expected types the processor declared; in Java and Kotlin the registry of
-the class also exposes them under the names the annotation gave them.
+<3> The compiled expressions carry the expected types the processor declared; in Java, Kotlin and Python the
+registry of the class also exposes them under the names the annotation gave them.

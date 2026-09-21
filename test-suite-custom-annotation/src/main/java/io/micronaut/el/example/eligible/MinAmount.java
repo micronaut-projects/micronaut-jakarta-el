@@ -29,6 +29,12 @@ import java.lang.annotation.Target;
 public @interface MinAmount {
 
     /**
+     * The default message, a template over {@code {value}}, {@code {inclusive}} and the expressions of the
+     * specification.
+     */
+    String DEFAULT_MESSAGE = "Must be greater than ${inclusive == true ? 'or equal to ' : ''}{value}"; // <1>
+
+    /**
      * @return The minimum
      */
     long value() default 0;
@@ -48,6 +54,6 @@ public @interface MinAmount {
      * @return The message of the violation, a template over {@code {value}}, {@code {inclusive}} and the
      * expressions of the specification
      */
-    String message() default "Must be greater than ${inclusive == true ? 'or equal to ' : ''}{value}"; // <1>
+    String message() default DEFAULT_MESSAGE;
 }
 // end::annotation[]
