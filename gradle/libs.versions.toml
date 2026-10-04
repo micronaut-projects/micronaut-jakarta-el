@@ -1,13 +1,13 @@
 [versions]
 managed-jakarta-el = "6.0.1"
 
-micronaut = "5.2.2"
-micronaut-sourcegen = "2.2.0"
+micronaut = "5.2.3"
+micronaut-sourcegen = "2.2.1"
 
 junit = "5.14.4"
 jmh = "1.37"
 expressly = "6.0.0"
-tomcat-el = "11.0.25"
+tomcat-el = "11.0.26"
 
 errorprone-gradle-plugin = "5.1.1"
 errorprone-no-reflection = "1.0.1"
