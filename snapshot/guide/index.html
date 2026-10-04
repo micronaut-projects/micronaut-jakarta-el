@@ -381,6 +381,15 @@ trees against that same runtime, which is why it too stays well ahead of the oth
 &lt;/annotationProcessorPaths&gt;</code></pre>
 </div>
 </div>
+<div class="listingblock multi-language-sample">
+<div class="title"></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="pyronaut">[tool.pyronaut.dependencies]
+build = [
+    <span class="hljs-string">"io.micronaut.el:micronaut-jakarta-el-processor"</span>,
+]</code></pre>
+</div>
+</div>
 </p>
 </div>
 <div class="paragraph">
@@ -396,6 +405,15 @@ trees against that same runtime, which is why it too stays well ahead of the oth
     &lt;groupId&gt;io.micronaut.el&lt;/groupId&gt;
     &lt;artifactId&gt;micronaut-jakarta-el&lt;/artifactId&gt;
 &lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title"></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="pyronaut">[tool.pyronaut.dependencies]
+runtime = [
+    <span class="hljs-string">"io.micronaut.el:micronaut-jakarta-el"</span>,
+]</code></pre>
 </div>
 </div>
 </p>
@@ -2658,6 +2676,15 @@ expression string is built at runtime, add the interpreter module:</p>
 &lt;/dependency&gt;</code></pre>
 </div>
 </div>
+<div class="listingblock multi-language-sample">
+<div class="title"></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="pyronaut">[tool.pyronaut.dependencies]
+runtime = [
+    <span class="hljs-string">"io.micronaut.el:micronaut-jakarta-el-interpreter"</span>,
+]</code></pre>
+</div>
+</div>
 </p>
 </div>
 <div class="paragraph">
@@ -2685,6 +2712,15 @@ add the optional reflection executor:</p>
     &lt;artifactId&gt;micronaut-jakarta-el-interpreter-reflection&lt;/artifactId&gt;
     &lt;scope&gt;runtime&lt;/scope&gt;
 &lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title"></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="pyronaut">[tool.pyronaut.dependencies]
+runtime = [
+    <span class="hljs-string">"io.micronaut.el:micronaut-jakarta-el-interpreter-reflection"</span>,
+]</code></pre>
 </div>
 </div>
 </p>
