@@ -1,10 +1,10 @@
 # Jakarta Expression Language TCK Evidence
 
-- Commit: b60693e072c30b163b10216d5b3bf47322fdcb76
+- Commit: 61e1051cca757e6490c781ea22b627e4a4ccb7a1
 - Project version: 1.1.1-SNAPSHOT
 - Expression Language API baseline: 6.0.1
 - TCK bundle: jakarta-expression-language-tck-6.0.1 (6.0 branch)
-- Workflow: https://github.com/micronaut-projects/micronaut-jakarta-el/actions/runs/37217558393
+- Workflow: https://github.com/micronaut-projects/micronaut-jakarta-el/actions/runs/38107600832
 - Sanitized JUnit XML: junit-xml/
 - Tests: 360
 - Failures: 0
