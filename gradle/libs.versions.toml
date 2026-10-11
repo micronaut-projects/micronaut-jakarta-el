@@ -1,8 +1,8 @@
 [versions]
 managed-jakarta-el = "6.0.1"
 
-micronaut = "5.2.3"
-micronaut-sourcegen = "2.2.1"
+micronaut = "5.2.15"
+micronaut-sourcegen = "2.2.3"
 
 junit = "5.14.4"
 jmh = "1.37"
@@ -10,10 +10,10 @@ expressly = "6.0.0"
 tomcat-el = "11.0.26"
 
 errorprone-gradle-plugin = "5.1.1"
-errorprone-no-reflection = "1.0.1"
-graalvm-buildtools = "0.11.5"
+errorprone-no-reflection = "1.0.3"
+graalvm-buildtools = "1.1.14"
 error_prone_core = "2.50.0"
-nullaway = "0.14.1"
+nullaway = "0.14.2"
 
 [libraries]
 # core
