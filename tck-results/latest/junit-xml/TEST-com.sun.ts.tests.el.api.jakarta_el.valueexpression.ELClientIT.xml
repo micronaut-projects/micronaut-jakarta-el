@@ -6,29 +6,29 @@
   <testcase name="positiveValueExpressionTest()" classname="com.sun.ts.tests.el.api.jakarta_el.valueexpression.ELClientIT" time="0"/>
   <testcase name="valueExpressionEqualsTest()" classname="com.sun.ts.tests.el.api.jakarta_el.valueexpression.ELClientIT" time="0"/>
   <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.valueexpression.ELClientIT logStartTest
+  <system-err><![CDATA[Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.valueexpression.ELClientIT logStartTest
 INFO: STARTING TEST : negativeValueExpressionTest()
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.valueexpression.ELClientIT logFinishTest
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.valueexpression.ELClientIT logFinishTest
 INFO: FINISHED TEST : negativeValueExpressionTest()
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.valueexpression.ELClientIT cleanup
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.valueexpression.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.valueexpression.ELClientIT logStartTest
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.valueexpression.ELClientIT logStartTest
 INFO: STARTING TEST : valueExpressionSerializableTest()
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.valueexpression.ELClientIT logFinishTest
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.valueexpression.ELClientIT logFinishTest
 INFO: FINISHED TEST : valueExpressionSerializableTest()
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.valueexpression.ELClientIT cleanup
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.valueexpression.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.valueexpression.ELClientIT logStartTest
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.valueexpression.ELClientIT logStartTest
 INFO: STARTING TEST : positiveValueExpressionTest()
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.valueexpression.ELClientIT logFinishTest
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.valueexpression.ELClientIT logFinishTest
 INFO: FINISHED TEST : positiveValueExpressionTest()
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.valueexpression.ELClientIT cleanup
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.valueexpression.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.valueexpression.ELClientIT logStartTest
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.valueexpression.ELClientIT logStartTest
 INFO: STARTING TEST : valueExpressionEqualsTest()
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.valueexpression.ELClientIT logFinishTest
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.valueexpression.ELClientIT logFinishTest
 INFO: FINISHED TEST : valueExpressionEqualsTest()
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.valueexpression.ELClientIT cleanup
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.valueexpression.ELClientIT cleanup
 INFO: Cleanup method called
 ]]></system-err>
 </testsuite>

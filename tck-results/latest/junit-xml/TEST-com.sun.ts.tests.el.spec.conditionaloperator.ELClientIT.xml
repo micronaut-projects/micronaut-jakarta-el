@@ -4,17 +4,17 @@
   <testcase name="elConditionalBooleanTest()" classname="com.sun.ts.tests.el.spec.conditionaloperator.ELClientIT" time="0"/>
   <testcase name="elConditionalStringTest()" classname="com.sun.ts.tests.el.spec.conditionaloperator.ELClientIT" time="0"/>
   <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.spec.conditionaloperator.ELClientIT logStartTest
+  <system-err><![CDATA[Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.spec.conditionaloperator.ELClientIT logStartTest
 INFO: STARTING TEST : elConditionalBooleanTest()
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.spec.conditionaloperator.ELClientIT logFinishTest
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.spec.conditionaloperator.ELClientIT logFinishTest
 INFO: FINISHED TEST : elConditionalBooleanTest()
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.spec.conditionaloperator.ELClientIT cleanup
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.spec.conditionaloperator.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.spec.conditionaloperator.ELClientIT logStartTest
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.spec.conditionaloperator.ELClientIT logStartTest
 INFO: STARTING TEST : elConditionalStringTest()
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.spec.conditionaloperator.ELClientIT logFinishTest
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.spec.conditionaloperator.ELClientIT logFinishTest
 INFO: FINISHED TEST : elConditionalStringTest()
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.spec.conditionaloperator.ELClientIT cleanup
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.spec.conditionaloperator.ELClientIT cleanup
 INFO: Cleanup method called
 ]]></system-err>
 </testsuite>

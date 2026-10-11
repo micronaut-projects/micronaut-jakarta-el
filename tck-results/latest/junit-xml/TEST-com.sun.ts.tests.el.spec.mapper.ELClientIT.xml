@@ -4,17 +4,17 @@
   <testcase name="ELFunctionBindingTest()" classname="com.sun.ts.tests.el.spec.mapper.ELClientIT" time="0"/>
   <testcase name="ELVariableBindingTest()" classname="com.sun.ts.tests.el.spec.mapper.ELClientIT" time="0"/>
   <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[Oct 04, 2026 5:04:13 PM com.sun.ts.tests.el.spec.mapper.ELClientIT logStartTest
+  <system-err><![CDATA[Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.spec.mapper.ELClientIT logStartTest
 INFO: STARTING TEST : ELFunctionBindingTest()
-Oct 04, 2026 5:04:13 PM com.sun.ts.tests.el.spec.mapper.ELClientIT logFinishTest
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.spec.mapper.ELClientIT logFinishTest
 INFO: FINISHED TEST : ELFunctionBindingTest()
-Oct 04, 2026 5:04:13 PM com.sun.ts.tests.el.spec.mapper.ELClientIT cleanup
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.spec.mapper.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 04, 2026 5:04:13 PM com.sun.ts.tests.el.spec.mapper.ELClientIT logStartTest
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.spec.mapper.ELClientIT logStartTest
 INFO: STARTING TEST : ELVariableBindingTest()
-Oct 04, 2026 5:04:13 PM com.sun.ts.tests.el.spec.mapper.ELClientIT logFinishTest
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.spec.mapper.ELClientIT logFinishTest
 INFO: FINISHED TEST : ELVariableBindingTest()
-Oct 04, 2026 5:04:13 PM com.sun.ts.tests.el.spec.mapper.ELClientIT cleanup
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.spec.mapper.ELClientIT cleanup
 INFO: Cleanup method called
 ]]></system-err>
 </testsuite>

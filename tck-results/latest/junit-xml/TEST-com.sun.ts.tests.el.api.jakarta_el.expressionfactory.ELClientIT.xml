@@ -11,71 +11,71 @@
   <testcase name="newInstanceTest()" classname="com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT" time="0"/>
   <testcase name="createValueExpressionELExceptionTest()" classname="com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT" time="0"/>
   <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT logStartTest
+  <system-err><![CDATA[Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT logStartTest
 INFO: STARTING TEST : coerceToTypeTest()
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT logFinishTest
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT logFinishTest
 INFO: FINISHED TEST : coerceToTypeTest()
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT cleanup
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT logStartTest
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT logStartTest
 INFO: STARTING TEST : createExpressionNPETest()
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT createExpressionNPETest
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT createExpressionNPETest
 INFO: Testing: ELContext.createValueExpression(context, function, null)
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.common.util.ELTestUtil checkForException
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.common.util.ELTestUtil checkForException
 INFO: Test PASSED
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT createExpressionNPETest
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT createExpressionNPETest
 INFO: Testing: ELContext.createValueExpression(instance, null)
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.common.util.ELTestUtil checkForException
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.common.util.ELTestUtil checkForException
 INFO: Test PASSED
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT createExpressionNPETest
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT createExpressionNPETest
 INFO: Testing: ELContext.createMethodExpression(context, instance, returnTypes, null)
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.common.util.ELTestUtil checkForException
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.common.util.ELTestUtil checkForException
 INFO: Test PASSED
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT logFinishTest
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT logFinishTest
 INFO: FINISHED TEST : createExpressionNPETest()
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT cleanup
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT logStartTest
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT logStartTest
 INFO: STARTING TEST : createValueExpression2Test()
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT logFinishTest
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT logFinishTest
 INFO: FINISHED TEST : createValueExpression2Test()
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT cleanup
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT logStartTest
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT logStartTest
 INFO: STARTING TEST : coerceToTypeELExceptionTest()
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT logFinishTest
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT logFinishTest
 INFO: FINISHED TEST : coerceToTypeELExceptionTest()
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT cleanup
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT logStartTest
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT logStartTest
 INFO: STARTING TEST : createMethodExpressionTest()
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT logFinishTest
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT logFinishTest
 INFO: FINISHED TEST : createMethodExpressionTest()
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT cleanup
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT logStartTest
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT logStartTest
 INFO: STARTING TEST : createMethodExpressionELExceptionTest()
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT logFinishTest
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT logFinishTest
 INFO: FINISHED TEST : createMethodExpressionELExceptionTest()
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT cleanup
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT logStartTest
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT logStartTest
 INFO: STARTING TEST : createValueExpressionTest()
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT logFinishTest
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT logFinishTest
 INFO: FINISHED TEST : createValueExpressionTest()
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT cleanup
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT logStartTest
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT logStartTest
 INFO: STARTING TEST : newInstanceTest()
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT logFinishTest
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT logFinishTest
 INFO: FINISHED TEST : newInstanceTest()
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT cleanup
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT logStartTest
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT logStartTest
 INFO: STARTING TEST : createValueExpressionELExceptionTest()
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT logFinishTest
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT logFinishTest
 INFO: FINISHED TEST : createValueExpressionELExceptionTest()
-Oct 04, 2026 5:04:12 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT cleanup
+Oct 11, 2026 9:41:30 PM com.sun.ts.tests.el.api.jakarta_el.expressionfactory.ELClientIT cleanup
 INFO: Cleanup method called
 ]]></system-err>
 </testsuite>
