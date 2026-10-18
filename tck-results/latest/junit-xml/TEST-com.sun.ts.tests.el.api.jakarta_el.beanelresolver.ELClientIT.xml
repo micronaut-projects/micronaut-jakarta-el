@@ -12,65 +12,65 @@
   <testcase name="beanELResolverDefaultMethodReadWriteTest()" classname="com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT" time="0"/>
   <testcase name="beanELResolverPNFETest()" classname="com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT" time="0"/>
   <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logStartTest
+  <system-err><![CDATA[Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logStartTest
 INFO: STARTING TEST : beanELResolverNPETest()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logFinishTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logFinishTest
 INFO: FINISHED TEST : beanELResolverNPETest()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT cleanup
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logStartTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logStartTest
 INFO: STARTING TEST : beanELResolverPNWETest()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logFinishTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logFinishTest
 INFO: FINISHED TEST : beanELResolverPNWETest()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT cleanup
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logStartTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logStartTest
 INFO: STARTING TEST : beanELResolverMethodVisibilityTest()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logFinishTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logFinishTest
 INFO: FINISHED TEST : beanELResolverMethodVisibilityTest()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT cleanup
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logStartTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logStartTest
 INFO: STARTING TEST : beanELResolverInvokeVoidTest()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logFinishTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logFinishTest
 INFO: FINISHED TEST : beanELResolverInvokeVoidTest()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT cleanup
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logStartTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logStartTest
 INFO: STARTING TEST : beanELResolverDefaultMethodReadOnlyTest()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logFinishTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logFinishTest
 INFO: FINISHED TEST : beanELResolverDefaultMethodReadOnlyTest()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT cleanup
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logStartTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logStartTest
 INFO: STARTING TEST : beanELResolverTest()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logFinishTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logFinishTest
 INFO: FINISHED TEST : beanELResolverTest()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT cleanup
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logStartTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logStartTest
 INFO: STARTING TEST : beanELResolverInvokeMNFETest()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logFinishTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logFinishTest
 INFO: FINISHED TEST : beanELResolverInvokeMNFETest()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT cleanup
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logStartTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logStartTest
 INFO: STARTING TEST : beanELResolverInvokeTest()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logFinishTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logFinishTest
 INFO: FINISHED TEST : beanELResolverInvokeTest()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT cleanup
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logStartTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logStartTest
 INFO: STARTING TEST : beanELResolverDefaultMethodReadWriteTest()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logFinishTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logFinishTest
 INFO: FINISHED TEST : beanELResolverDefaultMethodReadWriteTest()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT cleanup
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logStartTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logStartTest
 INFO: STARTING TEST : beanELResolverPNFETest()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logFinishTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT logFinishTest
 INFO: FINISHED TEST : beanELResolverPNFETest()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT cleanup
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.beanelresolver.ELClientIT cleanup
 INFO: Cleanup method called
 ]]></system-err>
 </testsuite>

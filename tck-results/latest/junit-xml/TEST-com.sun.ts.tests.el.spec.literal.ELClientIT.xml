@@ -8,41 +8,41 @@
   <testcase name="elNullLiteralTest()" classname="com.sun.ts.tests.el.spec.literal.ELClientIT" time="0"/>
   <testcase name="elStringLiteralTest()" classname="com.sun.ts.tests.el.spec.literal.ELClientIT" time="0"/>
   <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[Oct 11, 2026 9:41:29 PM com.sun.ts.tests.el.spec.literal.ELClientIT logStartTest
+  <system-err><![CDATA[Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.literal.ELClientIT logStartTest
 INFO: STARTING TEST : elIntegerLiteralTest()
-Oct 11, 2026 9:41:29 PM com.sun.ts.tests.el.spec.literal.ELClientIT logFinishTest
+Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.literal.ELClientIT logFinishTest
 INFO: FINISHED TEST : elIntegerLiteralTest()
-Oct 11, 2026 9:41:29 PM com.sun.ts.tests.el.spec.literal.ELClientIT cleanup
+Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.literal.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 11, 2026 9:41:29 PM com.sun.ts.tests.el.spec.literal.ELClientIT logStartTest
+Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.literal.ELClientIT logStartTest
 INFO: STARTING TEST : elSyntaxAsLiteralTest()
-Oct 11, 2026 9:41:29 PM com.sun.ts.tests.el.spec.literal.ELClientIT logFinishTest
+Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.literal.ELClientIT logFinishTest
 INFO: FINISHED TEST : elSyntaxAsLiteralTest()
-Oct 11, 2026 9:41:29 PM com.sun.ts.tests.el.spec.literal.ELClientIT cleanup
+Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.literal.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 11, 2026 9:41:29 PM com.sun.ts.tests.el.spec.literal.ELClientIT logStartTest
+Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.literal.ELClientIT logStartTest
 INFO: STARTING TEST : elFloatingPointLiteralTest()
-Oct 11, 2026 9:41:29 PM com.sun.ts.tests.el.spec.literal.ELClientIT logFinishTest
+Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.literal.ELClientIT logFinishTest
 INFO: FINISHED TEST : elFloatingPointLiteralTest()
-Oct 11, 2026 9:41:29 PM com.sun.ts.tests.el.spec.literal.ELClientIT cleanup
+Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.literal.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 11, 2026 9:41:29 PM com.sun.ts.tests.el.spec.literal.ELClientIT logStartTest
+Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.literal.ELClientIT logStartTest
 INFO: STARTING TEST : elBooleanLiteralTest()
-Oct 11, 2026 9:41:29 PM com.sun.ts.tests.el.spec.literal.ELClientIT logFinishTest
+Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.literal.ELClientIT logFinishTest
 INFO: FINISHED TEST : elBooleanLiteralTest()
-Oct 11, 2026 9:41:29 PM com.sun.ts.tests.el.spec.literal.ELClientIT cleanup
+Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.literal.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 11, 2026 9:41:29 PM com.sun.ts.tests.el.spec.literal.ELClientIT logStartTest
+Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.literal.ELClientIT logStartTest
 INFO: STARTING TEST : elNullLiteralTest()
-Oct 11, 2026 9:41:29 PM com.sun.ts.tests.el.spec.literal.ELClientIT logFinishTest
+Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.literal.ELClientIT logFinishTest
 INFO: FINISHED TEST : elNullLiteralTest()
-Oct 11, 2026 9:41:29 PM com.sun.ts.tests.el.spec.literal.ELClientIT cleanup
+Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.literal.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 11, 2026 9:41:29 PM com.sun.ts.tests.el.spec.literal.ELClientIT logStartTest
+Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.literal.ELClientIT logStartTest
 INFO: STARTING TEST : elStringLiteralTest()
-Oct 11, 2026 9:41:29 PM com.sun.ts.tests.el.spec.literal.ELClientIT logFinishTest
+Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.literal.ELClientIT logFinishTest
 INFO: FINISHED TEST : elStringLiteralTest()
-Oct 11, 2026 9:41:29 PM com.sun.ts.tests.el.spec.literal.ELClientIT cleanup
+Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.literal.ELClientIT cleanup
 INFO: Cleanup method called
 ]]></system-err>
 </testsuite>

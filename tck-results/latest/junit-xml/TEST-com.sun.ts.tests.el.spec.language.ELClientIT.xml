@@ -17,111 +17,111 @@
   <testcase name="poundDollarSameMeaning2Test()" classname="com.sun.ts.tests.el.spec.language.ELClientIT" time="0"/>
   <testcase name="elSyntaxEscapeTest()" classname="com.sun.ts.tests.el.spec.language.ELClientIT" time="0"/>
   <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT logStartTest
+  <system-err><![CDATA[Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT logStartTest
 INFO: STARTING TEST : parseOnceEvalManyTest()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT logFinishTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT logFinishTest
 INFO: FINISHED TEST : parseOnceEvalManyTest()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT cleanup
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT logStartTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT logStartTest
 INFO: STARTING TEST : mixedCompositeExpressionsTest()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT mixedCompositeExpressionsTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT mixedCompositeExpressionsTest
 SEVERE: Expected Exception thrown.
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT mixedCompositeExpressionsTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT mixedCompositeExpressionsTest
 SEVERE: Expected Exception thrown.
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT mixedCompositeExpressionsTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT mixedCompositeExpressionsTest
 SEVERE: Expected Exception thrown.
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT mixedCompositeExpressionsTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT mixedCompositeExpressionsTest
 SEVERE: Expected Exception thrown.
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT logFinishTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT logFinishTest
 INFO: FINISHED TEST : mixedCompositeExpressionsTest()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT cleanup
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT logStartTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT logStartTest
 INFO: STARTING TEST : nestedEvalExpressionsTest()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT nestedEvalExpressionsTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT nestedEvalExpressionsTest
 SEVERE: Expected Exception thrown.
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT nestedEvalExpressionsTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT nestedEvalExpressionsTest
 SEVERE: Expected Exception thrown.
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT nestedEvalExpressionsTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT nestedEvalExpressionsTest
 SEVERE: Expected Exception thrown.
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT nestedEvalExpressionsTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT nestedEvalExpressionsTest
 SEVERE: Expected Exception thrown.
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT logFinishTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT logFinishTest
 INFO: FINISHED TEST : nestedEvalExpressionsTest()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT cleanup
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT logStartTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT logStartTest
 INFO: STARTING TEST : dotAndIndexOperatorsSameTest()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT logFinishTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT logFinishTest
 INFO: FINISHED TEST : dotAndIndexOperatorsSameTest()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT cleanup
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT logStartTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT logStartTest
 INFO: STARTING TEST : literalExprEval1Test()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT logFinishTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT logFinishTest
 INFO: FINISHED TEST : literalExprEval1Test()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT cleanup
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT logStartTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT logStartTest
 INFO: STARTING TEST : literalExprEval2Test()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT logFinishTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT logFinishTest
 INFO: FINISHED TEST : literalExprEval2Test()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT cleanup
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT logStartTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT logStartTest
 INFO: STARTING TEST : compositeExprEval1Test()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT logFinishTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT logFinishTest
 INFO: FINISHED TEST : compositeExprEval1Test()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT cleanup
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT logStartTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT logStartTest
 INFO: STARTING TEST : compositeExprEval2Test()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT logFinishTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT logFinishTest
 INFO: FINISHED TEST : compositeExprEval2Test()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT cleanup
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT logStartTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT logStartTest
 INFO: STARTING TEST : literalExprAsMethodExpr1Test()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT logFinishTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT logFinishTest
 INFO: FINISHED TEST : literalExprAsMethodExpr1Test()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT cleanup
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT logStartTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT logStartTest
 INFO: STARTING TEST : literalExprAsMethodExpr2Test()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT logFinishTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT logFinishTest
 INFO: FINISHED TEST : literalExprAsMethodExpr2Test()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT cleanup
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT logStartTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT logStartTest
 INFO: STARTING TEST : rValueCoercion1Test()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT logFinishTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT logFinishTest
 INFO: FINISHED TEST : rValueCoercion1Test()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT cleanup
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT logStartTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT logStartTest
 INFO: STARTING TEST : rValueCoercion2Test()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT logFinishTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT logFinishTest
 INFO: FINISHED TEST : rValueCoercion2Test()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT cleanup
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT logStartTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT logStartTest
 INFO: STARTING TEST : poundDollarSameMeaning1Test()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT logFinishTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT logFinishTest
 INFO: FINISHED TEST : poundDollarSameMeaning1Test()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT cleanup
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT logStartTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT logStartTest
 INFO: STARTING TEST : poundDollarSameMeaning2Test()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT logFinishTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT logFinishTest
 INFO: FINISHED TEST : poundDollarSameMeaning2Test()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT cleanup
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT logStartTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT logStartTest
 INFO: STARTING TEST : elSyntaxEscapeTest()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT logFinishTest
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT logFinishTest
 INFO: FINISHED TEST : elSyntaxEscapeTest()
-Oct 11, 2026 9:41:28 PM com.sun.ts.tests.el.spec.language.ELClientIT cleanup
+Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.spec.language.ELClientIT cleanup
 INFO: Cleanup method called
 ]]></system-err>
 </testsuite>
