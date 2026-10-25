@@ -1,7 +1,7 @@
 [versions]
 managed-jakarta-el = "6.0.1"
 
-micronaut = "5.2.16"
+micronaut = "5.2.20"
 micronaut-sourcegen = "2.2.3"
 
 junit = "5.14.4"
@@ -11,7 +11,7 @@ tomcat-el = "11.0.27"
 
 errorprone-gradle-plugin = "5.1.1"
 errorprone-no-reflection = "1.0.3"
-graalvm-buildtools = "1.1.14"
+graalvm-buildtools = "1.1.16"
 error_prone_core = "2.50.0"
 nullaway = "0.14.2"
 
