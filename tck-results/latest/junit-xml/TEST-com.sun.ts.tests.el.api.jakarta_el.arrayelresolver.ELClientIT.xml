@@ -10,57 +10,57 @@
   <testcase name="arrayELResolverPNFETest()" classname="com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT" time="0"/>
   <testcase name="arrayELResolverNPETest()" classname="com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT" time="0"/>
   <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[Oct 25, 2026 12:41:35 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT logStartTest
+  <system-err><![CDATA[Oct 25, 2026 7:11:53 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT logStartTest
 INFO: STARTING TEST : arrayELResolverPNWETest()
-Oct 25, 2026 12:41:35 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT logFinishTest
+Oct 25, 2026 7:11:53 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT logFinishTest
 INFO: FINISHED TEST : arrayELResolverPNWETest()
-Oct 25, 2026 12:41:35 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT cleanup
+Oct 25, 2026 7:11:53 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 25, 2026 12:41:35 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT logStartTest
+Oct 25, 2026 7:11:53 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT logStartTest
 INFO: STARTING TEST : arrayELResolverOBETest()
-Oct 25, 2026 12:41:35 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT logFinishTest
+Oct 25, 2026 7:11:53 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT logFinishTest
 INFO: FINISHED TEST : arrayELResolverOBETest()
-Oct 25, 2026 12:41:35 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT cleanup
+Oct 25, 2026 7:11:53 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 25, 2026 12:41:35 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT logStartTest
+Oct 25, 2026 7:11:53 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT logStartTest
 INFO: STARTING TEST : arrayELResolverCCETest()
-Oct 25, 2026 12:41:35 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT logFinishTest
+Oct 25, 2026 7:11:53 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT logFinishTest
 INFO: FINISHED TEST : arrayELResolverCCETest()
-Oct 25, 2026 12:41:35 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT cleanup
+Oct 25, 2026 7:11:53 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 25, 2026 12:41:35 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT logStartTest
+Oct 25, 2026 7:11:53 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT logStartTest
 INFO: STARTING TEST : arrayELResolverLengthTest()
-Oct 25, 2026 12:41:35 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT logFinishTest
+Oct 25, 2026 7:11:53 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT logFinishTest
 INFO: FINISHED TEST : arrayELResolverLengthTest()
-Oct 25, 2026 12:41:35 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT cleanup
+Oct 25, 2026 7:11:53 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 25, 2026 12:41:35 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT logStartTest
+Oct 25, 2026 7:11:53 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT logStartTest
 INFO: STARTING TEST : arrayELResolverTest()
-Oct 25, 2026 12:41:35 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT logFinishTest
+Oct 25, 2026 7:11:53 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT logFinishTest
 INFO: FINISHED TEST : arrayELResolverTest()
-Oct 25, 2026 12:41:35 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT cleanup
+Oct 25, 2026 7:11:53 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 25, 2026 12:41:35 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT logStartTest
+Oct 25, 2026 7:11:53 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT logStartTest
 INFO: STARTING TEST : arrayELResolverIAETest()
-Oct 25, 2026 12:41:35 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT arrayELResolverIAETest
+Oct 25, 2026 7:11:53 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT arrayELResolverIAETest
 INFO: Test Passed  getValue() threw IllegalArgumentException 
 Test Passed  setValue() threw IllegalArgumentException 
 
-Oct 25, 2026 12:41:35 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT logFinishTest
+Oct 25, 2026 7:11:53 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT logFinishTest
 INFO: FINISHED TEST : arrayELResolverIAETest()
-Oct 25, 2026 12:41:35 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT cleanup
+Oct 25, 2026 7:11:53 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 25, 2026 12:41:35 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT logStartTest
+Oct 25, 2026 7:11:53 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT logStartTest
 INFO: STARTING TEST : arrayELResolverPNFETest()
-Oct 25, 2026 12:41:35 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT logFinishTest
+Oct 25, 2026 7:11:53 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT logFinishTest
 INFO: FINISHED TEST : arrayELResolverPNFETest()
-Oct 25, 2026 12:41:35 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT cleanup
+Oct 25, 2026 7:11:53 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 25, 2026 12:41:35 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT logStartTest
+Oct 25, 2026 7:11:53 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT logStartTest
 INFO: STARTING TEST : arrayELResolverNPETest()
-Oct 25, 2026 12:41:35 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT logFinishTest
+Oct 25, 2026 7:11:53 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT logFinishTest
 INFO: FINISHED TEST : arrayELResolverNPETest()
-Oct 25, 2026 12:41:35 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT cleanup
+Oct 25, 2026 7:11:53 PM com.sun.ts.tests.el.api.jakarta_el.arrayelresolver.ELClientIT cleanup
 INFO: Cleanup method called
 ]]></system-err>
 </testsuite>
