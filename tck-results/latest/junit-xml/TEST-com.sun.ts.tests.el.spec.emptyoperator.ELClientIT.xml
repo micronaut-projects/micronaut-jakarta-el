@@ -7,35 +7,35 @@
   <testcase name="elEmptyNullTest()" classname="com.sun.ts.tests.el.spec.emptyoperator.ELClientIT" time="0"/>
   <testcase name="elEmptyMapTest()" classname="com.sun.ts.tests.el.spec.emptyoperator.ELClientIT" time="0"/>
   <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[Oct 18, 2026 11:05:41 AM com.sun.ts.tests.el.spec.emptyoperator.ELClientIT logStartTest
+  <system-err><![CDATA[Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.emptyoperator.ELClientIT logStartTest
 INFO: STARTING TEST : elEmptyCollectionTest()
-Oct 18, 2026 11:05:41 AM com.sun.ts.tests.el.spec.emptyoperator.ELClientIT logFinishTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.emptyoperator.ELClientIT logFinishTest
 INFO: FINISHED TEST : elEmptyCollectionTest()
-Oct 18, 2026 11:05:41 AM com.sun.ts.tests.el.spec.emptyoperator.ELClientIT cleanup
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.emptyoperator.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 18, 2026 11:05:41 AM com.sun.ts.tests.el.spec.emptyoperator.ELClientIT logStartTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.emptyoperator.ELClientIT logStartTest
 INFO: STARTING TEST : elEmptyStringTest()
-Oct 18, 2026 11:05:41 AM com.sun.ts.tests.el.spec.emptyoperator.ELClientIT logFinishTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.emptyoperator.ELClientIT logFinishTest
 INFO: FINISHED TEST : elEmptyStringTest()
-Oct 18, 2026 11:05:41 AM com.sun.ts.tests.el.spec.emptyoperator.ELClientIT cleanup
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.emptyoperator.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 18, 2026 11:05:41 AM com.sun.ts.tests.el.spec.emptyoperator.ELClientIT logStartTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.emptyoperator.ELClientIT logStartTest
 INFO: STARTING TEST : elEmptyArrayTest()
-Oct 18, 2026 11:05:41 AM com.sun.ts.tests.el.spec.emptyoperator.ELClientIT logFinishTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.emptyoperator.ELClientIT logFinishTest
 INFO: FINISHED TEST : elEmptyArrayTest()
-Oct 18, 2026 11:05:41 AM com.sun.ts.tests.el.spec.emptyoperator.ELClientIT cleanup
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.emptyoperator.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 18, 2026 11:05:41 AM com.sun.ts.tests.el.spec.emptyoperator.ELClientIT logStartTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.emptyoperator.ELClientIT logStartTest
 INFO: STARTING TEST : elEmptyNullTest()
-Oct 18, 2026 11:05:41 AM com.sun.ts.tests.el.spec.emptyoperator.ELClientIT logFinishTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.emptyoperator.ELClientIT logFinishTest
 INFO: FINISHED TEST : elEmptyNullTest()
-Oct 18, 2026 11:05:41 AM com.sun.ts.tests.el.spec.emptyoperator.ELClientIT cleanup
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.emptyoperator.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 18, 2026 11:05:41 AM com.sun.ts.tests.el.spec.emptyoperator.ELClientIT logStartTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.emptyoperator.ELClientIT logStartTest
 INFO: STARTING TEST : elEmptyMapTest()
-Oct 18, 2026 11:05:41 AM com.sun.ts.tests.el.spec.emptyoperator.ELClientIT logFinishTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.emptyoperator.ELClientIT logFinishTest
 INFO: FINISHED TEST : elEmptyMapTest()
-Oct 18, 2026 11:05:41 AM com.sun.ts.tests.el.spec.emptyoperator.ELClientIT cleanup
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.emptyoperator.ELClientIT cleanup
 INFO: Cleanup method called
 ]]></system-err>
 </testsuite>

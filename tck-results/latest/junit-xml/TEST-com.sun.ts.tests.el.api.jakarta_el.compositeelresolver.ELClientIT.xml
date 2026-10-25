@@ -8,43 +8,43 @@
   <testcase name="compositeELResolverPNWETest()" classname="com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT" time="0"/>
   <testcase name="compositeELResolverNPETest()" classname="com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT" time="0"/>
   <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT logStartTest
+  <system-err><![CDATA[Oct 25, 2026 12:41:34 PM com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT logStartTest
 INFO: STARTING TEST : compositeELResolverInvokeTest()
-Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT logFinishTest
+Oct 25, 2026 12:41:34 PM com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT logFinishTest
 INFO: FINISHED TEST : compositeELResolverInvokeTest()
-Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT cleanup
+Oct 25, 2026 12:41:34 PM com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT logStartTest
+Oct 25, 2026 12:41:34 PM com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT logStartTest
 INFO: STARTING TEST : compositeELResolverTest()
-Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT logFinishTest
+Oct 25, 2026 12:41:34 PM com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT logFinishTest
 INFO: FINISHED TEST : compositeELResolverTest()
-Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT cleanup
+Oct 25, 2026 12:41:34 PM com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT logStartTest
+Oct 25, 2026 12:41:34 PM com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT logStartTest
 INFO: STARTING TEST : compositeELResolverAddNPETest()
-Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT compositeELResolverAddNPETest
+Oct 25, 2026 12:41:34 PM com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT compositeELResolverAddNPETest
 INFO: Expected Exception thrown, when providing a null resolver to Composite.add()
-Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT logFinishTest
+Oct 25, 2026 12:41:34 PM com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT logFinishTest
 INFO: FINISHED TEST : compositeELResolverAddNPETest()
-Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT cleanup
+Oct 25, 2026 12:41:34 PM com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT logStartTest
+Oct 25, 2026 12:41:34 PM com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT logStartTest
 INFO: STARTING TEST : compositeELResolverPNFETest()
-Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT logFinishTest
+Oct 25, 2026 12:41:34 PM com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT logFinishTest
 INFO: FINISHED TEST : compositeELResolverPNFETest()
-Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT cleanup
+Oct 25, 2026 12:41:34 PM com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT logStartTest
+Oct 25, 2026 12:41:34 PM com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT logStartTest
 INFO: STARTING TEST : compositeELResolverPNWETest()
-Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT logFinishTest
+Oct 25, 2026 12:41:34 PM com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT logFinishTest
 INFO: FINISHED TEST : compositeELResolverPNWETest()
-Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT cleanup
+Oct 25, 2026 12:41:34 PM com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT logStartTest
+Oct 25, 2026 12:41:34 PM com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT logStartTest
 INFO: STARTING TEST : compositeELResolverNPETest()
-Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT logFinishTest
+Oct 25, 2026 12:41:34 PM com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT logFinishTest
 INFO: FINISHED TEST : compositeELResolverNPETest()
-Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT cleanup
+Oct 25, 2026 12:41:34 PM com.sun.ts.tests.el.api.jakarta_el.compositeelresolver.ELClientIT cleanup
 INFO: Cleanup method called
 ]]></system-err>
 </testsuite>

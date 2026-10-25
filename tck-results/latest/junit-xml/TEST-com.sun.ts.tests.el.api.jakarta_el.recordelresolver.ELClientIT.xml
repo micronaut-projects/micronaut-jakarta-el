@@ -3,11 +3,11 @@
   <properties/>
   <testcase name="recordELResolverTest()" classname="com.sun.ts.tests.el.api.jakarta_el.recordelresolver.ELClientIT" time="0"/>
   <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.recordelresolver.ELClientIT logStartTest
+  <system-err><![CDATA[Oct 25, 2026 12:41:34 PM com.sun.ts.tests.el.api.jakarta_el.recordelresolver.ELClientIT logStartTest
 INFO: STARTING TEST : recordELResolverTest()
-Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.recordelresolver.ELClientIT logFinishTest
+Oct 25, 2026 12:41:34 PM com.sun.ts.tests.el.api.jakarta_el.recordelresolver.ELClientIT logFinishTest
 INFO: FINISHED TEST : recordELResolverTest()
-Oct 18, 2026 11:05:39 AM com.sun.ts.tests.el.api.jakarta_el.recordelresolver.ELClientIT cleanup
+Oct 25, 2026 12:41:34 PM com.sun.ts.tests.el.api.jakarta_el.recordelresolver.ELClientIT cleanup
 INFO: Cleanup method called
 ]]></system-err>
 </testsuite>

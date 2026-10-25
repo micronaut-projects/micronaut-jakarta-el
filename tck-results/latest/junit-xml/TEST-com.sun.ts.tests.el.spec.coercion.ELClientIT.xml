@@ -26,149 +26,149 @@
   <testcase name="elCoerceLambdaExpressionToFunctionalInterfaceTest()" classname="com.sun.ts.tests.el.spec.coercion.ELClientIT" time="0"/>
   <testcase name="elNumberToIntegerCoercionTest()" classname="com.sun.ts.tests.el.spec.coercion.ELClientIT" time="0"/>
   <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
+  <system-err><![CDATA[Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
 INFO: STARTING TEST : elStringToNumberCoercionTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
 INFO: FINISHED TEST : elStringToNumberCoercionTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
 INFO: STARTING TEST : elCoerceToEnumTypeTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
 INFO: FINISHED TEST : elCoerceToEnumTypeTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
 INFO: STARTING TEST : elNullToNumberCoercionTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
 INFO: FINISHED TEST : elNullToNumberCoercionTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
 INFO: STARTING TEST : elNumberToBigDecimalCoercionTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
 INFO: FINISHED TEST : elNumberToBigDecimalCoercionTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
 INFO: STARTING TEST : positiveBoxedToPrimitiveTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
 INFO: FINISHED TEST : positiveBoxedToPrimitiveTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
 INFO: STARTING TEST : negativeElBooleanCoercionTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
 INFO: FINISHED TEST : negativeElBooleanCoercionTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
 INFO: STARTING TEST : elNumberToShortCoercionTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
 INFO: FINISHED TEST : elNumberToShortCoercionTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
 INFO: STARTING TEST : negativeElNumberCoercionTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
 INFO: FINISHED TEST : negativeElNumberCoercionTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
 INFO: STARTING TEST : elCharacterToNumberCoercionTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
 INFO: FINISHED TEST : elCharacterToNumberCoercionTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
 INFO: STARTING TEST : elCoerceToOtherTypeTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
 INFO: FINISHED TEST : elCoerceToOtherTypeTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
 INFO: STARTING TEST : positiveElCharacterCoercionTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
 INFO: FINISHED TEST : positiveElCharacterCoercionTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
 INFO: STARTING TEST : elWrapperToStringCoercionTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
 INFO: FINISHED TEST : elWrapperToStringCoercionTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
 INFO: STARTING TEST : positiveElBooleanCoercionTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
 INFO: FINISHED TEST : positiveElBooleanCoercionTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
 INFO: STARTING TEST : positivePrimitiveToBoxedTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
 INFO: FINISHED TEST : positivePrimitiveToBoxedTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
 INFO: STARTING TEST : elPrimitiveToStringCoercionTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
 INFO: FINISHED TEST : elPrimitiveToStringCoercionTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
 INFO: STARTING TEST : elCoerceToArrayTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
 INFO: FINISHED TEST : elCoerceToArrayTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
 INFO: STARTING TEST : elNumberToFloatCoercionTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
 INFO: FINISHED TEST : elNumberToFloatCoercionTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
 INFO: STARTING TEST : negativeElCharacterCoercionTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
 INFO: FINISHED TEST : negativeElCharacterCoercionTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
 INFO: STARTING TEST : elNumberToLongCoercionTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
 INFO: FINISHED TEST : elNumberToLongCoercionTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
 INFO: STARTING TEST : elNumberToBigIntegerCoercionTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
 INFO: FINISHED TEST : elNumberToBigIntegerCoercionTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
 INFO: STARTING TEST : elNumberToDoubleCoercionTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
 INFO: FINISHED TEST : elNumberToDoubleCoercionTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
 INFO: STARTING TEST : elNumberToByteCoercionTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
 INFO: FINISHED TEST : elNumberToByteCoercionTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
 INFO: STARTING TEST : elCoerceLambdaExpressionToFunctionalInterfaceTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
 INFO: FINISHED TEST : elCoerceLambdaExpressionToFunctionalInterfaceTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logStartTest
 INFO: STARTING TEST : elNumberToIntegerCoercionTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT logFinishTest
 INFO: FINISHED TEST : elNumberToIntegerCoercionTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
+Oct 25, 2026 12:41:37 PM com.sun.ts.tests.el.spec.coercion.ELClientIT cleanup
 INFO: Cleanup method called
 ]]></system-err>
 </testsuite>

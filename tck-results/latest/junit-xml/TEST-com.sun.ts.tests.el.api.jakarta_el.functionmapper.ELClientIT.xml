@@ -3,11 +3,11 @@
   <properties/>
   <testcase name="functionMapperTest()" classname="com.sun.ts.tests.el.api.jakarta_el.functionmapper.ELClientIT" time="0"/>
   <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.api.jakarta_el.functionmapper.ELClientIT logStartTest
+  <system-err><![CDATA[Oct 25, 2026 12:41:35 PM com.sun.ts.tests.el.api.jakarta_el.functionmapper.ELClientIT logStartTest
 INFO: STARTING TEST : functionMapperTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.api.jakarta_el.functionmapper.ELClientIT logFinishTest
+Oct 25, 2026 12:41:35 PM com.sun.ts.tests.el.api.jakarta_el.functionmapper.ELClientIT logFinishTest
 INFO: FINISHED TEST : functionMapperTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.api.jakarta_el.functionmapper.ELClientIT cleanup
+Oct 25, 2026 12:41:35 PM com.sun.ts.tests.el.api.jakarta_el.functionmapper.ELClientIT cleanup
 INFO: Cleanup method called
 ]]></system-err>
 </testsuite>

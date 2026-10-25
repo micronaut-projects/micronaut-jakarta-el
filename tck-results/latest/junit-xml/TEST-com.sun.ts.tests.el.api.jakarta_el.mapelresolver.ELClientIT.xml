@@ -5,23 +5,23 @@
   <testcase name="mapELResolverPNWETest()" classname="com.sun.ts.tests.el.api.jakarta_el.mapelresolver.ELClientIT" time="0"/>
   <testcase name="mapELResolverNPETest()" classname="com.sun.ts.tests.el.api.jakarta_el.mapelresolver.ELClientIT" time="0"/>
   <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.api.jakarta_el.mapelresolver.ELClientIT logStartTest
+  <system-err><![CDATA[Oct 25, 2026 12:41:36 PM com.sun.ts.tests.el.api.jakarta_el.mapelresolver.ELClientIT logStartTest
 INFO: STARTING TEST : mapELResolverTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.api.jakarta_el.mapelresolver.ELClientIT logFinishTest
+Oct 25, 2026 12:41:36 PM com.sun.ts.tests.el.api.jakarta_el.mapelresolver.ELClientIT logFinishTest
 INFO: FINISHED TEST : mapELResolverTest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.api.jakarta_el.mapelresolver.ELClientIT cleanup
+Oct 25, 2026 12:41:36 PM com.sun.ts.tests.el.api.jakarta_el.mapelresolver.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.api.jakarta_el.mapelresolver.ELClientIT logStartTest
+Oct 25, 2026 12:41:36 PM com.sun.ts.tests.el.api.jakarta_el.mapelresolver.ELClientIT logStartTest
 INFO: STARTING TEST : mapELResolverPNWETest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.api.jakarta_el.mapelresolver.ELClientIT logFinishTest
+Oct 25, 2026 12:41:36 PM com.sun.ts.tests.el.api.jakarta_el.mapelresolver.ELClientIT logFinishTest
 INFO: FINISHED TEST : mapELResolverPNWETest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.api.jakarta_el.mapelresolver.ELClientIT cleanup
+Oct 25, 2026 12:41:36 PM com.sun.ts.tests.el.api.jakarta_el.mapelresolver.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.api.jakarta_el.mapelresolver.ELClientIT logStartTest
+Oct 25, 2026 12:41:36 PM com.sun.ts.tests.el.api.jakarta_el.mapelresolver.ELClientIT logStartTest
 INFO: STARTING TEST : mapELResolverNPETest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.api.jakarta_el.mapelresolver.ELClientIT logFinishTest
+Oct 25, 2026 12:41:36 PM com.sun.ts.tests.el.api.jakarta_el.mapelresolver.ELClientIT logFinishTest
 INFO: FINISHED TEST : mapELResolverNPETest()
-Oct 18, 2026 11:05:40 AM com.sun.ts.tests.el.api.jakarta_el.mapelresolver.ELClientIT cleanup
+Oct 25, 2026 12:41:36 PM com.sun.ts.tests.el.api.jakarta_el.mapelresolver.ELClientIT cleanup
 INFO: Cleanup method called
 ]]></system-err>
 </testsuite>
