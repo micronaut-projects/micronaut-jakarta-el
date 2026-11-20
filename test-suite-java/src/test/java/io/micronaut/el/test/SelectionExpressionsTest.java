@@ -16,12 +16,11 @@ class SelectionExpressionsTest {
     private final ELContext context = new CompiledELContext().setBean("selection", new Selection());
 
     @Test
-    void aNullArgumentSelectsTheReferenceOverloadWhenTheExpressionIsCompiled() {
-        // KNOWN DIVERGENCE: the compiler resolves this the way Java does and picks nullable(Object), while
-        // the interpreter, Expressly and the Jasper implementation all pick nullable(int) and coerce the null
-        // to its default. The differential fuzz test holds the interpreter to the other two; the compiler is
-        // the one that disagrees, and changing it changes the code generated for every null argument
-        assertEquals("object", SelectionExpressions$ELExpressions.NULL_OVERLOAD.getValue(context));
+    void aNullArgumentSelectsThePrimitiveOverloadWhenTheExpressionIsCompiled() {
+        // a null is assignable to a primitive parameter, which coerces it to its default: the compiler selects
+        // nullable(int), as the interpreter, Expressly and the Jasper implementation do, where Java would pick
+        // nullable(Object); CompilerRegressionInterpretedTest holds the interpreter to the same answer
+        assertEquals("int", SelectionExpressions$ELExpressions.NULL_OVERLOAD.getValue(context));
     }
 
     @Test

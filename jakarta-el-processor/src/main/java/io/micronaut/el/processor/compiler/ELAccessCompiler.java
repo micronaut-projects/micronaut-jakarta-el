@@ -28,15 +28,12 @@ import io.micronaut.sourcegen.model.VariableDef;
 import org.jspecify.annotations.Nullable;
 
 import javax.lang.model.element.Modifier;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Deque;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiFunction;
-import java.util.function.Supplier;
 
 /**
  * Compiles null-short-circuiting property and method continuations.
@@ -48,7 +45,6 @@ final class ELAccessCompiler {
     private final ELCompiler compiler;
     private final CompilationContext context;
     private final Map<String, ELCompiler.Typed> shared;
-    private final Deque<List<StatementDef>> statementScopes = new ArrayDeque<>();
     private final List<MethodDef> accessMethods = new ArrayList<>();
     @Nullable
     private ClassTypeDef generatedType;
@@ -74,15 +70,6 @@ final class ELAccessCompiler {
         return List.copyOf(accessMethods);
     }
 
-    ELCompiler.Typed compileInScope(List<StatementDef> statements, Supplier<ELCompiler.Typed> compilation) {
-        statementScopes.push(statements);
-        try {
-            return compilation.get();
-        } finally {
-            statementScopes.pop();
-        }
-    }
-
     ELCompiler.Typed access(ELCompiler.Typed base,
                             ExpressionDef ctx,
                             boolean required,
@@ -90,8 +77,11 @@ final class ELAccessCompiler {
         if (base.expression().type() instanceof TypeDef.Primitive || ELCompiler.isNonNull(base.expression())) {
             return continuation.apply(base, ctx);
         }
-        List<StatementDef> statements = statementScopes.peek();
-        if (compiler.inLambda() && generatedType != null) {
+        if (generatedType != null) {
+            // The continuation is an expression evaluated in place: a member of a stable base is guarded inline,
+            // any other base is handed to a private helper, which evaluates it exactly once. Nothing is hoisted
+            // ahead of the enclosing expression, so the operands of ?:, && and || that are not taken are not
+            // evaluated, and the operands of every operator keep their left-to-right order.
             if (!required && stable(base.expression())) {
                 ELCompiler.Typed inlined = inlineAccess(base, ctx, continuation);
                 if (inlined != null) {
@@ -100,10 +90,56 @@ final class ELAccessCompiler {
             }
             return helperAccess(base, ctx, required, continuation);
         }
-        if (statements != null) {
-            return guardedAccess(base, ctx, required, continuation, statements);
-        }
         return fallbackAccess(base, ctx, required, continuation);
+    }
+
+    /**
+     * @return Whether private helper methods can be added to the class being compiled
+     */
+    boolean canAddHelpers() {
+        return generatedType != null;
+    }
+
+    /**
+     * Adds a private static helper to the class being compiled and returns its invocation with the operands: the
+     * operands are evaluated once, in order, where the invocation stands, and the body sees them as parameters,
+     * which it may read any number of times.
+     *
+     * @param prefix     The prefix of the name of the helper
+     * @param operands   The operands
+     * @param returnType The return type of the helper
+     * @param body       Builds the body from the parameters
+     * @return The invocation of the helper
+     */
+    ExpressionDef helper(String prefix,
+                         List<ExpressionDef> operands,
+                         TypeDef returnType,
+                         java.util.function.Function<List<ExpressionDef>, StatementDef> body) {
+        int index = locals++;
+        MethodDef.MethodDefBuilder builder = MethodDef.builder(prefix + index)
+            .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
+            .returns(returnType);
+        for (int i = 0; i < operands.size(); i++) {
+            builder.addParameter("operand" + index + "_" + i, helperParameterType(operands.get(i).type()));
+        }
+        MethodDef method = builder.build((aThis, parameters) -> body.apply(new ArrayList<>(parameters)));
+        accessMethods.add(method);
+        // the invocation refers to the signature alone: the bytecode writer looks for the variables a lambda
+        // captures in the expressions nested in its body, which would otherwise reach into the statements of
+        // the helper and take its parameters for variables of the enclosing method
+        MethodDef signature = MethodDef.builder(method.getName())
+            .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
+            .addParameters(method.getParameters())
+            .returns(returnType)
+            .build();
+        return Objects.requireNonNull(generatedType).invokeStatic(signature, operands);
+    }
+
+    private static TypeDef helperParameterType(TypeDef type) {
+        if (type instanceof TypeDef.TypeVariable || type instanceof TypeDef.Wildcard || type.equals(TypeDef.VOID)) {
+            return TypeDef.OBJECT;
+        }
+        return type;
     }
 
     private static boolean stable(ExpressionDef expression) {
@@ -131,7 +167,7 @@ final class ELAccessCompiler {
             primitiveDefault(primitive), result.expression());
         ClassElement type = result.type();
         return new ELCompiler.Typed(nullable,
-            type == null ? null : ClassElement.of(ELCompiler.wrapperClass(type.getName())), direct);
+            type == null ? null : ClassElement.of(ELCompiler.wrapperClass(type.getName())), direct, true);
     }
 
     private ELCompiler.Typed fallbackAccess(
@@ -202,7 +238,7 @@ final class ELAccessCompiler {
         TypeDef.Primitive primitive = (TypeDef.Primitive) ELCompiler.erasure(type);
         AccessHelper direct = accessHelper(base, required, continuation, captures, primitive);
         return new ELCompiler.Typed(value, ClassElement.of(ELCompiler.wrapperClass(type.getName())),
-            direct.invocation(ctx, base.expression(), captures));
+            direct.invocation(ctx, base.expression(), captures), true);
     }
 
     // the access a compiled expression makes depends on what the model says about the base, the property
@@ -226,7 +262,16 @@ final class ELAccessCompiler {
         ClassElement[] resultType = new ClassElement[1];
         TypeDef[] returnType = new TypeDef[1];
         MethodDef method = builder.returns(primitiveReturn == null ? TypeDef.OBJECT : primitiveReturn)
-            .build((aThis, parameters) -> {
+            .build((aThis, methodParameters) -> {
+                // the parameters are bound to locals: a Java lambda of the continuation captures them by name,
+                // and the bytecode writer loads a captured variable as a local of the enclosing method
+                List<StatementDef> bindings = new ArrayList<>(methodParameters.size());
+                List<ExpressionDef> parameters = new ArrayList<>(methodParameters.size());
+                for (VariableDef.MethodParameter methodParameter : methodParameters) {
+                    VariableDef.Local local = new VariableDef.Local(methodParameter.name() + "Value", methodParameter.type());
+                    bindings.add(new StatementDef.DefineAndAssign(local, methodParameter));
+                    parameters.add(local);
+                }
                 ExpressionDef accessContext = parameters.get(0);
                 ExpressionDef parameter = parameters.get(1);
                 Map<String, ELCompiler.Typed> scope = new LinkedHashMap<>();
@@ -256,13 +301,15 @@ final class ELAccessCompiler {
                         : (expression.type() instanceof TypeDef.Primitive && primitiveReturn == null
                             ? ELCompiler.boxed(expression).cast(returnType[0]) : expression).returning();
                     if (required) {
-                        return StatementDef.multi(
-                            (StatementDef) compiler.runtime(EL_RESOLUTION, "requireBase", TypeDef.VOID, parameter),
-                            whenPresent);
+                        bindings.add((StatementDef) compiler.runtime(EL_RESOLUTION, "requireBase", TypeDef.VOID, parameter));
+                        bindings.add(whenPresent);
+                        return StatementDef.multi(bindings);
                     }
                     // Keep the continuation at method scope. Sourcegen 2.1.0 gives a scoped branch its own
                     // lambda-method collection and discards synthetic methods created inside that branch.
-                    return StatementDef.multi(new StatementDef.If(parameter.isNull(), whenNull), whenPresent);
+                    bindings.add(new StatementDef.If(parameter.isNull(), whenNull));
+                    bindings.add(whenPresent);
+                    return StatementDef.multi(bindings);
                 } finally {
                     context.exitLambdaScope();
                 }
@@ -275,65 +322,6 @@ final class ELAccessCompiler {
             .build();
         accessMethods.add(typedMethod);
         return new AccessHelper(Objects.requireNonNull(generatedType), typedMethod, resultType[0]);
-    }
-
-    // the guard, the access and the coercion of the result are one emitted expression
-    @SuppressWarnings("java:S3776")
-    private ELCompiler.Typed guardedAccess(
-        ELCompiler.Typed base,
-        ExpressionDef ctx,
-        boolean required,
-        BiFunction<ELCompiler.Typed, ExpressionDef, ELCompiler.Typed> continuation,
-        List<StatementDef> statements) {
-        VariableDef.Local baseLocal = new VariableDef.Local("accessBase" + locals++, base.expression().type());
-        statements.add(new StatementDef.DefineAndAssign(baseLocal, base.expression()));
-        List<StatementDef> accessStatements = new ArrayList<>();
-        ELCompiler.Typed result = compileInScope(accessStatements,
-            () -> continuation.apply(new ELCompiler.Typed(baseLocal, base.type(), base.primitiveExpression()), ctx));
-        ClassElement resultType = result.type();
-        TypeDef.Primitive primitive = result.expression().type() instanceof TypeDef.Primitive value ? value : null;
-        TypeDef localType = primitive != null ? primitive.wrapperType()
-            : result.expression().type().equals(TypeDef.VOID) ? TypeDef.OBJECT : result.expression().type();
-        VariableDef.Local resultLocal = new VariableDef.Local("accessResult" + locals++, localType);
-        if (!required && accessStatements.isEmpty() && !result.expression().type().equals(TypeDef.VOID)) {
-            ExpressionDef value = primitive == null ? result.expression()
-                : ELCompiler.boxed(result.expression()).cast(localType);
-            statements.add(new StatementDef.DefineAndAssign(resultLocal, new ExpressionDef.IfElse(
-                baseLocal.isNull(), ExpressionDef.nullValue().cast(localType), value)));
-            if (resultType == null) {
-                return ELCompiler.dynamic(resultLocal);
-            }
-            if (primitive == null) {
-                return new ELCompiler.Typed(resultLocal, resultType);
-            }
-            ExpressionDef primitiveValue = new ExpressionDef.IfElse(
-                resultLocal.isNull(), primitiveDefault(primitive), resultLocal.cast(primitive));
-            return new ELCompiler.Typed(resultLocal,
-                ClassElement.of(ELCompiler.wrapperClass(resultType.getName())), primitiveValue);
-        }
-        statements.add(new StatementDef.DefineAndAssign(resultLocal, ExpressionDef.nullValue().cast(localType)));
-        if (required) {
-            statements.add((StatementDef) compiler.runtime(EL_RESOLUTION, "requireBase", TypeDef.VOID, baseLocal));
-        }
-        if (result.expression().type().equals(TypeDef.VOID)) {
-            accessStatements.add((StatementDef) result.expression());
-        } else {
-            ExpressionDef value = primitive == null ? result.expression()
-                : ELCompiler.boxed(result.expression()).cast(localType);
-            accessStatements.add(resultLocal.assign(value));
-        }
-        StatementDef access = StatementDef.multi(accessStatements);
-        statements.add(required ? access : new StatementDef.If(new ExpressionDef.IsNotNull(baseLocal), access));
-        if (resultType == null || resultType.getName().equals("void")) {
-            return ELCompiler.dynamic(resultLocal);
-        }
-        if (primitive == null) {
-            return new ELCompiler.Typed(resultLocal, resultType);
-        }
-        ExpressionDef primitiveValue = new ExpressionDef.IfElse(
-            resultLocal.isNull(), primitiveDefault(primitive), resultLocal.cast(primitive));
-        return new ELCompiler.Typed(resultLocal,
-            ClassElement.of(ELCompiler.wrapperClass(resultType.getName())), primitiveValue);
     }
 
     private static ExpressionDef primitiveDefault(TypeDef.Primitive primitive) {
