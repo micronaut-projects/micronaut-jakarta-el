@@ -40,8 +40,8 @@ class ELParserTest {
     @Test
     void everyConstructThatNestsCountsTowardsTheLimit() {
         // the operand of a unary operator, the element of a list, the right side of an assignment and the
-        // body of a lambda nest through a recursion of the parser; a left associative chain nests through a
-        // loop, and deepens the tree just the same
+        // body of a lambda nest through a recursion of the parser; a left associative chain is parsed in a loop
+        // and nests nothing, but a chain this long deepens the tree beyond its own bound
         for (String nested : List.of(
             "${" + "!".repeat(5000) + "true}",
             "${" + "-".repeat(5000) + "1}",
@@ -196,13 +196,13 @@ class ELParserTest {
     @Test
     void expressionSizeIsBounded() {
         ELParsingException tooLong = assertThrows(ELParsingException.class,
-            () -> ELParser.parse("x".repeat(ELParser.MAX_EXPRESSION_LENGTH + 1)));
-        assertTrue(tooLong.getMessage().contains("cannot exceed " + ELParser.MAX_EXPRESSION_LENGTH + " characters"));
+            () -> ELParser.parse("x".repeat(ELParserOptions.DEFAULT_MAX_LENGTH + 1)));
+        assertTrue(tooLong.getMessage().contains("cannot exceed " + ELParserOptions.DEFAULT_MAX_LENGTH + " characters"));
 
-        String tooManyTokens = "${" + "1+".repeat(ELParser.MAX_TOKENS / 2) + "1}";
+        String tooManyTokens = "${" + "1+".repeat(ELParserOptions.DEFAULT_MAX_TOKENS / 2) + "1}";
         ELParsingException tokenFailure = assertThrows(ELParsingException.class,
             () -> ELParser.parse(tooManyTokens));
-        assertTrue(tokenFailure.getMessage().contains("cannot exceed " + ELParser.MAX_TOKENS + " tokens"));
+        assertTrue(tokenFailure.getMessage().contains("cannot exceed " + ELParserOptions.DEFAULT_MAX_TOKENS + " tokens"));
     }
 
     private static ELNode eval(String expression) {

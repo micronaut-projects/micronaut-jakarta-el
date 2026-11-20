@@ -604,8 +604,10 @@ class ELInterpreterTest {
         events.clear();
         MethodExpression method = ExpressionFactory.newInstance().createMethodExpression(context,
             "#{varargs.numberText}", Integer.class, new Class<?>[0]);
-        assertThrows(ELException.class, () -> method.invoke(context, null));
-        assertEquals(List.of("before:#{varargs.numberText}", "coerce"), events);
+        // the result of an invoked method is not coerced to the expected return type, as in both reference
+        // implementations, so no conversion is attempted
+        assertEquals("1", method.invoke(context, null));
+        assertEquals(List.of("before:#{varargs.numberText}", "after:#{varargs.numberText}"), events);
     }
 
     @Test

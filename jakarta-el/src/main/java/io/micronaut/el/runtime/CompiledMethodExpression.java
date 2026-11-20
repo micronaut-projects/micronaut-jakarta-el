@@ -120,11 +120,12 @@ public abstract class CompiledMethodExpression extends MethodExpression implemen
     @Nullable
     public Object invoke(ELContext context, Object @Nullable [] params) {
         context.notifyBeforeEvaluation(expressionString);
+        // the expected return type describes the method, it does not convert what the method returns: the
+        // section 1.2.1.2 coerces only the result of a literal-expression, and both reference implementations,
+        // like the interpreter, hand back the result of an invoked method as it is
         Object result = doInvoke(context, params);
-        Object coerced = expectedReturnType == null ? result
-            : expectedReturnType == void.class ? null : ELSupport.coerceToType(context, result, expectedReturnType);
         context.notifyAfterEvaluation(expressionString);
-        return coerced;
+        return result;
     }
 
     @Override
