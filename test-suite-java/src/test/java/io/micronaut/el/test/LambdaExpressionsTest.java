@@ -31,9 +31,9 @@ class LambdaExpressionsTest {
     void functionalInterfacesOfBeansTakeJavaLambdas() {
         assertEquals(2L, value(LambdaExpressions$ELExpressions.FUNCTIONAL_INTERFACE));
         assertEquals("A-1:5", value(LambdaExpressions$ELExpressions.FUNCTIONAL_INTERFACE_TYPED));
-        // the OptionalELResolver of the specification invokes a method on the value of an Optional, so the map
-        // of a String is not found: CompilerRegressionExpressions covers the method of the value itself
-        assertThrows(jakarta.el.MethodNotFoundException.class, () -> value(LambdaExpressions$ELExpressions.OPTIONAL_MAP));
+        // a method Optional declares itself keeps priority over the method of its value, as in the interpreter:
+        // CompilerRegressionExpressions covers the method of the value itself
+        assertEquals(3, value(LambdaExpressions$ELExpressions.OPTIONAL_MAP));
         // a custom functional interface with primitive parameters: the lambda is compiled to it directly
         assertEquals(9.99d * 5 + 1, value(LambdaExpressions$ELExpressions.CUSTOM_FUNCTIONAL_INTERFACE));
     }

@@ -673,8 +673,11 @@ public final class ELCompiler {
                                 Typed base,
                                 ExpressionDef ctx) {
         ClassElement baseType = base.type();
-        if (baseType != null && isOptional(baseType)) {
-            // the OptionalELResolver of the specification: the method of the value, null when it is empty
+        if (baseType != null && isOptional(baseType)
+            && (methodName == null || methodCandidates(baseType, methodName, method.arguments(), false).isEmpty())) {
+            // the OptionalELResolver of the specification: the method of the value, null when it is empty; a method
+            // Optional declares itself (map, orElse...) keeps priority, as the resolver chain and the interpreter
+            // try the bean resolver before the OptionalELResolver
             return access(unwrapOptional(base, baseType), ctx, (value, accessContext) ->
                 compileMethod(method, methodName, value, accessContext));
         }
