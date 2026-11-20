@@ -19,6 +19,7 @@ import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.io.service.SoftServiceLoader;
 import io.micronaut.core.order.OrderUtil;
 import io.micronaut.core.type.Argument;
+import io.micronaut.el.runtime.ELClassLoaderCache;
 import jakarta.el.ELContext;
 import org.jspecify.annotations.Nullable;
 
@@ -37,6 +38,14 @@ import java.util.List;
  */
 @Internal
 public final class ELExecutors {
+
+    /**
+     * The executors each class loader sees, read on first use with the context class loader of the thread, so that
+     * the executors of a deployment, a plugin or an isolated test are found by the expressions it evaluates rather
+     * than the ones of whichever loader was first.
+     */
+    private static final ELClassLoaderCache<List<ELMethodExecutor>> EXECUTORS =
+        new ELClassLoaderCache<>(ELExecutors.class.getClassLoader(), ELExecutors::load);
 
     private ELExecutors() {
     }
@@ -57,7 +66,7 @@ public final class ELExecutors {
                                    @Nullable Object method,
                                    Argument<?> @Nullable [] argumentTypes,
                                    Object @Nullable [] arguments) {
-        for (ELMethodExecutor executor : Holder.EXECUTORS) {
+        for (ELMethodExecutor executor : EXECUTORS.get()) {
             ELMethod resolved = executor.resolve(context, base, method, argumentTypes, arguments);
             if (resolved != null) {
                 return resolved;
@@ -66,20 +75,10 @@ public final class ELExecutors {
         return null;
     }
 
-    /**
-     * Loaded on first use, so that nothing is read from the classpath until an expression needs it.
-     */
-    private static final class Holder {
-
-        private static final List<ELMethodExecutor> EXECUTORS = load();
-
-        private static List<ELMethodExecutor> load() {
-            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-            List<ELMethodExecutor> executors = new ArrayList<>(
-                SoftServiceLoader.load(ELMethodExecutor.class,
-                    classLoader == null ? ELExecutors.class.getClassLoader() : classLoader).collectAll());
-            OrderUtil.sort(executors);
-            return List.copyOf(executors);
-        }
+    private static List<ELMethodExecutor> load(ClassLoader classLoader) {
+        List<ELMethodExecutor> executors = new ArrayList<>(
+            SoftServiceLoader.load(ELMethodExecutor.class, classLoader).collectAll());
+        OrderUtil.sort(executors);
+        return List.copyOf(executors);
     }
 }

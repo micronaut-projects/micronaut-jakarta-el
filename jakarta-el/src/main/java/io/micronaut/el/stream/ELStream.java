@@ -532,7 +532,6 @@ public final class ELStream<T> {
     static LambdaExpression lambda(ELContext context, Object[] arguments, int index, String operation) {
         Object argument = argument(arguments, index, operation);
         if (argument instanceof LambdaExpression lambdaExpression) {
-            lambdaExpression.setELContext(context);
             return lambdaExpression;
         }
         throw new ELException("The operation '" + operation + "' expects a lambda expression as the argument "

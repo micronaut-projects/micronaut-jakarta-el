@@ -81,7 +81,9 @@ import java.util.WeakHashMap;
  * chain and for an application registering the executor programmatically.</p>
  *
  * <p>The executor only invokes: the properties stay with the rest of the chain. A base whose class is not a
- * bean of the context has no definition, so the executor declines and the reflective one gets its chance. The
+ * bean of the context has no definition, so the executor declines and the reflective one gets its chance. That
+ * includes an instance of a plain superclass of a bean, which the registry would otherwise match to the definition
+ * of that subclass, whose methods the instance does not have. The
  * runtime class of an intercepted instance is the generated proxy, whose definition is a
  * {@link ProxyBeanDefinition}; the executor reads the executable methods of the target definition, so the
  * method that is found is the one the author wrote.</p>
@@ -330,7 +332,15 @@ public final class ExecutableMethodELExecutor extends ELResolver implements ELMe
             if (coerced == null) {
                 throw new ELException("The arguments do not match the method '" + method.getMethodName() + "'");
             }
-            return method.invoke(base, coerced);
+            try {
+                return method.invoke(base, coerced);
+            } catch (ELException e) {
+                throw e;
+            } catch (RuntimeException e) {
+                // what the method threw reaches the caller of the expression as an ELException, as the
+                // ELResolver contract requires and as the reflective invocation reports it
+                throw new ELException(e);
+            }
         }
 
         @Override
@@ -392,6 +402,10 @@ public final class ExecutableMethodELExecutor extends ELResolver implements ELMe
             for (ExecutableMethod<Object, ?> method : definition.getExecutableMethods()) {
                 @SuppressWarnings("unchecked")
                 ExecutableMethod<Object, Object> executable = (ExecutableMethod<Object, Object>) method;
+                if (!executable.getDeclaringType().isAssignableFrom(type)) {
+                    // a method a subclass declares cannot be invoked on an instance of the superclass
+                    continue;
+                }
                 byName.computeIfAbsent(executable.getMethodName(), name -> new ArrayList<>(1)).add(executable);
             }
             Map<String, List<ExecutableMethod<Object, Object>>> methods = new HashMap<>(byName.size());
@@ -410,9 +424,12 @@ public final class ExecutableMethodELExecutor extends ELResolver implements ELMe
             BeanDefinition<Object> definition = findDefinition(registry, beanType);
             if (definition instanceof ProxyBeanDefinition<Object> proxy) {
                 BeanDefinition<Object> target = findTarget(registry, definition);
-                return target == null ? findDefinition(registry, proxy.getTargetType()) : target;
+                definition = target == null ? findDefinition(registry, proxy.getTargetType()) : target;
             }
-            return definition;
+            // the registry finds a definition by assignability, so the class of a plain superclass instance
+            // finds the definition of its only bean subclass: the methods of that definition are not the ones
+            // of the instance, which is not a bean of the registry at all
+            return definition == null || !definition.getBeanType().isAssignableFrom(type) ? null : definition;
         }
 
         @Nullable

@@ -18,6 +18,7 @@ package io.micronaut.el;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.io.service.SoftServiceLoader;
 import io.micronaut.core.order.OrderUtil;
+import io.micronaut.el.runtime.ELClassLoaderCache;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,36 +37,43 @@ import java.util.List;
 @Internal
 public final class ELContributions {
 
+    /**
+     * The registry of the contributors each class loader sees, read on first use with the context class loader of
+     * the thread rather than once for the JVM with the loader of whichever thread was first.
+     */
+    private static final ELClassLoaderCache<ELMethodRegistry> REGISTRIES =
+        new ELClassLoaderCache<>(ELContributions.class.getClassLoader(), ELContributions::load);
+
     private ELContributions() {
     }
 
     /**
-     * The registry the contributors of the classpath declared into.
+     * The registry the contributors visible to the context class loader of the thread declared into.
      *
      * @return The registry
      */
     public static ELMethodRegistry shared() {
-        return Holder.REGISTRY;
+        return REGISTRIES.get();
     }
 
     /**
-     * Loaded on first use, so that nothing is read from the classpath until an expression needs it.
+     * The registry the contributors visible to the given class loader declared into.
+     *
+     * @param classLoader The class loader
+     * @return The registry
      */
-    private static final class Holder {
+    public static ELMethodRegistry shared(ClassLoader classLoader) {
+        return REGISTRIES.get(classLoader);
+    }
 
-        private static final ELMethodRegistry REGISTRY = load();
-
-        private static ELMethodRegistry load() {
-            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-            List<ELMethodContributor> contributors = new ArrayList<>(
-                SoftServiceLoader.load(ELMethodContributor.class,
-                    classLoader == null ? ELContributions.class.getClassLoader() : classLoader).collectAll());
-            OrderUtil.sort(contributors);
-            ELMethodRegistry registry = new ELMethodRegistry();
-            for (ELMethodContributor contributor : contributors) {
-                contributor.contribute(registry);
-            }
-            return registry;
+    private static ELMethodRegistry load(ClassLoader classLoader) {
+        List<ELMethodContributor> contributors = new ArrayList<>(
+            SoftServiceLoader.load(ELMethodContributor.class, classLoader).collectAll());
+        OrderUtil.sort(contributors);
+        ELMethodRegistry registry = new ELMethodRegistry();
+        for (ELMethodContributor contributor : contributors) {
+            contributor.contribute(registry);
         }
+        return registry;
     }
 }

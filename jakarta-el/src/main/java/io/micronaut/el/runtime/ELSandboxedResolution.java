@@ -116,11 +116,24 @@ public final class ELSandboxedResolution {
         }
         context.setPropertyResolved(false);
         ELResolver resolver = context.getELResolver();
+        // the value is coerced to the type of the property before it is assigned, as ELResolution#setValue does
+        Class<?> type;
         if (resolver instanceof ELResolverChain chain) {
-            chain.setValueSandboxed(context, base, property, value);
+            type = chain.getTypeSandboxed(context, base, property);
         } else {
             checkAccess(ELSandbox.of(context), base);
-            resolver.setValue(context, base, property, value);
+            type = resolver.getType(context, base, property);
+        }
+        Object coerced = context.isPropertyResolved() ? ELResolution.coerceAssigned(context, value, type) : value;
+        context.setPropertyResolved(false);
+        try {
+            if (resolver instanceof ELResolverChain chain) {
+                chain.setValueSandboxed(context, base, property, coerced);
+            } else {
+                resolver.setValue(context, base, property, coerced);
+            }
+        } catch (IllegalArgumentException | ClassCastException e) {
+            throw new jakarta.el.ELException(e);
         }
         if (!context.isPropertyResolved()) {
             throw ELResolution.propertyNotFound(base, property);
@@ -207,6 +220,27 @@ public final class ELSandboxedResolution {
             Class<?> type = typeOf(base);
             if (!sandbox.allowsType(type)) {
                 throw new ELSandboxException(type);
+            }
+        }
+    }
+
+    /**
+     * Fails when the sandbox denies the invocation of a method a reflective executor resolved, before the method
+     * runs: the class of the base object, or the class of a static method or of a constructor, and the method of
+     * that name on it.
+     *
+     * @param sandbox The sandbox
+     * @param base    The base object, an {@link ELClass} for a static method or a constructor
+     * @param name    The name of the method, {@code <init>} for a constructor
+     */
+    public static void checkInvocation(ELSandbox sandbox, Object base, String name) {
+        if (sandbox != ELSandbox.UNRESTRICTED) {
+            Class<?> type = typeOf(base);
+            if (!sandbox.allowsType(type)) {
+                throw new ELSandboxException(type);
+            }
+            if (!sandbox.allowsMethod(type, name)) {
+                throw new ELSandboxException(type, name);
             }
         }
     }

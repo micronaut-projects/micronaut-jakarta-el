@@ -18,6 +18,10 @@ package io.micronaut.el.resolver;
 import io.micronaut.context.BeanDefinitionRegistry;
 import io.micronaut.core.annotation.Experimental;
 import io.micronaut.core.io.service.SoftServiceLoader;
+import io.micronaut.el.ContributedELMethodExecutor;
+import io.micronaut.el.ELContributions;
+import io.micronaut.el.ELMethodRegistry;
+import io.micronaut.el.runtime.ELClassLoaderCache;
 import jakarta.el.ArrayELResolver;
 import jakarta.el.BeanELResolver;
 import jakarta.el.ELResolver;
@@ -52,19 +56,14 @@ public final class ELResolvers {
     );
 
     /**
-     * The resolvers of the specification, from the reflective invocation on, which hold no state and are shared
-     * by every chain.
+     * What the chains of the contexts created with a class loader share: the resolvers the modules visible to it
+     * contribute, which are read from the classpath once per loader rather than on every new context, and the
+     * resolvers of the specification, from the reflective invocation on. The resolver of the beans caches the
+     * properties of every class it read, so a JVM-wide one would keep the classes of every loader that ever used
+     * it reachable; it is one per loader instead, and the loader is held weakly.
      */
-    private static final List<ELResolver> REFLECTIVE = List.of(
-        new StaticFieldELResolver(),
-        new MapELResolver(),
-        new ResourceBundleELResolver(),
-        new ListELResolver(),
-        new ArrayELResolver(),
-        new RecordELResolver(),
-        new OptionalELResolver(),
-        new BeanELResolver()
-    );
+    private static final ELClassLoaderCache<Shared> SHARED =
+        new ELClassLoaderCache<>(ELResolvers.class.getClassLoader(), Shared::load);
 
     private ELResolvers() {
     }
@@ -130,9 +129,11 @@ public final class ELResolvers {
     }
 
     private static List<ELResolver> build(@Nullable BeanDefinitionRegistry registry, ELResolver... first) {
-        List<ELResolver> contributed = contributed();
+        Shared shared = SHARED.get();
+        List<ELResolver> contributed = shared.contributed();
+        List<ELResolver> reflective = shared.reflective();
         List<ELResolver> resolvers =
-            new ArrayList<>(first.length + COMPILED.size() + contributed.size() + REFLECTIVE.size() + 2);
+            new ArrayList<>(first.length + COMPILED.size() + contributed.size() + reflective.size() + 2);
         resolvers.addAll(List.of(first));
         resolvers.add(new IntrospectionELResolver());
         resolvers.addAll(COMPILED);
@@ -144,19 +145,41 @@ public final class ELResolvers {
         // what a module contributes describes a type more precisely than the resolvers of the specification,
         // which read the class of the base object on every invocation, so it is consulted before them
         resolvers.addAll(contributed);
-        resolvers.addAll(REFLECTIVE);
+        resolvers.addAll(reflective);
         return resolvers;
     }
 
     /**
-     * The resolvers the modules on the classpath contribute as services, which is how the optional
-     * interpreter-reflection module adds its reflective invocation without this module depending on it.
+     * The resolvers a class loader shares between the chains of its contexts.
      *
-     * @return The contributed resolvers
+     * @param contributed The resolvers the modules visible to the loader contribute as services, which is how the
+     *                    optional interpreter-reflection module adds its reflective invocation without this module
+     *                    depending on it
+     * @param reflective  The resolvers of the specification, from the reflective invocation on
      */
-    private static List<ELResolver> contributed() {
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        return SoftServiceLoader.load(ELResolver.class,
-            classLoader == null ? ELResolvers.class.getClassLoader() : classLoader).collectAll();
+    private record Shared(List<ELResolver> contributed, List<ELResolver> reflective) {
+
+        static Shared load(ClassLoader classLoader) {
+            List<ELResolver> contributed = new ArrayList<>();
+            ELMethodRegistry registry = ELContributions.shared(classLoader);
+            if (!registry.isEmpty()) {
+                // the methods the contributors registered, which a compiled expression reaches from a receiver it
+                // does not know the type of, before the reflective resolvers a module contributes
+                contributed.add(new ContributedELResolver(registry.build(ContributedELMethodExecutor.ORDER)));
+            }
+            contributed.addAll(SoftServiceLoader.load(ELResolver.class, classLoader).collectAll());
+            return new Shared(
+                List.copyOf(contributed),
+                List.of(
+                    new StaticFieldELResolver(),
+                    new MapELResolver(),
+                    new ResourceBundleELResolver(),
+                    new ListELResolver(),
+                    new ArrayELResolver(),
+                    new RecordELResolver(),
+                    new OptionalELResolver(),
+                    new BeanELResolver()
+                ));
+        }
     }
 }
