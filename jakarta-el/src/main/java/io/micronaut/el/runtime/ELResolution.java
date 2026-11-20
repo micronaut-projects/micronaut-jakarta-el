@@ -484,8 +484,14 @@ public final class ELResolution {
                                 @Nullable Object base,
                                 @Nullable Object method,
                                 Object... arguments) {
-        if (base == null || method == null) {
+        if (base == null) {
             return null;
+        }
+        if (method == null) {
+            // a method named by an expression that evaluates to null cannot be resolved, which Expressly reports
+            // with an ELException rather than evaluating the invocation to null
+            throw new ELException("Cannot invoke a method whose name is null on an instance of "
+                + (base instanceof ELClass elClass ? elClass.getKlass() : base.getClass()).getName());
         }
         if (base instanceof LambdaExpression lambda && "invoke".equals(method)) {
             lambda.setELContext(context);

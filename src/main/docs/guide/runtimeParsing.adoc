@@ -121,9 +121,34 @@ present, the standard Jakarta EL context can construct imported classes and invo
 methods. Only parse strings from a fully trusted source; an operator or database field that an untrusted user can
 modify must not be passed directly to the expression factory.
 
-To bound CPU, memory and stack use, the parser rejects an expression longer than 16,384 characters, containing
-more than 1,024 tokens, or nested deeper than `ELParser.DEFAULT_MAX_DEPTH`, which is 100 levels. Parse with
-`ELParser.parse(String, int)` to raise the depth for expressions a tool generates.
+To bound CPU, memory and stack use, the parser applies the limits of an api:el.parser.ELParserOptions[]. By default
+it rejects an expression:
+
+* longer than 1,048,576 characters (`maxLength`);
+* containing more than 131,072 tokens (`maxTokens`);
+* nesting constructs deeper than 100 levels (`maxDepth`): a parenthesised sub-expression, an argument, a list, set or
+map element, an index, the operand of a unary operator, the branches of a choice, the right side of an assignment and
+the body of a lambda each nest one level, while a chain of left associative operators such as `a + b + c` or
+`s.trim().trim()` does not nest, however long it is;
+* whose syntax tree is more than 1,000 nodes high (`maxTreeHeight`), which is what bounds a very long operator
+chain: every consumer walks the tree recursively.
+
+The defaults hold on a thread whose stack is half of the usual one. To change them, pass the options to the parser:
+
+[source,java]
+----
+new CompiledExpressionFactory(List.of(), new InterpretingELExpressionParser(
+    ELParserOptions.defaults().withMaxLength(4_000_000).withMaxTokens(500_000)));
+----
+
+The parser that `ExpressionFactory.newInstance()` loads as a service reads them from the system properties
+`micronaut.el.parser.max-length`, `micronaut.el.parser.max-tokens`, `micronaut.el.parser.max-depth` and
+`micronaut.el.parser.max-tree-height`. `ELParserOptions.fromResolver` reads the same names from any other source of
+configuration, such as the environment of a Micronaut application:
+`ELParserOptions.fromResolver(name -> environment.getProperty(name, String.class).orElse(null))`. A much deeper
+nesting or a much taller tree needs a thread with a larger stack.
+
+The processor parses an `@ELExpression` with the default limits.
 
 snippet::example.RuntimeExpressionTest[project-base="doc-examples/example", title="RuntimeExpressionTest"]
 

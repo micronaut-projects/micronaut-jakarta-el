@@ -22,6 +22,7 @@ import io.micronaut.el.ELMethodExecutor;
 import io.micronaut.el.ELExpressionParser;
 import io.micronaut.el.parser.ELParser;
 import io.micronaut.el.parser.ELIdentifiers;
+import io.micronaut.el.parser.ELParserOptions;
 import io.micronaut.el.parser.ast.ELNode;
 import io.micronaut.el.runtime.ELVariableBindings;
 import jakarta.el.ELContext;
@@ -29,9 +30,11 @@ import jakarta.el.ELException;
 import jakarta.el.MethodExpression;
 import jakarta.el.ValueExpression;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -39,6 +42,12 @@ import org.jspecify.annotations.Nullable;
  *
  * <p>The implementation is registered as a service, so adding this module to the runtime classpath is enough
  * to make {@code jakarta.el.ExpressionFactory} accept expression strings that are only known at runtime.</p>
+ *
+ * <p>The strings are parsed within the limits of an {@link ELParserOptions}. The instance the service loader creates
+ * reads them from the system properties {@value ELParserOptions#MAX_LENGTH_PROPERTY},
+ * {@value ELParserOptions#MAX_TOKENS_PROPERTY}, {@value ELParserOptions#MAX_DEPTH_PROPERTY} and
+ * {@value ELParserOptions#MAX_TREE_HEIGHT_PROPERTY}; an instance constructed by the application takes them as an
+ * argument.</p>
  *
  * @author Denis Stepanov
  * @since 1.0
@@ -53,19 +62,33 @@ public final class InterpretingELExpressionParser implements ELExpressionParser 
     static final int CACHE_SIZE = 2048;
 
     private final List<ELMethodExecutor> executors;
-
-    private final Map<String, Parsed> parsed = new LinkedHashMap<>(CACHE_SIZE, 0.75f, true) {
-        @Override
-        protected boolean removeEldestEntry(Map.Entry<String, Parsed> eldest) {
-            return size() > CACHE_SIZE;
-        }
-    };
+    private final ELParserOptions options;
 
     /**
-     * Creates a parser using the method executors visible to the context class loader.
+     * The parsed expressions. A lookup does not lock, and an entry parses its string once, holding up only the
+     * threads that ask for the same string meanwhile; the least recently used entry is evicted beyond the size.
+     */
+    private final Map<String, CacheEntry> parsed = new ConcurrentHashMap<>();
+    private final AtomicLong clock = new AtomicLong();
+    private final Object evictionLock = new Object();
+
+    /**
+     * Creates a parser using the method executors visible to the context class loader, and the parser limits of
+     * the system properties, see {@link ELParserOptions#fromSystemProperties()}.
      */
     public InterpretingELExpressionParser() {
-        this(loadExecutors());
+        this(loadExecutors(), ELParserOptions.fromSystemProperties());
+    }
+
+    /**
+     * Creates a parser using the method executors visible to the context class loader, and the given parser
+     * limits.
+     *
+     * @param options The limits an expression string must respect
+     * @since 1.1
+     */
+    public InterpretingELExpressionParser(ELParserOptions options) {
+        this(loadExecutors(), options);
     }
 
     /**
@@ -80,7 +103,28 @@ public final class InterpretingELExpressionParser implements ELExpressionParser 
      *                  io.micronaut.core.order.Ordered} contract
      */
     public InterpretingELExpressionParser(List<ELMethodExecutor> executors) {
+        this(executors, ELParserOptions.fromSystemProperties());
+    }
+
+    /**
+     * Creates a parser using the given method executors and parser limits.
+     *
+     * @param executors The executors, in any order; they are consulted following the {@link
+     *                  io.micronaut.core.order.Ordered} contract
+     * @param options   The limits an expression string must respect
+     * @since 1.1
+     */
+    public InterpretingELExpressionParser(List<ELMethodExecutor> executors, ELParserOptions options) {
         this.executors = ELInterpreter.orderExecutors(executors);
+        this.options = Objects.requireNonNull(options, "options");
+    }
+
+    /**
+     * @return The limits an expression string must respect
+     * @since 1.1
+     */
+    public ELParserOptions getOptions() {
+        return options;
     }
 
     @Override
@@ -93,7 +137,7 @@ public final class InterpretingELExpressionParser implements ELExpressionParser 
             ? ELInterpreter.of(executors, functions)
             : ELInterpreter.sharing(entry.root(), executors);
         ValueExpression interpreted = new InterpretedValueExpression(expression, expectedType, entry.node(),
-            functions, interpreter);
+            functions, interpreter, options);
         return ELVariableBindings.bind(context, interpreted,
             ELIdentifiers.free(entry.node()).toArray(String[]::new));
     }
@@ -110,28 +154,68 @@ public final class InterpretingELExpressionParser implements ELExpressionParser 
         requireMethodReference(expression, node);
         Map<String, ELMethod> functions = ELInterpreter.bindFunctions(context, node, executors);
         MethodExpression interpreted = new InterpretedMethodExpression(expression, expectedReturnType,
-            expectedParamTypes, node, functions, ELInterpreter.of(executors, functions));
+            expectedParamTypes, node, functions, ELInterpreter.of(executors, functions), options);
         return ELVariableBindings.bind(context, interpreted, ELIdentifiers.free(node).toArray(String[]::new));
     }
 
-    private synchronized Parsed parse(String expression) {
-        Parsed entry = parsed.get(expression);
+    private Parsed parse(String expression) {
+        CacheEntry entry = parsed.get(expression);
         if (entry == null) {
-            ELNode node = ELParser.parse(expression);
-            // an expression without functions evaluates the same way under every context, so its evaluators
-            // are compiled once and shared by the expressions created from the string
-            entry = new Parsed(node, ELInterpreter.containsFunction(node) ? null
-                : ELInterpreter.of(null, node, executors).compile(node));
-            parsed.put(expression, entry);
+            CacheEntry created = new CacheEntry(clock.incrementAndGet());
+            entry = parsed.putIfAbsent(expression, created);
+            if (entry == null) {
+                entry = created;
+                evictBeyondSize();
+            }
+        } else {
+            entry.lastUse = clock.incrementAndGet();
         }
-        return entry;
+        try {
+            return entry.get(expression);
+        } catch (RuntimeException | Error e) {
+            // a string that does not parse is not cached, so the entry is left for no one
+            parsed.remove(expression, entry);
+            throw e;
+        }
     }
 
-    synchronized int cachedExpressions() {
+    private Parsed doParse(String expression) {
+        ELNode node = ELParser.parse(expression, options);
+        // an expression without functions evaluates the same way under every context, so its evaluators
+        // are compiled once and shared by the expressions created from the string
+        return new Parsed(node, ELInterpreter.containsFunction(node) ? null
+            : ELInterpreter.of(null, node, executors).compile(node));
+    }
+
+    /**
+     * Evicts the least recently used entries beyond the size. The scan is linear, but it only follows a parse
+     * of a string that was not cached, which costs more, and it does not hold up a lookup.
+     */
+    private void evictBeyondSize() {
+        if (parsed.size() <= CACHE_SIZE) {
+            return;
+        }
+        synchronized (evictionLock) {
+            while (parsed.size() > CACHE_SIZE) {
+                Map.Entry<String, CacheEntry> eldest = null;
+                for (Map.Entry<String, CacheEntry> candidate : parsed.entrySet()) {
+                    if (eldest == null || candidate.getValue().lastUse < eldest.getValue().lastUse) {
+                        eldest = candidate;
+                    }
+                }
+                if (eldest == null) {
+                    return;
+                }
+                parsed.remove(eldest.getKey(), eldest.getValue());
+            }
+        }
+    }
+
+    int cachedExpressions() {
         return parsed.size();
     }
 
-    synchronized boolean isCached(String expression) {
+    boolean isCached(String expression) {
         return parsed.containsKey(expression);
     }
 
@@ -164,5 +248,32 @@ public final class InterpretingELExpressionParser implements ELExpressionParser 
      * @param root The evaluators compiled from it, {@code null} when the expression binds functions
      */
     private record Parsed(ELNode node, ELInterpreter.@Nullable Evaluator root) {
+    }
+
+    /**
+     * An entry of the cache, parsing its string the first time it is asked for it.
+     */
+    private final class CacheEntry {
+
+        private volatile long lastUse;
+        private volatile @Nullable Parsed value;
+
+        private CacheEntry(long lastUse) {
+            this.lastUse = lastUse;
+        }
+
+        private Parsed get(String expression) {
+            Parsed result = value;
+            if (result == null) {
+                synchronized (this) {
+                    result = value;
+                    if (result == null) {
+                        result = doParse(expression);
+                        value = result;
+                    }
+                }
+            }
+            return result;
+        }
     }
 }
