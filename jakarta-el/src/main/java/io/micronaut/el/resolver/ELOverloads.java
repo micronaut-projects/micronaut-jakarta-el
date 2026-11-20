@@ -126,8 +126,9 @@ final class ELOverloads {
                 coerced[i] = ELSupport.coerceToType(context, arguments[i], parameters[i].getType());
             }
             return coerced;
-        } catch (ELException e) {
-            // this overload does not accept these arguments
+        } catch (ELException | IllegalArgumentException | ClassCastException | ArithmeticException e) {
+            // this overload does not accept these arguments, whichever way the coercion, or a converter of the
+            // context, reports it
             return null;
         }
     }

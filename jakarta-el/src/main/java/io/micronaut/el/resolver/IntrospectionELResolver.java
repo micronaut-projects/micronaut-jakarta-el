@@ -57,14 +57,8 @@ public final class IntrospectionELResolver extends ELResolver implements ELMetho
      * by name. {@code BeanIntrospector.findIntrospection} loads the introspection through an {@code Optional}
      * on every call, and the methods of a name are otherwise filtered from all the methods on every invocation.
      */
-    private final ClassValue<Introspected> introspected = new ClassValue<>() {
-        @Override
-        protected Introspected computeValue(Class<?> type) {
-            return Introspected.of(findIntrospection(type));
-        }
-    };
+    private final ClassValue<Introspected> introspected;
 
-    private final BeanIntrospector introspector;
     private final boolean readOnly;
 
     /**
@@ -86,7 +80,10 @@ public final class IntrospectionELResolver extends ELResolver implements ELMetho
      * @param readOnly     Whether the resolver should reject the assignment of properties
      */
     public IntrospectionELResolver(BeanIntrospector introspector, boolean readOnly) {
-        this.introspector = introspector;
+        // what the shared introspector holds for a class does not depend on the resolver reading it, so every
+        // resolver of the shared introspector reads one cache rather than filling its own per context
+        this.introspected = introspector == BeanIntrospector.SHARED ? SharedIntrospections.SHARED
+            : new Introspections(introspector);
         this.readOnly = readOnly;
     }
 
@@ -103,7 +100,14 @@ public final class IntrospectionELResolver extends ELResolver implements ELMetho
             return null;
         }
         context.setPropertyResolved(base, property);
-        return beanProperty.get(base);
+        try {
+            return beanProperty.get(base);
+        } catch (ELException e) {
+            throw e;
+        } catch (RuntimeException e) {
+            // the ELResolver contract reports what the getter threw as an ELException
+            throw new ELException(e);
+        }
     }
 
     @Override
@@ -129,7 +133,15 @@ public final class IntrospectionELResolver extends ELResolver implements ELMetho
                 + beanProperty.getDeclaringType().getName() + " is not writable");
         }
         context.setPropertyResolved(base, property);
-        beanProperty.set(base, ELSupport.coerceToType(context, value, beanProperty.getType()));
+        Object coerced = ELSupport.coerceToType(context, value, beanProperty.getType());
+        try {
+            beanProperty.set(base, coerced);
+        } catch (ELException e) {
+            throw e;
+        } catch (RuntimeException e) {
+            // the ELResolver contract reports what the setter threw as an ELException
+            throw new ELException(e);
+        }
     }
 
     @Override
@@ -197,10 +209,31 @@ public final class IntrospectionELResolver extends ELResolver implements ELMetho
         return introspected.get(type);
     }
 
-    @Nullable
-    @SuppressWarnings("unchecked")
-    private BeanIntrospection<Object> findIntrospection(Class<?> type) {
-        return introspector.findIntrospection((Class<Object>) type).orElse(null);
+    /**
+     * What an introspector holds for every class, read once per class. A {@link ClassValue} is safe to share
+     * between threads and does not keep a class, or its loader, reachable.
+     */
+    private static class Introspections extends ClassValue<Introspected> {
+
+        private final BeanIntrospector introspector;
+
+        Introspections(BeanIntrospector introspector) {
+            this.introspector = introspector;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        protected Introspected computeValue(Class<?> type) {
+            return Introspected.of(introspector.findIntrospection((Class<Object>) type).orElse(null));
+        }
+    }
+
+    /**
+     * The introspections of the shared introspector, read by every resolver constructed with it.
+     */
+    private static final class SharedIntrospections {
+
+        private static final Introspections SHARED = new Introspections(BeanIntrospector.SHARED);
     }
 
     private boolean isReadOnly(BeanProperty<Object, Object> beanProperty) {
@@ -253,7 +286,14 @@ public final class IntrospectionELResolver extends ELResolver implements ELMetho
             if (coerced == null) {
                 throw new ELException("The arguments do not match the method '" + method.getName() + "'");
             }
-            return method.invoke(base, coerced);
+            try {
+                return method.invoke(base, coerced);
+            } catch (ELException e) {
+                throw e;
+            } catch (RuntimeException e) {
+                // what the method threw reaches the caller as an ELException, as the reflective path reports it
+                throw new ELException(e);
+            }
         }
 
         @Override

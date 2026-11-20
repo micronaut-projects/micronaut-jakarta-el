@@ -89,11 +89,20 @@ public final class CommonELResolver extends ELResolver implements ELMethodExecut
     @Override
     @Nullable
     public Class<?> getType(ELContext context, @Nullable Object base, @Nullable Object property) {
-        if (base != null && LENGTH.equals(property) && ELArray.isArray(base)) {
-            context.setPropertyResolved(base, property);
-            return int.class;
+        if (base == null || !ELArray.isArray(base)) {
+            return null;
         }
-        return null;
+        context.setPropertyResolved(base, property);
+        if (LENGTH.equals(property)) {
+            // the length is read only, and a read only property has no type to assign to, as described for
+            // getType in the specification and as the ArrayELResolver answers
+            return null;
+        }
+        int index = arrayIndex(property);
+        if (index < 0 || index >= ELArray.length(base)) {
+            throw new PropertyNotFoundException("The index " + index + " is out of the bounds of the array");
+        }
+        return base.getClass().getComponentType();
     }
 
     @Override
@@ -149,7 +158,15 @@ public final class CommonELResolver extends ELResolver implements ELMethodExecut
         if (index < 0 || index >= length) {
             throw new PropertyNotFoundException();
         }
-        ELArray.set(base, index, value);
+        // the value is coerced to the component type, as the ArrayELResolver of the specification requires the
+        // caller to, so that the assignment of a Long to an int[] or of a number to a String[] stores the
+        // coerced value rather than failing the JVM array store check
+        Object coerced = ELSupport.coerceToType(context, value, base.getClass().getComponentType());
+        try {
+            ELArray.set(base, index, coerced);
+        } catch (IllegalArgumentException | ClassCastException e) {
+            throw new ELException(e);
+        }
     }
 
     @Override

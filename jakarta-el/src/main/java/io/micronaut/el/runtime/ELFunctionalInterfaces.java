@@ -106,7 +106,9 @@ final class ELFunctionalInterfaces {
 
     @Nullable
     private static Object call(@Nullable ELContext context, LambdaExpression lambda, Object... arguments) {
-        return context == null ? lambda.invoke(arguments) : lambda.invoke(context, arguments);
+        // the instance may be called from any thread, several at once from a parallel stream: every call is given
+        // a lambda scope of its own rather than the one of the shared context
+        return ELLambdaInvocation.invoke(context, lambda, arguments);
     }
 
     @FunctionalInterface

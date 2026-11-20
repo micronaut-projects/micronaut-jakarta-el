@@ -24,6 +24,7 @@ import io.micronaut.el.parser.ast.ELNode;
 import io.micronaut.el.resolver.ELMethodDiagnostics;
 import io.micronaut.el.runtime.ELArithmetic;
 import io.micronaut.el.runtime.ELArguments;
+import io.micronaut.el.runtime.ELOptionalMethod;
 import io.micronaut.el.runtime.ELCollections;
 import io.micronaut.el.runtime.ELLambdas;
 import io.micronaut.el.runtime.ELResolution;
@@ -843,6 +844,12 @@ final class ELInterpreter {
                 // held up by it
                 return executor.isReflective() ? new SandboxedELMethod(resolved) : resolved;
             }
+        }
+        if (base instanceof java.util.Optional<?> optional) {
+            // a method the Optional itself does not have is the one of its value, as the OptionalELResolver of
+            // the specification invokes it in the resolver chain of a compiled expression: null when empty
+            return ELOptionalMethod.of(optional, method,
+                value -> resolveMethod(context, executors, value, method, paramTypes, arguments));
         }
         // the executors that were consulted are what says which of the remedies applies: the reflective one is
         // in the list only when the optional module is on the classpath

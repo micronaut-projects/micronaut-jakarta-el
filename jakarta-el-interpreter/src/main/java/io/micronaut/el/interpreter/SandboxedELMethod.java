@@ -66,7 +66,9 @@ final class SandboxedELMethod implements ELMethod {
     public Object invoke(ELContext context, @Nullable Object base, Object @Nullable [] arguments) {
         ELSandbox sandbox = ELSandbox.of(context);
         if (base != null) {
-            ELSandboxedResolution.checkAccess(sandbox, base);
+            // the class of the base object, or the class of a static method or a constructor, and the method
+            // itself, before it runs: what it does is done by the time its value is checked
+            ELSandboxedResolution.checkInvocation(sandbox, base, method.getName());
         }
         return ELSandboxedResolution.checkValue(sandbox, method.invoke(context, base, arguments));
     }

@@ -247,10 +247,12 @@ class ELSupportTest {
     void functionalInterfaceProxyKeepsTheContextItWasCreatedWith() {
         CompiledELContext firstContext = new CompiledELContext().setBean("value", "first");
         CompiledELContext secondContext = new CompiledELContext().setBean("value", "second");
+        // every invocation through the functional interface is given a lambda scope of its own, which reads the
+        // beans of the context the interface was created with
         assertContextIsCaptured(firstContext, secondContext, ELLambdas.create(firstContext, List.of(),
-            evaluated -> ((CompiledELContext) evaluated).getBean("value")));
+            evaluated -> ELResolution.resolveIdentifier(evaluated, "value")));
         assertContextIsCaptured(firstContext, secondContext, ELLambdas.lambda0(firstContext,
-            evaluated -> ((CompiledELContext) evaluated).getBean("value")));
+            evaluated -> ELResolution.resolveIdentifier(evaluated, "value")));
     }
 
     @Test
