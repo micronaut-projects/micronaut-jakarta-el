@@ -18,7 +18,9 @@ public final class ConstraintMessages {
 
     private static final Pattern ATTRIBUTE = Pattern.compile("(?<![#$])\\{(\\w+)}");
     // the expressions of a template, up to the first closing brace: good enough for messages
-    private static final Pattern EXPRESSION = Pattern.compile("[#$]\\{[^}]*}");
+    // an escaped delimiter, \\${ or \\#{, is literal text and not an expression
+    private static final Pattern EXPRESSION = Pattern.compile("(?<!\\\\)[#$]\\{[^}]*}");
+    private static final Pattern ESCAPED = Pattern.compile("\\\\([#$]\\{)");
 
     private ConstraintMessages() {
     }
@@ -44,7 +46,8 @@ public final class ConstraintMessages {
                 .getValue(context);
             expressions.appendReplacement(message, Matcher.quoteReplacement(evaluated));
         }
-        return expressions.appendTail(message).toString();
+        expressions.appendTail(message);
+        return ESCAPED.matcher(message).replaceAll("$1");
     }
 
     /**

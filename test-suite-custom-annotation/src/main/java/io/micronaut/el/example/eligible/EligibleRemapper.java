@@ -51,6 +51,10 @@ public final class EligibleRemapper implements AnnotationRemapper {
         }
         String condition = textOf(annotation.getValues().get(AnnotationMetadata.VALUE_MEMBER)); // <2>
         if (condition == null) {
+            // the alias, which the metadata builder has not resolved by the time a remapper runs
+            condition = textOf(annotation.getValues().get("condition"));
+        }
+        if (condition == null) {
             return List.of(annotation);
         }
         String otherwise = textOf(annotation.getValues().get("otherwise"));
@@ -86,8 +90,8 @@ public final class EligibleRemapper implements AnnotationRemapper {
     }
 
     /**
-     * The expression as written, with {@code ${...}} stored as {@code #{...}}: the specification treats the two
-     * alike, while Micronaut resolves a {@code ${...}} in the metadata of a bean as a property placeholder.
+     * The expression as written, with every {@code ${...}} stored as {@code #{...}}: the specification treats the
+     * two alike, while Micronaut resolves a {@code ${...}} in the metadata of a bean as a property placeholder.
      */
     private static String textOf(Object value) {
         String text;
@@ -102,7 +106,7 @@ public final class EligibleRemapper implements AnnotationRemapper {
         if (text.isEmpty()) {
             return null;
         }
-        return text.startsWith("${") ? "#" + text.substring(1) : text; // <7>
+        return ExpressionTexts.deferred(text); // <7>
     }
 }
 // end::remapper[]

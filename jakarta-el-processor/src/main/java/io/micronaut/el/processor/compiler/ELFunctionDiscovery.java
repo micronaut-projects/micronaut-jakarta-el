@@ -18,11 +18,13 @@ package io.micronaut.el.processor.compiler;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.MethodElement;
+import io.micronaut.inject.visitor.VisitorContext;
 import org.jspecify.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -36,16 +38,27 @@ import java.util.Set;
 @Internal
 public final class ELFunctionDiscovery {
 
-    private static final ELFunctionDiscovery CURRENT = new ELFunctionDiscovery();
+    private static final String ATTRIBUTE = ELFunctionDiscovery.class.getName();
 
     private final Map<String, MethodElement> functions = new LinkedHashMap<>();
     private final Set<String> registered = new HashSet<>();
 
     /**
-     * @return The discovery of the current compilation, shared by the visitors
+     * The discovery of the compilation the visitor context belongs to, shared by the visitors through the
+     * attributes of the context rather than through a static field, which every compilation running in the same
+     * JVM, a Gradle daemon compiling several modules at once among them, would share.
+     *
+     * @param context The visitor context
+     * @return The discovery of the current compilation
      */
-    public static ELFunctionDiscovery current() {
-        return CURRENT;
+    public static ELFunctionDiscovery of(VisitorContext context) {
+        Optional<ELFunctionDiscovery> existing = context.get(ATTRIBUTE, ELFunctionDiscovery.class);
+        if (existing.isPresent()) {
+            return existing.get();
+        }
+        ELFunctionDiscovery discovery = new ELFunctionDiscovery();
+        context.put(ATTRIBUTE, discovery);
+        return discovery;
     }
 
     /**

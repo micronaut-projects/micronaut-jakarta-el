@@ -58,7 +58,7 @@ public final class MinAmountRemapper implements AnnotationRemapper {
             // stored with ${...} as #{...}, which nothing in Micronaut resolves as a property placeholder;
             // a message template uses ${...}, so, unlike a whole-expression member, it never reaches the
             // metadata builder as an evaluated expression reference
-            return text.replace("${", "#{");
+            return ExpressionTexts.deferred(text);
         }
         return null;
     }

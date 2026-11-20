@@ -2139,7 +2139,8 @@ public final class ELCompiler {
                 argumentMatch = sameType(argument, parameter) ? MethodMatch.EXACT
                     : ELSpecificity.sameBoxedType(argument, parameter) || isAssignable(argument, parameter)
                         ? MethodMatch.ASSIGNABLE
-                        : isCoercible(argument, parameter) ? MethodMatch.COERCIBLE : MethodMatch.NONE;
+                        : isCoercible(argument, parameter) || mayBeInstance(argument, parameter)
+                            ? MethodMatch.COERCIBLE : MethodMatch.NONE;
             }
             if (argumentMatch == MethodMatch.NONE) {
                 return MethodMatch.NONE;
