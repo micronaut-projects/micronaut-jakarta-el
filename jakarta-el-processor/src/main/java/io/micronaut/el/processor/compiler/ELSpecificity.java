@@ -46,8 +46,8 @@ final class ELSpecificity {
             if (sameBoxedType(firstType, secondType)) {
                 continue;
             }
-            int comparison = firstType.isAssignable(secondType) ? 1
-                : secondType.isAssignable(firstType) ? -1
+            int comparison = assignable(firstType, secondType) ? 1
+                : assignable(secondType, firstType) ? -1
                 : numericSpecificity(firstType, secondType,
                     i < argumentTypes.size() ? argumentTypes.get(i) : null, elSpecific);
             if (comparison == 0 || (result != 0 && result != comparison)) {
@@ -56,6 +56,17 @@ final class ELSpecificity {
             result = comparison;
         }
         return result;
+    }
+
+    /** Whether the first type is assignable to the second, a primitive compared as its wrapper. */
+    private static boolean assignable(ClassElement first, ClassElement second) {
+        if (first.isAssignable(second)) {
+            return true;
+        }
+        if (first.isPrimitive() && !first.isArray()) {
+            return second.getName().equals(Object.class.getName()) || ELCompiler.jdkAssignable(first, second);
+        }
+        return false;
     }
 
     static ClassElement comparisonType(MethodElement method, int index) {
