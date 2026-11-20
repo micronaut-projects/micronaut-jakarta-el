@@ -41,7 +41,9 @@ public final class ELFunctionVisitor implements TypeElementVisitor<Object, Objec
 
     @Override
     public VisitorKind getVisitorKind() {
-        return VisitorKind.ISOLATING;
+        // the functions a class declares are found by the expressions of other classes: the expressions depend
+        // on every class declaring functions, which is what an aggregating processor is for
+        return VisitorKind.AGGREGATING;
     }
 
     @Override
@@ -51,7 +53,7 @@ public final class ELFunctionVisitor implements TypeElementVisitor<Object, Objec
 
     @Override
     public void start(VisitorContext visitorContext) {
-        ELFunctionDiscovery.current().reset();
+        ELFunctionDiscovery.of(visitorContext).reset();
     }
 
     @Override
@@ -62,7 +64,7 @@ public final class ELFunctionVisitor implements TypeElementVisitor<Object, Objec
     @Override
     public void visitClass(ClassElement element, VisitorContext context) {
         if (ELFunctionBinder.declaresFunctions(element)) {
-            ELFunctionDiscovery.current().register(element);
+            ELFunctionDiscovery.of(context).register(element);
         }
     }
 }

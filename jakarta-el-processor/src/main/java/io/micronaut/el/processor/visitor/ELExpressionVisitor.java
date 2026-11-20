@@ -85,7 +85,10 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
 
     @Override
     public VisitorKind getVisitorKind() {
-        return VisitorKind.ISOLATING;
+        // an expression may call a function discovered on any other class of the compilation, so its generated
+        // classes depend on more than the class declaring it; aggregating also keeps the visitor in the same
+        // processor, and visitor context, as ELFunctionVisitor
+        return VisitorKind.AGGREGATING;
     }
 
     @Override
@@ -146,7 +149,7 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
             return;
         }
         try {
-            compile(element, context);
+            compile(element, context, context.getLanguage() != VisitorContext.Language.KOTLIN);
         } catch (ProcessingException e) {
             if (e.getCause() instanceof ELUndeclaredFunctionException && context.getLanguage() != VisitorContext.Language.KOTLIN) {
                 // the function may be declared in a class of the module not visited yet: Groovy visits the
@@ -170,14 +173,24 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
                 continue;
             }
             try {
-                compile(element, context);
+                compile(element, context, false);
             } catch (ProcessingException e) {
                 context.fail(String.valueOf(e.getMessage()), element);
             }
         }
     }
 
-    private void compile(ClassElement element, VisitorContext context) {
+    /**
+     * Compiles the expressions declared on a class and writes them, unless one of them cannot be compiled: each
+     * failure is then reported on the element declaring the expression, with its text, and every expression of
+     * the class is compiled first so that all the failures are reported at once.
+     *
+     * @param element         The class
+     * @param context         The visitor context
+     * @param retryUndeclared Whether an expression calling a function no class visited so far declares makes the
+     *                        whole class retried later, rather than reported
+     */
+    private void compile(ClassElement element, VisitorContext context, boolean retryUndeclared) {
         List<Declared<ELExpression>> expressions = declaredOn(element, ELExpression.class);
         List<Declared<ELMethodExpression>> methodExpressions = declaredOn(element, ELMethodExpression.class);
         if (expressions.isEmpty() && methodExpressions.isEmpty()) {
@@ -191,27 +204,51 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
             // its first classes generated already
             List<ClassDef> generated = new ArrayList<>();
 
+            List<Failure> failures = new ArrayList<>();
             List<ExpressionSourceWriter.CompiledValue> compiledValues = new ArrayList<>(expressions.size());
             Set<String> constantNames = new HashSet<>();
             for (int i = 0; i < expressions.size(); i++) {
                 Declared<ELExpression> declared = expressions.get(i);
-                ELExpressionDefinition definition = valueDefinition(declared.annotation(), declared.owner(), constantNames, context);
-                String className = prefix + "$Expression" + i;
-                ValueExpressionWriter.Written written = ValueExpressionWriter.write(className, definition,
-                    compilerFor(declared.owner(), element, compilers, context));
-                generated.add(written.type());
-                compiledValues.add(new ExpressionSourceWriter.CompiledValue(written.definition(), className));
+                try {
+                    ELExpressionDefinition definition = valueDefinition(declared.annotation(), declared.owner(), constantNames, context);
+                    String className = prefix + "$Expression" + i;
+                    ValueExpressionWriter.Written written = ValueExpressionWriter.write(className, definition,
+                        compilerFor(declared.owner(), element, compilers, context));
+                    generated.add(written.type());
+                    compiledValues.add(new ExpressionSourceWriter.CompiledValue(written.definition(), className));
+                } catch (ELParsingException | ELCompilationException e) {
+                    failures.add(new Failure(declared.owner(), expressionOf(declared.annotation()).orElse(""), e));
+                }
             }
 
             List<ExpressionSourceWriter.CompiledMethod> compiledMethods = new ArrayList<>(methodExpressions.size());
             for (int i = 0; i < methodExpressions.size(); i++) {
                 Declared<ELMethodExpression> declared = methodExpressions.get(i);
-                ELMethodExpressionDefinition definition = methodDefinition(declared.annotation(), declared.owner(), constantNames, context);
-                String className = prefix + "$MethodExpression" + i;
-                MethodExpressionWriter.Written written = MethodExpressionWriter.write(className, definition,
-                    compilerFor(declared.owner(), element, compilers, context));
-                generated.add(written.type());
-                compiledMethods.add(new ExpressionSourceWriter.CompiledMethod(written.definition(), className));
+                try {
+                    ELMethodExpressionDefinition definition = methodDefinition(declared.annotation(), declared.owner(), constantNames, context);
+                    String className = prefix + "$MethodExpression" + i;
+                    MethodExpressionWriter.Written written = MethodExpressionWriter.write(className, definition,
+                        compilerFor(declared.owner(), element, compilers, context));
+                    generated.add(written.type());
+                    compiledMethods.add(new ExpressionSourceWriter.CompiledMethod(written.definition(), className));
+                } catch (ELParsingException | ELCompilationException e) {
+                    failures.add(new Failure(declared.owner(), expressionOf(declared.annotation()).orElse(""), e));
+                }
+            }
+            if (!failures.isEmpty()) {
+                Failure undeclared = failures.stream()
+                    .filter(failure -> failure.cause() instanceof ELUndeclaredFunctionException)
+                    .findFirst().orElse(null);
+                if (retryUndeclared && undeclared != null) {
+                    throw undeclared.cause();
+                }
+                for (Failure failure : failures) {
+                    // reported as it is: the processors of the languages would format it, and an expression may
+                    // well contain a '%'
+                    context.fail("The expression '" + failure.expression() + "' cannot be compiled: "
+                        + reportable(failure.cause()), failure.owner());
+                }
+                return;
             }
 
             String sourceClassName = prefix + "$ELExpressions";
@@ -401,7 +438,7 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
         if (owner != element) {
             declare(owner.getAnnotation(ELEnvironment.class), owner, context, variables, importedClasses, importedPackages, staticImports, functions);
         }
-        return new CompilationContext(context, owner, ELFunctionDiscovery.current(), variables, importedClasses, importedPackages, staticImports, functions);
+        return new CompilationContext(context, owner, ELFunctionDiscovery.of(context), variables, importedClasses, importedPackages, staticImports, functions);
     }
 
     private void declare(@Nullable AnnotationValue<ELEnvironment> environment,
@@ -516,5 +553,15 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
     }
 
     private record DeclarationKey(Element owner, String signature) {
+    }
+
+    /**
+     * An expression that cannot be compiled.
+     *
+     * @param owner      The element declaring it, where the failure is reported
+     * @param expression The text of the expression
+     * @param cause      The reason
+     */
+    private record Failure(Element owner, String expression, RuntimeException cause) {
     }
 }
