@@ -23,6 +23,7 @@ import jakarta.el.LambdaExpression;
 import org.jspecify.annotations.Nullable;
 
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
@@ -82,21 +83,44 @@ public final class ReflectiveELProxyFactory implements ELProxyFactory {
                     };
                 }
                 if (method.isDefault()) {
-                    // not InvocationHandler.invokeDefault: it resolves the interface from the proxy's own
-                    // module, which a native image places in jdk.proxy* where the interface is not readable.
-                    // Anchoring the lookup in the interface itself resolves it the same way everywhere
-                    Class<?> declaring = method.getDeclaringClass();
-                    return MethodHandles.privateLookupIn(declaring, MethodHandles.lookup())
-                        .unreflectSpecial(method, declaring)
-                        .bindTo(proxy)
-                        .invokeWithArguments(args == null ? new Object[0] : args);
+                    return invokeDefault(proxy, method, args);
                 }
                 Object[] arguments = args == null ? new Object[0] : args;
-                Object result = context == null ? lambda.invoke(arguments) : lambda.invoke(context, arguments);
+                // an instance of the interface can be called from any thread, concurrently: each call evaluates
+                // the lambda with a context of its own rather than entering its arguments in the shared one
+                ELContext invocation = context == null ? null : new InvocationELContext(context);
+                Object result = invocation == null ? lambda.invoke(arguments) : lambda.invoke(invocation, arguments);
                 Class<?> returnType = method.getReturnType();
-                return returnType == void.class ? null : ELSupport.coerceToType(context, result, returnType);
+                return returnType == void.class ? null : ELSupport.coerceToType(invocation, result, returnType);
             }
         );
+    }
+
+    /**
+     * Invokes the default method of the interface on the proxy, through {@link InvocationHandler#invokeDefault},
+     * which needs no access to the package of the interface: a private lookup in it does, and the packages of the
+     * platform, {@code java.util.function} among them, are not open to this module.
+     *
+     * <p>A native image defines the proxy class in a module of its own, from which the interface may not be
+     * readable; the private lookup anchored in the interface is the fallback there.</p>
+     */
+    @Nullable
+    private static Object invokeDefault(Object proxy, Method method, Object @Nullable [] args) throws Throwable {
+        Object[] arguments = args == null ? new Object[0] : args;
+        try {
+            return InvocationHandler.invokeDefault(proxy, method, arguments);
+        } catch (IllegalAccessException e) {
+            Class<?> declaring = method.getDeclaringClass();
+            try {
+                return MethodHandles.privateLookupIn(declaring, MethodHandles.lookup())
+                    .unreflectSpecial(method, declaring)
+                    .bindTo(proxy)
+                    .invokeWithArguments(arguments);
+            } catch (IllegalAccessException fallbackFailure) {
+                e.addSuppressed(fallbackFailure);
+                throw e;
+            }
+        }
     }
 
     private static boolean isObjectMethod(Method method) {

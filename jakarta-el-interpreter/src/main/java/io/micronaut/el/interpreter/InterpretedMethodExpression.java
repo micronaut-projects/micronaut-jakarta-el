@@ -19,6 +19,7 @@ import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.type.Argument;
 import io.micronaut.el.ELMethod;
 import io.micronaut.el.parser.ELParser;
+import io.micronaut.el.parser.ELParserOptions;
 import io.micronaut.el.parser.ELNodes;
 import io.micronaut.el.parser.ast.ELNode;
 import io.micronaut.el.runtime.ELResolution;
@@ -51,6 +52,7 @@ final class InterpretedMethodExpression extends MethodExpression implements ELEx
     private final Class<?> expectedReturnType;
     private final Class<?> @Nullable [] expectedParamTypes;
     private final Map<String, ELMethod> functions;
+    private final ELParserOptions options;
     private transient @Nullable ELNode node;
     private transient ELNode.@Nullable Method invocation;
     private transient @Nullable ELInterpreter interpreter;
@@ -61,7 +63,8 @@ final class InterpretedMethodExpression extends MethodExpression implements ELEx
                                 Class<?> @Nullable [] expectedParamTypes,
                                 ELNode node,
                                 Map<String, ELMethod> functions,
-                                ELInterpreter interpreter) {
+                                ELInterpreter interpreter,
+                                ELParserOptions options) {
         this.expressionString = Objects.requireNonNull(expressionString, "expressionString");
         this.expectedReturnType = Objects.requireNonNull(expectedReturnType, "expectedReturnType");
         this.expectedParamTypes = expectedParamTypes == null ? null : expectedParamTypes.clone();
@@ -69,16 +72,19 @@ final class InterpretedMethodExpression extends MethodExpression implements ELEx
         this.node = Objects.requireNonNull(node, "node");
         this.invocation = unwrap(node) instanceof ELNode.Method method ? method : null;
         this.interpreter = Objects.requireNonNull(interpreter, "interpreter");
+        this.options = Objects.requireNonNull(options, "options");
     }
 
     @Override
     @Nullable
     public Object invoke(ELContext context, Object @Nullable [] params) {
         context.notifyBeforeEvaluation(expressionString);
+        // the expected return type validates the method a caller expects, it does not convert what the method
+        // returns: the section 1.2.1.2 coerces only the result of a literal-expression, and both reference
+        // implementations hand back the result of an invoked method as it is
         Object result = doInvoke(context, params);
-        Object coerced = expectedReturnType == void.class ? null : ELSupport.coerceToType(context, result, expectedReturnType);
         context.notifyAfterEvaluation(expressionString);
-        return coerced;
+        return result;
     }
 
     @Override
@@ -138,7 +144,7 @@ final class InterpretedMethodExpression extends MethodExpression implements ELEx
     private ELNode node() {
         ELNode resolved = node;
         if (resolved == null) {
-            resolved = ELParser.parse(expressionString);
+            resolved = ELParser.parse(expressionString, options);
             node = resolved;
         }
         return resolved;

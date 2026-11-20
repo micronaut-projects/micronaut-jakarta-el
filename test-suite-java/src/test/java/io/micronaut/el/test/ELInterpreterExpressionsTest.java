@@ -237,9 +237,10 @@ class ELInterpreterExpressionsTest {
         assertEquals(List.of("before:${'1'}", "coerce"), events);
 
         events.clear();
-        assertThrows(ELException.class,
-            () -> ELInterpreterExpressions$ELExpressions.COERCION_LISTENER_METHOD.invoke(listeningContext, null));
-        assertEquals(List.of("before:#{varargs.numberText}", "coerce"), events);
+        // the result of an invoked method is not coerced to the expected return type, as in both reference
+        // implementations, so no conversion is attempted
+        assertEquals("1", ELInterpreterExpressions$ELExpressions.COERCION_LISTENER_METHOD.invoke(listeningContext, null));
+        assertEquals(List.of("before:#{varargs.numberText}", "after:#{varargs.numberText}"), events);
     }
 
     @Test
@@ -247,7 +248,8 @@ class ELInterpreterExpressionsTest {
         CompiledExpressionFactory factory = new CompiledExpressionFactory(
             List.of(new ELInterpreterExpressions$ELExpressions()));
 
-        assertEquals(1, ELInterpreterExpressions$ELExpressions.COERCION_LISTENER_METHOD.invoke(context, null));
+        // with or without an expected return type, the result of the method is returned as it is
+        assertEquals("1", ELInterpreterExpressions$ELExpressions.COERCION_LISTENER_METHOD.invoke(context, null));
         assertEquals("1", factory.createMethodExpression(context, "#{varargs.numberText}", null,
             new Class<?>[0]).invoke(context, null));
     }
