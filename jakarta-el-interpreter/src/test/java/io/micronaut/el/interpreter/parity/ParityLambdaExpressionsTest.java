@@ -30,9 +30,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 /**
  * The interpreted counterparts of {@code io.micronaut.el.test.LambdaExpressions}, with the results
  * {@code LambdaExpressionsTest} asserts for the compiled ones.
- *
- * <p>{@code ${item.note.map(n -> n.length()).orElse(0)}} calls a method on a {@link java.util.Optional}, whose
- * interpreted resolution is being changed in parallel; its pair is added with that change.</p>
  */
 class ParityLambdaExpressionsTest {
 
@@ -57,6 +54,8 @@ class ParityLambdaExpressionsTest {
         assertEquals(2L, value(context, "${item.count(t -> t.length() > 1)}"));
         assertEquals("A-1:5", value(context, "${item.describe(i -> i.sku += ':' += i.quantity)}"));
         assertEquals(9.99d * 5 + 1, value(context, "${item.adjusted((p, q) -> p * q + 1)}"));
+        // a method Optional declares itself keeps priority over the method of its value
+        assertEquals(3, value(context, "${item.note.map(n -> n.length()).orElse(0)}"));
     }
 
     @Test

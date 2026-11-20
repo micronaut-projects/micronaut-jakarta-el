@@ -25,7 +25,6 @@ import jakarta.el.ExpressionFactory;
 import jakarta.el.MethodExpression;
 import jakarta.el.PropertyNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -192,8 +191,6 @@ class CompilerRegressionInterpretedTest {
     }
 
     @Test
-    @Disabled("the interpreter invokes a method on the Optional itself until the runtime fix of the method "
-        + "invocation on an Optional is merged; the compiled counterpart already follows the OptionalELResolver")
     void theMethodOfAnOptionalIsTheOneOfItsValue() {
         assertEquals(3, value("${probe.optionalTitle.length()}"));
         assertNull(value("${probe.emptyTitle.length()}"));

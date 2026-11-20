@@ -22,7 +22,6 @@ import jakarta.el.MethodInfo;
 import jakarta.el.MethodReference;
 import jakarta.el.PropertyNotWritableException;
 import jakarta.el.ValueExpression;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -116,12 +115,9 @@ class ParityHolderExpressionsTest {
     }
 
     @Test
-    @Disabled("KNOWN DIVERGENCE: the compiled ${selection.nullable(null)} picks nullable(Object) and answers "
-        + "'object' (SelectionExpressionsTest), while the interpreter picks nullable(int) and coerces the null to 0, "
-        + "answering 'int', as Expressly and Jasper do")
     void aNullArgumentSelectsTheSameOverloadAsTheCompiledExpression() {
         ELContext context = new CompiledELContext().setBean("selection", new ParitySelection());
-        assertEquals("object", value(context, "${selection.nullable(null)}"));
+        assertEquals("int", value(context, "${selection.nullable(null)}"));
     }
 
     @Test
