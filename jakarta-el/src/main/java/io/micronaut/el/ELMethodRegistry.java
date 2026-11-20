@@ -809,9 +809,10 @@ public final class ELMethodRegistry {
             if (candidates == null || candidates.isEmpty()) {
                 return null;
             }
-            // the name is registered, so an argument list that fits none of its overloads is an error of the
-            // expression rather than a reason to fall through to the next executor
-            return ELMethods.select(type, method.toString(), candidates,
+            // a contribution describes the methods it registers, not every method of the type: an argument list
+            // that fits none of the registered overloads may fit a method the type declares itself, so the
+            // resolution falls through to the next executor rather than failing here
+            return ELMethods.selectOrNull(type, method.toString(), candidates,
                 argumentTypes == null ? null : Argument.toClassArray(argumentTypes),
                 arguments == null ? NO_ARGUMENTS : arguments, isStatic);
         }

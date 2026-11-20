@@ -44,6 +44,18 @@ public final class ELSandboxException extends ELException {
     }
 
     /**
+     * @param type   The type the expression reached
+     * @param method The method of that type the expression is not allowed to invoke
+     * @since 1.1
+     */
+    public ELSandboxException(Class<?> type, String method) {
+        super("An expression parsed at runtime is not allowed to invoke the method '" + method + "' of "
+            + type.getName() + ". Declare the expression with @ELExpression so that it is compiled, or widen the"
+            + " sandbox with ELContext.putContext(ELSandbox.class, sandbox).");
+        this.type = type;
+    }
+
+    /**
      * @return The type the expression reached
      */
     public Class<?> getType() {

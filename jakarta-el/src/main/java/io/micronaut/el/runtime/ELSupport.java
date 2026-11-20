@@ -27,14 +27,13 @@ import jakarta.el.ELException;
 import jakarta.el.ELResolver;
 import jakarta.el.LambdaExpression;
 
-import java.beans.PropertyEditor;
-import java.beans.PropertyEditorManager;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * The type conversion, comparison and emptiness rules of the Jakarta Expression Language specification.
@@ -134,25 +133,7 @@ public final class ELSupport {
             return (T) value;
         }
         if (value instanceof String string) {
-            // the specification coerces a String to any other type through the PropertyEditor of that type, which
-            // the editor manager finds among the registered editors or loads by the name of the type
-            @SuppressWarnings("NoReflection")
-            PropertyEditor editor = PropertyEditorManager.findEditor(type);
-            if (editor == null) {
-                if (string.isEmpty()) {
-                    return null;
-                }
-                throw cannotCoerce(value, type);
-            }
-            try {
-                editor.setAsText(string);
-                return (T) editor.getValue();
-            } catch (RuntimeException e) {
-                if (string.isEmpty()) {
-                    return null;
-                }
-                throw cannotCoerce(value, type);
-            }
+            return (T) PropertyEditors.coerce(string, type);
         }
         throw cannotCoerce(value, type);
     }
@@ -181,8 +162,11 @@ public final class ELSupport {
         if (type == null) {
             return false;
         }
-        return ELFunctionalInterfaces.isKnown(type) || contributed(type) != null
-            || (Proxies.FACTORY != null && Proxies.FACTORY.isFunctionalInterface(type));
+        if (ELFunctionalInterfaces.isKnown(type) || contributed(type) != null) {
+            return true;
+        }
+        ELProxyFactory factory = Proxies.factory();
+        return factory != null && factory.isFunctionalInterface(type);
     }
 
     /**
@@ -207,7 +191,7 @@ public final class ELSupport {
             return (T) registered.create(context, lambda);
         }
         // isFunctionalInterface accepted the type, so one of the three knows it
-        return Objects.requireNonNull(Proxies.FACTORY).create(context, lambda, type);
+        return Objects.requireNonNull(Proxies.factory()).create(context, lambda, type);
     }
 
     /**
@@ -638,12 +622,9 @@ public final class ELSupport {
         if (isWholeNumberOperand(left, right)) {
             return Long.compare(longValue(left), longValue(right));
         }
-        // the same rule, and the same place in the order, as the equality of the section 1.9.2: a boolean
-        // operand decides the comparison, so that 'false gt "9"' is the false the equality of the two implies
-        // rather than the lexical comparison of "false" with "9"
-        if (left instanceof Boolean || right instanceof Boolean) {
-            return Boolean.compare(toBoolean(left), toBoolean(right));
-        }
+        // the section 1.9.1 has no rule of its own for a boolean operand, unlike the equality of the section
+        // 1.9.2: a boolean compared with a string is compared as a string, as the reference implementations do,
+        // and with another boolean as the Comparable it is
         if (left instanceof String || right instanceof String) {
             return coerceToString(left).compareTo(coerceToString(right));
         }
@@ -882,17 +863,78 @@ public final class ELSupport {
     }
 
     /**
-     * The factory that implements an interface nothing described, loaded once from the classpath.
+     * The coercion of a String to any other type, which the specification performs through the
+     * {@code java.beans.PropertyEditor} of that type. The editors are in the {@code java.desktop} module, which a
+     * runtime image may leave out: the classes of {@code java.beans} are only referenced from here, so that a
+     * missing module makes the coercion fail as the coercion of a type without an editor does, rather than with a
+     * {@link LinkageError}.
+     */
+    private static final class PropertyEditors {
+
+        private static volatile boolean available = true;
+
+        private PropertyEditors() {
+        }
+
+        @Nullable
+        static Object coerce(String string, Class<?> type) {
+            Object coerced;
+            try {
+                coerced = available ? edit(string, type) : NO_EDITOR;
+            } catch (LinkageError e) {
+                // java.desktop is not in the runtime image
+                available = false;
+                coerced = NO_EDITOR;
+            }
+            if (coerced != NO_EDITOR) {
+                return coerced;
+            }
+            if (string.isEmpty()) {
+                return null;
+            }
+            throw cannotCoerce(string, type);
+        }
+
+        @Nullable
+        private static Object edit(String string, Class<?> type) {
+            // the editor manager finds the editor among the registered ones or loads it by the name of the type
+            @SuppressWarnings("NoReflection")
+            java.beans.PropertyEditor editor = java.beans.PropertyEditorManager.findEditor(type);
+            if (editor == null) {
+                return NO_EDITOR;
+            }
+            try {
+                editor.setAsText(string);
+                return editor.getValue();
+            } catch (RuntimeException e) {
+                return NO_EDITOR;
+            }
+        }
+    }
+
+    /**
+     * What {@link PropertyEditors} returns when no editor converts the string.
+     */
+    private static final Object NO_EDITOR = new Object();
+
+    /**
+     * The factory that implements an interface nothing described, loaded once per class loader.
      */
     private static final class Proxies {
 
-        private static final @Nullable ELProxyFactory FACTORY = load();
+        private static final ELClassLoaderCache<Optional<ELProxyFactory>> FACTORIES =
+            new ELClassLoaderCache<>(ELSupport.class.getClassLoader(), Proxies::load);
 
-        private static @Nullable ELProxyFactory load() {
-            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-            List<ELProxyFactory> factories = SoftServiceLoader.load(ELProxyFactory.class,
-                classLoader == null ? ELSupport.class.getClassLoader() : classLoader).collectAll();
-            return factories.isEmpty() ? null : factories.get(0);
+        private Proxies() {
+        }
+
+        static @Nullable ELProxyFactory factory() {
+            return FACTORIES.get().orElse(null);
+        }
+
+        private static Optional<ELProxyFactory> load(ClassLoader classLoader) {
+            List<ELProxyFactory> factories = SoftServiceLoader.load(ELProxyFactory.class, classLoader).collectAll();
+            return factories.isEmpty() ? Optional.empty() : Optional.of(factories.get(0));
         }
     }
 

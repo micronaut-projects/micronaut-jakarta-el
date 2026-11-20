@@ -42,6 +42,10 @@ public final class CompiledLambdaExpression extends LambdaExpression {
     private final ELLambdaBody body;
     @Nullable
     private ELContext context;
+    /**
+     * The context the lambda expression was created in, whose variables its body reads wherever it is invoked.
+     */
+    private final ELContext creation;
 
     /**
      * @param context    The context the lambda expression is created in
@@ -53,6 +57,7 @@ public final class CompiledLambdaExpression extends LambdaExpression {
         this.parameters = parameters;
         this.body = body;
         this.context = context;
+        this.creation = context;
         super.setELContext(context);
     }
 
@@ -68,7 +73,18 @@ public final class CompiledLambdaExpression extends LambdaExpression {
         if (args.length < parameters.length) {
             throw new ELException("Expected Argument " + parameters[args.length] + " missing in Lambda Expression");
         }
-        return body.evaluate(elContext, args);
+        // a lambda expression that escapes the expression it was created in, and is invoked with another context,
+        // still reads the variables it was created with, as a closure does: section 1.20 of the specification
+        ELContext evaluated = elContext == creation ? elContext : ELLambdaInvocation.capturing(elContext, creation);
+        return body.evaluate(evaluated, args);
+    }
+
+    /**
+     * @return The context the lambda expression was created in, or was last given
+     */
+    @Nullable
+    ELContext context() {
+        return context;
     }
 
     @Override
