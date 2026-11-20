@@ -130,6 +130,36 @@ public final class ELMethods {
                                Class<?> @Nullable [] paramTypes,
                                Object @Nullable [] arguments,
                                boolean isStatic) {
+        T selected = selectOrNull(type, name, candidates, paramTypes, arguments, isStatic);
+        if (selected == null) {
+            Object[] values = arguments == null ? new Object[0] : arguments;
+            throw notFound(type, name, paramTypes == null ? values.length : paramTypes.length);
+        }
+        return selected;
+    }
+
+    /**
+     * Selects the method as {@link #select} does, returning {@code null} rather than failing when no candidate
+     * accepts the arguments, so that a caller describing only some of the methods of a type can leave the
+     * others to the next executor. Several equally specific candidates still make the reference ambiguous.
+     *
+     * @param type       The type of the base object, or the class declaring a static method
+     * @param name       The name of the method, for the error messages
+     * @param candidates The methods of that name
+     * @param paramTypes The parameter types provided at parse time, can be {@code null}
+     * @param arguments  The evaluated arguments, can be {@code null}
+     * @param isStatic   Whether to look for a static method
+     * @param <T>        The type of the method the candidates stand for
+     * @return The selected method, or {@code null} when no candidate accepts the arguments
+     * @throws MethodNotFoundException when several candidates are equally specific
+     */
+    @Nullable
+    public static <T> T selectOrNull(Class<?> type,
+                                     String name,
+                                     List<Candidate<T>> candidates,
+                                     Class<?> @Nullable [] paramTypes,
+                                     Object @Nullable [] arguments,
+                                     boolean isStatic) {
         Object[] values = arguments == null ? new Object[0] : arguments;
         Class<?>[] matchingTypes = paramTypes == null ? typesOf(values) : paramTypes;
         List<Candidate<T>> assignable = new ArrayList<>(1);
@@ -161,7 +191,7 @@ public final class ELMethods {
         if (!variableArity.isEmpty()) {
             return mostSpecific(type, name, variableArity, matchingTypes, true);
         }
-        throw notFound(type, name, matchingTypes.length);
+        return null;
     }
 
     /**
@@ -369,7 +399,7 @@ public final class ELMethods {
         try {
             ELSupport.coerce(argument, parameterType);
             return true;
-        } catch (ELException | IllegalArgumentException e) {
+        } catch (ELException | IllegalArgumentException | ClassCastException | ArithmeticException e) {
             return false;
         }
     }

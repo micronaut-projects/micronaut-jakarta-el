@@ -20,11 +20,13 @@ import io.micronaut.el.CompiledELContext;
 import io.micronaut.el.ELExecutors;
 import io.micronaut.el.ELMethod;
 import io.micronaut.el.ELBeanProvider;
+import io.micronaut.el.ELSandbox;
 import io.micronaut.el.resolver.ELMethodDiagnostics;
 import org.jspecify.annotations.Nullable;
 import jakarta.el.ELClass;
 import jakarta.el.ELContext;
 import jakarta.el.ELException;
+import jakarta.el.ELResolver;
 import jakarta.el.ImportHandler;
 import jakarta.el.LambdaExpression;
 import jakarta.el.MethodExpression;
@@ -121,6 +123,11 @@ public final class ELResolution {
             }
             Class<?> resolvedClass = importHandler.resolveClass(name);
             if (resolvedClass != null) {
+                if (sandboxed) {
+                    // the class an identifier names is the base of every static member and constructor reached
+                    // from it: a denied one is not handed to the expression at all
+                    ELSandboxedResolution.checkAccess(ELSandbox.of(context), new ELClass(resolvedClass));
+                }
                 return new ELClass(resolvedClass);
             }
         }
@@ -369,10 +376,44 @@ public final class ELResolution {
         if (base == null || property == null) {
             throw propertyNotFound(base, property);
         }
+        ELResolver resolver = context.getELResolver();
+        // the value is coerced to the type of the property before it is assigned, as the reference
+        // implementations do: the resolvers of the specification store what they are given
         context.setPropertyResolved(false);
-        context.getELResolver().setValue(context, base, property, value);
+        Class<?> type = resolver.getType(context, base, property);
+        Object coerced = context.isPropertyResolved() ? coerceAssigned(context, value, type) : value;
+        context.setPropertyResolved(false);
+        try {
+            resolver.setValue(context, base, property, coerced);
+        } catch (IllegalArgumentException | ClassCastException e) {
+            throw new ELException(e);
+        }
         if (!context.isPropertyResolved()) {
             throw propertyNotFound(base, property);
+        }
+    }
+
+    /**
+     * Coerces a value assigned to a property to the type of the property, as the reference implementations do
+     * before they hand it to {@code ELResolver.setValue}.
+     *
+     * @param context The context
+     * @param value   The assigned value
+     * @param type    The type of the property, {@code null} when the resolver does not know it, as for a read
+     *                only property
+     * @return The value to assign
+     */
+    @Nullable
+    static Object coerceAssigned(ELContext context, @Nullable Object value, @Nullable Class<?> type) {
+        if (type == null || type == Object.class || (value != null && type.isInstance(value))) {
+            return value;
+        }
+        try {
+            return ELSupport.coerceToType(context, value, type);
+        } catch (ELException e) {
+            throw e;
+        } catch (RuntimeException e) {
+            throw new ELException(e);
         }
     }
 
@@ -464,7 +505,6 @@ public final class ELResolution {
             return methodExpression.invoke(context, arguments);
         }
         if (target instanceof LambdaExpression lambdaExpression) {
-            lambdaExpression.setELContext(context);
             return lambdaExpression.invoke(context, arguments == null ? new Object[0] : arguments);
         }
         throw new MethodNotFoundException("The identifier does not evaluate to a method expression");
@@ -494,7 +534,6 @@ public final class ELResolution {
                 + (base instanceof ELClass elClass ? elClass.getKlass() : base.getClass()).getName());
         }
         if (base instanceof LambdaExpression lambda && "invoke".equals(method)) {
-            lambda.setELContext(context);
             return lambda.invoke(context, arguments);
         }
         context.setPropertyResolved(false);
@@ -527,7 +566,6 @@ public final class ELResolution {
         }
         Object[] arguments = params == null ? new Object[0] : params;
         if (base instanceof LambdaExpression lambda && "invoke".equals(method)) {
-            lambda.setELContext(context);
             return lambda.invoke(context, arguments);
         }
         context.setPropertyResolved(false);
@@ -559,7 +597,6 @@ public final class ELResolution {
                                         @Nullable Object target,
                                         Object... arguments) {
         if (target instanceof LambdaExpression lambda) {
-            lambda.setELContext(context);
             return lambda.invoke(context, arguments);
         }
         if (target instanceof ELClass elClass) {

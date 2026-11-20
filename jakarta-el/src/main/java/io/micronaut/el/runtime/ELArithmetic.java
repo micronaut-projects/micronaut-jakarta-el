@@ -178,9 +178,10 @@ public final class ELArithmetic {
             return -longValue(string);
         }
         if (value instanceof Character character) {
-            // the section 1.25.3 coerces a character to its numeric value, which is what the binary
-            // operators of the section 1.7 do with one, and the unary minus is not the exception
-            return (short) -((short) character.charValue());
+            // a character is not a number: the unary minus of the section 1.7.5 coerces it to a Long, as it does
+            // every operand that is neither a number nor a string, which is what the reference implementations
+            // return, its numeric value being the one of the section 1.25.3
+            return -(long) (short) character.charValue();
         }
         if (value instanceof Byte aByte) {
             return (byte) -aByte;

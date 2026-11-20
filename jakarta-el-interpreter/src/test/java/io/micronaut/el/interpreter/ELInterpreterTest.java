@@ -75,10 +75,10 @@ class ELInterpreterTest {
 
     @Test
     void aBooleanOperandDecidesARelationalComparison() {
-        // the section 1.9.1 orders its rules the way the equality of the section 1.9.2 does, so a boolean
-        // operand is coerced with the other rather than the two being compared as strings
-        assertEquals((Object) false, processor.eval("false gt '9'"));
-        assertEquals((Object) true, processor.eval("false le '9'"));
+        // the section 1.9.1 has no rule for a boolean operand: compared with a string, it is compared as a
+        // string, as the reference implementations do
+        assertEquals((Object) true, processor.eval("false gt '9'"));
+        assertEquals((Object) false, processor.eval("false le '9'"));
         assertEquals((Object) false, processor.eval("false lt '9'"));
         assertEquals((Object) true, processor.eval("false ge '9'"));
         assertEquals((Object) false, processor.eval("'9' gt false"));
@@ -90,8 +90,8 @@ class ELInterpreterTest {
 
     @Test
     void aCharacterIsANumberForTheUnaryMinus() {
-        // the section 1.25.3 coerces a character to its numeric value, which the binary operators already do
-        assertEquals((Object) (short) -49, processor.eval("-Character.valueOf(49)"));
+        // the unary minus coerces a character to a Long, as the reference implementations do
+        assertEquals((Object) (-49L), processor.eval("-Character.valueOf(49)"));
         assertEquals((Object) 49L, processor.eval("Character.valueOf(49) + 0"));
         assertEquals((Object) (-49L), processor.eval("-Character.valueOf(49) + 0"));
     }
