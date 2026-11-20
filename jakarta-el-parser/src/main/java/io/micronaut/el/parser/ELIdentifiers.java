@@ -68,7 +68,7 @@ public final class ELIdentifiers {
     }
 
     @SuppressWarnings("java:S1541")
-    private static List<ELNode> children(ELNode node) {
+    static List<ELNode> children(ELNode node) {
         return switch (node) {
             case ELNode.Composite composite -> composite.parts();
             case ELNode.Eval eval -> List.of(eval.expression());

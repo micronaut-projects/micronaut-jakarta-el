@@ -18,6 +18,7 @@ package io.micronaut.el.interpreter;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.el.ELMethod;
 import io.micronaut.el.parser.ELParser;
+import io.micronaut.el.parser.ELParserOptions;
 import io.micronaut.el.parser.ELNodes;
 import io.micronaut.el.parser.ast.ELNode;
 import io.micronaut.el.runtime.ELSupport;
@@ -46,6 +47,7 @@ final class InterpretedValueExpression extends ValueExpression implements ELExpr
     private final String expressionString;
     private final Class<?> expectedType;
     private final Map<String, ELMethod> functions;
+    private final ELParserOptions options;
     private transient @Nullable ELNode node;
     private transient @Nullable ELInterpreter interpreter;
     private transient @Nullable String equalityForm;
@@ -54,12 +56,14 @@ final class InterpretedValueExpression extends ValueExpression implements ELExpr
                                Class<?> expectedType,
                                ELNode node,
                                Map<String, ELMethod> functions,
-                               ELInterpreter interpreter) {
+                               ELInterpreter interpreter,
+                               ELParserOptions options) {
         this.expressionString = Objects.requireNonNull(expressionString, "expressionString");
         this.expectedType = Objects.requireNonNull(expectedType, "expectedType");
         this.functions = Map.copyOf(functions);
         this.node = Objects.requireNonNull(node, "node");
         this.interpreter = Objects.requireNonNull(interpreter, "interpreter");
+        this.options = Objects.requireNonNull(options, "options");
     }
 
     @Override
@@ -126,7 +130,7 @@ final class InterpretedValueExpression extends ValueExpression implements ELExpr
     private ELNode node() {
         ELNode resolved = node;
         if (resolved == null) {
-            resolved = ELParser.parse(expressionString);
+            resolved = ELParser.parse(expressionString, options);
             node = resolved;
         }
         return resolved;
