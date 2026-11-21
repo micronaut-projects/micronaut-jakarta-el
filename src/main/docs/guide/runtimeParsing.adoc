@@ -148,7 +148,27 @@ configuration, such as the environment of a Micronaut application:
 `ELParserOptions.fromResolver(name -> environment.getProperty(name, String.class).orElse(null))`. A much deeper
 nesting or a much taller tree needs a thread with a larger stack.
 
-The processor parses an `@ELExpression` with the default limits.
+The processor parses an `@ELExpression` and an `@ELMethodExpression` with the same default limits, and reads lowered
+or raised ones from annotation processor options of the same names. An expression beyond a limit fails the
+compilation, with the limit and the option in the message. javac only accepts an `-A` key made of Java identifiers and
+rejects `-Amicronaut.el.parser.max-length` before any processor runs, so the processor also reads the camel case
+aliases `micronaut.el.parser.maxLength`, `maxTokens`, `maxDepth` and `maxTreeHeight`; a hyphenated name takes
+precedence over its alias where both are set:
+
+[source,groovy]
+----
+// Gradle, Java
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs += ['-Amicronaut.el.parser.maxLength=4000', '-Amicronaut.el.parser.maxDepth=50']
+}
+
+// Gradle, Kotlin with KSP, which takes either name
+ksp {
+    arg('micronaut.el.parser.max-length', '4000')
+}
+----
+
+A Groovy compilation reads the options from the system properties of the compiler, with either name.
 
 snippet::example.RuntimeExpressionTest[project-base="doc-examples/example", title="RuntimeExpressionTest"]
 

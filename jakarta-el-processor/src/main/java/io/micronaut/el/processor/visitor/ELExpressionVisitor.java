@@ -41,6 +41,8 @@ import io.micronaut.el.processor.compiler.ELExpressionDefinition;
 import io.micronaut.el.processor.compiler.ELMethodExpressionDefinition;
 import io.micronaut.el.parser.ELParser;
 import io.micronaut.el.parser.ELParsingException;
+import io.micronaut.el.parser.ELParserOptions;
+import io.micronaut.el.parser.ast.ELNode;
 import io.micronaut.el.processor.writer.ExpressionSourceWriter;
 import io.micronaut.el.processor.writer.MethodExpressionWriter;
 import io.micronaut.el.processor.writer.ValueExpressionWriter;
@@ -68,6 +70,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * The visitor compiling the expressions declared with {@link ELExpression} and {@link ELMethodExpression}.
@@ -79,6 +82,20 @@ import java.util.Set;
 public final class ELExpressionVisitor implements TypeElementVisitor<Object, Object> {
 
     private static final String EXPECTED_PARAM_TYPES = "expectedParamTypes";
+    /**
+     * The annotation processor options limiting the parser, named as the system properties the runtime parser
+     * reads, so that an expression is held to the same limits at compile time as at runtime, each with the
+     * camel case alias javac accepts: a key of {@code -A} must be a dot separated sequence of Java identifiers, which
+     * javac checks before any processor runs, so {@code -Amicronaut.el.parser.max-length=...} is rejected there,
+     * while KSP and the system properties a Groovy compilation reads take either name.
+     */
+    private static final Map<String, String> PARSER_OPTION_ALIASES = Map.of(
+        ELParserOptions.MAX_LENGTH_PROPERTY, ELParserOptions.PROPERTY_PREFIX + "maxLength",
+        ELParserOptions.MAX_TOKENS_PROPERTY, ELParserOptions.PROPERTY_PREFIX + "maxTokens",
+        ELParserOptions.MAX_DEPTH_PROPERTY, ELParserOptions.PROPERTY_PREFIX + "maxDepth",
+        ELParserOptions.MAX_TREE_HEIGHT_PROPERTY, ELParserOptions.PROPERTY_PREFIX + "maxTreeHeight"
+    );
+    private static final Set<String> PARSER_OPTIONS = parserOptionNames();
 
     private final Set<String> processed = new HashSet<>();
     private final List<ClassElement> pending = new ArrayList<>();
@@ -95,6 +112,12 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
     public void start(VisitorContext visitorContext) {
         processed.clear();
         pending.clear();
+    }
+
+    @Override
+    public Set<String> getSupportedOptions() {
+        // the names javac accepts: a supported option is declared to javac, which only knows identifiers
+        return Set.copyOf(PARSER_OPTION_ALIASES.values());
     }
 
     @Override
@@ -398,7 +421,9 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
         // an omitted type is inferred from the static type of the expression once it is compiled
         ClassElement expectedType = ELTypes.resolveMember(annotation, "expectedType", context).orElse(null);
         String name = uniqueConstantName(annotation, owner, expression, used);
-        return new ELExpressionDefinition(expression, expectedType, false, name, ELParser.parse(expression));
+        ELParserOptions options = parserOptions(context);
+        return new ELExpressionDefinition(expression, expectedType, false, name,
+            parse(options, () -> ELParser.parse(expression, options)));
     }
 
     private ELMethodExpressionDefinition methodDefinition(AnnotationValue<ELMethodExpression> annotation,
@@ -416,8 +441,49 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
             "name", annotation.stringValue("name").orElse(""), EXPECTED_PARAM_TYPES,
             parameterTypes, context);
         String name = uniqueConstantName(annotation, owner, expression, used);
+        ELParserOptions options = parserOptions(context);
         return new ELMethodExpressionDefinition(expression, returnType, false, parameterTypes, name,
-            ELParser.parseEval(expression));
+            parse(options, () -> ELParser.parseEval(expression, options)));
+    }
+
+    /**
+     * The limits of the parser, read from the annotation processor options {@code micronaut.el.parser.max-length},
+     * {@code max-tokens}, {@code max-depth} and {@code max-tree-height}, or their aliases {@code maxLength},
+     * {@code maxTokens}, {@code maxDepth} and {@code maxTreeHeight}, the defaults for those not set.
+     */
+    private static ELParserOptions parserOptions(VisitorContext context) {
+        Map<String, String> options = context.getOptions();
+        try {
+            return ELParserOptions.fromResolver(name -> {
+                String value = options.get(name);
+                String alias = PARSER_OPTION_ALIASES.get(name);
+                return value != null || alias == null ? value : options.get(alias);
+            });
+        } catch (IllegalArgumentException e) {
+            throw new ELCompilationException("Invalid annotation processor option: " + e.getMessage());
+        }
+    }
+
+    private static Set<String> parserOptionNames() {
+        Set<String> names = new java.util.TreeSet<>(PARSER_OPTION_ALIASES.keySet());
+        names.addAll(PARSER_OPTION_ALIASES.values());
+        return java.util.Collections.unmodifiableSet(names);
+    }
+
+    /**
+     * Parses an expression, naming the annotation processor options in the failure of a limit that is not the
+     * default, so that the limit is found where it is set.
+     */
+    private static ELNode parse(ELParserOptions options, Supplier<ELNode> parser) {
+        try {
+            return parser.get();
+        } catch (ELParsingException e) {
+            if (options.equals(ELParserOptions.defaults())) {
+                throw e;
+            }
+            throw new ELParsingException(e.getMessage() + ". The limits of the parser are set by the annotation "
+                + "processor options " + String.join(", ", PARSER_OPTIONS) + ", here " + options);
+        }
     }
 
     private CompilationContext environmentOf(ClassElement element, Element owner, VisitorContext context) {
