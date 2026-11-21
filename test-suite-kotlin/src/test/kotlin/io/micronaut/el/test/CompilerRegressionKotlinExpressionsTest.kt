@@ -34,6 +34,14 @@ class CompilerRegressionKotlinExpressionsTest {
     }
 
     @Test
+    fun `a variable declared with Int class selects as its value does`() {
+        // the interpreter, Expressly and Tomcat pass the value of the variable, an Integer, which selects
+        // which(Int?) over which(Int); the compiled expression selects the same overload
+        assertEquals("Integer:2",
+            factory.createValueExpression(context, "\${text.which(count)}", Any::class.java).getValue(context))
+    }
+
+    @Test
     fun `a primitive class literal selects the primitive overload over the wrapper one`() {
         // the registry would also answer a request for Integer, so the overload invoked is what tells
         // int.class from Integer.class: the wrapper overload is the one Integer selects
