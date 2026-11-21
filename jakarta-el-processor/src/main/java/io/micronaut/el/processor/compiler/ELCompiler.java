@@ -99,6 +99,7 @@ public final class ELCompiler {
      */
     private final Map<String, Typed> shared = new LinkedHashMap<>();
     private final java.util.Set<String> unresolvedIdentifiers = new java.util.LinkedHashSet<>();
+    private final ELOverloadSelection overloads = new ELOverloadSelection(this::functionalMethod);
     private int lambdas;
     private int lambdaDepth;
     @Nullable
@@ -651,7 +652,7 @@ public final class ELCompiler {
             ClassElement importedClass = context.isLambdaParameter(name) || context.variableType(name) != null
                 ? null : context.resolveClass(name);
             if (importedClass != null) {
-                Arguments arguments = new Arguments(method.arguments(), ctx);
+                ELArguments arguments = arguments(method.arguments(), ctx);
                 MethodElement staticMethod = selectMethod(importedClass, methodName, arguments, true);
                 if (staticMethod != null) {
                     return invocation(null, staticMethod, coercedArguments(null, staticMethod, arguments),
@@ -674,7 +675,7 @@ public final class ELCompiler {
                                 ExpressionDef ctx) {
         ClassElement baseType = base.type();
         if (baseType != null && isOptional(baseType)
-            && (methodName == null || methodCandidates(baseType, methodName, method.arguments(), false).isEmpty())) {
+            && (methodName == null || ELOverloadSelection.methodCandidates(baseType, methodName, method.arguments(), false).isEmpty())) {
             // the OptionalELResolver of the specification: the method of the value, null when it is empty; a method
             // Optional declares itself (map, orElse...) keeps priority, as the resolver chain and the interpreter
             // try the bean resolver before the OptionalELResolver
@@ -686,7 +687,7 @@ public final class ELCompiler {
             return new Typed(runtime(EL_STREAM, "of", EL_STREAM, ctx, base.expression()), streamOf(baseType));
         }
         // every argument is compiled once, whatever the selection of the method reads of it
-        Arguments arguments = new Arguments(method.arguments(), ctx);
+        ELArguments arguments = arguments(method.arguments(), ctx);
         if (methodName != null && baseType != null) {
             MethodElement target = selectMethod(baseType, methodName, arguments, false);
             if (target != null) {
@@ -702,7 +703,7 @@ public final class ELCompiler {
                     return invocation(base.expression(), target, values, returnType(baseType, target),
                         (receiver, parameters) -> receiver.invoke(target, parameters));
                 }
-            } else if (methodCandidates(baseType, methodName, method.arguments(), false).isEmpty()) {
+            } else if (ELOverloadSelection.methodCandidates(baseType, methodName, method.arguments(), false).isEmpty()) {
                 // the selection may well be deferred to runtime, for an argument whose static type does not
                 // decide between overloads: only a method the type does not declare at all is reported
                 warnUnknownMember(baseType, "method", methodName + "(" + method.arguments().size() + " argument(s))");
@@ -870,10 +871,10 @@ public final class ELCompiler {
                 ClassElement bean = declared.getDeclaringType();
                 ExpressionDef provider = runtime(EL_RESOLUTION, "functionProvider", TypeDef.erasure(bean),
                     ctx, ExpressionDef.constant(TypeDef.erasure(bean)));
-                return invocation(provider, declared, coercedArguments(null, declared, new Arguments(arguments, ctx)),
+                return invocation(provider, declared, coercedArguments(null, declared, arguments(arguments, ctx)),
                     declared.getReturnType(), (receiver, values) -> receiver.invoke(declared, values));
             }
-            return invocation(null, declared, coercedArguments(null, declared, new Arguments(arguments, ctx)),
+            return invocation(null, declared, coercedArguments(null, declared, arguments(arguments, ctx)),
                 declared.getReturnType(),
                 (receiver, values) -> ELTypes.staticOwner(declared).invokeStatic(declared, values));
         }
@@ -883,7 +884,7 @@ public final class ELCompiler {
         }
         String name = localName;
         if (!context.isLambdaParameter(name) && context.variableType(name) == null) {
-            Arguments compiledArguments = new Arguments(arguments, ctx);
+            ELArguments compiledArguments = arguments(arguments, ctx);
             ClassElement importedClass = context.resolveClass(name);
             if (importedClass != null) {
                 MethodElement constructor = selectConstructor(importedClass, compiledArguments);
@@ -903,7 +904,7 @@ public final class ELCompiler {
                             .instantiate(List.of(TypeDef.of(Throwable.class)), exception)))), importedClass);
             }
             for (ClassElement staticImport : context.staticImports()) {
-                MethodSelection imported = selectMethods(methodCandidates(staticImport, name, arguments, true),
+                ELOverloadSelection.MethodSelection imported = select(ELOverloadSelection.methodCandidates(staticImport, name, arguments, true),
                     compiledArguments);
                 if (imported.ambiguous()) {
                     throw new ELCompilationException("The reference to the imported static method '" + name
@@ -1593,7 +1594,7 @@ public final class ELCompiler {
     private List<ExpressionDef> arguments(ExpressionDef ctx,
                                           ExpressionDef base,
                                           ExpressionDef property,
-                                          Arguments arguments) {
+                                          ELArguments arguments) {
         List<ExpressionDef> values = new ArrayList<>(arguments.size() + 3);
         values.add(ctx);
         values.add(base);
@@ -1605,59 +1606,10 @@ public final class ELCompiler {
     }
 
     /**
-     * The arguments of an invocation, each compiled once, the first time the selection of the method or the
-     * invocation reads it: a compiled argument is an expression placed in the invocation, and compiling it again
-     * would only add unused helpers.
-     */
-    private final class Arguments {
-
-        private final List<ELNode> nodes;
-        private final ExpressionDef ctx;
-        private final Typed[] compiled;
-
-        private Arguments(List<ELNode> nodes, ExpressionDef ctx) {
-            this.nodes = nodes;
-            this.ctx = ctx;
-            this.compiled = new Typed[nodes.size()];
-        }
-
-        int size() {
-            return nodes.size();
-        }
-
-        ELNode node(int index) {
-            return nodes.get(index);
-        }
-
-        List<ELNode> nodes() {
-            return nodes;
-        }
-
-        Typed typed(int index) {
-            Typed typed = compiled[index];
-            if (typed == null) {
-                typed = compileTyped(nodes.get(index), ctx);
-                compiled[index] = typed;
-            }
-            return typed;
-        }
-
-        /** @return The static type of the argument, null for a lambda expression, whose type is its target */
-        @Nullable
-        ClassElement type(int index) {
-            return nodes.get(index) instanceof ELNode.Lambda ? null : typed(index).type();
-        }
-
-        ExpressionDef ctx() {
-            return ctx;
-        }
-    }
-
-    /**
      * @param receiver The type the method is invoked on, whose type arguments bind the type variables of the
      *                 parameters, or {@code null} for a static method
      */
-    private List<ExpressionDef> coercedArguments(@Nullable ClassElement receiver, MethodElement method, Arguments compiledArguments) {
+    private List<ExpressionDef> coercedArguments(@Nullable ClassElement receiver, MethodElement method, ELArguments compiledArguments) {
         List<ELNode> arguments = compiledArguments.nodes();
         ExpressionDef ctx = compiledArguments.ctx();
         ParameterElement[] parameters = method.getParameters();
@@ -1672,7 +1624,7 @@ public final class ELCompiler {
                 directValue = compiledArguments.typed(i);
                 ClassElement arrayParameter = parameters[parameters.length - 1].getType();
                 // the name of an array type is the name of its component, so the dimensions are compared too
-                if (directValue.type() != null && isArrayArgument(directValue.type(), arrayParameter)) {
+                if (directValue.type() != null && ELTypeCompatibility.isArrayArgument(directValue.type(), arrayParameter)) {
                     directVarargsArray = true;
                 } else {
                     parameter = parameters[parameters.length - 1].getType().fromArray();
@@ -1695,7 +1647,7 @@ public final class ELCompiler {
             }
             Typed value = directValue == null ? compiledArguments.typed(i) : directValue;
             if (parameter != null) {
-                requireCoercible(value.type(), parameter, method, i);
+                ELTypeCompatibility.requireCoercible(value.type(), parameter, method, i);
             }
             values.add(parameter == null ? value.expression() : coerce(value.expression(), parameter, ctx));
         }
@@ -1708,116 +1660,6 @@ public final class ELCompiler {
         ClassElement component = parameters[fixed].getType().fromArray();
         packed.add(erasure(component).array().instantiate(values.subList(fixed, values.size())));
         return packed;
-    }
-
-    /**
-     * An argument whose static type cannot be coerced to the parameter, section 1.23 of the specification, is
-     * an error: the invocation would fail on every evaluation.
-     */
-    private static void requireCoercible(@Nullable ClassElement argument, ClassElement parameter, MethodElement method, int index) {
-        if (argument == null || isCoercible(argument, parameter) || mayBeInstance(argument, parameter)) {
-            return;
-        }
-        throw new ELCompilationException("The argument " + (index + 1) + " of "
-            + method.getDeclaringType().getName() + "." + method.getName() + " is a " + argument.getName()
-            + ", which cannot be coerced to the declared " + parameter.getName()
-            + ". Pass a compatible value, or change the signature of the method.");
-    }
-
-    /**
-     * Whether a value of the type can be coerced to the parameter type: assignable, or one of the coercions of
-     * the section 1.23. A string coerces to almost anything, including through a {@code PropertyEditor}, so a
-     * string argument is never rejected.
-     */
-    private static boolean isCoercible(ClassElement argument, ClassElement parameter) {
-        if (parameter.isArray()) {
-            // a variable arity parameter, or an array the runtime coercion of the section 1.23.6 fills
-            return true;
-        }
-        if (isUnknown(parameter) || isUnknown(argument)
-            || argument.getName().equals(parameter.getName())
-            || argument.isAssignable(parameter.getName())
-            || argument.getName().equals(String.class.getName())
-            || parameter.getName().equals(String.class.getName())
-            || parameter.isAssignable(argument.getName())
-            || jdkAssignable(argument, parameter)) {
-            return true;
-        }
-        boolean argumentNumeric = numericRank(argument) >= 0 || argument.isAssignable(Number.class)
-            || argument.getName().equals("char") || argument.isAssignable(Character.class);
-        boolean parameterNumeric = numericRank(parameter) >= 0 || parameter.isAssignable(Number.class)
-            || parameter.getName().equals("char") || parameter.isAssignable(Character.class);
-        if (argumentNumeric || parameterNumeric) {
-            return argumentNumeric && parameterNumeric;
-        }
-        boolean argumentBoolean = argument.getName().equals("boolean") || argument.isAssignable(Boolean.class);
-        boolean parameterBoolean = parameter.getName().equals("boolean") || parameter.isAssignable(Boolean.class);
-        if (argumentBoolean || parameterBoolean) {
-            return argumentBoolean && parameterBoolean;
-        }
-        if (parameter.isEnum()) {
-            // only a string, handled above, coerces to an enum
-            return false;
-        }
-        if (parameter.isInterface() && argument.isAssignable(LambdaExpression.class)) {
-            return true;
-        }
-        // an unrelated reference type: the coercion of the section 1.23.10 requires an instance of the type
-        return false;
-    }
-
-    /**
-     * Whether a value of the static type of the argument may be an instance of the parameter type at runtime,
-     * which the coercion of the section 1.23.10 then passes as it is: the static type of the argument is not
-     * the type of the value. An interface and a class that is not final, or two interfaces, may well describe
-     * the same instance; only two unrelated classes, or a final class and an interface it does not implement,
-     * never do.
-     */
-    private static boolean mayBeInstance(ClassElement argument, ClassElement parameter) {
-        if (argument.isArray() || parameter.isArray()) {
-            return false;
-        }
-        Class<?> argumentClass = jdkClass(argument.isPrimitive() ? wrapper(argument.getName()) : argument.getName());
-        Class<?> parameterClass = jdkClass(parameter.getName());
-        if (argumentClass != null && parameterClass != null) {
-            return parameterClass.isAssignableFrom(argumentClass) || argumentClass.isAssignableFrom(parameterClass)
-                || parameterClass.isInterface() && !java.lang.reflect.Modifier.isFinal(argumentClass.getModifiers())
-                || argumentClass.isInterface() && !java.lang.reflect.Modifier.isFinal(parameterClass.getModifiers());
-        }
-        if (argument.isPrimitive()) {
-            return false;
-        }
-        if (parameter.isInterface()) {
-            return !argument.isFinal() || argument.isAssignable(parameter.getName());
-        }
-        return argument.isInterface() && !parameter.isFinal();
-    }
-
-    /**
-     * Whether a type of the platform, a primitive as its wrapper, is assignable to another type of the platform,
-     * read from the classes themselves: the elements of a wrapper built from its class do not always report the
-     * interfaces it implements, {@code Comparable} and {@code Serializable} among them.
-     */
-    static boolean jdkAssignable(ClassElement argument, ClassElement parameter) {
-        if (argument.isArray() || parameter.isArray()) {
-            return false;
-        }
-        Class<?> argumentClass = jdkClass(argument.isPrimitive() ? wrapper(argument.getName()) : argument.getName());
-        Class<?> parameterClass = jdkClass(parameter.getName());
-        return argumentClass != null && parameterClass != null && !parameterClass.isPrimitive()
-            && parameterClass.isAssignableFrom(argumentClass);
-    }
-
-    @Nullable
-    private static Class<?> jdkClass(String name) {
-        if (!name.startsWith("java.")) {
-            return null;
-        }
-        try {
-            return Class.forName(name, false, ClassLoader.getPlatformClassLoader());
-        } catch (ClassNotFoundException | LinkageError e) {
-            return null;
-        }
     }
 
     private ExpressionDef coerce(ExpressionDef value, ClassElement target, ExpressionDef ctx) {
@@ -2002,13 +1844,13 @@ public final class ELCompiler {
      * Selects the best statically known overload, deferring an undecidable call to runtime resolution.
      */
     @Nullable
-    private MethodElement selectMethod(ClassElement type, String name, Arguments compiledArguments, boolean onlyStatic) {
+    private MethodElement selectMethod(ClassElement type, String name, ELArguments compiledArguments, boolean onlyStatic) {
         List<ELNode> arguments = compiledArguments.nodes();
-        List<MethodElement> candidates = methodCandidates(type, name, arguments, onlyStatic);
+        List<MethodElement> candidates = ELOverloadSelection.methodCandidates(type, name, arguments, onlyStatic);
         if (requiresRuntimeOverloadSelection(candidates, compiledArguments)) {
             return null;
         }
-        MethodSelection selection = selectMethods(candidates, compiledArguments);
+        ELOverloadSelection.MethodSelection selection = select(candidates, compiledArguments);
         if (selection.ambiguous() && arguments.stream().anyMatch(ELNode.Lambda.class::isInstance)) {
             List<MethodElement> functionalTargets = candidates.stream()
                 .filter(candidate -> {
@@ -2021,7 +1863,7 @@ public final class ELCompiler {
                     return true;
                 })
                 .toList();
-            MethodSelection functionalSelection = selectMethods(functionalTargets, compiledArguments);
+            ELOverloadSelection.MethodSelection functionalSelection = select(functionalTargets, compiledArguments);
             if (functionalSelection.method() != null) {
                 return functionalSelection.method();
             }
@@ -2032,7 +1874,7 @@ public final class ELCompiler {
     }
 
     // A non-final declared type cannot determine which overload best matches its runtime subtype.
-    private boolean requiresRuntimeOverloadSelection(List<MethodElement> candidates, Arguments arguments) {
+    private boolean requiresRuntimeOverloadSelection(List<MethodElement> candidates, ELArguments arguments) {
         if (candidates.size() < 2 || arguments.nodes().stream().anyMatch(ELNode.Lambda.class::isInstance)) {
             return false;
         }
@@ -2053,198 +1895,6 @@ public final class ELCompiler {
         return false;
     }
 
-    private static List<MethodElement> methodCandidates(ClassElement type,
-                                                        String name,
-                                                        List<ELNode> arguments,
-                                                        boolean onlyStatic) {
-        List<MethodElement> candidates = new ArrayList<>();
-        for (MethodElement method : type.getEnclosedElements(ElementQuery.ALL_METHODS.onlyAccessible().named(name))) {
-            if ((method.getParameters().length == arguments.size()
-                || method.isVarArgs() && arguments.size() >= method.getParameters().length - 1) && method.isPublic()
-                && (!onlyStatic || ELTypes.isStatic(method))) {
-                candidates.add(method);
-            }
-        }
-        return candidates;
-    }
-
-    private MethodSelection selectMethods(List<MethodElement> candidates, Arguments compiledArguments) {
-        if (candidates.isEmpty()) {
-            return new MethodSelection(null, false);
-        }
-        List<ELNode> arguments = compiledArguments.nodes();
-        List<ClassElement> argumentTypes = new ArrayList<>(arguments.size());
-        for (int i = 0; i < arguments.size(); i++) {
-            argumentTypes.add(compiledArguments.type(i));
-        }
-        List<MethodElement> exact = new ArrayList<>();
-        List<MethodElement> assignable = new ArrayList<>();
-        List<MethodElement> coercible = new ArrayList<>();
-        List<MethodElement> varArgs = new ArrayList<>();
-        for (MethodElement candidate : candidates) {
-            MethodMatch match = match(candidate, arguments, argumentTypes);
-            switch (match) {
-                case EXACT -> exact.add(candidate);
-                case ASSIGNABLE -> assignable.add(candidate);
-                case COERCIBLE -> coercible.add(candidate);
-                case VARARGS -> varArgs.add(candidate);
-                case NONE -> {
-                    // not a candidate
-                }
-                default -> throw new IllegalStateException("Unexpected method match " + match);
-            }
-        }
-        boolean elSpecific = exact.isEmpty() && assignable.isEmpty();
-        List<MethodElement> best = !exact.isEmpty() ? exact : !assignable.isEmpty() ? assignable
-            : !coercible.isEmpty() ? coercible : varArgs;
-        return mostSpecific(best, argumentTypes, elSpecific);
-    }
-
-    // the overload selection of the section 1.6, whose branches are rules ordered against each other
-    @SuppressWarnings("java:S3776")
-    private MethodMatch match(MethodElement method,
-                              List<ELNode> arguments,
-                              List<ClassElement> argumentTypes) {
-        ParameterElement[] parameters = method.getParameters();
-        int fixed = method.isVarArgs() ? parameters.length - 1 : parameters.length;
-        if (method.isVarArgs() ? arguments.size() < fixed : arguments.size() != fixed) {
-            return MethodMatch.NONE;
-        }
-        // the section 15.12.2 of the JLS, which the section 1.2.1.2 of the specification follows: an array assignable
-        // to the variable arity parameter is the array itself, applicable in the first phase, by subtyping
-        boolean directVarargsArray = method.isVarArgs() && arguments.size() == parameters.length
-            && !(arguments.get(parameters.length - 1) instanceof ELNode.Lambda)
-            && argumentTypes.get(parameters.length - 1) != null
-            && isArrayArgument(argumentTypes.get(parameters.length - 1), parameters[parameters.length - 1].getType());
-        MethodMatch result = MethodMatch.EXACT;
-        for (int i = 0; i < arguments.size(); i++) {
-            ClassElement argument = argumentTypes.get(i);
-            boolean directArray = directVarargsArray && i == fixed;
-            ClassElement parameter = directArray ? parameters[parameters.length - 1].getType()
-                : method.isVarArgs() && i >= fixed ? parameters[parameters.length - 1].getType().fromArray() : parameters[i].getType();
-            MethodMatch argumentMatch;
-            if (arguments.get(i) instanceof ELNode.Lambda) {
-                // a lambda expression is compiled to a functional interface, section 1.25.8, and is itself a
-                // LambdaExpression, the former being the direct form
-                if (functionalMethod(parameter) != null) {
-                    argumentMatch = MethodMatch.EXACT;
-                } else if (parameter.isAssignable(LambdaExpression.class) || parameter.getName().equals(Object.class.getName())) {
-                    argumentMatch = MethodMatch.ASSIGNABLE;
-                } else {
-                    return MethodMatch.NONE;
-                }
-            } else if (arguments.get(i) instanceof ELNode.NullLiteral) {
-                // a null is assignable to any parameter, a primitive one included, which the coercion of the
-                // section 1.23 turns into its default: the interpreter selects int over Object for it, as the
-                // reference implementations do, where Java would rule the primitive out
-                argumentMatch = MethodMatch.ASSIGNABLE;
-            } else if (directArray) {
-                argumentMatch = sameType(argument, parameter) ? MethodMatch.EXACT : MethodMatch.ASSIGNABLE;
-            } else {
-                if (argument == null) {
-                    return MethodMatch.NONE;
-                }
-                argumentMatch = sameType(argument, parameter) ? MethodMatch.EXACT
-                    : ELSpecificity.sameBoxedType(argument, parameter) || isAssignable(argument, parameter)
-                        ? MethodMatch.ASSIGNABLE
-                        : isCoercible(argument, parameter) || mayBeInstance(argument, parameter)
-                            ? MethodMatch.COERCIBLE : MethodMatch.NONE;
-            }
-            if (argumentMatch == MethodMatch.NONE) {
-                return MethodMatch.NONE;
-            }
-            if (argumentMatch == MethodMatch.COERCIBLE
-                || (argumentMatch == MethodMatch.ASSIGNABLE && result == MethodMatch.EXACT)) {
-                result = argumentMatch;
-            }
-        }
-        return method.isVarArgs() && !directVarargsArray ? MethodMatch.VARARGS : result;
-    }
-
-    /** Whether two types are the same, an array type being named after its component. */
-    private static boolean sameType(ClassElement first, ClassElement second) {
-        return first.getName().equals(second.getName()) && first.isArray() == second.isArray()
-            && first.getArrayDimensions() == second.getArrayDimensions();
-    }
-
-    /** Whether an argument is itself the array a variable arity parameter takes. */
-    private static boolean isArrayArgument(ClassElement argument, ClassElement arrayParameter) {
-        if (!argument.isArray() || argument.getArrayDimensions() != arrayParameter.getArrayDimensions()) {
-            return false;
-        }
-        ClassElement component = argument.fromArray();
-        ClassElement parameterComponent = arrayParameter.fromArray();
-        if (component.getName().equals(parameterComponent.getName())) {
-            return true;
-        }
-        // the array of a subtype is assignable to the array of its supertype, so it is the array the parameter takes,
-        // for every kind of invocation: an instance or a static method, a function and a constructor alike
-        return !component.isPrimitive() && !parameterComponent.isPrimitive()
-            && (component.isAssignable(parameterComponent) || jdkAssignable(component, parameterComponent));
-    }
-
-    private static boolean isAssignable(ClassElement argument, ClassElement parameter) {
-        return argument.isAssignable(parameter)
-            || parameter.getName().equals(Object.class.getName())
-            || (numericRank(argument) >= 0 && parameter.getName().equals(Number.class.getName()));
-    }
-
-    private static MethodSelection mostSpecific(List<MethodElement> candidates,
-                                                List<ClassElement> argumentTypes,
-                                                boolean elSpecific) {
-        if (candidates.isEmpty()) {
-            return new MethodSelection(null, false);
-        }
-        List<MethodElement> best = new ArrayList<>(1);
-        for (MethodElement candidate : candidates) {
-            boolean lessSpecific = false;
-            for (int i = best.size() - 1; i >= 0; i--) {
-                int comparison = ELSpecificity.compare(candidate, best.get(i), argumentTypes, elSpecific);
-                if (comparison > 0) {
-                    best.remove(i);
-                } else if (comparison < 0) {
-                    lessSpecific = true;
-                }
-            }
-            if (!lessSpecific && best.stream().noneMatch(method -> sameSignature(method, candidate))) {
-                best.add(candidate);
-            }
-        }
-        if (best.size() == 1) {
-            return new MethodSelection(best.get(0), false);
-        }
-        return new MethodSelection(null, true);
-    }
-
-    private static boolean sameSignature(MethodElement first, MethodElement second) {
-        ParameterElement[] firstParameters = first.getParameters();
-        ParameterElement[] secondParameters = second.getParameters();
-        if (firstParameters.length != secondParameters.length) {
-            return false;
-        }
-        for (int i = 0; i < firstParameters.length; i++) {
-            if (!firstParameters[i].getType().getName().equals(secondParameters[i].getType().getName())) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * @return The width of a numeric type, so that a wider parameter accepts a narrower argument, or -1
-     */
-    static int numericRank(ClassElement type) {
-        return switch (type.getName()) {
-            case "byte", ELTypeNames.JAVA_LANG_BYTE -> 0;
-            case "short", ELTypeNames.JAVA_LANG_SHORT -> 1;
-            case "int", ELTypeNames.JAVA_LANG_INTEGER -> 2;
-            case "long", ELTypeNames.JAVA_LANG_LONG -> 3;
-            case "float", ELTypeNames.JAVA_LANG_FLOAT -> 4;
-            case "double", ELTypeNames.JAVA_LANG_DOUBLE -> 5;
-            default -> -1;
-        };
-    }
-
     private static Class<?> integerLiteralType(String image) {
         try {
             Long.parseLong(image);
@@ -2259,7 +1909,7 @@ public final class ELCompiler {
     }
 
     @Nullable
-    private MethodElement selectConstructor(ClassElement type, Arguments compiledArguments) {
+    private MethodElement selectConstructor(ClassElement type, ELArguments compiledArguments) {
         List<ELNode> arguments = compiledArguments.nodes();
         List<MethodElement> candidates = new ArrayList<>();
         for (MethodElement constructor : type.getEnclosedElements(ElementQuery.CONSTRUCTORS)) {
@@ -2268,7 +1918,7 @@ public final class ELCompiler {
                 candidates.add(constructor);
             }
         }
-        return selectMethods(candidates, compiledArguments).method();
+        return select(candidates, compiledArguments).method();
     }
 
     private static ExpressionDef integerLiteral(String image) {
@@ -2287,25 +1937,18 @@ public final class ELCompiler {
         return ExpressionDef.constant(Double.valueOf(value));
     }
 
+    private ELArguments arguments(List<ELNode> arguments, ExpressionDef ctx) {
+        return new ELArguments(arguments, ctx, this::compileTyped);
+    }
+
+    private ELOverloadSelection.MethodSelection select(List<MethodElement> candidates, ELArguments compiledArguments) {
+        // the types are only read, and the arguments compiled, when there is a method to select
+        return overloads.select(candidates, compiledArguments.nodes(),
+            candidates.isEmpty() ? List.of() : compiledArguments.types());
+    }
+
     static Typed dynamic(ExpressionDef expression) {
         return new Typed(expression, null);
-    }
-
-    /**
-     * The result of selecting an overload, distinguishing no match from an ambiguous match.
-     *
-     * @param method    The uniquely selected method, or {@code null}
-     * @param ambiguous Whether multiple methods matched with the same score
-     */
-    private record MethodSelection(@Nullable MethodElement method, boolean ambiguous) {
-    }
-
-    private enum MethodMatch {
-        EXACT,
-        ASSIGNABLE,
-        COERCIBLE,
-        VARARGS,
-        NONE
     }
 
     /**
