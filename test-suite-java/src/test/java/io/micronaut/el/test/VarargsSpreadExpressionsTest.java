@@ -26,11 +26,6 @@ class VarargsSpreadExpressionsTest {
     }
 
     @Test
-    void aStaticMethodOfTheJdkSpreadsTheArray() {
-        assertEquals("a-b", value(STATIC_FORMAT));
-    }
-
-    @Test
     void anInstanceMethodSpreadsTheArray() {
         assertEquals("2:java.lang.String", value(INSTANCE_SUBTYPE_ARRAY));
         assertEquals("a-b", value(INSTANCE_JOIN));
@@ -43,14 +38,8 @@ class VarargsSpreadExpressionsTest {
     }
 
     @Test
-    void aFunctionSpreadsTheArray() {
-        assertEquals("2:java.lang.String", value(FUNCTION));
+    void aStaticallyImportedMethodSpreadsTheArray() {
         assertEquals("2:java.lang.String", value(STATIC_IMPORT));
-    }
-
-    @Test
-    void aConstructorSpreadsTheArray() {
-        assertEquals("2:java.lang.String", value(CONSTRUCTOR));
     }
 
     @Test

@@ -2,7 +2,6 @@ package io.micronaut.el.test;
 
 import io.micronaut.el.annotation.ELEnvironment;
 import io.micronaut.el.annotation.ELExpression;
-import io.micronaut.el.annotation.ELFunctions;
 import io.micronaut.el.annotation.ELVariable;
 
 /**
@@ -11,6 +10,10 @@ import io.micronaut.el.annotation.ELVariable;
  * 15.12.2 of the JLS, where such an invocation is applicable in the first phase. Every kind of invocation spreads
  * it alike. The interpreted counterparts, with the same text and results, are in
  * {@code io.micronaut.el.interpreter.VarargsSpreadInterpretedTest}.
+ *
+ * <p>Unlike {@code RuntimeVarargsSpreadExpressions}, whose receivers are undeclared and resolved at runtime, the
+ * receiver here is declared, so the compiler selects the instance and static methods statically; the JDK static
+ * method, the function and the constructor that both would share are only in {@code RuntimeVarargsSpreadExpressions}.</p>
  */
 @ELEnvironment(
     variables = {
@@ -19,23 +22,17 @@ import io.micronaut.el.annotation.ELVariable;
         @ELVariable(name = "objects", type = Object[].class),
         @ELVariable(name = "numbers", type = int[].class)
     },
-    imports = {VarargsSpreadBean.class, VarargsSpreadTally.class},
-    staticImports = VarargsSpreadFunctions.class,
-    functions = @ELFunctions(value = VarargsSpreadFunctions.class, prefix = "vs")
+    imports = VarargsSpreadBean.class,
+    staticImports = VarargsSpreadFunctions.class
 )
-// a static method of the JDK
-@ELExpression(value = "${String.format('%s-%s', strings)}", expectedType = Object.class, name = "staticFormat")
 // an instance method, alone and after a fixed parameter
 @ELExpression(value = "${bean.argumentType(strings)}", expectedType = Object.class, name = "instanceSubtypeArray")
 @ELExpression(value = "${bean.join('-', strings)}", expectedType = Object.class, name = "instanceJoin")
 // a static method, through its class and through an instance
 @ELExpression(value = "${VarargsSpreadBean.staticCount(strings)}", expectedType = Object.class, name = "staticThroughClass")
 @ELExpression(value = "${bean.staticCount(strings)}", expectedType = Object.class, name = "staticThroughInstance")
-// a function, and the same method statically imported
-@ELExpression(value = "${vs:count(strings)}", expectedType = Object.class, name = "function")
+// a statically imported method
 @ELExpression(value = "${count(strings)}", expectedType = Object.class, name = "staticImport")
-// a constructor
-@ELExpression(value = "${VarargsSpreadTally(strings).summary}", expectedType = Object.class, name = "constructor")
 // an array of the very type of the parameter, and one of a primitive component, which is not assignable to Object[]
 @ELExpression(value = "${bean.argumentType(objects)}", expectedType = Object.class, name = "sameTypeArray")
 @ELExpression(value = "${bean.argumentType(numbers)}", expectedType = Object.class, name = "primitiveArray")
