@@ -31,7 +31,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * The interpreted counterparts of {@code io.micronaut.el.test.VarargsSpreadExpressions}, with the same text and
  * the same results: an array passed as the single argument of a variable arity parameter {@code T...}, to which it
  * is assignable, is the array of the parameter, not its one element, section 1.2.1.2 of the specification
- * following section 15.12.2 of the JLS, whatever the kind of invocation.
+ * following section 15.12.2 of the JLS, whatever the kind of invocation. The JDK static method, the function and
+ * the constructor are in {@code RuntimeVarargsSpreadTest}.
  */
 class VarargsSpreadInterpretedTest {
 
@@ -39,15 +40,13 @@ class VarargsSpreadInterpretedTest {
     private final ELProcessor processor = new ELProcessor();
 
     @BeforeEach
-    void setUp() throws NoSuchMethodException {
+    void setUp() {
         processor.defineBean("bean", new VarargsSpreadBean());
         processor.defineBean("strings", new String[]{"a", "b"});
         processor.defineBean("objects", new Object[]{"a", "b"});
         processor.defineBean("numbers", new int[]{1, 2});
         processor.getELManager().importClass(VarargsSpreadBean.class.getName());
-        processor.getELManager().importClass(VarargsSpreadTally.class.getName());
         processor.getELManager().importStatic(VarargsSpreadFunctions.class.getName() + ".count");
-        processor.defineFunction("vs", "count", VarargsSpreadFunctions.class.getMethod("count", Object[].class));
         // the sandbox is a policy of the interpreted path, not a semantic difference, and this compares semantics
         processor.getELManager().getELContext().putContext(ELSandbox.class, ELSandbox.UNRESTRICTED);
     }
@@ -55,11 +54,6 @@ class VarargsSpreadInterpretedTest {
     private Object value(String expression) {
         ELContext context = processor.getELManager().getELContext();
         return factory.createValueExpression(context, expression, Object.class).getValue(context);
-    }
-
-    @Test
-    void aStaticMethodOfTheJdkSpreadsTheArray() {
-        assertEquals("a-b", value("${String.format('%s-%s', strings)}"));
     }
 
     @Test
@@ -75,14 +69,8 @@ class VarargsSpreadInterpretedTest {
     }
 
     @Test
-    void aFunctionSpreadsTheArray() {
-        assertEquals("2:java.lang.String", value("${vs:count(strings)}"));
+    void aStaticallyImportedMethodSpreadsTheArray() {
         assertEquals("2:java.lang.String", value("${count(strings)}"));
-    }
-
-    @Test
-    void aConstructorSpreadsTheArray() {
-        assertEquals("2:java.lang.String", value("${VarargsSpreadTally(strings).summary}"));
     }
 
     @Test
