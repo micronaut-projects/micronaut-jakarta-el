@@ -400,8 +400,8 @@ public final class ELCompiler {
             case ELNode.LiteralText literal -> new Typed(ExpressionDef.constant(literal.text()), ClassElement.of(String.class));
             case ELNode.NullLiteral ignored -> dynamic(ExpressionDef.nullValue());
             case ELNode.BooleanLiteral literal -> new Typed(ExpressionDef.constant(Boolean.valueOf(literal.value())), ClassElement.of(Boolean.class));
-            case ELNode.IntegerLiteral literal -> new Typed(integerLiteral(literal.image()), ClassElement.of(integerLiteralType(literal.image())));
-            case ELNode.FloatingPointLiteral literal -> new Typed(floatingPointLiteral(literal.image()), ClassElement.of(floatingPointLiteralType(literal.image())));
+            case ELNode.IntegerLiteral literal -> new Typed(ELLiterals.integerLiteral(literal.image()), ClassElement.of(ELLiterals.integerLiteralType(literal.image())));
+            case ELNode.FloatingPointLiteral literal -> new Typed(ELLiterals.floatingPointLiteral(literal.image()), ClassElement.of(ELLiterals.floatingPointLiteralType(literal.image())));
             case ELNode.StringLiteral literal -> new Typed(ExpressionDef.constant(literal.value()), ClassElement.of(String.class));
             case ELNode.Identifier identifier -> compileIdentifier(identifier, ctx);
             case ELNode.Property property -> compileProperty(property, ctx);
@@ -1321,11 +1321,28 @@ public final class ELCompiler {
                 .map(parameter -> (ExpressionDef) ExpressionDef.constant(parameter))
                 .toList()));
             arguments.add(body);
-            return runtime(EL_LAMBDAS, "lambda", LAMBDA_EXPRESSION, arguments);
+            return closingOver(lambda, runtime(EL_LAMBDAS, "lambda", LAMBDA_EXPRESSION, arguments));
         }
         parameters.forEach(parameter -> arguments.add(ExpressionDef.constant(parameter)));
         arguments.add(body);
-        return runtime(EL_LAMBDAS, "lambda" + arity, LAMBDA_EXPRESSION, arguments);
+        return closingOver(lambda, runtime(EL_LAMBDAS, "lambda" + arity, LAMBDA_EXPRESSION, arguments));
+    }
+
+    /**
+     * Closes the lambda expression over the variables its free identifiers name when it is created: the runtime
+     * snapshots a variable mapper of its own whole, while any other one, such as the mapper of a
+     * {@code StandardELContext}, cannot list what it holds and is asked for these names, as the interpreter does.
+     * The parameters of an enclosing lambda expression are arguments, not variables, and are left out.
+     */
+    private ExpressionDef closingOver(ELNode.Lambda lambda, ExpressionDef created) {
+        List<ExpressionDef> names = io.micronaut.el.parser.ELIdentifiers.free(lambda).stream()
+            .filter(name -> !context.isLambdaParameter(name))
+            .map(name -> (ExpressionDef) ExpressionDef.constant(name))
+            .toList();
+        if (names.isEmpty()) {
+            return created;
+        }
+        return runtime(EL_LAMBDAS, "closingOver", LAMBDA_EXPRESSION, created, STRING.array().instantiate(names));
     }
 
     /**
@@ -1668,7 +1685,7 @@ public final class ELCompiler {
             // the coercion to Object is the identity
             return value;
         }
-        ExpressionDef literal = coerceLiteral(value, target);
+        ExpressionDef literal = ELLiterals.coerceLiteral(value, target);
         if (literal != null) {
             return literal;
         }
@@ -1680,44 +1697,6 @@ public final class ELCompiler {
             targetType,
             ctx, value, ExpressionDef.constant(targetType)
         );
-    }
-
-    /**
-     * Coerces a literal to a type at compilation time, as described in the section 1.23 of the specification:
-     * a number to a numeric type, a string to a string, a boolean to a boolean.
-     *
-     * @return The coerced literal, or {@code null} when the value is not a literal the compiler coerces
-     */
-    @Nullable
-    private static ExpressionDef coerceLiteral(ExpressionDef value, ClassElement target) {
-        if (!(value instanceof ExpressionDef.Constant constant) || constant.value() == null) {
-            return null;
-        }
-        Object literal = constant.value();
-        String name = target.getName();
-        if (literal instanceof String && name.equals(String.class.getName())
-            || literal instanceof Boolean && (name.equals("boolean") || name.equals(Boolean.class.getName()))) {
-            return value;
-        }
-        if (literal instanceof Long || literal instanceof Double) {
-            Number number = (Number) literal;
-            return switch (name) {
-                case "byte" -> ExpressionDef.primitiveConstant(number.byteValue());
-                case "short" -> ExpressionDef.primitiveConstant(number.shortValue());
-                case "int" -> ExpressionDef.constant(number.intValue());
-                case "long" -> ExpressionDef.constant(number.longValue());
-                case "float" -> ExpressionDef.constant(number.floatValue());
-                case "double" -> ExpressionDef.constant(number.doubleValue());
-                case ELTypeNames.JAVA_LANG_BYTE -> ExpressionDef.constant(Byte.valueOf(number.byteValue()));
-                case ELTypeNames.JAVA_LANG_SHORT -> ExpressionDef.constant(Short.valueOf(number.shortValue()));
-                case ELTypeNames.JAVA_LANG_INTEGER -> ExpressionDef.constant(Integer.valueOf(number.intValue()));
-                case ELTypeNames.JAVA_LANG_LONG -> ExpressionDef.constant(Long.valueOf(number.longValue()));
-                case ELTypeNames.JAVA_LANG_FLOAT -> ExpressionDef.constant(Float.valueOf(number.floatValue()));
-                case ELTypeNames.JAVA_LANG_DOUBLE -> ExpressionDef.constant(Double.valueOf(number.doubleValue()));
-                default -> null;
-            };
-        }
-        return null;
     }
 
     /**
@@ -1895,19 +1874,6 @@ public final class ELCompiler {
         return false;
     }
 
-    private static Class<?> integerLiteralType(String image) {
-        try {
-            Long.parseLong(image);
-            return Long.class;
-        } catch (NumberFormatException e) {
-            return BigInteger.class;
-        }
-    }
-
-    private static Class<?> floatingPointLiteralType(String image) {
-        return Double.isInfinite(Double.parseDouble(image)) ? BigDecimal.class : Double.class;
-    }
-
     @Nullable
     private MethodElement selectConstructor(ClassElement type, ELArguments compiledArguments) {
         List<ELNode> arguments = compiledArguments.nodes();
@@ -1919,22 +1885,6 @@ public final class ELCompiler {
             }
         }
         return select(candidates, compiledArguments).method();
-    }
-
-    private static ExpressionDef integerLiteral(String image) {
-        try {
-            return ExpressionDef.constant(Long.valueOf(image));
-        } catch (NumberFormatException e) {
-            return ClassTypeDef.of(BigInteger.class).instantiate(ExpressionDef.constant(image));
-        }
-    }
-
-    private static ExpressionDef floatingPointLiteral(String image) {
-        double value = Double.parseDouble(image);
-        if (Double.isInfinite(value)) {
-            return ClassTypeDef.of(BigDecimal.class).instantiate(ExpressionDef.constant(image));
-        }
-        return ExpressionDef.constant(Double.valueOf(value));
     }
 
     private ELArguments arguments(List<ELNode> arguments, ExpressionDef ctx) {

@@ -133,6 +133,31 @@ public final class ELLambdaInvocation {
     }
 
     /**
+     * The variables a lambda expression closes over, given the names of its free identifiers: a mapper this
+     * runtime can list is snapshotted as by {@link #snapshot(VariableMapper)}, any other one, such as the mapper of
+     * a {@code StandardELContext}, is asked for those names now, as the interpreter does.
+     *
+     * @param mapper    The variable mapper of the context creating the lambda expression, can be {@code null}
+     * @param freeNames The identifiers of the body of the lambda expression that are not its parameters
+     * @return The snapshot, or {@code null} when the mapper is {@code null}
+     */
+    @Nullable
+    public static VariableMapper snapshot(@Nullable VariableMapper mapper, String[] freeNames) {
+        VariableMapper snapshot = snapshot(mapper);
+        if (snapshot != mapper || mapper == null || freeNames.length == 0) {
+            return snapshot;
+        }
+        MapVariableMapper resolved = new MapVariableMapper();
+        for (String name : freeNames) {
+            ValueExpression variable = mapper.resolveVariable(name);
+            if (variable != null) {
+                resolved.setVariable(name, variable);
+            }
+        }
+        return resolved.snapshot();
+    }
+
+    /**
      * Whether a {@link #snapshot} still holds what the mapper holds, so that a lambda expression invoked with a
      * context whose mapper it is reads the same variables through that context as through the snapshot.
      *

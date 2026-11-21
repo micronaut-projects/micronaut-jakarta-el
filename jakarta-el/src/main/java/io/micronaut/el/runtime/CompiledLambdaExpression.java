@@ -48,7 +48,7 @@ public final class CompiledLambdaExpression extends LambdaExpression {
      * reads wherever it is invoked.
      */
     @Nullable
-    private final VariableMapper captured;
+    private VariableMapper captured;
 
     /**
      * @param context    The context the lambda expression is created in
@@ -62,6 +62,19 @@ public final class CompiledLambdaExpression extends LambdaExpression {
         this.context = context;
         this.captured = ELLambdaInvocation.snapshot(context.getVariableMapper());
         super.setELContext(context);
+    }
+
+    /**
+     * Closes over the free identifiers of the body, resolved in the variable mapper of the creation context,
+     * which a mapper this runtime cannot list needs: called right after the lambda expression is created.
+     *
+     * @param freeNames The identifiers of the body that are not parameters of a lambda expression
+     */
+    void closeOver(String[] freeNames) {
+        ELContext creation = context;
+        if (creation != null) {
+            captured = ELLambdaInvocation.snapshot(creation.getVariableMapper(), freeNames);
+        }
     }
 
     @Override

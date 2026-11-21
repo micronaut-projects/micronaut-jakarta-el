@@ -25,6 +25,7 @@ import jakarta.el.ELException;
 import jakarta.el.ExpressionFactory;
 import jakarta.el.LambdaExpression;
 import jakarta.el.MethodNotFoundException;
+import jakarta.el.StandardELContext;
 import jakarta.inject.Singleton;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -216,6 +217,24 @@ class RuntimeRegressionExpressionsTest {
         CompiledELContext creation = new CompiledELContext();
         creation.getVariableMapper().setVariable("s", factory.createValueExpression("str", String.class));
         CompiledELContext other = new CompiledELContext();
+
+        LambdaExpression lambda =
+            (LambdaExpression) RuntimeRegressionExpressions$ELExpressions.ESCAPING_LAMBDA.getValue(creation);
+        creation.getVariableMapper().setVariable("s", factory.createValueExpression("changed", String.class));
+
+        assertEquals("str2", lambda.invoke(other, 2L));
+        assertEquals("str2", lambda.invoke(creation, 2L));
+    }
+
+    @Test
+    void anEscapingLambdaCreatedWithAForeignVariableMapperKeepsItsCreationTimeVariables() {
+        // the variable mapper of a StandardELContext cannot list what it holds: the processor names the free
+        // identifiers of the lambda expression, which the runtime resolves when the lambda expression is created
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        StandardELContext creation = new StandardELContext(factory);
+        creation.getVariableMapper().setVariable("s", factory.createValueExpression("str", String.class));
+        StandardELContext other = new StandardELContext(factory);
+        other.getVariableMapper().setVariable("s", factory.createValueExpression("other", String.class));
 
         LambdaExpression lambda =
             (LambdaExpression) RuntimeRegressionExpressions$ELExpressions.ESCAPING_LAMBDA.getValue(creation);
