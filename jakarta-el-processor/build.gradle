@@ -10,6 +10,10 @@ noReflection {
 dependencies {
     api mn.micronaut.core.processor
     compileOnly mn.micronaut.inject.java
+    // read only while the Kotlin processor runs, where they are on the classpath of KSP
+    compileOnly mn.micronaut.inject.kotlin
+    compileOnly libs.ksp.api
+    compileOnly mn.kotlin.stdlib
     api mnSourcegen.micronaut.sourcegen.generator
     api projects.micronautJakartaEl
     api projects.micronautJakartaElParser

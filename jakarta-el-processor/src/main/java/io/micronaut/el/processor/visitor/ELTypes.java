@@ -175,9 +175,11 @@ public final class ELTypes {
      * The class literals a {@code Class[]} member of a repeatable annotation names, read from the Java
      * mirrors, which is the only place a primitive one survives: the neutral metadata drops it.
      *
-     * <p>Nothing is recovered for a class the Groovy or the Kotlin processor compiles, so the annotation has
-     * to name the wrapper type there. Reaching the helper at all would load a type of the Java processor,
-     * which those compilers do not have on the classpath, so the language is checked first.</p>
+     * <p>For a class the Kotlin processor compiles, the metadata names the wrapper of a primitive literal, and
+     * the primitive is read from the KSP model instead. Nothing is recovered for a class the Groovy processor
+     * compiles, so the annotation has to name the wrapper type there. Reaching a helper at all would load types
+     * of the processor of another language, which the compiler does not have on its classpath, so the language
+     * is checked first.</p>
      *
      * @param nativeType          The native element carrying the annotation
      * @param annotationName      The name of the annotation
@@ -199,6 +201,16 @@ public final class ELTypes {
                                                          String member,
                                                          List<ClassElement> recovered,
                                                          VisitorContext context) {
+        if (context.getLanguage() == VisitorContext.Language.KOTLIN) {
+            // the metadata keeps every literal of a Kotlin source, a primitive as its wrapper: the KSP model
+            // tells Int::class from Integer::class
+            List<List<ClassElement>> declarations = KotlinAnnotationTypes.resolveRepeatableMemberTypes(nativeType,
+                annotationName, discriminatorMembers, discriminatorValue, nameMember, nameValue, member, recovered);
+            if (declarations.isEmpty() || declarations.stream().map(ELTypes::names).distinct().count() != 1) {
+                return recovered;
+            }
+            return declarations.get(0);
+        }
         if (context.getLanguage() != VisitorContext.Language.JAVA) {
             return recovered;
         }

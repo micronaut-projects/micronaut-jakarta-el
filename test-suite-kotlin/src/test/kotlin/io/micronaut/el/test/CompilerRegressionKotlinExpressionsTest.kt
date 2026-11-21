@@ -32,4 +32,17 @@ class CompilerRegressionKotlinExpressionsTest {
             arrayOf<Class<*>>(Int::class.javaPrimitiveType!!, String::class.java))
         assertEquals("int:--", mixed.invoke(context, arrayOf<Any>(2, "-")))
     }
+
+    @Test
+    fun `a primitive class literal selects the primitive overload over the wrapper one`() {
+        // the registry would also answer a request for Integer, so the overload invoked is what tells
+        // int.class from Integer.class: the wrapper overload is the one Integer selects
+        val single = factory.createMethodExpression(context, "\${text.which}", String::class.java,
+            arrayOf<Class<*>>(Int::class.javaPrimitiveType!!))
+        assertEquals("int:2", single.invoke(context, arrayOf<Any>(2)))
+        val several = factory.createMethodExpression(context, "\${text.whichLong}", String::class.java,
+            arrayOf<Class<*>>(Long::class.javaPrimitiveType!!, Boolean::class.javaPrimitiveType!!,
+                Double::class.javaPrimitiveType!!))
+        assertEquals("primitives:1:true:0.5", several.invoke(context, arrayOf<Any>(1L, true, 0.5)))
+    }
 }

@@ -220,6 +220,13 @@ class CompilerRegressionInterpretedTest {
         MethodExpression mixed = factory.createMethodExpression(context, "${text.pad}", String.class,
             new Class<?>[]{int.class, String.class});
         assertEquals("int:--", mixed.invoke(context, new Object[]{2, "-"}));
+        // the Kotlin Int::class is int.class: the primitive overload, not the wrapper one
+        MethodExpression which = factory.createMethodExpression(context, "${text.which}", String.class,
+            new Class<?>[]{int.class});
+        assertEquals("int:2", which.invoke(context, new Object[]{2}));
+        MethodExpression whichLong = factory.createMethodExpression(context, "${text.whichLong}", String.class,
+            new Class<?>[]{long.class, boolean.class, double.class});
+        assertEquals("primitives:1:true:0.5", whichLong.invoke(context, new Object[]{1L, true, 0.5}));
     }
 
     /**
@@ -267,6 +274,22 @@ class CompilerRegressionInterpretedTest {
 
         public String pad(long width, String fill) {
             return "long:" + fill.repeat((int) width);
+        }
+
+        public String which(int value) {
+            return "int:" + value;
+        }
+
+        public String which(Integer value) {
+            return "Integer:" + value;
+        }
+
+        public String whichLong(long value, boolean flag, double ratio) {
+            return "primitives:" + value + ":" + flag + ":" + ratio;
+        }
+
+        public String whichLong(Long value, Boolean flag, Double ratio) {
+            return "wrappers:" + value + ":" + flag + ":" + ratio;
         }
     }
 }
