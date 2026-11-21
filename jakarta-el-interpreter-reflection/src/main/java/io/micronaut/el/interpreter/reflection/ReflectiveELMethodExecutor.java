@@ -20,7 +20,6 @@ import io.micronaut.core.order.Ordered;
 import io.micronaut.core.type.Argument;
 import io.micronaut.el.ELMethod;
 import io.micronaut.el.ELMethodExecutor;
-import io.micronaut.el.runtime.ELSupport;
 import io.micronaut.el.runtime.ELMethods;
 import jakarta.el.ELClass;
 import jakarta.el.ELContext;
@@ -29,7 +28,6 @@ import jakarta.el.FunctionMapper;
 import jakarta.el.MethodNotFoundException;
 import org.jspecify.annotations.Nullable;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -81,11 +79,11 @@ public final class ReflectiveELMethodExecutor implements ELMethodExecutor {
             }
             Method resolved = ReflectiveELMethods.findMethodOrNull(elClass.getKlass(), name,
                 argumentTypes == null ? null : Argument.toClassArray(argumentTypes), arguments, true);
-            return resolved == null ? null : new ReflectiveMethod(ReflectiveELMethods.accessible(resolved), true, false);
+            return resolved == null ? null : new ReflectiveMethod(ReflectiveELMethods.accessible(resolved), true);
         }
         Method resolved = ReflectiveELMethods.findMethodOrNull(base.getClass(), name,
             argumentTypes == null ? null : Argument.toClassArray(argumentTypes), arguments, false);
-        return resolved == null ? null : new ReflectiveMethod(ReflectiveELMethods.accessible(resolved), false, false);
+        return resolved == null ? null : new ReflectiveMethod(ReflectiveELMethods.accessible(resolved), false);
     }
 
     @Override
@@ -99,7 +97,7 @@ public final class ReflectiveELMethodExecutor implements ELMethodExecutor {
         if (method == null) {
             return null;
         }
-        return new ReflectiveMethod(ReflectiveELMethods.accessible(method), Modifier.isStatic(method.getModifiers()), true);
+        return new ReflectiveMethod(ReflectiveELMethods.accessible(method), Modifier.isStatic(method.getModifiers()));
     }
 
     @Nullable
@@ -124,51 +122,19 @@ public final class ReflectiveELMethodExecutor implements ELMethodExecutor {
         }
     }
 
-    private static boolean sameTypes(Class<?>[] declared, Argument<?>[] provided) {
-        if (declared.length != provided.length) {
-            return false;
-        }
-        for (int i = 0; i < declared.length; i++) {
-            if (wrap(declared[i]) != provided[i].getWrapperType()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private static Class<?> wrap(Class<?> type) {
-        if (!type.isPrimitive()) {
-            return type;
-        }
-        return switch (type.getName()) {
-            case "boolean" -> Boolean.class;
-            case "byte" -> Byte.class;
-            case "short" -> Short.class;
-            case "int" -> Integer.class;
-            case "long" -> Long.class;
-            case "char" -> Character.class;
-            case "float" -> Float.class;
-            case "double" -> Double.class;
-            case "void" -> Void.class;
-            default -> type;
-        };
-    }
-
     private static final class ReflectiveMethod implements ELMethod {
         private final Class<?> owner;
         private final String name;
         private final Class<?>[] parameterTypes;
         private final boolean staticMethod;
-        private final boolean directArrayVarargs;
         private transient @Nullable Method method;
 
-        private ReflectiveMethod(Method method, boolean staticMethod, boolean directArrayVarargs) {
+        private ReflectiveMethod(Method method, boolean staticMethod) {
             Method accessible = accessible(method);
             this.owner = accessible.getDeclaringClass();
             this.name = accessible.getName();
             this.parameterTypes = accessible.getParameterTypes().clone();
             this.staticMethod = staticMethod;
-            this.directArrayVarargs = directArrayVarargs;
             this.method = accessible;
         }
 
@@ -201,9 +167,7 @@ public final class ReflectiveELMethodExecutor implements ELMethodExecutor {
         @Nullable
         public Object invoke(ELContext context, @Nullable Object base, Object @Nullable [] arguments) {
             Method resolved = method();
-            return directArrayVarargs
-                ? invokeFunction(context, resolved, staticMethod ? null : base, arguments)
-                : ReflectiveELMethods.invoke(context, resolved, staticMethod ? null : base, arguments);
+            return ReflectiveELMethods.invoke(context, resolved, staticMethod ? null : base, arguments);
         }
 
         @Override
@@ -230,46 +194,6 @@ public final class ReflectiveELMethodExecutor implements ELMethodExecutor {
                 accessible.trySetAccessible();
             }
             return accessible;
-        }
-
-        @Nullable
-        private static Object invokeFunction(ELContext context,
-                                              Method method,
-                                              @Nullable Object base,
-                                              Object @Nullable [] values) {
-            if (!method.isVarArgs()) {
-                return ReflectiveELMethods.invoke(context, method, base, values);
-            }
-            Class<?>[] parameterTypes = method.getParameterTypes();
-            Object[] arguments = values == null ? new Object[0] : values;
-            int fixed = parameterTypes.length - 1;
-            if (arguments.length < fixed) {
-                throw new IllegalArgumentException("The method '" + method.getName() + "' expects at least "
-                    + fixed + " argument(s) but " + arguments.length + " were provided");
-            }
-            Object[] parameters = new Object[parameterTypes.length];
-            for (int i = 0; i < fixed; i++) {
-                parameters[i] = ELSupport.coerceToType(context, arguments[i], parameterTypes[i]);
-            }
-            if (arguments.length == parameterTypes.length && arguments[fixed] != null
-                && parameterTypes[fixed].isInstance(arguments[fixed])) {
-                parameters[fixed] = arguments[fixed];
-            } else {
-                Class<?> componentType = parameterTypes[fixed].getComponentType();
-                Object varargs = Array.newInstance(componentType, arguments.length - fixed);
-                for (int i = fixed; i < arguments.length; i++) {
-                    Array.set(varargs, i - fixed, ELSupport.coerceToType(context, arguments[i], componentType));
-                }
-                parameters[fixed] = varargs;
-            }
-            try {
-                return method.invoke(base, parameters);
-            } catch (IllegalAccessException | IllegalArgumentException e) {
-                throw new ELException(e);
-            } catch (InvocationTargetException e) {
-                Throwable cause = e.getCause();
-                throw cause instanceof ELException elException ? elException : new ELException(cause);
-            }
         }
     }
 
@@ -308,9 +232,6 @@ public final class ReflectiveELMethodExecutor implements ELMethodExecutor {
 
         @Override
         @Nullable
-        // the arity check, the packing of the variable arity arguments and the coercion of each are one
-        // invocation, and splitting them would hide what the constructor is handed
-        @SuppressWarnings("java:S3776")
         public Object invoke(ELContext context, @Nullable Object base, Object @Nullable [] arguments) {
             Object[] values = arguments == null ? new Object[0] : arguments;
             int fixed = varArgs ? parameterTypes.length - 1 : parameterTypes.length;
@@ -318,24 +239,9 @@ public final class ReflectiveELMethodExecutor implements ELMethodExecutor {
                 throw new IllegalArgumentException("The constructor of '" + owner.getName() + "' expects "
                     + (varArgs ? "at least " + fixed : fixed) + " argument(s) but " + values.length + " were provided");
             }
-            Object[] parameters = new Object[parameterTypes.length];
-            for (int i = 0; i < fixed; i++) {
-                parameters[i] = io.micronaut.el.runtime.ELSupport.coerceToType(context, values[i], parameterTypes[i]);
-            }
-            if (varArgs) {
-                if (values.length == parameterTypes.length && values[fixed] != null
-                    && parameterTypes[fixed].isInstance(values[fixed])) {
-                    parameters[fixed] = values[fixed];
-                } else {
-                    Class<?> componentType = parameterTypes[fixed].getComponentType();
-                    Object varargs = java.lang.reflect.Array.newInstance(componentType, values.length - fixed);
-                    for (int i = fixed; i < values.length; i++) {
-                        io.micronaut.el.runtime.ELArray.set(varargs, i - fixed,
-                            io.micronaut.el.runtime.ELSupport.coerceToType(context, values[i], componentType));
-                    }
-                    parameters[fixed] = varargs;
-                }
-            }
+            // the coercion and the packing of the variable arity arguments every other invocation uses, which
+            // passes a single array assignable to the variable arity parameter as that array
+            Object[] parameters = ELMethods.coerceArguments(context, CONSTRUCTOR, parameterTypes, varArgs, values);
             try {
                 return constructor().newInstance(parameters);
             } catch (InstantiationException | IllegalAccessException | IllegalArgumentException e) {

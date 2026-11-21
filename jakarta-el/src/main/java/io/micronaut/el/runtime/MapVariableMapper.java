@@ -20,6 +20,7 @@ import jakarta.el.ValueExpression;
 import jakarta.el.VariableMapper;
 import org.jspecify.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,7 +34,11 @@ import java.util.Map;
 @Experimental
 public final class MapVariableMapper extends VariableMapper {
 
-    private final Map<String, ValueExpression> variables = new HashMap<>();
+    /**
+     * The variables, replaced rather than modified by {@link #setVariable}: a {@link #snapshot()} keeps the map it
+     * was taken from, which no later binding changes, and a reader never sees a map being modified.
+     */
+    private volatile Map<String, ValueExpression> variables = Map.of();
 
     /**
      * @return Whether the mapper holds no variable
@@ -50,10 +55,53 @@ public final class MapVariableMapper extends VariableMapper {
 
     @Override
     @Nullable
-    public ValueExpression setVariable(String variable, @Nullable ValueExpression expression) {
-        if (expression == null) {
-            return variables.remove(variable);
+    public synchronized ValueExpression setVariable(String variable, @Nullable ValueExpression expression) {
+        Map<String, ValueExpression> copy = new HashMap<>(variables);
+        ValueExpression previous = expression == null ? copy.remove(variable) : copy.put(variable, expression);
+        variables = Collections.unmodifiableMap(copy);
+        return previous;
+    }
+
+    /**
+     * The variables this mapper holds now, which the bindings it is given later do not change: what a lambda
+     * expression closes over when it is created, section 1.20 of the specification.
+     *
+     * @return A read-only mapper of the current variables
+     */
+    public VariableMapper snapshot() {
+        return new Snapshot(variables);
+    }
+
+    /**
+     * Whether a snapshot taken of this mapper still holds what the mapper holds.
+     *
+     * @param snapshot The snapshot
+     * @return Whether no variable was bound since the snapshot was taken
+     */
+    boolean isCurrent(VariableMapper snapshot) {
+        return snapshot instanceof Snapshot taken && taken.variables == variables;
+    }
+
+    /**
+     * The variables a mapper held when the snapshot was taken.
+     */
+    private static final class Snapshot extends VariableMapper {
+
+        private final Map<String, ValueExpression> variables;
+
+        private Snapshot(Map<String, ValueExpression> variables) {
+            this.variables = variables;
         }
-        return variables.put(variable, expression);
+
+        @Override
+        @Nullable
+        public ValueExpression resolveVariable(String variable) {
+            return variables.get(variable);
+        }
+
+        @Override
+        public ValueExpression setVariable(String variable, @Nullable ValueExpression expression) {
+            throw new UnsupportedOperationException("The variables a lambda expression closed over are read-only");
+        }
     }
 }

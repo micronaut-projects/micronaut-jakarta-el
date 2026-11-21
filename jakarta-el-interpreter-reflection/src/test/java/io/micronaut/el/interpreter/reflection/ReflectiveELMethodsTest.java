@@ -74,8 +74,10 @@ class ReflectiveELMethodsTest {
         assertEquals("2", invoke("join", "a", "b"));
         assertEquals("0", invoke("join"));
         assertEquals("2", invoke("join", (Object) new Object[]{"a", "b"}));
-        // an array whose type is not the declared one is one of the packed arguments, not the array itself
-        assertEquals("1", invoke("join", (Object) new String[]{"a", "b"}));
+        // an array of a subtype is assignable to the declared array, so it is the array itself (JLS 15.12.2, phase 1)
+        assertEquals("2", invoke("join", (Object) new String[]{"a", "b"}));
+        // an array that is not assignable to the declared one is one of the packed arguments
+        assertEquals("1", invoke("join", (Object) new int[]{1, 2}));
     }
 
     @Test

@@ -114,6 +114,43 @@ final class InterpreterRegressionDifferentialTest {
             assertEquals("str2", lambda.invoke(new StandardELContext(factory), 2), name);
             context.getVariableMapper().setVariable("s", factory.createValueExpression("changed", String.class));
             assertEquals("str2", lambda.invoke(context, 2), name);
+            // a binding made after the lambda expression was created is not seen from any other context either
+            assertEquals("str2", lambda.invoke(new StandardELContext(factory), 2), name);
+        }
+    }
+
+    /**
+     * The one deliberate deviation from both references in method selection. The section 1.2.1.2 of the
+     * specification selects a method as the section 15.12.2 of the Java Language Specification does, whose first
+     * phase applies {@code argumentType(Object...)} to a {@code String[]} by subtyping, without a variable arity
+     * invocation: the array is the variable arity array, and Java answers {@code 2:java.lang.String}. Expressly and
+     * Tomcat only pass an array of exactly the parameter type through and wrap a {@code String[]} as the single
+     * element. An array of exactly the parameter type, and an array that is not assignable to it, are answered the
+     * same way by all three.
+     */
+    @Test
+    void aSingleArrayAssignableToTheVariableArityParameterIsTheVariableArityArray() {
+        for (ExpressionFactory factory : FACTORIES) {
+            ELContext context = context(factory);
+            String name = factory.getClass().getName();
+            context.getVariableMapper().setVariable("strings",
+                factory.createValueExpression(new String[]{"a", "b"}, Object.class));
+            context.getVariableMapper().setVariable("objects",
+                factory.createValueExpression(new Object[]{"a", "b"}, Object.class));
+            context.getVariableMapper().setVariable("numbers",
+                factory.createValueExpression(new int[]{1, 2}, Object.class));
+            boolean micronaut = factory instanceof CompiledExpressionFactory;
+            assertEquals(micronaut ? "2:java.lang.String" : "1:java.lang.String[]",
+                value(factory, context, "${bean.argumentType(strings)}"), name);
+            if (micronaut) {
+                assertEquals("a-b", value(factory, context, "${String.format('%s-%s', strings)}"), name);
+            } else {
+                // the array is the only format argument, and the second specifier has none
+                assertThrows(ELException.class,
+                    () -> value(factory, context, "${String.format('%s-%s', strings)}"), name);
+            }
+            assertEquals("2:java.lang.String", value(factory, context, "${bean.argumentType(objects)}"), name);
+            assertEquals("1:int[]", value(factory, context, "${bean.argumentType(numbers)}"), name);
         }
     }
 
@@ -138,6 +175,10 @@ final class InterpreterRegressionDifferentialTest {
 
         public int two() {
             return 2;
+        }
+
+        public String argumentType(Object... values) {
+            return values.length + ":" + values[0].getClass().getTypeName();
         }
     }
 }

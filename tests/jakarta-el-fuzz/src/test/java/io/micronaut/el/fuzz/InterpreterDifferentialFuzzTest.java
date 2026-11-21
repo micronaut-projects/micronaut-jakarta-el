@@ -43,6 +43,17 @@ final class InterpreterDifferentialFuzzTest {
     private static final int MAX_DEPTH = 4;
     private static final String SEED_PROPERTY = "el.fuzz.seed";
     private static final String CASES_PROPERTY = "el.fuzz.cases";
+    /**
+     * The one dispatch whose answer deliberately differs from both references. A {@code String[]} is assignable to
+     * the {@code Object[]} of {@code argumentType(Object...)}, so the first phase of the section 15.12.2 of the
+     * Java Language Specification, which the section 1.2.1.2 of the Jakarta Expression Language specification
+     * defers to, finds the method applicable by subtyping and passes the array as the variable arity array: Java
+     * prints {@code 2:java.lang.String} for the same call. Expressly and Tomcat only pass an array of exactly the
+     * parameter type through and wrap any other one as the single element, {@code 1:[Ljava.lang.String;}.
+     */
+    static final String SPREAD_DEVIATION = "bean.argumentType(strings)";
+    private static final String REFERENCE_SPREAD = "1:[Ljava.lang.String;";
+    private static final String MICRONAUT_SPREAD = "2:java.lang.String";
 
     @Test
     void matchesReferenceImplementations() {
@@ -63,6 +74,18 @@ final class InterpreterDifferentialFuzzTest {
             Outcome actual = evaluate(subject, subjectContext, expression, expectedType);
             Outcome expresslyOutcome = evaluate(expressly, expresslyContext, expression, expectedType);
             Outcome tomcatOutcome = evaluate(tomcat, tomcatContext, expression, expectedType);
+            if (generated.text().equals(SPREAD_DEVIATION)) {
+                // the references agree with each other, and Micronaut answers what Java answers instead
+                Outcome expected = spread(expresslyOutcome);
+                if (!equivalent(expresslyOutcome, tomcatOutcome) || !equivalent(actual, expected)) {
+                    fail("Differential EL fuzz failure for the variable arity deviation (seed=" + seed + ", case="
+                        + caseNumber + ", expression=" + expression + ", expectedType="
+                        + expectedType.getTypeName() + ")\nreferences (Expressly): " + expresslyOutcome.describe()
+                        + "\nreferences (Tomcat): " + tomcatOutcome.describe() + "\nexpected (Micronaut): "
+                        + expected.describe() + "\nactual (Micronaut): " + actual.describe());
+                }
+                continue;
+            }
             if (equivalent(expresslyOutcome, tomcatOutcome) && !equivalent(actual, expresslyOutcome)) {
                 fail("Differential EL fuzz failure (seed=" + seed + ", case=" + caseNumber + ", expression="
                     + expression + ", expectedType=" + expectedType.getTypeName() + ")\nexpected (Expressly): "
@@ -101,7 +124,7 @@ final class InterpreterDifferentialFuzzTest {
             // a variable arity parameter reached with an array of its own type, of a subtype, of a
             // primitive component type, and with loose elements
             case 0 -> "bean.argumentType(objects)";
-            case 1 -> "bean.argumentType(strings)";
+            case 1 -> SPREAD_DEVIATION;
             case 2 -> "bean.argumentType(numbers)";
             case 3 -> "bean.argumentType('a', 'b')";
             case 4 -> "bean.argumentType()";
@@ -121,6 +144,21 @@ final class InterpreterDifferentialFuzzTest {
             default -> "bean.join('-', strings)";
         };
         return new Expr(text, Kind.ANY);
+    }
+
+    /**
+     * What Micronaut answers for {@link #SPREAD_DEVIATION} given what the references answer: the same text with the
+     * spread array, or the same failure.
+     */
+    private static Outcome spread(Outcome reference) {
+        if (reference.value() instanceof String text) {
+            if (!text.contains(REFERENCE_SPREAD)) {
+                fail("The references no longer wrap the array: " + reference.describe());
+            }
+            return new Outcome(text.replace(REFERENCE_SPREAD, MICRONAUT_SPREAD), null);
+        }
+        // a failure, or the false both texts coerce to as a Boolean
+        return reference;
     }
 
     private static String expressionText(Random random, Expr expression) {

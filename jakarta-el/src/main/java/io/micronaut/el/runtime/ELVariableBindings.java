@@ -62,6 +62,30 @@ public final class ELVariableBindings {
     }
 
     /**
+     * The variables a creation-time binding view answers with now: its bindings, which never change, over a
+     * snapshot of the mapper it falls back to.
+     *
+     * @param mapper The variable mapper
+     * @return The snapshot, or {@code null} when the mapper is not a binding view
+     */
+    @Nullable
+    static VariableMapper snapshot(VariableMapper mapper) {
+        return mapper instanceof BindingVariableMapper binding ? binding.snapshot() : null;
+    }
+
+    /**
+     * Whether a snapshot of a creation-time binding view still holds what the view answers with.
+     *
+     * @param snapshot The snapshot
+     * @param live     The mapper it was taken of, or another one
+     * @return Whether both are binding views of the same bindings, over mappers that hold the same variables
+     */
+    static boolean isCurrent(VariableMapper snapshot, VariableMapper live) {
+        return live instanceof BindingVariableMapper binding && snapshot instanceof BindingVariableMapper taken
+            && binding.isCurrent(taken);
+    }
+
+    /**
      * Binds the named variables of a value expression against its creation context.
      *
      * @param context    The creation context
@@ -434,9 +458,24 @@ public final class ELVariableBindings {
         private final @Nullable ValueExpression[] expressions;
 
         private BindingVariableMapper(@Nullable VariableMapper delegate, Bindings bindings) {
+            this(delegate, bindings.names, bindings.expressions);
+        }
+
+        private BindingVariableMapper(@Nullable VariableMapper delegate,
+                                      String[] names,
+                                      @Nullable ValueExpression[] expressions) {
             this.delegate = delegate;
-            this.names = bindings.names;
-            this.expressions = bindings.expressions;
+            this.names = names;
+            this.expressions = expressions;
+        }
+
+        private BindingVariableMapper snapshot() {
+            return new BindingVariableMapper(ELLambdaInvocation.snapshot(delegate), names, expressions);
+        }
+
+        private boolean isCurrent(BindingVariableMapper snapshot) {
+            return snapshot.names == names && snapshot.expressions == expressions
+                && ELLambdaInvocation.isCurrent(snapshot.delegate, delegate);
         }
 
         @Override

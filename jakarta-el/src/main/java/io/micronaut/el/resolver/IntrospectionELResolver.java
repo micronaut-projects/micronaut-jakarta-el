@@ -209,6 +209,10 @@ public final class IntrospectionELResolver extends ELResolver implements ELMetho
         return introspected.get(type);
     }
 
+    private boolean isReadOnly(BeanProperty<Object, Object> beanProperty) {
+        return readOnly || beanProperty.isReadOnly();
+    }
+
     /**
      * What an introspector holds for every class, read once per class. A {@link ClassValue} is safe to share
      * between threads and does not keep a class, or its loader, reachable.
@@ -234,10 +238,6 @@ public final class IntrospectionELResolver extends ELResolver implements ELMetho
     private static final class SharedIntrospections {
 
         private static final Introspections SHARED = new Introspections(BeanIntrospector.SHARED);
-    }
-
-    private boolean isReadOnly(BeanProperty<Object, Object> beanProperty) {
-        return readOnly || beanProperty.isReadOnly();
     }
 
     // the bean method is not serializable, and never reaches a stream: this resolver binds no function,
