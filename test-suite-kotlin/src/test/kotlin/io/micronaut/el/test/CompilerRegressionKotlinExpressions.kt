@@ -19,6 +19,11 @@ import io.micronaut.el.annotation.ELVariable
     expectedParamTypes = [Int::class], name = "PRIMITIVE_PARAMETER")
 @ELMethodExpression(value = "\${text.pad}", expectedReturnType = String::class,
     expectedParamTypes = [Int::class, String::class], name = "PRIMITIVE_AND_REFERENCE_PARAMETERS")
+// Int::class is int.class, never its wrapper: the overload taking an int is the one the declaration names
+@ELMethodExpression(value = "\${text.which}", expectedReturnType = String::class,
+    expectedParamTypes = [Int::class], name = "PRIMITIVE_OVERLOAD")
+@ELMethodExpression(value = "\${text.whichLong}", expectedReturnType = String::class,
+    expectedParamTypes = [Long::class, Boolean::class, Double::class], name = "PRIMITIVE_OVERLOADS")
 class CompilerRegressionKotlinExpressions
 
 /**
@@ -33,4 +38,12 @@ class CompilerRegressionKotlinText {
     fun pad(width: Int, fill: String): String = "int:" + fill.repeat(width)
 
     fun pad(width: Long, fill: String): String = "long:" + fill.repeat(width.toInt())
+
+    fun which(value: Int): String = "int:$value"
+
+    fun which(value: Int?): String = "Integer:$value"
+
+    fun whichLong(value: Long, flag: Boolean, ratio: Double): String = "primitives:$value:$flag:$ratio"
+
+    fun whichLong(value: Long?, flag: Boolean?, ratio: Double?): String = "wrappers:$value:$flag:$ratio"
 }

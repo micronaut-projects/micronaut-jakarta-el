@@ -524,7 +524,13 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
             AnnotationValue<ELVariable> variable = declaredVariables.get(i);
             String name = variable.stringValue("name").orElseThrow(() ->
                 new ELCompilationException("The name of @ELVariable is required"));
-            ClassElement type = ELTypes.resolveMember(variable, "type", context)
+            Optional<ClassElement> kotlinPrimitive = context.getLanguage() == VisitorContext.Language.KOTLIN
+                // the metadata names the wrapper of Int::class, the KSP model the primitive it is
+                ? KotlinAnnotationTypes.resolveNestedPrimitive(owner.getNativeType(), ELEnvironment.class.getName(),
+                    "variables", variableIndex, "type")
+                : Optional.empty();
+            ClassElement type = kotlinPrimitive
+                .or(() -> ELTypes.resolveMember(variable, "type", context))
                 .or(() -> context.getLanguage() == VisitorContext.Language.JAVA
                     ? JavaAnnotationTypes.resolveNestedMember(owner.getNativeType(), ELEnvironment.class.getName(),
                         "variables", variableIndex, "type", context)

@@ -3,6 +3,7 @@ managed-jakarta-el = "6.0.1"
 
 micronaut = "5.2.20"
 micronaut-sourcegen = "2.2.3"
+ksp = "2.3.10"
 
 junit = "5.14.4"
 jmh = "1.37"
@@ -24,6 +25,9 @@ micronaut-sourcegen = { module = 'io.micronaut.sourcegen:micronaut-sourcegen-bom
 
 # managed dependencies
 managed-jakarta-el = { module = 'jakarta.el:jakarta.el-api', version.ref = 'managed-jakarta-el' }
+
+# the KSP model, read by the processor where the Micronaut metadata maps a Kotlin primitive to its wrapper
+ksp-api = { module = 'com.google.devtools.ksp:symbol-processing-api', version.ref = 'ksp' }
 
 # nullability
 nullaway = { module = "com.uber.nullaway:nullaway", version.ref = "nullaway" }
