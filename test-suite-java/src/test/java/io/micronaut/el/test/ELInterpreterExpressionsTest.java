@@ -171,7 +171,7 @@ class ELInterpreterExpressionsTest {
         assertEquals("default:EL", value(ELInterpreterExpressions$ELExpressions.FUNCTIONAL_INTERFACE));
         assertEquals("default:EL", value(ELInterpreterExpressions$ELExpressions.ALIASED_FUNCTIONAL_INTERFACE));
         assertEquals("1:int[]", value(ELInterpreterExpressions$ELExpressions.FORMATTING_PRIMITIVE_ARRAY));
-        assertEquals("1:java.lang.String[]", value(ELInterpreterExpressions$ELExpressions.FORMATTING_REFERENCE_ARRAY));
+        assertEquals("2:java.lang.String", value(ELInterpreterExpressions$ELExpressions.FORMATTING_REFERENCE_ARRAY));
         assertEquals(7, value(ELInterpreterExpressions$ELExpressions.STATIC_INTEGER_MAXIMUM));
         assertEquals(25d, value(ELInterpreterExpressions$ELExpressions.STATIC_DOUBLE_MAXIMUM));
         assertEquals(true, value(ELInterpreterExpressions$ELExpressions.LARGE_INTEGRAL_BIG_DECIMAL_EQUALITY));

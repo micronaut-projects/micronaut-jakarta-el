@@ -1672,7 +1672,7 @@ public final class ELCompiler {
                 directValue = compiledArguments.typed(i);
                 ClassElement arrayParameter = parameters[parameters.length - 1].getType();
                 // the name of an array type is the name of its component, so the dimensions are compared too
-                if (directValue.type() != null && isArrayArgument(directValue.type(), arrayParameter, receiver == null)) {
+                if (directValue.type() != null && isArrayArgument(directValue.type(), arrayParameter)) {
                     directVarargsArray = true;
                 } else {
                     parameter = parameters[parameters.length - 1].getType().fromArray();
@@ -2110,9 +2110,12 @@ public final class ELCompiler {
         if (method.isVarArgs() ? arguments.size() < fixed : arguments.size() != fixed) {
             return MethodMatch.NONE;
         }
+        // the section 15.12.2 of the JLS, which the section 1.2.1.2 of the specification follows: an array assignable
+        // to the variable arity parameter is the array itself, applicable in the first phase, by subtyping
         boolean directVarargsArray = method.isVarArgs() && arguments.size() == parameters.length
+            && !(arguments.get(parameters.length - 1) instanceof ELNode.Lambda)
             && argumentTypes.get(parameters.length - 1) != null
-            && sameType(argumentTypes.get(parameters.length - 1), parameters[parameters.length - 1].getType());
+            && isArrayArgument(argumentTypes.get(parameters.length - 1), parameters[parameters.length - 1].getType());
         MethodMatch result = MethodMatch.EXACT;
         for (int i = 0; i < arguments.size(); i++) {
             ClassElement argument = argumentTypes.get(i);
@@ -2135,6 +2138,8 @@ public final class ELCompiler {
                 // section 1.23 turns into its default: the interpreter selects int over Object for it, as the
                 // reference implementations do, where Java would rule the primitive out
                 argumentMatch = MethodMatch.ASSIGNABLE;
+            } else if (directArray) {
+                argumentMatch = sameType(argument, parameter) ? MethodMatch.EXACT : MethodMatch.ASSIGNABLE;
             } else {
                 if (argument == null) {
                     return MethodMatch.NONE;
@@ -2153,7 +2158,7 @@ public final class ELCompiler {
                 result = argumentMatch;
             }
         }
-        return method.isVarArgs() ? MethodMatch.VARARGS : result;
+        return method.isVarArgs() && !directVarargsArray ? MethodMatch.VARARGS : result;
     }
 
     /** Whether two types are the same, an array type being named after its component. */
@@ -2163,7 +2168,7 @@ public final class ELCompiler {
     }
 
     /** Whether an argument is itself the array a variable arity parameter takes. */
-    private static boolean isArrayArgument(ClassElement argument, ClassElement arrayParameter, boolean covariant) {
+    private static boolean isArrayArgument(ClassElement argument, ClassElement arrayParameter) {
         if (!argument.isArray() || argument.getArrayDimensions() != arrayParameter.getArrayDimensions()) {
             return false;
         }
@@ -2172,9 +2177,9 @@ public final class ELCompiler {
         if (component.getName().equals(parameterComponent.getName())) {
             return true;
         }
-        // the array of a subtype is the array a function or a static method takes, as the function mapper of the
-        // interpreter passes it; an instance method packs it as one element, as the resolvers do
-        return covariant && !component.isPrimitive() && !parameterComponent.isPrimitive()
+        // the array of a subtype is assignable to the array of its supertype, so it is the array the parameter takes,
+        // for every kind of invocation: an instance or a static method, a function and a constructor alike
+        return !component.isPrimitive() && !parameterComponent.isPrimitive()
             && (component.isAssignable(parameterComponent) || jdkAssignable(component, parameterComponent));
     }
 
