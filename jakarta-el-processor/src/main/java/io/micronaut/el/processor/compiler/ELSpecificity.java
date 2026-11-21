@@ -64,7 +64,7 @@ final class ELSpecificity {
             return true;
         }
         if (first.isPrimitive() && !first.isArray()) {
-            return second.getName().equals(Object.class.getName()) || ELCompiler.jdkAssignable(first, second);
+            return second.getName().equals(Object.class.getName()) || ELTypeCompatibility.jdkAssignable(first, second);
         }
         return false;
     }
@@ -81,11 +81,11 @@ final class ELSpecificity {
                                           ClassElement second,
                                           @Nullable ClassElement argument,
                                           boolean elSpecific) {
-        if (!elSpecific || argument == null || ELCompiler.numericRank(argument) < 0) {
+        if (!elSpecific || argument == null || ELTypeCompatibility.numericRank(argument) < 0) {
             return 0;
         }
-        boolean firstNumeric = ELCompiler.numericRank(first) >= 0 || first.isAssignable(Number.class);
-        boolean secondNumeric = ELCompiler.numericRank(second) >= 0 || second.isAssignable(Number.class);
+        boolean firstNumeric = ELTypeCompatibility.numericRank(first) >= 0 || first.isAssignable(Number.class);
+        boolean secondNumeric = ELTypeCompatibility.numericRank(second) >= 0 || second.isAssignable(Number.class);
         return firstNumeric == secondNumeric ? 0 : firstNumeric ? 1 : -1;
     }
 
