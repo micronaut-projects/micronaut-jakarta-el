@@ -17,6 +17,7 @@ package io.micronaut.el.interpreter.reflection;
 
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.el.ELProxyFactory;
+import io.micronaut.el.runtime.ELLambdaInvocation;
 import io.micronaut.el.runtime.ELSupport;
 import jakarta.el.ELContext;
 import jakarta.el.LambdaExpression;
@@ -88,8 +89,10 @@ public final class ReflectiveELProxyFactory implements ELProxyFactory {
                 Object[] arguments = args == null ? new Object[0] : args;
                 // an instance of the interface can be called from any thread, concurrently: each call evaluates
                 // the lambda with a context of its own rather than entering its arguments in the shared one
-                ELContext invocation = context == null ? null : new InvocationELContext(context);
-                Object result = invocation == null ? lambda.invoke(arguments) : lambda.invoke(invocation, arguments);
+                ELContext invocation = context == null ? null : ELLambdaInvocation.isolate(context);
+                Object result = invocation == null
+                    ? ELLambdaInvocation.invoke(null, lambda, arguments)
+                    : lambda.invoke(invocation, arguments);
                 Class<?> returnType = method.getReturnType();
                 return returnType == void.class ? null : ELSupport.coerceToType(invocation, result, returnType);
             }

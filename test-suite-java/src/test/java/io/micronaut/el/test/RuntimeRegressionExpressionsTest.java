@@ -210,6 +210,21 @@ class RuntimeRegressionExpressionsTest {
         assertEquals("str2", lambda.invoke(new CompiledELContext(), 2L));
     }
 
+    @Test
+    void anEscapingLambdaDoesNotSeeAVariableReboundAfterItWasCreated() {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        CompiledELContext creation = new CompiledELContext();
+        creation.getVariableMapper().setVariable("s", factory.createValueExpression("str", String.class));
+        CompiledELContext other = new CompiledELContext();
+
+        LambdaExpression lambda =
+            (LambdaExpression) RuntimeRegressionExpressions$ELExpressions.ESCAPING_LAMBDA.getValue(creation);
+        creation.getVariableMapper().setVariable("s", factory.createValueExpression("changed", String.class));
+
+        assertEquals("str2", lambda.invoke(other, 2L));
+        assertEquals("str2", lambda.invoke(creation, 2L));
+    }
+
     /**
      * A superclass whose only bean is its subclass.
      */

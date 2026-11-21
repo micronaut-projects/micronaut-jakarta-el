@@ -202,7 +202,7 @@ class ELInterpreterExpressionsTest {
             new Object[]{"42"}));
         assertEquals("a,b", ELInterpreterExpressions$ELExpressions.VARARGS_METHOD.invoke(context,
             new Object[]{"a", "b"}));
-        assertEquals("1:java.lang.String[]", ELInterpreterExpressions$ELExpressions.OBJECT_VARARGS_METHOD.invoke(context,
+        assertEquals("2:java.lang.String", ELInterpreterExpressions$ELExpressions.OBJECT_VARARGS_METHOD.invoke(context,
             new Object[]{new String[]{"a", "b"}}));
         assertEquals("number", ELInterpreterExpressions$ELExpressions.SPECIFIC_METHOD.invoke(context,
             new Object[]{1L}));

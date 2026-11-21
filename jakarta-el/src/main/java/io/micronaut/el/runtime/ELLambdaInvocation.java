@@ -41,8 +41,10 @@ import java.util.Objects;
  * {@code propertyResolved} flag. Each invocation through a functional interface is therefore given a context of its
  * own, which has its own lambda scope and flag and reads everything else - the resolvers, the variables, the
  * functions, the imports, the objects registered with {@link ELContext#putContext} and the arguments of the lambda
- * expressions enclosing the one invoked - from the context the expression is evaluated with. Nothing is written
- * to that context, so concurrent invocations only ever read it.</p>
+ * expressions enclosing the one invoked - from the context the expression is evaluated with, and notifies the
+ * evaluation listeners of that context. Nothing is written to that context, so concurrent invocations only ever
+ * read it. This is the one implementation of that context: the coercion to the known interfaces, to the contributed
+ * ones and the reflective proxies of the {@code micronaut-jakarta-el-interpreter-reflection} module all use it.</p>
  *
  * @author Denis Stepanov
  * @since 1.1
@@ -88,19 +90,70 @@ public final class ELLambdaInvocation {
 
     /**
      * A context reading everything from the context a lambda expression is invoked with, except the variables,
-     * which the variable mapper of the context the lambda expression was created in resolves first: a lambda
+     * which the variables the lambda expression closed over when it was created resolve first: a lambda
      * expression that escapes the expression it was created in keeps the bindings it closed over.
      *
-     * <p>The variable mapper of the creation context is consulted when a variable is read, since a mapper cannot
-     * list what it holds; a binding that mapper replaces later is the one read.</p>
-     *
      * @param invoking The context the lambda expression is invoked with
-     * @param creation The context the lambda expression was created in
+     * @param captured The variables the lambda expression closed over, a {@link #snapshot} of the variable mapper
+     *                 of the context it was created in
      * @return The context to evaluate the body with
      */
-    public static ELContext capturing(ELContext invoking, ELContext creation) {
-        VariableMapper captured = creation.getVariableMapper();
-        return captured == null ? invoking : new InvocationContext(invoking, captured);
+    public static ELContext capturing(ELContext invoking, VariableMapper captured) {
+        return new InvocationContext(invoking, captured);
+    }
+
+    /**
+     * The variables a variable mapper holds now, which the bindings it is given later do not change: what a lambda
+     * expression closes over when it is created. Both reference implementations, Expressly and the Jasper one,
+     * resolve the variables of an expression when the expression is created and never consult the mapper again,
+     * and the interpreter snapshots the free identifiers of a lambda expression when it creates one; a compiled
+     * lambda expression snapshots the mapper of its creation context the same way.
+     *
+     * <p>A variable mapper cannot list what it holds, so only the mappers of this runtime are snapshotted: the
+     * {@link MapVariableMapper} of a {@link io.micronaut.el.CompiledELContext}, the creation-time bindings of an
+     * expression created by the factory, and the variables a lambda expression already closed over. Any other
+     * mapper is returned as it is, and is consulted when a variable is read.</p>
+     *
+     * @param mapper The variable mapper of the context creating the lambda expression, can be {@code null}
+     * @return The snapshot, or {@code null} when the mapper is {@code null}
+     */
+    @Nullable
+    public static VariableMapper snapshot(@Nullable VariableMapper mapper) {
+        if (mapper == null) {
+            return null;
+        }
+        if (mapper instanceof MapVariableMapper map) {
+            return map.snapshot();
+        }
+        if (mapper instanceof CapturedVariableMapper captured) {
+            return new CapturedVariableMapper(captured.closed, snapshot(captured.own));
+        }
+        VariableMapper bindings = ELVariableBindings.snapshot(mapper);
+        return bindings != null ? bindings : mapper;
+    }
+
+    /**
+     * Whether a {@link #snapshot} still holds what the mapper holds, so that a lambda expression invoked with a
+     * context whose mapper it is reads the same variables through that context as through the snapshot.
+     *
+     * @param snapshot The snapshot, can be {@code null}
+     * @param live     The variable mapper of the invoking context, can be {@code null}
+     * @return Whether no variable the snapshot answers with was bound since it was taken
+     */
+    public static boolean isCurrent(@Nullable VariableMapper snapshot, @Nullable VariableMapper live) {
+        if (snapshot == live) {
+            return true;
+        }
+        if (snapshot == null || live == null) {
+            return false;
+        }
+        if (live instanceof MapVariableMapper map) {
+            return map.isCurrent(snapshot);
+        }
+        if (live instanceof CapturedVariableMapper current && snapshot instanceof CapturedVariableMapper taken) {
+            return current.closed == taken.closed && isCurrent(taken.own, current.own);
+        }
+        return ELVariableBindings.isCurrent(snapshot, live);
     }
 
     /**
@@ -140,20 +193,7 @@ public final class ELLambdaInvocation {
             if (closed == null || closed == own) {
                 return own;
             }
-            return new VariableMapper() {
-                @Override
-                @Nullable
-                public ValueExpression resolveVariable(String variable) {
-                    ValueExpression expression = closed.resolveVariable(variable);
-                    return expression != null || own == null ? expression : own.resolveVariable(variable);
-                }
-
-                @Override
-                @Nullable
-                public ValueExpression setVariable(String variable, @Nullable ValueExpression expression) {
-                    return own == null ? null : own.setVariable(variable, expression);
-                }
-            };
+            return new CapturedVariableMapper(closed, own);
         }
 
         @Override
@@ -172,6 +212,21 @@ public final class ELLambdaInvocation {
         public Locale getLocale() {
             Locale own = super.getLocale();
             return own != null ? own : parent.getLocale();
+        }
+
+        @Override
+        public void notifyBeforeEvaluation(String expression) {
+            parent.notifyBeforeEvaluation(expression);
+        }
+
+        @Override
+        public void notifyAfterEvaluation(String expression) {
+            parent.notifyAfterEvaluation(expression);
+        }
+
+        @Override
+        public void notifyPropertyResolved(@Nullable Object base, @Nullable Object property) {
+            parent.notifyPropertyResolved(base, property);
         }
 
         @Override
@@ -218,6 +273,35 @@ public final class ELLambdaInvocation {
             if (own != null && !own.isEmpty()) {
                 own.remove(own.size() - 1);
             }
+        }
+    }
+
+    /**
+     * The variables a lambda expression closed over, resolved before the ones of the context it is invoked with,
+     * which a binding is written to.
+     */
+    private static final class CapturedVariableMapper extends VariableMapper {
+
+        private final VariableMapper closed;
+        @Nullable
+        private final VariableMapper own;
+
+        private CapturedVariableMapper(VariableMapper closed, @Nullable VariableMapper own) {
+            this.closed = closed;
+            this.own = own;
+        }
+
+        @Override
+        @Nullable
+        public ValueExpression resolveVariable(String variable) {
+            ValueExpression expression = closed.resolveVariable(variable);
+            return expression != null || own == null ? expression : own.resolveVariable(variable);
+        }
+
+        @Override
+        @Nullable
+        public ValueExpression setVariable(String variable, @Nullable ValueExpression expression) {
+            return own == null ? null : own.setVariable(variable, expression);
         }
     }
 }

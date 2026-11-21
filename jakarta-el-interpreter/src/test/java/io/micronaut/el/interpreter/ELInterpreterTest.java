@@ -293,7 +293,7 @@ class ELInterpreterTest {
             "#{bean.argumentType}", String.class, new Class<?>[]{Object[].class});
 
         assertEquals("a,b", join.invoke(context, new Object[]{"a", "b"}));
-        assertEquals("1:java.lang.String[]",
+        assertEquals("2:java.lang.String",
             argumentType.invoke(context, new Object[]{new String[]{"a", "b"}}));
     }
 
