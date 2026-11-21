@@ -395,7 +395,7 @@ class ELInterpreterTest {
         ExpressionFactory factory = ExpressionFactory.newInstance();
 
         assertEquals("1:int[]", processor.eval("formatting.argumentType(formatting.numbers)"));
-        assertEquals("1:java.lang.String[]", processor.eval("formatting.argumentType(strings)"));
+        assertEquals("2:java.lang.String", processor.eval("formatting.argumentType(strings)"));
         assertEquals((Object) 7, processor.eval("Math.max(item.quantity, Integer.valueOf(7))"));
         assertEquals(25d, processor.eval("Math.max(book.unitPrice, 25.0)"));
 

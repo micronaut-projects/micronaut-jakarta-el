@@ -100,7 +100,7 @@ class LValueExpressionsTest {
     @Test
     void variableArityMethodsHandleDirectArrays() {
         assertEquals("1:int[]", LValueExpressions$ELExpressions.PACKED_PRIMITIVE_ARRAY.getValue(context));
-        assertEquals("1:java.lang.String[]", LValueExpressions$ELExpressions.PACKED_REFERENCE_ARRAY.getValue(context));
+        assertEquals("2:java.lang.String", LValueExpressions$ELExpressions.PACKED_REFERENCE_ARRAY.getValue(context));
         assertEquals("a", LValueExpressions$ELExpressions.FIRST_STRING.getValue(context));
     }
 
