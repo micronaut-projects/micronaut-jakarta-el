@@ -30,6 +30,7 @@ import io.micronaut.el.ELSandboxException;
 import jakarta.el.ELContext;
 import jakarta.el.ELException;
 import jakarta.el.ExpressionFactory;
+import jakarta.el.LambdaExpression;
 import jakarta.el.MethodNotFoundException;
 import jakarta.el.ValueExpression;
 import jakarta.inject.Singleton;
@@ -287,6 +288,35 @@ class RuntimeRegressionInterpretedTest {
         for (int i = 0; i < 5; i++) {
             assertEquals(bean.big(), evaluate(context, "${bean.big().parallelStream().map(x -> x + 0).toList()}"));
         }
+    }
+
+    // finding: a lambda expression reads its variables as they were bound when it was created, as both reference
+    // implementations do, also once the creating context binds the variable to another value
+
+    @Test
+    void anEscapingLambdaKeepsTheVariablesItWasCreatedWith() {
+        CompiledELContext creation = new CompiledELContext();
+        creation.getVariableMapper().setVariable("s", factory.createValueExpression("str", String.class));
+        CompiledELContext other = new CompiledELContext();
+        other.getVariableMapper().setVariable("s", factory.createValueExpression("other", String.class));
+
+        LambdaExpression lambda = (LambdaExpression) evaluate(creation, "${y -> s += y}");
+
+        assertEquals("str2", lambda.invoke(other, 2L));
+        assertEquals("str2", lambda.invoke(new CompiledELContext(), 2L));
+    }
+
+    @Test
+    void anEscapingLambdaDoesNotSeeAVariableReboundAfterItWasCreated() {
+        CompiledELContext creation = new CompiledELContext();
+        creation.getVariableMapper().setVariable("s", factory.createValueExpression("str", String.class));
+        CompiledELContext other = new CompiledELContext();
+
+        LambdaExpression lambda = (LambdaExpression) evaluate(creation, "${y -> s += y}");
+        creation.getVariableMapper().setVariable("s", factory.createValueExpression("changed", String.class));
+
+        assertEquals("str2", lambda.invoke(other, 2L));
+        assertEquals("str2", lambda.invoke(creation, 2L));
     }
 
     private Object evaluate(ELContext context, String expression) {
