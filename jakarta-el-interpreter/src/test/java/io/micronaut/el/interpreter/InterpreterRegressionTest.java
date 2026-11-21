@@ -252,11 +252,13 @@ class InterpreterRegressionTest {
     // --- 7. an escaping lambda keeps its variables ---
 
     /**
-     * A lambda returned to Java and invoked with another context is a contract of the runtime API. Its generated
-     * counterpart, {@code ${y -> s += y}} declared with an {@code @ELVariable s}, does not hold yet: the compiled
-     * lambda of the core runtime resolves {@code s} against the invoking context and throws
-     * {@code PropertyNotFoundException}, which is outside the interpreter. The differential test of the fuzz module
-     * checks the interpreter against both reference implementations instead.
+     * A lambda returned to Java and invoked with another context is a contract of the runtime API. The generated
+     * counterparts of {@code ${y -> s += y}}, invoked with another context and after {@code s} is bound again, are
+     * {@code anEscapingLambdaKeepsTheVariablesItWasCreatedWith} and
+     * {@code anEscapingLambdaDoesNotSeeAVariableReboundAfterItWasCreated} of
+     * {@code io.micronaut.el.test.RuntimeRegressionExpressionsTest}, whose interpreted twins are in
+     * {@link RuntimeRegressionInterpretedTest}. The differential test of the fuzz module checks the interpreter
+     * against both reference implementations.
      */
     @Test
     void anEscapingLambdaKeepsTheVariablesOfTheExpressionCreatingIt() {

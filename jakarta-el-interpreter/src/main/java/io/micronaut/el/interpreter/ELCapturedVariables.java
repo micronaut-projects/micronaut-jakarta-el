@@ -81,9 +81,27 @@ final class ELCapturedVariables {
             return body;
         }
         @Nullable ValueExpression[] variables = captured;
-        return invocation -> invocation.getVariableMapper() == mapper
+        // the snapshot is what the body reads, whichever context invokes it: a context whose mapper still resolves
+        // every captured identifier to the same variable, the creating one in particular, is used as it is, and a
+        // variable bound since, in the creating context or any other, is not seen, as in both reference
+        // implementations and in a compiled lambda expression
+        return invocation -> resolvesSame(invocation.getVariableMapper(), freeNames, variables)
             ? body.apply(invocation)
             : body.apply(new CapturingContext(invocation, freeNames, variables));
+    }
+
+    private static boolean resolvesSame(@Nullable VariableMapper mapper,
+                                        String[] names,
+                                        @Nullable ValueExpression[] variables) {
+        if (mapper == null) {
+            return false;
+        }
+        for (int i = 0; i < names.length; i++) {
+            if (variables[i] != null && mapper.resolveVariable(names[i]) != variables[i]) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
