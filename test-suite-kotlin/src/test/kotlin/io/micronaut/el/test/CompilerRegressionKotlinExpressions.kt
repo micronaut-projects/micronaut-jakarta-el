@@ -24,6 +24,8 @@ import io.micronaut.el.annotation.ELVariable
     expectedParamTypes = [Int::class], name = "PRIMITIVE_OVERLOAD")
 @ELMethodExpression(value = "\${text.whichLong}", expectedReturnType = String::class,
     expectedParamTypes = [Long::class, Boolean::class, Double::class], name = "PRIMITIVE_OVERLOADS")
+// a variable declared Int::class is an int whose value, as any value of the language, is an object: Integer
+@ELExpression(value = "\${text.which(count)}", name = "PRIMITIVE_VARIABLE_OVERLOAD")
 class CompilerRegressionKotlinExpressions
 
 /**

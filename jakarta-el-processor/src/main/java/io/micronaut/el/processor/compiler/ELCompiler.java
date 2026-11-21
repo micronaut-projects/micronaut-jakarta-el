@@ -554,6 +554,12 @@ public final class ELCompiler {
         ClassElement variableType = context.variableType(name);
         if (variableType != null) {
             ExpressionDef variable = runtime(EL_RESOLUTION, "resolveVariable", TypeDef.OBJECT, ctx, ExpressionDef.constant(name));
+            if (variableType.isPrimitive() && !variableType.isArray()) {
+                // the value of a variable is an object, as it is to the interpreter and both references, whatever
+                // primitive type declares it: it may be null, compares to null, and selects which(Integer) over
+                // which(int); a primitive parameter still receives it coerced, a null becoming zero
+                variableType = ClassElement.of(wrapperClass(variableType.getName()));
+            }
             return new Typed(variable.cast(TypeDef.erasure(variableType)), variableType);
         }
         FieldElement staticField = context.resolveStaticField(name);
@@ -1892,7 +1898,22 @@ public final class ELCompiler {
     private ELOverloadSelection.MethodSelection select(List<MethodElement> candidates, ELArguments compiledArguments) {
         // the types are only read, and the arguments compiled, when there is a method to select
         return overloads.select(candidates, compiledArguments.nodes(),
-            candidates.isEmpty() ? List.of() : compiledArguments.types());
+            candidates.isEmpty() ? List.of() : selectionTypes(compiledArguments.types()));
+    }
+
+    /**
+     * The types the overload selection reads: a value of the expression language is an object, so a variable
+     * declared {@code int}, a getter returning an {@code int} or an arithmetic result reaches a method as its
+     * wrapper, which the interpreter, Expressly and Tomcat all select by: {@code which(Integer)} over
+     * {@code which(int)}. The argument itself keeps its primitive form, which the invocation coerces.
+     */
+    private static List<@Nullable ClassElement> selectionTypes(List<@Nullable ClassElement> types) {
+        List<@Nullable ClassElement> boxed = new ArrayList<>(types.size());
+        for (ClassElement type : types) {
+            boxed.add(type != null && type.isPrimitive() && !type.isArray() && !type.getName().equals("void")
+                ? ClassElement.of(wrapperClass(type.getName())) : type);
+        }
+        return boxed;
     }
 
     static Typed dynamic(ExpressionDef expression) {

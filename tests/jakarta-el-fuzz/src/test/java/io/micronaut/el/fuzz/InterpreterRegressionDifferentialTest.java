@@ -154,6 +154,26 @@ final class InterpreterRegressionDifferentialTest {
         }
     }
 
+    /**
+     * The value of a variable or a property is an object, whatever type declares it: a value expression created
+     * for {@code int.class}, and a getter returning an {@code int}, both reach the method selection as an
+     * {@code Integer}, which selects {@code which(Integer)} over {@code which(int)} in every implementation. A
+     * compiled expression whose variable is declared {@code int.class} selects the same overload, and the result
+     * of an arithmetic operator, a {@code Long}, selects {@code which(Long)}.
+     */
+    @Test
+    void aPrimitiveValueSelectsTheWrapperOverload() {
+        for (ExpressionFactory factory : FACTORIES) {
+            ELContext context = context(factory);
+            String name = factory.getClass().getName();
+            context.getVariableMapper().setVariable("count", factory.createValueExpression(2, int.class));
+            assertEquals("Integer:2", value(factory, context, "${bean.which(count)}"), name);
+            assertEquals("Integer:2", value(factory, context, "${bean.which(bean.two())}"), name);
+            assertEquals("Integer:2", value(factory, context, "${bean.which(bean.count)}"), name);
+            assertEquals("Long:2", value(factory, context, "${bean.which(count + 0)}"), name);
+        }
+    }
+
     private static Object value(ExpressionFactory factory, ELContext context, String expression) {
         return factory.createValueExpression(context, expression, Object.class).getValue(context);
     }
@@ -175,6 +195,26 @@ final class InterpreterRegressionDifferentialTest {
 
         public int two() {
             return 2;
+        }
+
+        public int getCount() {
+            return 2;
+        }
+
+        public String which(int value) {
+            return "int:" + value;
+        }
+
+        public String which(Integer value) {
+            return "Integer:" + value;
+        }
+
+        public String which(long value) {
+            return "long:" + value;
+        }
+
+        public String which(Long value) {
+            return "Long:" + value;
         }
 
         public String argumentType(Object... values) {

@@ -214,6 +214,8 @@ class CompilerRegressionInterpretedTest {
         processor.defineBean("count", 2);
         processor.defineBean("text", new Text());
         assertEquals(3L, value("${count + 1}"));
+        // the value of the variable is an Integer, whatever primitive type the Kotlin declaration names
+        assertEquals("Integer:2", value("${text.which(count)}"));
         MethodExpression single = factory.createMethodExpression(context, "${text.repeat}", String.class,
             new Class<?>[]{int.class});
         assertEquals("int:abab", single.invoke(context, new Object[]{2}));
