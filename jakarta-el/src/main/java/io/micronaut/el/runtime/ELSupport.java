@@ -871,6 +871,11 @@ public final class ELSupport {
      */
     private static final class PropertyEditors {
 
+        /**
+         * What {@link #edit} returns when no editor converts the string.
+         */
+        private static final Object NO_EDITOR = new Object();
+
         private static volatile boolean available = true;
 
         private PropertyEditors() {
@@ -911,11 +916,6 @@ public final class ELSupport {
             }
         }
     }
-
-    /**
-     * What {@link PropertyEditors} returns when no editor converts the string.
-     */
-    private static final Object NO_EDITOR = new Object();
 
     /**
      * The factory that implements an interface nothing described, loaded once per class loader.
