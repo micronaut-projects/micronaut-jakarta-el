@@ -369,6 +369,6 @@ specification decides, and the references do not follow.
 Not a divergence: a lambda expression reads its variables as they were bound when it was created, in compiled
 and interpreted expressions alike, as both references do: binding a variable to another value expression
 afterwards, in the context that created the lambda expression or in any other, does not change what an escaping
-lambda expression reads. A compiled lambda expression snapshots the variable mapper of the context creating it
-when that mapper is the one of a `CompiledELContext` or the creation-time bindings of an expression created by
-the factory; another mapper, which cannot list what it holds, is consulted when the variable is read.
+lambda expression reads. A compiled lambda expression snapshots the variable mapper of the context creating it,
+and resolves the free identifiers of its body when it is created in a mapper that cannot list what it holds, such
+as the one of a `StandardELContext`, as the interpreter does.
