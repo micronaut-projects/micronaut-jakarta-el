@@ -23,6 +23,7 @@ import jakarta.el.ELContext;
 import jakarta.el.LambdaExpression;
 import org.jspecify.annotations.Nullable;
 
+import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -100,29 +101,59 @@ public final class ReflectiveELProxyFactory implements ELProxyFactory {
     }
 
     /**
-     * Invokes the default method of the interface on the proxy, through {@link InvocationHandler#invokeDefault},
-     * which needs no access to the package of the interface: a private lookup in it does, and the packages of the
-     * platform, {@code java.util.function} among them, are not open to this module.
+     * Invokes the default method of the interface on the proxy.
      *
-     * <p>A native image defines the proxy class in a module of its own, from which the interface may not be
-     * readable; the private lookup anchored in the interface is the fallback there.</p>
+     * <p>When the package of the interface is open to this module, which every package of the unnamed module
+     * is, the method is invoked through a private lookup anchored in the interface itself: it resolves the
+     * interface the same way everywhere, including in a native image, which defines the proxy class in a
+     * {@code jdk.proxy*} module of its own from which the interface may not be accessible, so that
+     * {@link InvocationHandler#invokeDefault} fails there with an {@link InternalError} wrapping an
+     * {@link IllegalAccessException}.</p>
+     *
+     * <p>A package that is not open to this module, such as {@code java.util.function} of the platform, cannot
+     * be looked up privately; {@link InvocationHandler#invokeDefault} needs no access to it, and is used there.
+     * Should the proxy class still be refused access to the interface, the private lookup is the fallback.</p>
      */
     @Nullable
     private static Object invokeDefault(Object proxy, Method method, Object @Nullable [] args) throws Throwable {
         Object[] arguments = args == null ? new Object[0] : args;
+        Class<?> declaring = method.getDeclaringClass();
+        if (isOpenToThisModule(declaring)) {
+            MethodHandle special = findSpecial(method, declaring);
+            if (special != null) {
+                return special.bindTo(proxy).invokeWithArguments(arguments);
+            }
+        }
         try {
             return InvocationHandler.invokeDefault(proxy, method, arguments);
-        } catch (IllegalAccessException e) {
-            Class<?> declaring = method.getDeclaringClass();
-            try {
-                return MethodHandles.privateLookupIn(declaring, MethodHandles.lookup())
-                    .unreflectSpecial(method, declaring)
-                    .bindTo(proxy)
-                    .invokeWithArguments(arguments);
-            } catch (IllegalAccessException fallbackFailure) {
-                e.addSuppressed(fallbackFailure);
+        } catch (IllegalAccessException | InternalError e) {
+            // the proxy class cannot access the interface, which a native image reports as an InternalError
+            if (e instanceof InternalError && !(e.getCause() instanceof IllegalAccessException)) {
                 throw e;
             }
+            MethodHandle special = findSpecial(method, declaring);
+            if (special == null) {
+                throw e;
+            }
+            return special.bindTo(proxy).invokeWithArguments(arguments);
+        }
+    }
+
+    private static boolean isOpenToThisModule(Class<?> type) {
+        return type.getModule().isOpen(type.getPackageName(), ReflectiveELProxyFactory.class.getModule());
+    }
+
+    /**
+     * Finds the default method through a private lookup anchored in the interface that declares it.
+     *
+     * @return The handle of the method, or {@code null} when the package of the interface refuses the lookup
+     */
+    @Nullable
+    private static MethodHandle findSpecial(Method method, Class<?> declaring) {
+        try {
+            return MethodHandles.privateLookupIn(declaring, MethodHandles.lookup()).unreflectSpecial(method, declaring);
+        } catch (IllegalAccessException e) {
+            return null;
         }
     }
 
