@@ -73,7 +73,7 @@ final class ELLiterals {
         try {
             Long.parseLong(image);
             return Long.class;
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException _) {
             return BigInteger.class;
         }
     }
@@ -85,7 +85,7 @@ final class ELLiterals {
     static ExpressionDef integerLiteral(String image) {
         try {
             return ExpressionDef.constant(Long.valueOf(image));
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException _) {
             return ClassTypeDef.of(BigInteger.class).instantiate(ExpressionDef.constant(image));
         }
     }

@@ -89,9 +89,52 @@ final class ELOverloadSelection {
             }
         }
         boolean elSpecific = exact.isEmpty() && assignable.isEmpty();
-        List<MethodElement> best = !exact.isEmpty() ? exact : !assignable.isEmpty() ? assignable
-            : !coercible.isEmpty() ? coercible : varArgs;
-        return mostSpecific(best, argumentTypes, elSpecific);
+        return mostSpecific(firstNonEmpty(exact, assignable, coercible, varArgs), argumentTypes, elSpecific);
+    }
+
+    /**
+     * @return The first of the candidate lists that is not empty, the last one when they all are
+     */
+    @SafeVarargs
+    private static List<MethodElement> firstNonEmpty(List<MethodElement>... candidates) {
+        for (List<MethodElement> list : candidates) {
+            if (!list.isEmpty()) {
+                return list;
+            }
+        }
+        return candidates[candidates.length - 1];
+    }
+
+    /**
+     * @return The type of the parameter an argument is passed to, the component of the variable arity parameter
+     * for its elements unless the argument is the array itself
+     */
+    private static ClassElement parameterType(MethodElement method, int index, boolean directArray) {
+        ParameterElement[] parameters = method.getParameters();
+        int last = parameters.length - 1;
+        if (directArray) {
+            return parameters[last].getType();
+        }
+        if (method.isVarArgs() && index >= last) {
+            return parameters[last].getType().fromArray();
+        }
+        return parameters[index].getType();
+    }
+
+    /**
+     * @return How an argument of the static type matches the parameter type
+     */
+    private static MethodMatch typeMatch(ClassElement argument, ClassElement parameter) {
+        if (ELTypeCompatibility.sameType(argument, parameter)) {
+            return MethodMatch.EXACT;
+        }
+        if (ELSpecificity.sameBoxedType(argument, parameter) || ELTypeCompatibility.isAssignable(argument, parameter)) {
+            return MethodMatch.ASSIGNABLE;
+        }
+        if (ELTypeCompatibility.isCoercible(argument, parameter) || ELTypeCompatibility.mayBeInstance(argument, parameter)) {
+            return MethodMatch.COERCIBLE;
+        }
+        return MethodMatch.NONE;
     }
 
     // the overload selection of the section 1.6, whose branches are rules ordered against each other
@@ -114,8 +157,7 @@ final class ELOverloadSelection {
         for (int i = 0; i < arguments.size(); i++) {
             ClassElement argument = argumentTypes.get(i);
             boolean directArray = directVarargsArray && i == fixed;
-            ClassElement parameter = directArray ? parameters[parameters.length - 1].getType()
-                : method.isVarArgs() && i >= fixed ? parameters[parameters.length - 1].getType().fromArray() : parameters[i].getType();
+            ClassElement parameter = parameterType(method, i, directArray);
             MethodMatch argumentMatch;
             if (arguments.get(i) instanceof ELNode.Lambda) {
                 // a lambda expression is compiled to a functional interface, section 1.25.8, and is itself a
@@ -138,11 +180,7 @@ final class ELOverloadSelection {
                 if (argument == null) {
                     return MethodMatch.NONE;
                 }
-                argumentMatch = ELTypeCompatibility.sameType(argument, parameter) ? MethodMatch.EXACT
-                    : ELSpecificity.sameBoxedType(argument, parameter) || ELTypeCompatibility.isAssignable(argument, parameter)
-                        ? MethodMatch.ASSIGNABLE
-                        : ELTypeCompatibility.isCoercible(argument, parameter) || ELTypeCompatibility.mayBeInstance(argument, parameter)
-                            ? MethodMatch.COERCIBLE : MethodMatch.NONE;
+                argumentMatch = typeMatch(argument, parameter);
             }
             if (argumentMatch == MethodMatch.NONE) {
                 return MethodMatch.NONE;

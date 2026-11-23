@@ -49,7 +49,6 @@ final class InterpretedMethodExpression extends MethodExpression implements ELEx
     private static final long serialVersionUID = 1L;
 
     private final String expressionString;
-    private final Class<?> expectedReturnType;
     private final Class<?> @Nullable [] expectedParamTypes;
     private final Map<String, ELMethod> functions;
     private final ELParserOptions options;
@@ -66,7 +65,7 @@ final class InterpretedMethodExpression extends MethodExpression implements ELEx
                                 ELInterpreter interpreter,
                                 ELParserOptions options) {
         this.expressionString = Objects.requireNonNull(expressionString, "expressionString");
-        this.expectedReturnType = Objects.requireNonNull(expectedReturnType, "expectedReturnType");
+        Objects.requireNonNull(expectedReturnType, "expectedReturnType");
         this.expectedParamTypes = expectedParamTypes == null ? null : expectedParamTypes.clone();
         this.functions = Map.copyOf(functions);
         this.node = Objects.requireNonNull(node, "node");

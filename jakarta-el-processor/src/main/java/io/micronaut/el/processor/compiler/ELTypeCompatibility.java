@@ -54,24 +54,16 @@ final class ELTypeCompatibility {
             // a variable arity parameter, or an array the runtime coercion of the section 1.23.6 fills
             return true;
         }
-        if (ELCompiler.isUnknown(parameter) || ELCompiler.isUnknown(argument)
-            || argument.getName().equals(parameter.getName())
-            || argument.isAssignable(parameter.getName())
-            || argument.getName().equals(String.class.getName())
-            || parameter.getName().equals(String.class.getName())
-            || parameter.isAssignable(argument.getName())
-            || jdkAssignable(argument, parameter)) {
+        if (isDirectlyCoercible(argument, parameter)) {
             return true;
         }
-        boolean argumentNumeric = numericRank(argument) >= 0 || argument.isAssignable(Number.class)
-            || argument.getName().equals("char") || argument.isAssignable(Character.class);
-        boolean parameterNumeric = numericRank(parameter) >= 0 || parameter.isAssignable(Number.class)
-            || parameter.getName().equals("char") || parameter.isAssignable(Character.class);
+        boolean argumentNumeric = isNumeric(argument);
+        boolean parameterNumeric = isNumeric(parameter);
         if (argumentNumeric || parameterNumeric) {
             return argumentNumeric && parameterNumeric;
         }
-        boolean argumentBoolean = argument.getName().equals("boolean") || argument.isAssignable(Boolean.class);
-        boolean parameterBoolean = parameter.getName().equals("boolean") || parameter.isAssignable(Boolean.class);
+        boolean argumentBoolean = isBooleanType(argument);
+        boolean parameterBoolean = isBooleanType(parameter);
         if (argumentBoolean || parameterBoolean) {
             return argumentBoolean && parameterBoolean;
         }
@@ -79,11 +71,33 @@ final class ELTypeCompatibility {
             // only a string, handled above, coerces to an enum
             return false;
         }
-        if (parameter.isInterface() && argument.isAssignable(LambdaExpression.class)) {
-            return true;
-        }
-        // an unrelated reference type: the coercion of the section 1.23.10 requires an instance of the type
-        return false;
+        // an unrelated reference type: the coercion of the section 1.23.10 requires an instance of the type, but
+        // a lambda expression coerces to a functional interface
+        return parameter.isInterface() && argument.isAssignable(LambdaExpression.class);
+    }
+
+    /**
+     * Whether a value of the type is coerced without converting it: either type is unknown, the types are
+     * assignable, or one of them is a string.
+     */
+    private static boolean isDirectlyCoercible(ClassElement argument, ClassElement parameter) {
+        return ELCompiler.isUnknown(parameter) || ELCompiler.isUnknown(argument)
+            || argument.getName().equals(parameter.getName())
+            || argument.isAssignable(parameter.getName())
+            || argument.getName().equals(String.class.getName())
+            || parameter.getName().equals(String.class.getName())
+            || parameter.isAssignable(argument.getName())
+            || jdkAssignable(argument, parameter);
+    }
+
+    /** Whether the type is a number or a character, which the section 1.23.3 coerces between. */
+    private static boolean isNumeric(ClassElement type) {
+        return numericRank(type) >= 0 || type.isAssignable(Number.class)
+            || type.getName().equals("char") || type.isAssignable(Character.class);
+    }
+
+    private static boolean isBooleanType(ClassElement type) {
+        return type.getName().equals("boolean") || type.isAssignable(Boolean.class);
     }
 
     /**
@@ -135,9 +149,18 @@ final class ELTypeCompatibility {
         }
         try {
             return Class.forName(name, false, ClassLoader.getPlatformClassLoader());
-        } catch (ClassNotFoundException | LinkageError e) {
+        } catch (ClassNotFoundException | LinkageError _) {
             return null;
         }
+    }
+
+    /**
+     * @return Whether the types are the same, or a primitive and its wrapper
+     */
+    static boolean isSameOrBoxed(ClassElement type, ClassElement other) {
+        return type.getName().equals(other.getName())
+            || other.isPrimitive() && ELCompiler.wrapper(other.getName()).equals(type.getName())
+            || type.isPrimitive() && ELCompiler.wrapper(type.getName()).equals(other.getName());
     }
 
     /** Whether two types are the same, an array type being named after its component. */

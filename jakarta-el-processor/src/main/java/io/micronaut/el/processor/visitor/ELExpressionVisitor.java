@@ -82,6 +82,7 @@ import java.util.function.Supplier;
 public final class ELExpressionVisitor implements TypeElementVisitor<Object, Object> {
 
     private static final String EXPECTED_PARAM_TYPES = "expectedParamTypes";
+    private static final String VARIABLES = "variables";
     /**
      * The annotation processor options limiting the parser, named as the system properties the runtime parser
      * reads, so that an expression is held to the same limits at compile time as at runtime, each with the
@@ -221,59 +222,16 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
         }
         SourceGenerator sourceGenerator = generatorFor(context);
         try {
-            Map<Element, ELCompiler> compilers = new LinkedHashMap<>();
-            String prefix = element.getPackageName() + "." + element.getSimpleName();
-            // every expression is compiled before anything is written: a class retried later must not find
-            // its first classes generated already
-            List<ClassDef> generated = new ArrayList<>();
-
-            List<Failure> failures = new ArrayList<>();
-            List<ExpressionSourceWriter.CompiledValue> compiledValues = new ArrayList<>(expressions.size());
-            Set<String> constantNames = new HashSet<>();
-            for (int i = 0; i < expressions.size(); i++) {
-                Declared<ELExpression> declared = expressions.get(i);
-                try {
-                    ELExpressionDefinition definition = valueDefinition(declared.annotation(), declared.owner(), constantNames, context);
-                    String className = prefix + "$Expression" + i;
-                    ValueExpressionWriter.Written written = ValueExpressionWriter.write(className, definition,
-                        compilerFor(declared.owner(), element, compilers, context));
-                    generated.add(written.type());
-                    compiledValues.add(new ExpressionSourceWriter.CompiledValue(written.definition(), className));
-                } catch (ELParsingException | ELCompilationException e) {
-                    failures.add(new Failure(declared.owner(), expressionOf(declared.annotation()).orElse(""), e));
-                }
-            }
-
-            List<ExpressionSourceWriter.CompiledMethod> compiledMethods = new ArrayList<>(methodExpressions.size());
-            for (int i = 0; i < methodExpressions.size(); i++) {
-                Declared<ELMethodExpression> declared = methodExpressions.get(i);
-                try {
-                    ELMethodExpressionDefinition definition = methodDefinition(declared.annotation(), declared.owner(), constantNames, context);
-                    String className = prefix + "$MethodExpression" + i;
-                    MethodExpressionWriter.Written written = MethodExpressionWriter.write(className, definition,
-                        compilerFor(declared.owner(), element, compilers, context));
-                    generated.add(written.type());
-                    compiledMethods.add(new ExpressionSourceWriter.CompiledMethod(written.definition(), className));
-                } catch (ELParsingException | ELCompilationException e) {
-                    failures.add(new Failure(declared.owner(), expressionOf(declared.annotation()).orElse(""), e));
-                }
-            }
-            if (!failures.isEmpty()) {
-                Failure undeclared = failures.stream()
-                    .filter(failure -> failure.cause() instanceof ELUndeclaredFunctionException)
-                    .findFirst().orElse(null);
-                if (retryUndeclared && undeclared != null) {
-                    throw undeclared.cause();
-                }
-                for (Failure failure : failures) {
-                    // reported as it is: the processors of the languages would format it, and an expression may
-                    // well contain a '%'
-                    context.fail("The expression '" + failure.expression() + "' cannot be compiled: "
-                        + reportable(failure.cause()), failure.owner());
-                }
+            ClassCompilation compilation = new ClassCompilation(element, context);
+            List<ExpressionSourceWriter.CompiledValue> compiledValues = compilation.compileValues(expressions);
+            List<ExpressionSourceWriter.CompiledMethod> compiledMethods = compilation.compileMethods(methodExpressions);
+            if (!compilation.failures.isEmpty()) {
+                reportFailures(compilation.failures, retryUndeclared, context);
                 return;
             }
 
+            List<ClassDef> generated = compilation.generated;
+            String prefix = compilation.prefix;
             String sourceClassName = prefix + "$ELExpressions";
             generated.add(ExpressionSourceWriter.write(sourceClassName, compiledValues, compiledMethods));
             for (ClassDef classDef : generated) {
@@ -292,6 +250,27 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
                 throw runtimeException;
             }
             throw new ProcessingException(element, "Failed to generate the expressions: " + reportable(e), e);
+        }
+    }
+
+    /**
+     * Reports the expressions of a class that cannot be compiled on the elements declaring them.
+     *
+     * @throws ELUndeclaredFunctionException When one of them calls a function no class visited so far declares,
+     *                                       and the class is to be retried later
+     */
+    private static void reportFailures(List<Failure> failures, boolean retryUndeclared, VisitorContext context) {
+        Failure undeclared = failures.stream()
+            .filter(failure -> failure.cause() instanceof ELUndeclaredFunctionException)
+            .findFirst().orElse(null);
+        if (retryUndeclared && undeclared != null) {
+            throw undeclared.cause();
+        }
+        for (Failure failure : failures) {
+            // reported as it is: the processors of the languages would format it, and an expression may
+            // well contain a '%'
+            context.fail("The expression '" + failure.expression() + "' cannot be compiled: "
+                + reportable(failure.cause()), failure.owner());
         }
     }
 
@@ -518,7 +497,7 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
         if (environment == null) {
             return;
         }
-        List<AnnotationValue<ELVariable>> declaredVariables = ELTypes.nested(environment, "variables", ELVariable.class);
+        List<AnnotationValue<ELVariable>> declaredVariables = ELTypes.nested(environment, VARIABLES, ELVariable.class);
         for (int i = 0; i < declaredVariables.size(); i++) {
             int variableIndex = i;
             AnnotationValue<ELVariable> variable = declaredVariables.get(i);
@@ -527,13 +506,13 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
             Optional<ClassElement> kotlinPrimitive = context.getLanguage() == VisitorContext.Language.KOTLIN
                 // the metadata names the wrapper of Int::class, the KSP model the primitive it is
                 ? KotlinAnnotationTypes.resolveNestedPrimitive(owner.getNativeType(), ELEnvironment.class.getName(),
-                    "variables", variableIndex, "type")
+                    VARIABLES, variableIndex, "type")
                 : Optional.empty();
             ClassElement type = kotlinPrimitive
                 .or(() -> ELTypes.resolveMember(variable, "type", context))
                 .or(() -> context.getLanguage() == VisitorContext.Language.JAVA
                     ? JavaAnnotationTypes.resolveNestedMember(owner.getNativeType(), ELEnvironment.class.getName(),
-                        "variables", variableIndex, "type", context)
+                        VARIABLES, variableIndex, "type", context)
                     : Optional.empty())
                 .orElseThrow(() ->
                 new ELCompilationException("The type of the variable '" + name + "' is required"));
@@ -635,5 +614,62 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
      * @param cause      The reason
      */
     private record Failure(Element owner, String expression, RuntimeException cause) {
+    }
+
+    /**
+     * The compilation of the expressions declared on a class. Every expression is compiled before anything is
+     * written: a class retried later must not find its first classes generated already.
+     */
+    private final class ClassCompilation {
+
+        private final ClassElement element;
+        private final VisitorContext context;
+        private final String prefix;
+        private final Map<Element, ELCompiler> compilers = new LinkedHashMap<>();
+        private final Set<String> constantNames = new HashSet<>();
+        private final List<ClassDef> generated = new ArrayList<>();
+        private final List<Failure> failures = new ArrayList<>();
+
+        private ClassCompilation(ClassElement element, VisitorContext context) {
+            this.element = element;
+            this.context = context;
+            this.prefix = element.getPackageName() + "." + element.getSimpleName();
+        }
+
+        private List<ExpressionSourceWriter.CompiledValue> compileValues(List<Declared<ELExpression>> expressions) {
+            List<ExpressionSourceWriter.CompiledValue> compiledValues = new ArrayList<>(expressions.size());
+            for (int i = 0; i < expressions.size(); i++) {
+                Declared<ELExpression> declared = expressions.get(i);
+                try {
+                    ELExpressionDefinition definition = valueDefinition(declared.annotation(), declared.owner(), constantNames, context);
+                    String className = prefix + "$Expression" + i;
+                    ValueExpressionWriter.Written written = ValueExpressionWriter.write(className, definition,
+                        compilerFor(declared.owner(), element, compilers, context));
+                    generated.add(written.type());
+                    compiledValues.add(new ExpressionSourceWriter.CompiledValue(written.definition(), className));
+                } catch (ELParsingException | ELCompilationException e) {
+                    failures.add(new Failure(declared.owner(), expressionOf(declared.annotation()).orElse(""), e));
+                }
+            }
+            return compiledValues;
+        }
+
+        private List<ExpressionSourceWriter.CompiledMethod> compileMethods(List<Declared<ELMethodExpression>> methodExpressions) {
+            List<ExpressionSourceWriter.CompiledMethod> compiledMethods = new ArrayList<>(methodExpressions.size());
+            for (int i = 0; i < methodExpressions.size(); i++) {
+                Declared<ELMethodExpression> declared = methodExpressions.get(i);
+                try {
+                    ELMethodExpressionDefinition definition = methodDefinition(declared.annotation(), declared.owner(), constantNames, context);
+                    String className = prefix + "$MethodExpression" + i;
+                    MethodExpressionWriter.Written written = MethodExpressionWriter.write(className, definition,
+                        compilerFor(declared.owner(), element, compilers, context));
+                    generated.add(written.type());
+                    compiledMethods.add(new ExpressionSourceWriter.CompiledMethod(written.definition(), className));
+                } catch (ELParsingException | ELCompilationException e) {
+                    failures.add(new Failure(declared.owner(), expressionOf(declared.annotation()).orElse(""), e));
+                }
+            }
+            return compiledMethods;
+        }
     }
 }

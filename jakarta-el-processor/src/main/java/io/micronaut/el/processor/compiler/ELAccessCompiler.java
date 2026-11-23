@@ -80,8 +80,8 @@ final class ELAccessCompiler {
         if (generatedType != null) {
             // The continuation is an expression evaluated in place: a member of a stable base is guarded inline,
             // any other base is handed to a private helper, which evaluates it exactly once. Nothing is hoisted
-            // ahead of the enclosing expression, so the operands of ?:, && and || that are not taken are not
-            // evaluated, and the operands of every operator keep their left-to-right order.
+            // ahead of the enclosing expression, so the operands of the conditional and logical operators that
+            // are not taken are not evaluated, and the operands of every operator keep their left-to-right order.
             if (!required && stable(base.expression())) {
                 ELCompiler.Typed inlined = inlineAccess(base, ctx, continuation);
                 if (inlined != null) {

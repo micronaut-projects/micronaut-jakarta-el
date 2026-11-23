@@ -23,6 +23,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 /**
@@ -34,7 +35,7 @@ import java.util.function.Function;
  * held value would keep a loader that was otherwise dropped, a redeployed application or a closed plugin,
  * reachable from this cache forever. A value the collector cleared is read again on the next use.</p>
  *
- * <p>A read does not lock: the entries are an immutable array replaced as a whole on every write, and there are
+ * <p>A read does not lock: the entries are an immutable list replaced as a whole on every write, and there are
  * only ever as many of them as there are class loaders evaluating expressions.</p>
  *
  * @param <T> The type of the value
@@ -47,8 +48,7 @@ public final class ELClassLoaderCache<T> {
     private final Function<ClassLoader, T> reader;
     private final ClassLoader fallback;
 
-    @SuppressWarnings("unchecked")
-    private volatile Entry<T>[] entries = new Entry[0];
+    private final AtomicReference<List<Entry<T>>> entries = new AtomicReference<>(List.of());
 
     /**
      * @param fallback The class loader used when the thread has no context class loader, normally the loader of
@@ -74,18 +74,19 @@ public final class ELClassLoaderCache<T> {
      * @return The value of the class loader, read once and kept until the loader or the value is collected
      */
     public T get(ClassLoader classLoader) {
-        T value = find(entries, classLoader);
+        T value = find(entries(), classLoader);
         if (value != null) {
             return value;
         }
         synchronized (this) {
-            value = find(entries, classLoader);
+            List<Entry<T>> current = entries();
+            value = find(current, classLoader);
             if (value != null) {
                 return value;
             }
             value = Objects.requireNonNull(reader.apply(classLoader), "The value of a class loader cannot be null");
-            List<Entry<T>> retained = new ArrayList<>(entries.length + 1);
-            for (Entry<T> entry : entries) {
+            List<Entry<T>> retained = new ArrayList<>(current.size() + 1);
+            for (Entry<T> entry : current) {
                 ClassLoader key = entry.classLoader.get();
                 // the entries of a collected loader or value, and the stale one of this loader, are dropped
                 if (key != null && key != classLoader && entry.value.get() != null) {
@@ -93,15 +94,17 @@ public final class ELClassLoaderCache<T> {
                 }
             }
             retained.add(new Entry<>(classLoader, value));
-            @SuppressWarnings("unchecked")
-            Entry<T>[] replaced = retained.toArray(new Entry[0]);
-            entries = replaced;
+            entries.set(List.copyOf(retained));
             return value;
         }
     }
 
+    private List<Entry<T>> entries() {
+        return Objects.requireNonNull(entries.get());
+    }
+
     @Nullable
-    private static <T> T find(Entry<T>[] entries, ClassLoader classLoader) {
+    private static <T> T find(List<Entry<T>> entries, ClassLoader classLoader) {
         for (Entry<T> entry : entries) {
             if (entry.classLoader.get() == classLoader) {
                 return entry.value.get();

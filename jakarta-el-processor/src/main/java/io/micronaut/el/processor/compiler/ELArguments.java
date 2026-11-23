@@ -17,6 +17,8 @@ package io.micronaut.el.processor.compiler;
 
 import io.micronaut.el.parser.ast.ELNode;
 import io.micronaut.inject.ast.ClassElement;
+import io.micronaut.inject.ast.MethodElement;
+import io.micronaut.inject.ast.ParameterElement;
 import io.micronaut.sourcegen.model.ExpressionDef;
 import org.jspecify.annotations.Nullable;
 
@@ -84,5 +86,33 @@ final class ELArguments {
 
     ExpressionDef ctx() {
         return ctx;
+    }
+
+    /**
+     * @return Whether the argument is an array passed as the variable arity parameter itself, rather than its
+     * single element
+     */
+    boolean isDirectVarargsArray(MethodElement method, int index) {
+        ParameterElement[] parameters = method.getParameters();
+        if (!method.isVarArgs() || index != parameters.length - 1 || nodes.size() != parameters.length
+            || nodes.get(index) instanceof ELNode.Lambda) {
+            return false;
+        }
+        ClassElement type = typed(index).type();
+        // the name of an array type is the name of its component, so the dimensions are compared too
+        return type != null && ELTypeCompatibility.isArrayArgument(type, parameters[index].getType());
+    }
+
+    /**
+     * @return The type of the parameter an argument is passed to, the component of the variable arity parameter
+     * for its elements, or {@code null} for an argument beyond the parameters
+     */
+    @Nullable
+    static ClassElement parameter(MethodElement method, int index, boolean directVarargsArray) {
+        ParameterElement[] parameters = method.getParameters();
+        if (!directVarargsArray && method.isVarArgs() && index >= parameters.length - 1) {
+            return parameters[parameters.length - 1].getType().fromArray();
+        }
+        return index < parameters.length ? parameters[index].getType() : null;
     }
 }

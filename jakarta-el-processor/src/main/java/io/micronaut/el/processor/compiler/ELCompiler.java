@@ -80,6 +80,8 @@ public final class ELCompiler {
     private static final ClassTypeDef EL_CLASS = ClassTypeDef.of(ELClass.class);
     private static final ClassTypeDef EL_STREAM = ClassTypeDef.of(ELStream.class);
     private static final String STREAM = "stream";
+    private static final String INVOKE = "invoke";
+    private static final String NEGATE = "negate";
     private static final TypeDef LAMBDA_EXPRESSION = TypeDef.of(LambdaExpression.class);
     private static final TypeDef STRING = TypeDef.of(String.class);
     private static final TypeDef BOOLEAN = TypeDef.Primitive.BOOLEAN;
@@ -172,7 +174,8 @@ public final class ELCompiler {
                 boolean inLambda = lambdaReferences.containsKey(name) && context.variableType(name) != null;
                 // the shared local is resolved before anything else is evaluated, which is only the evaluation
                 // of the expression when one of the references is evaluated whatever the operands evaluate to:
-                // a reference behind ?:, &&, || or a base that may be null may not be evaluated at all
+                // a reference behind a conditional or logical operator, or behind a base that may be null, may not be
+                // evaluated at all
                 if ((count > 1 || inLambda) && unconditional.contains(name)
                     && context.resolveClass(name) == null && context.resolveStaticField(name) == null) {
                     shared.add(name);
@@ -664,7 +667,7 @@ public final class ELCompiler {
                         (receiver, values) -> ClassTypeDef.of(importedClass).invokeStatic(staticMethod, values));
                 }
                 // the class declares overloads of the method, the resolution is deferred to the resolvers
-                return dynamic(runtime(EL_RESOLUTION, "invoke", TypeDef.OBJECT,
+                return dynamic(runtime(EL_RESOLUTION, INVOKE, TypeDef.OBJECT,
                     arguments(ctx, elClass(importedClass), compile(method.property(), ctx), arguments)));
             }
         }
@@ -678,8 +681,7 @@ public final class ELCompiler {
                                 Typed base,
                                 ExpressionDef ctx) {
         ClassElement baseType = base.type();
-        if (baseType != null && isOptional(baseType)
-            && (methodName == null || ELOverloadSelection.methodCandidates(baseType, methodName, method.arguments(), false).isEmpty())) {
+        if (baseType != null && isOptional(baseType) && !declaresMethod(baseType, methodName, method)) {
             // the OptionalELResolver of the specification: the method of the value, null when it is empty; a method
             // Optional declares itself (map, orElse...) keeps priority, as the resolver chain and the interpreter
             // try the bean resolver before the OptionalELResolver
@@ -693,28 +695,57 @@ public final class ELCompiler {
         // every argument is compiled once, whatever the selection of the method reads of it
         ELArguments arguments = arguments(method.arguments(), ctx);
         if (methodName != null && baseType != null) {
-            MethodElement target = selectMethod(baseType, methodName, arguments, false);
-            if (target != null) {
-                ClassElement argumentType = arguments.size() == 1 ? arguments.typed(0).type() : null;
-                if (!ELBridgeMethods.requiresRuntimeSelection(baseType, target, argumentType)) {
-                    List<ExpressionDef> values = coercedArguments(baseType, target, arguments);
-                    if (ELTypes.isStatic(target)) {
-                        // a static method invoked through an instance: the instance is evaluated, then ignored
-                        ClassTypeDef owner = ELTypes.staticOwner(target);
-                        return invocation(base.expression(), target, values, returnType(baseType, target),
-                            (receiver, parameters) -> owner.invokeStatic(target, parameters));
-                    }
-                    return invocation(base.expression(), target, values, returnType(baseType, target),
-                        (receiver, parameters) -> receiver.invoke(target, parameters));
-                }
-            } else if (ELOverloadSelection.methodCandidates(baseType, methodName, method.arguments(), false).isEmpty()) {
+            Typed selected = compileSelectedMethod(method, methodName, base, baseType, arguments);
+            if (selected != null) {
+                return selected;
+            }
+        }
+        return dynamic(runtime(EL_RESOLUTION, INVOKE, TypeDef.OBJECT,
+            arguments(ctx, base.expression(), compile(method.property(), ctx), arguments)));
+    }
+
+    /**
+     * @return Whether the type declares a method of the name taking as many arguments, false when the name is
+     * only known at runtime
+     */
+    private static boolean declaresMethod(ClassElement type, @Nullable String methodName, ELNode.Method method) {
+        return methodName != null
+            && !ELOverloadSelection.methodCandidates(type, methodName, method.arguments(), false).isEmpty();
+    }
+
+    /**
+     * Invokes the method the compiler selects of the static type of the base.
+     *
+     * @return The invocation, or {@code null} when the method is selected at runtime
+     */
+    @Nullable
+    private Typed compileSelectedMethod(ELNode.Method method,
+                                        String methodName,
+                                        Typed base,
+                                        ClassElement baseType,
+                                        ELArguments arguments) {
+        MethodElement target = selectMethod(baseType, methodName, arguments, false);
+        if (target == null) {
+            if (!declaresMethod(baseType, methodName, method)) {
                 // the selection may well be deferred to runtime, for an argument whose static type does not
                 // decide between overloads: only a method the type does not declare at all is reported
                 warnUnknownMember(baseType, "method", methodName + "(" + method.arguments().size() + " argument(s))");
             }
+            return null;
         }
-        return dynamic(runtime(EL_RESOLUTION, "invoke", TypeDef.OBJECT,
-            arguments(ctx, base.expression(), compile(method.property(), ctx), arguments)));
+        ClassElement argumentType = arguments.size() == 1 ? arguments.typed(0).type() : null;
+        if (ELBridgeMethods.requiresRuntimeSelection(baseType, target, argumentType)) {
+            return null;
+        }
+        List<ExpressionDef> values = coercedArguments(baseType, target, arguments);
+        if (ELTypes.isStatic(target)) {
+            // a static method invoked through an instance: the instance is evaluated, then ignored
+            ClassTypeDef owner = ELTypes.staticOwner(target);
+            return invocation(base.expression(), target, values, returnType(baseType, target),
+                (receiver, parameters) -> owner.invokeStatic(target, parameters));
+        }
+        return invocation(base.expression(), target, values, returnType(baseType, target),
+            (receiver, parameters) -> receiver.invoke(target, parameters));
     }
 
     private static boolean isOptional(ClassElement type) {
@@ -765,25 +796,31 @@ public final class ELCompiler {
         }
         operands.addAll(values);
         TypeDef returnType = isVoid ? TypeDef.OBJECT : helperReturnType(direct.type());
-        ExpressionDef call = accessCompiler.helper("invoke", operands, returnType, parameters -> {
+        ExpressionDef call = accessCompiler.helper(INVOKE, operands, returnType, parameters -> {
             ExpressionDef target = receiver == null ? null : parameters.get(0);
             List<ExpressionDef> arguments = parameters.subList(receiver == null ? 0 : 1, parameters.size());
             ExpressionDef invocation = invoke.apply(target, arguments);
-            StatementDef body;
-            if (isVoid) {
-                body = StatementDef.multi((StatementDef) invocation, ExpressionDef.nullValue().returning());
-            } else if (!(returnType instanceof TypeDef.Primitive) && !returnType.equals(TypeDef.OBJECT)
-                && !invocation.type().equals(returnType)) {
-                body = invocation.cast(returnType).returning();
-            } else {
-                body = invocation.returning();
-            }
-            return new StatementDef.Try(body)
-                .doCatch(jakarta.el.ELException.class, exception -> new StatementDef.Throw(exception))
+            return new StatementDef.Try(returningInvocation(invocation, isVoid, returnType))
+                .doCatch(jakarta.el.ELException.class, StatementDef.Throw::new)
                 .doCatch(Exception.class, exception -> new StatementDef.Throw(ClassTypeDef.of(jakarta.el.ELException.class)
                     .instantiate(List.of(TypeDef.of(Throwable.class)), exception)));
         });
         return isVoid ? dynamic(call) : new Typed(call, resultType);
+    }
+
+    /**
+     * @return The statement returning the result of an invocation from a helper: null for a {@code void} member,
+     * the result cast to the return type of the helper when it is a narrower reference type
+     */
+    private static StatementDef returningInvocation(ExpressionDef invocation, boolean isVoid, TypeDef returnType) {
+        if (isVoid) {
+            return StatementDef.multi((StatementDef) invocation, ExpressionDef.nullValue().returning());
+        }
+        if (!(returnType instanceof TypeDef.Primitive) && !returnType.equals(TypeDef.OBJECT)
+            && !invocation.type().equals(returnType)) {
+            return invocation.cast(returnType).returning();
+        }
+        return invocation.returning();
     }
 
     private static TypeDef helperReturnType(TypeDef type) {
@@ -903,7 +940,7 @@ public final class ELCompiler {
                 }
                 return new Typed(accessCompiler.helper("instantiate", values, TypeDef.erasure(importedClass),
                     parameters -> new StatementDef.Try(ClassTypeDef.of(importedClass).instantiate(constructor, parameters).returning())
-                        .doCatch(jakarta.el.ELException.class, exception -> new StatementDef.Throw(exception))
+                        .doCatch(jakarta.el.ELException.class, StatementDef.Throw::new)
                         .doCatch(Exception.class, exception -> new StatementDef.Throw(ClassTypeDef.of(jakarta.el.ELException.class)
                             .instantiate(List.of(TypeDef.of(Throwable.class)), exception)))), importedClass);
             }
@@ -981,9 +1018,9 @@ public final class ELCompiler {
             TypeDef.Primitive primitive = (TypeDef.Primitive) Objects.requireNonNull(operand.primitiveExpression()).type();
             if (!accessCompiler.canAddHelpers() || primitive.equals(TypeDef.Primitive.BYTE)
                 || primitive.equals(TypeDef.Primitive.SHORT)) {
-                return dynamic(runtime(EL_ARITHMETIC, "negate", TypeDef.OBJECT, operand.expression()));
+                return dynamic(runtime(EL_ARITHMETIC, NEGATE, TypeDef.OBJECT, operand.expression()));
             }
-            return dynamic(accessCompiler.helper("negate", List.of(operand.expression()), TypeDef.OBJECT, parameters ->
+            return dynamic(accessCompiler.helper(NEGATE, List.of(operand.expression()), TypeDef.OBJECT, parameters ->
                 StatementDef.multi(new StatementDef.If(parameters.get(0).isNull(),
                         ExpressionDef.constant(Long.valueOf(0L)).cast(TypeDef.OBJECT).returning()),
                     boxed(parameters.get(0).cast(primitive).math(ExpressionDef.MathUnaryOperation.OpType.NEGATE))
@@ -997,7 +1034,7 @@ public final class ELCompiler {
             return new Typed(numeric(operand, type).math(ExpressionDef.MathUnaryOperation.OpType.NEGATE),
                 type.equals(TypeDef.Primitive.INT) ? PrimitiveElement.INT : PrimitiveElement.FLOAT);
         }
-        return dynamic(runtime(EL_ARITHMETIC, "negate", TypeDef.OBJECT, operand.expression()));
+        return dynamic(runtime(EL_ARITHMETIC, NEGATE, TypeDef.OBJECT, operand.expression()));
     }
 
     private Typed compileBinary(ELNode.Binary binary, ExpressionDef ctx) {
@@ -1138,7 +1175,7 @@ public final class ELCompiler {
     }
 
     private static boolean isLiteral(ELNode node) {
-        ELNode expression = node instanceof ELNode.Eval eval ? eval.expression() : node;
+        ELNode expression = node instanceof ELNode.Eval(ELNode evaluated) ? evaluated : node;
         return expression instanceof ELNode.IntegerLiteral || expression instanceof ELNode.FloatingPointLiteral
             || expression instanceof ELNode.StringLiteral || expression instanceof ELNode.BooleanLiteral
             || expression instanceof ELNode.NullLiteral;
@@ -1170,9 +1207,14 @@ public final class ELCompiler {
         return bool(accessCompiler.helper("compare", operands, BOOLEAN, parameters -> {
             ExpressionDef a = nullableParameter(left, parameters.get(0), type);
             ExpressionDef b = nullableParameter(right, parameters.get(1), type);
-            ExpressionDef.ConditionExpressionDef anyNull = left.primitiveNullable() && right.primitiveNullable()
-                ? parameters.get(0).isNull().or(parameters.get(1).isNull())
-                : (left.primitiveNullable() ? parameters.get(0) : parameters.get(1)).isNull();
+            ExpressionDef.ConditionExpressionDef anyNull;
+            if (left.primitiveNullable() && right.primitiveNullable()) {
+                anyNull = parameters.get(0).isNull().or(parameters.get(1).isNull());
+            } else if (left.primitiveNullable()) {
+                anyNull = parameters.get(0).isNull();
+            } else {
+                anyNull = parameters.get(1).isNull();
+            }
             ExpressionDef whenNull = ExpressionDef.constant(operator == BinaryOperator.NOT_EQUAL);
             if (left.primitiveNullable() && right.primitiveNullable()
                 && (operator == BinaryOperator.EQUAL || operator == BinaryOperator.NOT_EQUAL)) {
@@ -1519,9 +1561,7 @@ public final class ELCompiler {
             return result.expression().cast(TypeDef.OBJECT).returning();
         }
         ClassElement type = result.type();
-        if (type != null && (type.getName().equals(returnType.getName())
-            || returnType.isPrimitive() && wrapper(returnType.getName()).equals(type.getName())
-            || type.isPrimitive() && wrapper(type.getName()).equals(returnType.getName()))) {
+        if (type != null && ELTypeCompatibility.isSameOrBoxed(type, returnType)) {
             // the body already has the type the interface returns
             ExpressionDef value = result.expression();
             return (value.type().equals(erasure(returnType)) ? value : value.cast(erasure(returnType))).returning();
@@ -1603,18 +1643,6 @@ public final class ELCompiler {
     private List<ExpressionDef> arguments(ExpressionDef ctx,
                                           ExpressionDef base,
                                           ExpressionDef property,
-                                          List<ELNode> arguments) {
-        List<ExpressionDef> values = new ArrayList<>(arguments.size() + 3);
-        values.add(ctx);
-        values.add(base);
-        values.add(property);
-        values.addAll(compileAll(arguments, ctx));
-        return values;
-    }
-
-    private List<ExpressionDef> arguments(ExpressionDef ctx,
-                                          ExpressionDef base,
-                                          ExpressionDef property,
                                           ELArguments arguments) {
         List<ExpressionDef> values = new ArrayList<>(arguments.size() + 3);
         values.add(ctx);
@@ -1631,46 +1659,15 @@ public final class ELCompiler {
      *                 parameters, or {@code null} for a static method
      */
     private List<ExpressionDef> coercedArguments(@Nullable ClassElement receiver, MethodElement method, ELArguments compiledArguments) {
-        List<ELNode> arguments = compiledArguments.nodes();
-        ExpressionDef ctx = compiledArguments.ctx();
+        int count = compiledArguments.size();
         ParameterElement[] parameters = method.getParameters();
-        List<ExpressionDef> values = new ArrayList<>(arguments.size());
+        List<ExpressionDef> values = new ArrayList<>(count);
         boolean directVarargsArray = false;
-        for (int i = 0; i < arguments.size(); i++) {
-            ELNode argument = arguments.get(i);
-            ClassElement parameter = i < parameters.length ? parameters[i].getType() : null;
-            Typed directValue = null;
-            if (method.isVarArgs() && i == parameters.length - 1 && arguments.size() == parameters.length
-                && !(argument instanceof ELNode.Lambda)) {
-                directValue = compiledArguments.typed(i);
-                ClassElement arrayParameter = parameters[parameters.length - 1].getType();
-                // the name of an array type is the name of its component, so the dimensions are compared too
-                if (directValue.type() != null && ELTypeCompatibility.isArrayArgument(directValue.type(), arrayParameter)) {
-                    directVarargsArray = true;
-                } else {
-                    parameter = parameters[parameters.length - 1].getType().fromArray();
-                }
-            } else if (method.isVarArgs() && i >= parameters.length - 1) {
-                parameter = parameters[parameters.length - 1].getType().fromArray();
-            }
-            if (argument instanceof ELNode.Lambda lambda && parameter != null) {
-                MethodElement functionalMethod = functionalMethod(parameter);
-                if (functionalMethod != null) {
-                    // the section 1.25.8 of the specification coerces a lambda expression to a functional
-                    // interface, which a lambda expression written in place implements directly
-                    values.add(functionalLambda(lambda, receiver, parameter, functionalMethod, ctx));
-                    continue;
-                }
-                if (parameter.isAssignable(LambdaExpression.class)) {
-                    values.add(compileLambda(lambda, ctx));
-                    continue;
-                }
-            }
-            Typed value = directValue == null ? compiledArguments.typed(i) : directValue;
-            if (parameter != null) {
-                ELTypeCompatibility.requireCoercible(value.type(), parameter, method, i);
-            }
-            values.add(parameter == null ? value.expression() : coerce(value.expression(), parameter, ctx));
+        for (int i = 0; i < count; i++) {
+            boolean direct = compiledArguments.isDirectVarargsArray(method, i);
+            directVarargsArray |= direct;
+            ClassElement parameter = ELArguments.parameter(method, i, direct);
+            values.add(coercedArgument(receiver, method, compiledArguments, i, parameter));
         }
         if (!method.isVarArgs() || directVarargsArray) {
             return values;
@@ -1681,6 +1678,47 @@ public final class ELCompiler {
         ClassElement component = parameters[fixed].getType().fromArray();
         packed.add(erasure(component).array().instantiate(values.subList(fixed, values.size())));
         return packed;
+    }
+
+    private ExpressionDef coercedArgument(@Nullable ClassElement receiver,
+                                          MethodElement method,
+                                          ELArguments arguments,
+                                          int index,
+                                          @Nullable ClassElement parameter) {
+        ExpressionDef ctx = arguments.ctx();
+        if (parameter != null && arguments.nodes().get(index) instanceof ELNode.Lambda lambda) {
+            ExpressionDef value = lambdaArgument(lambda, receiver, parameter, ctx);
+            if (value != null) {
+                return value;
+            }
+        }
+        Typed value = arguments.typed(index);
+        if (parameter == null) {
+            return value.expression();
+        }
+        ELTypeCompatibility.requireCoercible(value.type(), parameter, method, index);
+        return coerce(value.expression(), parameter, ctx);
+    }
+
+    /**
+     * @return A lambda expression written in place as an argument of the parameter, or {@code null} when the
+     * parameter takes neither a functional interface nor a {@link LambdaExpression}
+     */
+    @Nullable
+    private ExpressionDef lambdaArgument(ELNode.Lambda lambda,
+                                         @Nullable ClassElement receiver,
+                                         ClassElement parameter,
+                                         ExpressionDef ctx) {
+        MethodElement functionalMethod = functionalMethod(parameter);
+        if (functionalMethod != null) {
+            // the section 1.25.8 of the specification coerces a lambda expression to a functional
+            // interface, which a lambda expression written in place implements directly
+            return functionalLambda(lambda, receiver, parameter, functionalMethod, ctx);
+        }
+        if (parameter.isAssignable(LambdaExpression.class)) {
+            return compileLambda(lambda, ctx);
+        }
+        return null;
     }
 
     private ExpressionDef coerce(ExpressionDef value, ClassElement target, ExpressionDef ctx) {

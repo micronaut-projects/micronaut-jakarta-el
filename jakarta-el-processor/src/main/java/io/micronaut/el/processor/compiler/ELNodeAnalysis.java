@@ -95,11 +95,11 @@ final class ELNodeAnalysis {
     private static void collectUnconditional(ELNode node, Set<String> names) {
         switch (node) {
             case ELNode.Identifier identifier -> names.add(identifier.name());
-            case ELNode.Lambda ignored -> {
+            case ELNode.Lambda _ -> {
                 // evaluated when invoked, if at all
             }
-            case ELNode.Property property -> collectUnconditional(property.base(), names);
-            case ELNode.Method method -> collectUnconditional(method.base(), names);
+            case ELNode.Property(ELNode base, var _) -> collectUnconditional(base, names);
+            case ELNode.Method(ELNode base, var _, var _) -> collectUnconditional(base, names);
             case ELNode.Ternary ternary -> collectUnconditional(ternary.condition(), names);
             case ELNode.Binary binary -> {
                 collectUnconditional(binary.left(), names);

@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -170,21 +171,17 @@ public final class InterpretingELExpressionParser implements ELExpressionParser 
         } else {
             entry.lastUse = clock.incrementAndGet();
         }
+        boolean parsedOk = false;
         try {
-            return entry.get(expression);
-        } catch (RuntimeException | Error e) {
-            // a string that does not parse is not cached, so the entry is left for no one
-            parsed.remove(expression, entry);
-            throw e;
+            Parsed result = entry.get(expression);
+            parsedOk = true;
+            return result;
+        } finally {
+            if (!parsedOk) {
+                // a string that does not parse is not cached, so the entry is left for no one
+                parsed.remove(expression, entry);
+            }
         }
-    }
-
-    private Parsed doParse(String expression) {
-        ELNode node = ELParser.parse(expression, options);
-        // an expression without functions evaluates the same way under every context, so its evaluators
-        // are compiled once and shared by the expressions created from the string
-        return new Parsed(node, ELInterpreter.containsFunction(node) ? null
-            : ELInterpreter.of(null, node, executors).compile(node));
     }
 
     /**
@@ -256,24 +253,32 @@ public final class InterpretingELExpressionParser implements ELExpressionParser 
     private final class CacheEntry {
 
         private volatile long lastUse;
-        private volatile @Nullable Parsed value;
+        private final AtomicReference<@Nullable Parsed> value = new AtomicReference<>();
 
         private CacheEntry(long lastUse) {
             this.lastUse = lastUse;
         }
 
         private Parsed get(String expression) {
-            Parsed result = value;
+            Parsed result = value.get();
             if (result == null) {
                 synchronized (this) {
-                    result = value;
+                    result = value.get();
                     if (result == null) {
                         result = doParse(expression);
-                        value = result;
+                        value.set(result);
                     }
                 }
             }
             return result;
+        }
+
+        private Parsed doParse(String expression) {
+            ELNode node = ELParser.parse(expression, options);
+            // an expression without functions evaluates the same way under every context, so its evaluators
+            // are compiled once and shared by the expressions created from the string
+            return new Parsed(node, ELInterpreter.containsFunction(node) ? null
+                : ELInterpreter.of(null, node, executors).compile(node));
         }
     }
 }

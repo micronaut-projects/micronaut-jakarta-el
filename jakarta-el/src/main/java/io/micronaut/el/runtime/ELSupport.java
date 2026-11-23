@@ -886,7 +886,7 @@ public final class ELSupport {
             Object coerced;
             try {
                 coerced = available ? edit(string, type) : NO_EDITOR;
-            } catch (LinkageError e) {
+            } catch (LinkageError _) {
                 // java.desktop is not in the runtime image
                 available = false;
                 coerced = NO_EDITOR;

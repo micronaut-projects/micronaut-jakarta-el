@@ -426,7 +426,7 @@ public final class ELMethods {
         try {
             ELSupport.coerce(argument, parameterType);
             return true;
-        } catch (ELException | IllegalArgumentException | ClassCastException | ArithmeticException e) {
+        } catch (ELException | IllegalArgumentException | ClassCastException | ArithmeticException _) {
             return false;
         }
     }

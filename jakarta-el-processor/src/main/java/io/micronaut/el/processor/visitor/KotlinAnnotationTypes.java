@@ -117,25 +117,41 @@ final class KotlinAnnotationTypes {
         List<List<ClassElement>> matches = new ArrayList<>(1);
         for (KSAnnotation annotation : annotations(nativeType)) {
             for (KSAnnotation declaration : declarations(annotation, annotationName)) {
-                if (discriminatorMembers.stream().noneMatch(name ->
-                    Objects.equals(discriminatorValue, argument(declaration, name)))) {
-                    continue;
+                if (isDeclaration(declaration, discriminatorMembers, discriminatorValue, nameMember, nameValue)
+                    && argument(declaration, member) instanceof List<?> values
+                    && values.size() == recovered.size()) {
+                    matches.add(memberTypes(values, recovered));
                 }
-                if (!nameValue.isEmpty() && !Objects.equals(nameValue, argument(declaration, nameMember))) {
-                    continue;
-                }
-                if (!(argument(declaration, member) instanceof List<?> values) || values.size() != recovered.size()) {
-                    continue;
-                }
-                List<ClassElement> types = new ArrayList<>(values.size());
-                for (int i = 0; i < values.size(); i++) {
-                    PrimitiveElement primitive = primitive(values.get(i));
-                    types.add(primitive != null ? primitive : recovered.get(i));
-                }
-                matches.add(types);
             }
         }
         return matches;
+    }
+
+    /**
+     * Whether the declaration is the one identified by the discriminator and, when given, the name.
+     */
+    private static boolean isDeclaration(KSAnnotation declaration,
+                                         List<String> discriminatorMembers,
+                                         String discriminatorValue,
+                                         String nameMember,
+                                         String nameValue) {
+        if (discriminatorMembers.stream().noneMatch(name ->
+            Objects.equals(discriminatorValue, argument(declaration, name)))) {
+            return false;
+        }
+        return nameValue.isEmpty() || Objects.equals(nameValue, argument(declaration, nameMember));
+    }
+
+    /**
+     * The types of the class literals of a member, a primitive put back in place of the wrapper the metadata kept.
+     */
+    private static List<ClassElement> memberTypes(List<?> values, List<ClassElement> recovered) {
+        List<ClassElement> types = new ArrayList<>(values.size());
+        for (int i = 0; i < values.size(); i++) {
+            PrimitiveElement primitive = primitive(values.get(i));
+            types.add(primitive != null ? primitive : recovered.get(i));
+        }
+        return types;
     }
 
     /**

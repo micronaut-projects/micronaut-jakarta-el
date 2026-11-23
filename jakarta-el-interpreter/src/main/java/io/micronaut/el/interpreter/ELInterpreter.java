@@ -662,12 +662,12 @@ final class ELInterpreter {
      */
     @Nullable
     ValueReference valueReference(ELContext context, ELNode node) {
-        ELNode unwrapped = node instanceof ELNode.Eval eval ? eval.expression() : node;
-        if (unwrapped instanceof ELNode.Identifier identifier) {
+        ELNode unwrapped = node instanceof ELNode.Eval(ELNode expression) ? expression : node;
+        if (unwrapped instanceof ELNode.Identifier(String name)) {
             // a variable stands for the expression it was set to, so the reference is the one of that
             // expression, null for a value wrapped in an expression, as both reference implementations answer
-            VariableMapper mapper = context.isLambdaArgument(identifier.name()) ? null : context.getVariableMapper();
-            ValueExpression variable = mapper == null ? null : mapper.resolveVariable(identifier.name());
+            VariableMapper mapper = context.isLambdaArgument(name) ? null : context.getVariableMapper();
+            ValueExpression variable = mapper == null ? null : mapper.resolveVariable(name);
             if (variable != null) {
                 return variable.getValueReference(context);
             }

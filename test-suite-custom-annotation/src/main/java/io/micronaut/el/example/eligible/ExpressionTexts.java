@@ -34,16 +34,17 @@ final class ExpressionTexts {
      */
     static String deferred(String text) {
         StringBuilder stored = new StringBuilder(text.length());
-        for (int i = 0; i < text.length(); i++) {
+        int i = 0;
+        while (i < text.length()) {
             char c = text.charAt(i);
-            if (c == '\\' && i + 1 < text.length() && (text.charAt(i + 1) == '$' || text.charAt(i + 1) == '#')) {
+            char next = i + 1 < text.length() ? text.charAt(i + 1) : 0;
+            if (c == '\\' && (next == '$' || next == '#')) {
                 // an escaped delimiter: the backslash and the character it escapes stay literal text
-                stored.append(c).append(text.charAt(i + 1));
-                i++;
-            } else if (c == '$' && i + 1 < text.length() && text.charAt(i + 1) == '{') {
-                stored.append('#');
+                stored.append(c).append(next);
+                i += 2;
             } else {
-                stored.append(c);
+                stored.append(c == '$' && next == '{' ? '#' : c);
+                i++;
             }
         }
         return stored.toString();
