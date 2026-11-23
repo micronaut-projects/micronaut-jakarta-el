@@ -92,5 +92,11 @@
       "type": "java.math.BigDecimal",
       "serializable": true
     }
+  ],
+  "resources": [
+    {
+      "comment": "The resolver chain ends with jakarta.el.BeanELResolver, and jakarta.el.ELUtil reads the messages of the exceptions the API throws, a property or a method that is not found among them, from this bundle.",
+      "bundle": "jakarta.el.PrivateMessages"
+    }
   ]
 }
