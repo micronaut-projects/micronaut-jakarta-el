@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -134,6 +135,42 @@ class ELParserLimitsTest {
         assertThrows(IllegalArgumentException.class, () -> ELParserOptions.defaults().withMaxDepth(0));
         assertNull(System.getProperty(ELParserOptions.MAX_DEPTH_PROPERTY));
         assertEquals(ELParserOptions.defaults(), ELParserOptions.fromSystemProperties());
+    }
+
+    @Test
+    void aBlankPropertyKeepsTheDefaultAndAValueIsTrimmed() {
+        Properties properties = new Properties();
+        properties.setProperty(ELParserOptions.MAX_LENGTH_PROPERTY, "   ");
+        properties.setProperty(ELParserOptions.MAX_TOKENS_PROPERTY, "");
+        properties.setProperty(ELParserOptions.MAX_DEPTH_PROPERTY, " 12 ");
+
+        ELParserOptions options = ELParserOptions.fromProperties(properties);
+
+        assertEquals(ELParserOptions.DEFAULT_MAX_LENGTH, options.maxLength());
+        assertEquals(ELParserOptions.DEFAULT_MAX_TOKENS, options.maxTokens());
+        assertEquals(12, options.maxDepth());
+        assertEquals(ELParserOptions.DEFAULT_MAX_TREE_HEIGHT, options.maxTreeHeight());
+        IllegalArgumentException failure = assertThrows(IllegalArgumentException.class,
+            () -> ELParserOptions.fromResolver(name -> name.equals(ELParserOptions.MAX_TOKENS_PROPERTY) ? "-1" : null));
+        assertTrue(failure.getMessage().contains("maxTokens"), failure.getMessage());
+    }
+
+    @Test
+    void optionsAreEqualWhenEveryLimitIs() {
+        ELParserOptions options = ELParserOptions.defaults().withMaxLength(10).withMaxTokens(20).withMaxDepth(30)
+            .withMaxTreeHeight(40);
+        ELParserOptions same = ELParserOptions.defaults().withMaxTreeHeight(40).withMaxDepth(30).withMaxTokens(20)
+            .withMaxLength(10);
+
+        assertEquals(options, same);
+        assertEquals(options.hashCode(), same.hashCode());
+        assertEquals("ELParserOptions[maxLength=10, maxTokens=20, maxDepth=30, maxTreeHeight=40]", options.toString());
+        assertNotEquals(options, same.withMaxLength(11));
+        assertNotEquals(options, same.withMaxTokens(21));
+        assertNotEquals(options, same.withMaxDepth(31));
+        assertNotEquals(options, same.withMaxTreeHeight(41));
+        assertNotEquals(options.hashCode(), same.withMaxTreeHeight(41).hashCode());
+        assertNotEquals(options, "ELParserOptions[maxLength=10, maxTokens=20, maxDepth=30, maxTreeHeight=40]");
     }
 
     /**

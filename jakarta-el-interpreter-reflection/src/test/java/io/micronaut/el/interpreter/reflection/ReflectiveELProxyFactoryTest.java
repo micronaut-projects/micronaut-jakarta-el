@@ -101,6 +101,36 @@ class ReflectiveELProxyFactoryTest {
         assertEquals(3, ELSupport.coerceToType(context, lambda, Defaulted.class).twice(1));
     }
 
+    interface Task {
+
+        void run();
+
+        default String describe() {
+            return "task";
+        }
+    }
+
+    @Test
+    void aVoidMethodWithoutParametersRunsTheLambdaAndReturnsNothing() {
+        CompiledELContext context = new CompiledELContext();
+        List<String> runs = new java.util.ArrayList<>();
+        LambdaExpression lambda = ELLambdas.create(context, List.of(), evaluated -> {
+            runs.add("run");
+            return "ignored";
+        });
+
+        // coerced without a context, the lambda expression is invoked with the context it carries
+        Task task = ELSupport.coerce(lambda, Task.class);
+        task.run();
+        task.run();
+
+        assertTrue(Proxy.isProxyClass(task.getClass()));
+        assertEquals(List.of("run", "run"), runs);
+        assertEquals("task", task.describe());
+        assertEquals(System.identityHashCode(task), task.hashCode());
+        assertEquals(lambda.toString(), task.toString());
+    }
+
     @Test
     void theProxyIsInvokedConcurrentlyWithAContextOfItsOwnPerCall() {
         CompiledELContext context = new CompiledELContext();
