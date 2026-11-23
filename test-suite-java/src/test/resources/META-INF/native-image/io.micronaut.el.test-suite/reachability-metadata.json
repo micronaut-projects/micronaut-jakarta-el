@@ -153,6 +153,122 @@
       "comment": "The method deliberately left without @Executable, which the reflective resolver of the chain invokes.",
       "type": "io.micronaut.el.test.executable.Greeter",
       "allPublicMethods": true
+    },
+    {
+      "comment": "The beans of the regressions that are neither introspected nor beans of the context: the expressions declare no type for them, or name a method of them in a method expression, so they resolve through the reflective resolvers of the chain.",
+      "type": "io.micronaut.el.test.InterpreterRegressionBean",
+      "allPublicMethods": true
+    },
+    {
+      "type": "io.micronaut.el.test.PrimitiveVariableBean",
+      "allPublicMethods": true
+    },
+    {
+      "type": "io.micronaut.el.test.RuntimeRegressionExpressionsTest$RegressionBase",
+      "allPublicMethods": true
+    },
+    {
+      "type": "io.micronaut.el.test.RuntimeRegressionExpressionsTest$RegressionPlain",
+      "allPublicMethods": true
+    },
+    {
+      "type": "io.micronaut.el.test.RuntimeRegressionExpressionsTest$RegressionPojo",
+      "allPublicMethods": true
+    },
+    {
+      "type": "io.micronaut.el.test.RuntimeRegressionExpressionsTest$RegressionMoney",
+      "allPublicMethods": true
+    },
+    {
+      "type": "io.micronaut.el.test.RuntimeVarargsSpreadExpressionsTest$SpreadPlain",
+      "allPublicMethods": true
+    },
+    {
+      "comment": "The executor of a compiled method expression describes the method it names, MethodExpression.getMethodInfo, without an introspection of the type: the reflective executor of the classpath describes it.",
+      "type": "io.micronaut.el.test.parity.ParityGreeter",
+      "allPublicMethods": true
+    },
+    {
+      "comment": "An expanded variable arity call is left to the reflective resolver, because BeanMethod does not carry the variable arity flag, as for io.micronaut.el.test.Formatting.",
+      "type": "io.micronaut.el.test.RuntimeVarargsSpreadExpressionsTest$SpreadIntrospected",
+      "methods": [
+        {
+          "name": "argumentType",
+          "parameterTypes": [
+            "java.lang.Object[]"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "io.micronaut.el.test.RuntimeVarargsSpreadExpressionsTest$SpreadExecutable",
+      "methods": [
+        {
+          "name": "argumentType",
+          "parameterTypes": [
+            "java.lang.Object[]"
+          ]
+        }
+      ]
+    },
+    {
+      "comment": "Values of the platform whose runtime classes are implementation classes of a module: the property and the method are read through the public type that declares them.",
+      "type": "java.util.TimeZone",
+      "methods": [
+        {
+          "name": "getID",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.util.calendar.ZoneInfo"
+    },
+    {
+      "type": "java.nio.charset.Charset",
+      "methods": [
+        {
+          "name": "name",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.nio.cs.UTF_8"
+    },
+    {
+      "comment": "A coerced lambda called concurrently from a parallel stream: the methods of the stream are invoked reflectively, on the public interfaces that declare them, from the implementation classes of the platform.",
+      "type": "java.util.Collection",
+      "methods": [
+        {
+          "name": "parallelStream",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.util.ArrayList"
+    },
+    {
+      "type": "java.util.stream.Stream",
+      "methods": [
+        {
+          "name": "map",
+          "parameterTypes": [
+            "java.util.function.Function"
+          ]
+        },
+        {
+          "name": "toList",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.util.stream.ReferencePipeline$Head"
+    },
+    {
+      "type": "java.util.stream.ReferencePipeline$3"
     }
   ]
 }
