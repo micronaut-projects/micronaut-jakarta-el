@@ -117,6 +117,22 @@ public final class ELLambdas {
     }
 
     /**
+     * Closes a compiled lambda expression, just created, over the variables its free identifiers name in the
+     * creation context, which a variable mapper this runtime cannot list, such as the one of a
+     * {@code StandardELContext}, cannot otherwise be snapshotted for.
+     *
+     * @param lambda    The lambda expression, just created
+     * @param freeNames The identifiers of its body that are not parameters of a lambda expression
+     * @return The lambda expression
+     */
+    public static LambdaExpression closingOver(LambdaExpression lambda, String[] freeNames) {
+        if (lambda instanceof CompiledLambdaExpression compiled) {
+            compiled.closeOver(freeNames);
+        }
+        return lambda;
+    }
+
+    /**
      * Discards the result of the body of a lambda expression implementing a functional interface whose method
      * returns nothing.
      *

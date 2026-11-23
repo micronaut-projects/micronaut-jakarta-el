@@ -20,6 +20,7 @@ import jakarta.el.ELContext;
 import jakarta.el.ELException;
 import jakarta.el.LambdaExpression;
 import jakarta.el.ValueExpression;
+import jakarta.el.VariableMapper;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
@@ -42,6 +43,12 @@ public final class CompiledLambdaExpression extends LambdaExpression {
     private final ELLambdaBody body;
     @Nullable
     private ELContext context;
+    /**
+     * The variables of the context the lambda expression was created in, as they were bound then, which its body
+     * reads wherever it is invoked.
+     */
+    @Nullable
+    private VariableMapper captured;
 
     /**
      * @param context    The context the lambda expression is created in
@@ -53,7 +60,21 @@ public final class CompiledLambdaExpression extends LambdaExpression {
         this.parameters = parameters;
         this.body = body;
         this.context = context;
+        this.captured = ELLambdaInvocation.snapshot(context.getVariableMapper());
         super.setELContext(context);
+    }
+
+    /**
+     * Closes over the free identifiers of the body, resolved in the variable mapper of the creation context,
+     * which a mapper this runtime cannot list needs: called right after the lambda expression is created.
+     *
+     * @param freeNames The identifiers of the body that are not parameters of a lambda expression
+     */
+    void closeOver(String[] freeNames) {
+        ELContext creation = context;
+        if (creation != null) {
+            captured = ELLambdaInvocation.snapshot(creation.getVariableMapper(), freeNames);
+        }
     }
 
     @Override
@@ -68,7 +89,22 @@ public final class CompiledLambdaExpression extends LambdaExpression {
         if (args.length < parameters.length) {
             throw new ELException("Expected Argument " + parameters[args.length] + " missing in Lambda Expression");
         }
-        return body.evaluate(elContext, args);
+        // a lambda expression reads the variables as they were bound when it was created, as a closure does
+        // (section 1.20 of the specification), whichever context invokes it and whatever that context binds since:
+        // the interpreter and both reference implementations do the same
+        VariableMapper closed = captured;
+        ELContext evaluated = closed == null || ELLambdaInvocation.isCurrent(closed, elContext.getVariableMapper())
+            ? elContext
+            : ELLambdaInvocation.capturing(elContext, closed);
+        return body.evaluate(evaluated, args);
+    }
+
+    /**
+     * @return The context the lambda expression was created in, or was last given
+     */
+    @Nullable
+    ELContext context() {
+        return context;
     }
 
     @Override

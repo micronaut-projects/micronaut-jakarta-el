@@ -485,13 +485,13 @@ public final class ELStream<T> {
     public Object invokeOperation(String name, Object[] arguments) {
         requireArity(name, arguments.length);
         return switch (name) {
-            case "filter" -> filter(lambda(context, arguments, 0, name));
-            case "map" -> map(lambda(context, arguments, 0, name));
-            case "flatMap" -> flatMap(lambda(context, arguments, 0, name));
+            case "filter" -> filter(lambda(arguments, 0, name));
+            case "map" -> map(lambda(arguments, 0, name));
+            case "flatMap" -> flatMap(lambda(arguments, 0, name));
             case "distinct" -> distinct();
-            case "sorted" -> arguments.length == 0 ? sorted() : sorted(lambda(context, arguments, 0, name));
-            case "forEach" -> forEach(lambda(context, arguments, 0, name));
-            case "peek" -> peek(lambda(context, arguments, 0, name));
+            case "sorted" -> arguments.length == 0 ? sorted() : sorted(lambda(arguments, 0, name));
+            case "forEach" -> forEach(lambda(arguments, 0, name));
+            case "peek" -> peek(lambda(arguments, 0, name));
             case "iterator" -> iterator();
             case "limit" -> limit(argument(arguments, 0, name));
             case "substream" -> arguments.length == 1
@@ -500,16 +500,16 @@ public final class ELStream<T> {
             case "toArray" -> toArray();
             case "toList" -> toList();
             case "reduce" -> arguments.length == 1
-                ? reduce(lambda(context, arguments, 0, name))
-                : reduce(argument(arguments, 0, name), lambda(context, arguments, 1, name));
-            case "max" -> arguments.length == 0 ? max() : max(lambda(context, arguments, 0, name));
-            case "min" -> arguments.length == 0 ? min() : min(lambda(context, arguments, 0, name));
+                ? reduce(lambda(arguments, 0, name))
+                : reduce(argument(arguments, 0, name), lambda(arguments, 1, name));
+            case "max" -> arguments.length == 0 ? max() : max(lambda(arguments, 0, name));
+            case "min" -> arguments.length == 0 ? min() : min(lambda(arguments, 0, name));
             case "average" -> average();
             case "sum" -> sum();
             case "count" -> count();
-            case "anyMatch" -> anyMatch(lambda(context, arguments, 0, name));
-            case "allMatch" -> allMatch(lambda(context, arguments, 0, name));
-            case "noneMatch" -> noneMatch(lambda(context, arguments, 0, name));
+            case "anyMatch" -> anyMatch(lambda(arguments, 0, name));
+            case "allMatch" -> allMatch(lambda(arguments, 0, name));
+            case "noneMatch" -> noneMatch(lambda(arguments, 0, name));
             case "findFirst" -> findFirst();
             default -> throw new MethodNotFoundException("Unknown stream operation '" + name + "'");
         };
@@ -529,10 +529,9 @@ public final class ELStream<T> {
         }
     }
 
-    static LambdaExpression lambda(ELContext context, Object[] arguments, int index, String operation) {
+    static LambdaExpression lambda(Object[] arguments, int index, String operation) {
         Object argument = argument(arguments, index, operation);
         if (argument instanceof LambdaExpression lambdaExpression) {
-            lambdaExpression.setELContext(context);
             return lambdaExpression;
         }
         throw new ELException("The operation '" + operation + "' expects a lambda expression as the argument "

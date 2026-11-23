@@ -78,6 +78,43 @@ final class ELNodeAnalysis {
         }
     }
 
+    /**
+     * The identifiers the evaluation of the expression resolves whatever its operands evaluate to: the operands
+     * of ?:, && and || that may not be taken, the deferred right operand of {@code <} and {@code >}, and what
+     * follows a base that may be null, its property and arguments, are left out, as are the lambda bodies.
+     *
+     * @param node The expression
+     * @return The names of the identifiers always resolved
+     */
+    static Set<String> unconditionalIdentifiers(ELNode node) {
+        Set<String> names = new HashSet<>();
+        collectUnconditional(node, names);
+        return names;
+    }
+
+    private static void collectUnconditional(ELNode node, Set<String> names) {
+        switch (node) {
+            case ELNode.Identifier identifier -> names.add(identifier.name());
+            case ELNode.Lambda _ -> {
+                // evaluated when invoked, if at all
+            }
+            case ELNode.Property(ELNode base, var _) -> collectUnconditional(base, names);
+            case ELNode.Method(ELNode base, var _, var _) -> collectUnconditional(base, names);
+            case ELNode.Ternary ternary -> collectUnconditional(ternary.condition(), names);
+            case ELNode.Binary binary -> {
+                collectUnconditional(binary.left(), names);
+                switch (binary.operator()) {
+                    case AND, OR, LESS_THAN, GREATER_THAN -> {
+                        // short-circuited, or deferred when the left operand is null
+                    }
+                    default -> collectUnconditional(binary.right(), names);
+                }
+            }
+            case ELNode.Semicolon semicolon -> collectUnconditional(semicolon.left(), names);
+            default -> children(node).forEach(child -> collectUnconditional(child, names));
+        }
+    }
+
     private static Set<String> bound(Set<String> parameters, ELNode.Lambda lambda) {
         Set<String> all = new HashSet<>(parameters);
         all.addAll(lambda.parameters());

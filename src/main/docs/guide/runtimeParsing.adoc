@@ -121,9 +121,54 @@ present, the standard Jakarta EL context can construct imported classes and invo
 methods. Only parse strings from a fully trusted source; an operator or database field that an untrusted user can
 modify must not be passed directly to the expression factory.
 
-To bound CPU, memory and stack use, the parser rejects an expression longer than 16,384 characters, containing
-more than 1,024 tokens, or nested deeper than `ELParser.DEFAULT_MAX_DEPTH`, which is 100 levels. Parse with
-`ELParser.parse(String, int)` to raise the depth for expressions a tool generates.
+To bound CPU, memory and stack use, the parser applies the limits of an api:el.parser.ELParserOptions[]. By default
+it rejects an expression:
+
+* longer than 1,048,576 characters (`maxLength`);
+* containing more than 131,072 tokens (`maxTokens`);
+* nesting constructs deeper than 100 levels (`maxDepth`): a parenthesised sub-expression, an argument, a list, set or
+map element, an index, the operand of a unary operator, the branches of a choice, the right side of an assignment and
+the body of a lambda each nest one level, while a chain of left associative operators such as `a + b + c` or
+`s.trim().trim()` does not nest, however long it is;
+* whose syntax tree is more than 1,000 nodes high (`maxTreeHeight`), which is what bounds a very long operator
+chain: every consumer walks the tree recursively.
+
+The defaults hold on a thread whose stack is half of the usual one. To change them, pass the options to the parser:
+
+[source,java]
+----
+new CompiledExpressionFactory(List.of(), new InterpretingELExpressionParser(
+    ELParserOptions.defaults().withMaxLength(4_000_000).withMaxTokens(500_000)));
+----
+
+The parser that `ExpressionFactory.newInstance()` loads as a service reads them from the system properties
+`micronaut.el.parser.max-length`, `micronaut.el.parser.max-tokens`, `micronaut.el.parser.max-depth` and
+`micronaut.el.parser.max-tree-height`. `ELParserOptions.fromResolver` reads the same names from any other source of
+configuration, such as the environment of a Micronaut application:
+`ELParserOptions.fromResolver(name -> environment.getProperty(name, String.class).orElse(null))`. A much deeper
+nesting or a much taller tree needs a thread with a larger stack.
+
+The processor parses an `@ELExpression` and an `@ELMethodExpression` with the same default limits, and reads lowered
+or raised ones from annotation processor options of the same names. An expression beyond a limit fails the
+compilation, with the limit and the option in the message. javac only accepts an `-A` key made of Java identifiers and
+rejects `-Amicronaut.el.parser.max-length` before any processor runs, so the processor also reads the camel case
+aliases `micronaut.el.parser.maxLength`, `maxTokens`, `maxDepth` and `maxTreeHeight`; a hyphenated name takes
+precedence over its alias where both are set:
+
+[source,groovy]
+----
+// Gradle, Java
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs += ['-Amicronaut.el.parser.maxLength=4000', '-Amicronaut.el.parser.maxDepth=50']
+}
+
+// Gradle, Kotlin with KSP, which takes either name
+ksp {
+    arg('micronaut.el.parser.max-length', '4000')
+}
+----
+
+A Groovy compilation reads the options from the system properties of the compiler, with either name.
 
 snippet::example.RuntimeExpressionTest[project-base="doc-examples/example", title="RuntimeExpressionTest"]
 
@@ -296,9 +341,10 @@ cannot grow the heap.
 
 == Deliberate Divergences
 
-Four behaviours differ from Expressly, from Tomcat Jasper EL, or from both. Each is a place the specification
+Five behaviours differ from Expressly, from Tomcat Jasper EL, or from both. Four are places the specification
 leaves open, and the Technology Compatibility Kit passes either way, so the reading kept here is the one that
-is the least surprising.
+is the least surprising. The fifth, the single array argument of a variable arity method, is one the
+specification decides, and the references do not follow.
 
 * The right operand of a relational operator whose left operand is null is evaluated, so `${null gt x}`
   reports that `x` cannot be resolved and `${null gt (y=1)}` performs the assignment. Both references skip it
@@ -308,3 +354,21 @@ is the least surprising.
 * The index of `${null[expr]}` is evaluated. Expressly skips it, and Tomcat rejects a null base outright.
 * A backslash in literal text follows the escapes of the section 1.2.2 and no others, so `\'` stays `\'` and
   `\\` becomes `\`. Expressly drops every backslash, and Tomcat keeps `\\` as `\\`.
+* A single array assignable to a variable arity parameter is the variable arity array itself, in compiled and
+  interpreted expressions alike. The section 1.2.1.2 of the specification selects a method as the section
+  15.12.2 of the Java Language Specification does, whose first phase applies `m(T...)` by subtyping, as the
+  fixed arity `m(T[])`, to any array assignable to `T[]`, without a variable arity invocation. So with a
+  `String[] strs` of `a` and `b`, `${String.format('%s-%s', strs)}` is `a-b` and `${bean.describe(strs)}`, where
+  `describe(Object... values)`, sees two values, as the same calls in Java do. Expressly and Tomcat only pass an
+  array of exactly the parameter type through, and wrap a `String[]` as the single element of an `Object[]`, so
+  the first call fails with a missing format argument and the second sees one value. For the same reason
+  `pick(Object...)` is preferred over `pick(Object)` for an array argument, `Object[]` being the more specific
+  parameter. A `null`, or an array that is not assignable such as an `int[]` for `Object...`, is still the single
+  element of the array.
+
+Not a divergence: a lambda expression reads its variables as they were bound when it was created, in compiled
+and interpreted expressions alike, as both references do: binding a variable to another value expression
+afterwards, in the context that created the lambda expression or in any other, does not change what an escaping
+lambda expression reads. A compiled lambda expression snapshots the variable mapper of the context creating it,
+and resolves the free identifiers of its body when it is created in a mapper that cannot list what it holds, such
+as the one of a `StandardELContext`, as the interpreter does.

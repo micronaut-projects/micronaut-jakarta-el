@@ -19,11 +19,13 @@ import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.io.service.SoftServiceLoader;
 import io.micronaut.el.ELMethod;
 import io.micronaut.el.ELMethodExecutor;
+import io.micronaut.el.parser.ELIdentifiers;
 import io.micronaut.el.parser.ast.BinaryOperator;
 import io.micronaut.el.parser.ast.ELNode;
 import io.micronaut.el.resolver.ELMethodDiagnostics;
 import io.micronaut.el.runtime.ELArithmetic;
 import io.micronaut.el.runtime.ELArguments;
+import io.micronaut.el.runtime.ELOptionalMethod;
 import io.micronaut.el.runtime.ELCollections;
 import io.micronaut.el.runtime.ELLambdas;
 import io.micronaut.el.runtime.ELResolution;
@@ -36,7 +38,9 @@ import jakarta.el.LambdaExpression;
 import jakarta.el.MethodNotFoundException;
 import jakarta.el.PropertyNotWritableException;
 import jakarta.el.PropertyNotFoundException;
+import jakarta.el.ValueExpression;
 import jakarta.el.ValueReference;
+import jakarta.el.VariableMapper;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -157,10 +161,9 @@ final class ELInterpreter {
                         if (evaluatedBase == null) {
                             return null;
                         }
-                        Object evaluatedName = name.evaluate(context);
-                        return evaluatedName == null ? null
-                            : callSite.invoke(context, executors, evaluatedBase, evaluatedName,
-                                evaluateAll(context, arguments));
+                        Object evaluatedName = requireMethodName(evaluatedBase, name.evaluate(context));
+                        return callSite.invoke(context, executors, evaluatedBase, evaluatedName,
+                            evaluateAll(context, arguments));
                     }
                 };
             }
@@ -216,10 +219,12 @@ final class ELInterpreter {
             case LAMBDA -> {
                 ELNode.Lambda lambda = (ELNode.Lambda) node;
                 Evaluator body = compile(lambda.body());
+                String[] freeNames = ELIdentifiers.free(lambda).toArray(String[]::new);
                 yield new Evaluator() {
                     @Override
                     Object evaluate(ELContext context) {
-                        return ELLambdas.create(context, lambda.parameters(), body::evaluate);
+                        return ELLambdas.create(context, lambda.parameters(),
+                            ELCapturedVariables.capture(context, freeNames, body::evaluate));
                     }
                 };
             }
@@ -592,9 +597,8 @@ final class ELInterpreter {
                 if (base == null) {
                     yield null;
                 }
-                Object property = evaluate(context, method.property());
-                yield property == null ? null : invokeWithParams(
-                    context, base, property, evaluateAll(context, method.arguments()));
+                Object property = requireMethodName(base, evaluate(context, method.property()));
+                yield invokeWithParams(context, base, property, evaluateAll(context, method.arguments()));
             }
             case CALL -> {
                 ELNode.Call call = (ELNode.Call) node;
@@ -615,7 +619,9 @@ final class ELInterpreter {
             }
             case LAMBDA -> {
                 ELNode.Lambda lambda = (ELNode.Lambda) node;
-                yield ELLambdas.create(context, lambda.parameters(), lambdaContext -> evaluate(lambdaContext, lambda.body()));
+                yield ELLambdas.create(context, lambda.parameters(), ELCapturedVariables.capture(context,
+                    ELIdentifiers.free(lambda).toArray(String[]::new),
+                    lambdaContext -> evaluate(lambdaContext, lambda.body())));
             }
             case SET_DATA -> ELCollections.set(evaluateAll(context, ((ELNode.SetData) node).elements()));
             case LIST_DATA -> ELCollections.list(evaluateAll(context, ((ELNode.ListData) node).elements()));
@@ -656,6 +662,16 @@ final class ELInterpreter {
      */
     @Nullable
     ValueReference valueReference(ELContext context, ELNode node) {
+        ELNode unwrapped = node instanceof ELNode.Eval(ELNode expression) ? expression : node;
+        if (unwrapped instanceof ELNode.Identifier(String name)) {
+            // a variable stands for the expression it was set to, so the reference is the one of that
+            // expression, null for a value wrapped in an expression, as both reference implementations answer
+            VariableMapper mapper = context.isLambdaArgument(name) ? null : context.getVariableMapper();
+            ValueExpression variable = mapper == null ? null : mapper.resolveVariable(name);
+            if (variable != null) {
+                return variable.getValueReference(context);
+            }
+        }
         Target target = resolveTarget(context, node);
         if (target == null) {
             return null;
@@ -817,13 +833,26 @@ final class ELInterpreter {
     @Nullable
     private Object invokeCallable(ELContext context, @Nullable Object target, Object... arguments) {
         if (target instanceof LambdaExpression lambda) {
-            lambda.setELContext(context);
+            // the lambda may be shared, held by a variable or a bean and invoked from several threads at once:
+            // the context it is invoked with is passed along, the one it carries is left as it is
             return lambda.invoke(context, arguments);
         }
         if (target instanceof ELClass) {
             return invokeWithParams(context, target, "<init>", arguments);
         }
         return ELResolution.invokeCallable(context, target, arguments);
+    }
+
+    /**
+     * A method invoked by a name that evaluates to {@code null} cannot be resolved, which Expressly reports with
+     * an {@link ELException} rather than evaluating the invocation to {@code null}.
+     */
+    private static Object requireMethodName(Object base, @Nullable Object name) {
+        if (name == null) {
+            throw new ELException("Cannot invoke a method whose name is null on an instance of "
+                + (base instanceof ELClass elClass ? elClass.getKlass() : base.getClass()).getName());
+        }
+        return name;
     }
 
     static ELMethod resolveMethod(ELContext context,
@@ -843,6 +872,12 @@ final class ELInterpreter {
                 // held up by it
                 return executor.isReflective() ? new SandboxedELMethod(resolved) : resolved;
             }
+        }
+        if (base instanceof java.util.Optional<?> optional) {
+            // a method the Optional itself does not have is the one of its value, as the OptionalELResolver of
+            // the specification invokes it in the resolver chain of a compiled expression: null when empty
+            return ELOptionalMethod.of(optional, method,
+                value -> resolveMethod(context, executors, value, method, paramTypes, arguments));
         }
         // the executors that were consulted are what says which of the remedies applies: the reflective one is
         // in the list only when the optional module is on the classpath

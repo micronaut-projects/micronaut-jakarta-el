@@ -126,8 +126,9 @@ final class ELOverloads {
                 coerced[i] = ELSupport.coerceToType(context, arguments[i], parameters[i].getType());
             }
             return coerced;
-        } catch (ELException e) {
-            // this overload does not accept these arguments
+        } catch (ELException | IllegalArgumentException | ClassCastException | ArithmeticException e) {
+            // this overload does not accept these arguments, whichever way the coercion, or a converter of the
+            // context, reports it
             return null;
         }
     }
@@ -194,7 +195,10 @@ final class ELOverloads {
         for (int i = 0; i < parameters.length; i++) {
             Object argument = arguments[i];
             Class<?> type = parameters[i].getWrapperType();
-            if (argument == null ? parameters[i].getType().isPrimitive() : !type.isInstance(argument)) {
+            // a null fits a primitive parameter too, coerced to its default value (section 1.23): Expressly, the
+            // Jasper implementation, ELMethods and the compiled selection all pick nullable(int) over
+            // nullable(Object) for a null argument
+            if (argument != null && !type.isInstance(argument)) {
                 return false;
             }
         }

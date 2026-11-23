@@ -61,9 +61,12 @@ public final class ELMethods {
      * specification: every argument is coerced to its parameter type, and the arguments a variable arity
      * parameter takes are packed into an array of its component type.
      *
-     * <p>An array already of the parameter type is passed through as the variable arity array itself, rather
-     * than becoming its single element. This is the one implementation of that rule, so a caller that
-     * dispatches directly prepares its arguments exactly as the reflective invocation does.</p>
+     * <p>A single array assignable to the variable arity parameter, a {@code String[]} for an {@code Object...}
+     * as much as an {@code Object[]}, is passed through as the variable arity array itself rather than becoming
+     * its single element: the section 1.2.1.2 of the specification defers to the section 15.12.2 of the Java
+     * Language Specification, whose first phase finds the method applicable by subtyping with the array as its
+     * last argument, without any variable arity invocation. This is the one implementation of that rule, so a
+     * caller that dispatches directly prepares its arguments exactly as the reflective invocation does.</p>
      *
      * @param context        The context
      * @param name           The name of the method, for the error message
@@ -94,8 +97,7 @@ public final class ELMethods {
         }
         if (varArgs) {
             Class<?> componentType = parameterTypes[fixed].getComponentType();
-            if (count == parameterTypes.length && arguments[fixed] != null
-                && arguments[fixed].getClass() == parameterTypes[fixed]) {
+            if (count == parameterTypes.length && passesArray(arguments[fixed], parameterTypes[fixed])) {
                 parameters[fixed] = arguments[fixed];
             } else {
                 Object varargs = ELArray.newInstance(componentType, Math.max(0, count - fixed));
@@ -130,6 +132,36 @@ public final class ELMethods {
                                Class<?> @Nullable [] paramTypes,
                                Object @Nullable [] arguments,
                                boolean isStatic) {
+        T selected = selectOrNull(type, name, candidates, paramTypes, arguments, isStatic);
+        if (selected == null) {
+            Object[] values = arguments == null ? new Object[0] : arguments;
+            throw notFound(type, name, paramTypes == null ? values.length : paramTypes.length);
+        }
+        return selected;
+    }
+
+    /**
+     * Selects the method as {@link #select} does, returning {@code null} rather than failing when no candidate
+     * accepts the arguments, so that a caller describing only some of the methods of a type can leave the
+     * others to the next executor. Several equally specific candidates still make the reference ambiguous.
+     *
+     * @param type       The type of the base object, or the class declaring a static method
+     * @param name       The name of the method, for the error messages
+     * @param candidates The methods of that name
+     * @param paramTypes The parameter types provided at parse time, can be {@code null}
+     * @param arguments  The evaluated arguments, can be {@code null}
+     * @param isStatic   Whether to look for a static method
+     * @param <T>        The type of the method the candidates stand for
+     * @return The selected method, or {@code null} when no candidate accepts the arguments
+     * @throws MethodNotFoundException when several candidates are equally specific
+     */
+    @Nullable
+    public static <T> T selectOrNull(Class<?> type,
+                                     String name,
+                                     List<Candidate<T>> candidates,
+                                     Class<?> @Nullable [] paramTypes,
+                                     Object @Nullable [] arguments,
+                                     boolean isStatic) {
         Object[] values = arguments == null ? new Object[0] : arguments;
         Class<?>[] matchingTypes = paramTypes == null ? typesOf(values) : paramTypes;
         List<Candidate<T>> assignable = new ArrayList<>(1);
@@ -139,12 +171,16 @@ public final class ELMethods {
             if (isStatic && !candidate.isStatic()) {
                 continue;
             }
-            switch (match(candidate, matchingTypes, values)) {
+            // a variable arity method whose last parameter takes the single array argument as it is applies by
+            // subtyping in the first phase of the section 15.12.2 of the Java Language Specification, as a fixed
+            // arity method, and is compared with the other candidates as one
+            Candidate<T> applicable = spreadsArray(candidate, matchingTypes) ? candidate.fixedArity() : candidate;
+            switch (match(applicable, matchingTypes, values)) {
                 // a method whose every parameter matches exactly is the method, section 1.6
                 case EXACT -> {
                     return candidate.value();
                 }
-                case ASSIGNABLE -> assignable.add(candidate);
+                case ASSIGNABLE -> assignable.add(applicable);
                 case COERCIBLE -> coercible.add(candidate);
                 case VARIABLE_ARITY -> variableArity.add(candidate);
                 default -> {
@@ -161,7 +197,7 @@ public final class ELMethods {
         if (!variableArity.isEmpty()) {
             return mostSpecific(type, name, variableArity, matchingTypes, true);
         }
-        throw notFound(type, name, matchingTypes.length);
+        return null;
     }
 
     /**
@@ -185,9 +221,6 @@ public final class ELMethods {
         for (int i = 0; i < parameterCount; i++) {
             if (i == parameterCount - 1 && candidate.varArgs()) {
                 varArgs = true;
-                if (parameterCount == argumentCount && parameterTypes[i] == argumentTypes[i]) {
-                    continue;
-                }
                 Class<?> componentType = parameterTypes[i].getComponentType();
                 for (int j = i; j < argumentCount; j++) {
                     if (!isAssignable(argumentTypes[j], componentType)
@@ -325,6 +358,30 @@ public final class ELMethods {
         return spread;
     }
 
+    /**
+     * Whether the single argument a variable arity parameter takes is an array assignable to the parameter, which
+     * the first phase of the section 15.12.2 of the Java Language Specification passes as the array itself. A
+     * {@code null} is not: the section 1.23 of the specification makes it the single element of the array.
+     */
+    private static boolean spreadsArray(Candidate<?> candidate, Class<?>[] argumentTypes) {
+        Class<?>[] parameterTypes = candidate.parameterTypes();
+        int last = parameterTypes.length - 1;
+        return candidate.varArgs() && argumentTypes.length == parameterTypes.length
+            && argumentTypes[last] != null && argumentTypes[last].isArray()
+            && parameterTypes[last].isAssignableFrom(argumentTypes[last]);
+    }
+
+    /**
+     * Whether an argument is passed as the variable arity array itself, as {@link #spreadsArray} selects it.
+     *
+     * @param argument      The single argument of the variable arity parameter
+     * @param parameterType The variable arity parameter, an array type
+     * @return Whether the argument is an array assignable to the parameter
+     */
+    public static boolean passesArray(@Nullable Object argument, Class<?> parameterType) {
+        return argument != null && argument.getClass().isArray() && parameterType.isInstance(argument);
+    }
+
     private static Class<?>[] typesOf(Object[] values) {
         Class<?>[] types = new Class<?>[values.length];
         for (int i = 0; i < values.length; i++) {
@@ -369,7 +426,7 @@ public final class ELMethods {
         try {
             ELSupport.coerce(argument, parameterType);
             return true;
-        } catch (ELException | IllegalArgumentException e) {
+        } catch (ELException | IllegalArgumentException | ClassCastException | ArithmeticException _) {
             return false;
         }
     }
@@ -434,6 +491,13 @@ public final class ELMethods {
          */
         public Candidate(T value, Class<?>[] parameterTypes) {
             this(value, parameterTypes, false, false, false);
+        }
+
+        /**
+         * @return This candidate as a fixed arity method, whose last parameter takes an array as it is
+         */
+        Candidate<T> fixedArity() {
+            return new Candidate<>(value, parameterTypes, false, isStatic, bridge);
         }
     }
 

@@ -75,7 +75,17 @@ class CompiledVersusInterpretedTest {
             "${empty book.tags}", "${-book.unitPrice}", "${book.title += '!'}",
             "${(1 ; book.title)}", "${book.title ; 1}", "text ${book.title} tail",
             "${book.title}${book.pages}", "#{book.title}", "${[book.pages, book.isbn]}",
-            "${{book.title : book.pages}}", "${Integer.MAX_VALUE}", "${Math.max(1, 2)}")) {
+            "${{book.title : book.pages}}", "${Integer.MAX_VALUE}", "${Math.max(1, 2)}",
+            // the side effects show which operands are evaluated, how many times and in which order
+            "${book.available ? book.hit('t') : book.hit('f')}", "${false && book.hit('a') != null}",
+            "${true || book.hit('o') != null}", "${book.hit('x') += book.hit('y')}",
+            "${[book.hit('x'), book.hit('y')]}", "${book.matches(book.hit('arg'))}",
+            "${book.hit('x') == book.hit('y')}", "${empty book.tags ? book.hit('e') : book.hit('n')}",
+            // a null intermediate bean, whose primitive property is null rather than zero
+            "${book.none.pages}", "${book.none.pages == 0}", "${book.none.pages < 1}", "${book.none.pages + 1}",
+            "${-book.none.pages}", "${book.none.available == false}", "${book.none.hit('never')}",
+            // a single argument of a variable arity method
+            "${book.join(book.title)}", "${book.join(book.codes)}", "${book.join('a', 'b')}")) {
             for (String expectedType : List.of("Object", "String", "Boolean")) {
                 cases.add(new Case(expression, expectedType));
             }
@@ -115,6 +125,7 @@ class CompiledVersusInterpretedTest {
         ExpressionFactory compiled = compiledFactory(loader);
         for (Case one : batch) {
             agree(one, "value", value(compiled, loader, one), value(interpreted, loader, one));
+            agree(one, "side effects", sideEffects(compiled, loader, one), sideEffects(interpreted, loader, one));
             agree(one, "type", operation(compiled, loader, one, "getType"),
                 operation(interpreted, loader, one, "getType"));
             agree(one, "read only flag", operation(compiled, loader, one, "isReadOnly"),
@@ -147,6 +158,21 @@ class CompiledVersusInterpretedTest {
             ELContext context = context(loader);
             return normalize(factory.createValueExpression(context, one.expression(), one.type())
                 .getValue(context));
+        } catch (Throwable t) {
+            return failure(t);
+        }
+    }
+
+    /**
+     * What the evaluation called {@code hit} with, in order: the operands an expression evaluates, how many
+     * times, and in which order, which both paths must agree on as much as on the value.
+     */
+    private Object sideEffects(ExpressionFactory factory, ClassLoader loader, Case one) {
+        try {
+            List<?> log = (List<?>) loader.loadClass(PACKAGE + ".Book").getField("LOG").get(null);
+            log.clear();
+            value(factory, loader, one);
+            return String.valueOf(log);
         } catch (Throwable t) {
             return failure(t);
         }
@@ -285,7 +311,11 @@ class CompiledVersusInterpretedTest {
             import java.util.*;
 
             public class Book {
+                public static final List<String> LOG = new ArrayList<>();
                 private String title = "EL";
+                public String hit(String s) { LOG.add(s); return s; }
+                public Book getNone() { return null; }
+                public String join(String... parts) { return String.join("+", parts) + "#" + parts.length; }
                 public String getTitle() { return title; }
                 public void setTitle(String t) { title = t; }
                 public double getUnitPrice() { return 20.5d; }
@@ -348,6 +378,7 @@ class CompiledVersusInterpretedTest {
             "book.sizes", "book.stock", "book.codes", "book.discount(10)", "book.repeat(2)",
             "book.matches('EL')", "book.title.length()", "book.stock['x']", "book.codes[0]",
             "book.tags[1]", "Integer.MAX_VALUE", "Math.max(1,2)", "String.valueOf(4)",
+            "book.hit('h')", "book.none.pages", "book.none.title", "book.join(book.title)",
             "1", "-7", "2.5", "'a'", "true", "false", "null"};
         private static final String[] STREAMS = {
             "book.tags.stream().toList()", "book.sizes.stream().sum()", "book.sizes.stream().count()",

@@ -79,8 +79,7 @@ public final class ValueExpressionWriter {
             .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
             .addAnnotation(Generated.class)
             .superclass(ClassTypeDef.of(CompiledValueExpression.class))
-            // the source writer interprets a '$' in the javadoc
-            .addJavadoc("The compiled form of the expression <code>" + definition.expression().replace("$", "$$") + "</code>.")
+            .addJavadoc("The compiled form of the expression <code>" + ValueExpressionWriter.javadocText(definition.expression()) + "</code>.")
             .addMethod(constructor(definition, compiler, coerced))
             .addMethod(evaluate);
         if (definition.inferred() && definition.requireExpectedType().getName().equals(Object.class.getName())) {
@@ -96,6 +95,32 @@ public final class ValueExpressionWriter {
         }
         builder.addMethods(compiler.accessMethods());
         return new Written(builder.build(), definition);
+    }
+
+    /**
+     * The text of an expression as it is placed in the Javadoc of a generated class. The source writer takes the
+     * text as it is, so a {@code $} is left alone; what would end the comment, start a tag or be read as a
+     * unicode escape by the Java compiler is written as an HTML entity.
+     *
+     * @param expression The text of the expression
+     * @return The text for the Javadoc
+     */
+    static String javadocText(String expression) {
+        StringBuilder text = new StringBuilder(expression.length());
+        for (int i = 0; i < expression.length(); i++) {
+            char c = expression.charAt(i);
+            switch (c) {
+                case '&' -> text.append("&amp;");
+                case '<' -> text.append("&lt;");
+                case '>' -> text.append("&gt;");
+                case '@' -> text.append("&#64;");
+                case '\\' -> text.append("&#92;");
+                case '*' -> text.append(i + 1 < expression.length() && expression.charAt(i + 1) == '/' ? "&#42;" : "*");
+                case '\n', '\r' -> text.append(' ');
+                default -> text.append(c);
+            }
+        }
+        return text.toString();
     }
 
     /**

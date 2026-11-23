@@ -140,11 +140,11 @@ public final class ELOptional<T> {
             case "get" -> get();
             case "isPresent" -> isPresent();
             case "ifPresent" -> {
-                ifPresent(ELStream.lambda(context, arguments, 0, name));
+                ifPresent(ELStream.lambda(arguments, 0, name));
                 yield null;
             }
             case "orElse" -> orElse(ELStream.argument(arguments, 0, name));
-            case "orElseGet" -> orElseGet(ELStream.lambda(context, arguments, 0, name));
+            case "orElseGet" -> orElseGet(ELStream.lambda(arguments, 0, name));
             default -> throw new MethodNotFoundException("Unknown optional operation '" + name + "'");
         };
     }

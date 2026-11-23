@@ -75,10 +75,10 @@ class ELInterpreterTest {
 
     @Test
     void aBooleanOperandDecidesARelationalComparison() {
-        // the section 1.9.1 orders its rules the way the equality of the section 1.9.2 does, so a boolean
-        // operand is coerced with the other rather than the two being compared as strings
-        assertEquals((Object) false, processor.eval("false gt '9'"));
-        assertEquals((Object) true, processor.eval("false le '9'"));
+        // the section 1.9.1 has no rule for a boolean operand: compared with a string, it is compared as a
+        // string, as the reference implementations do
+        assertEquals((Object) true, processor.eval("false gt '9'"));
+        assertEquals((Object) false, processor.eval("false le '9'"));
         assertEquals((Object) false, processor.eval("false lt '9'"));
         assertEquals((Object) true, processor.eval("false ge '9'"));
         assertEquals((Object) false, processor.eval("'9' gt false"));
@@ -90,8 +90,8 @@ class ELInterpreterTest {
 
     @Test
     void aCharacterIsANumberForTheUnaryMinus() {
-        // the section 1.25.3 coerces a character to its numeric value, which the binary operators already do
-        assertEquals((Object) (short) -49, processor.eval("-Character.valueOf(49)"));
+        // the unary minus coerces a character to a Long, as the reference implementations do
+        assertEquals((Object) (-49L), processor.eval("-Character.valueOf(49)"));
         assertEquals((Object) 49L, processor.eval("Character.valueOf(49) + 0"));
         assertEquals((Object) (-49L), processor.eval("-Character.valueOf(49) + 0"));
     }
@@ -293,7 +293,7 @@ class ELInterpreterTest {
             "#{bean.argumentType}", String.class, new Class<?>[]{Object[].class});
 
         assertEquals("a,b", join.invoke(context, new Object[]{"a", "b"}));
-        assertEquals("1:java.lang.String[]",
+        assertEquals("2:java.lang.String",
             argumentType.invoke(context, new Object[]{new String[]{"a", "b"}}));
     }
 
@@ -395,7 +395,7 @@ class ELInterpreterTest {
         ExpressionFactory factory = ExpressionFactory.newInstance();
 
         assertEquals("1:int[]", processor.eval("formatting.argumentType(formatting.numbers)"));
-        assertEquals("1:java.lang.String[]", processor.eval("formatting.argumentType(strings)"));
+        assertEquals("2:java.lang.String", processor.eval("formatting.argumentType(strings)"));
         assertEquals((Object) 7, processor.eval("Math.max(item.quantity, Integer.valueOf(7))"));
         assertEquals(25d, processor.eval("Math.max(book.unitPrice, 25.0)"));
 
@@ -604,8 +604,10 @@ class ELInterpreterTest {
         events.clear();
         MethodExpression method = ExpressionFactory.newInstance().createMethodExpression(context,
             "#{varargs.numberText}", Integer.class, new Class<?>[0]);
-        assertThrows(ELException.class, () -> method.invoke(context, null));
-        assertEquals(List.of("before:#{varargs.numberText}", "coerce"), events);
+        // the result of an invoked method is not coerced to the expected return type, as in both reference
+        // implementations, so no conversion is attempted
+        assertEquals("1", method.invoke(context, null));
+        assertEquals(List.of("before:#{varargs.numberText}", "after:#{varargs.numberText}"), events);
     }
 
     @Test

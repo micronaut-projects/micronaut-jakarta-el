@@ -274,8 +274,9 @@ class CompiledEvaluationTest {
         assertEquals("number", value("${ bean.widen(1) }", String.class));
         assertEquals("-2", value("${ bean.join('-', 'a', 'b') }", String.class));
         assertEquals("only-", value("${ bean.join('-') }", String.class));
-        // an array of a component type the parameter does not declare is packed, not passed through
-        assertEquals("-1", value("${ bean.join('-', words) }", String.class));
+        // an array assignable to the variable arity parameter is its array, section 15.12.2 of the JLS, so a
+        // String[] passed to Object... is spread, not packed as one element
+        assertEquals("-2", value("${ bean.join('-', words) }", String.class));
         assertEquals("", value("${ bean.reset() }", String.class));
         assertEquals("", value("${ bean.absent.describe() }", String.class));
     }

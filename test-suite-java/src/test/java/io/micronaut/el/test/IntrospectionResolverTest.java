@@ -3,6 +3,8 @@ package io.micronaut.el.test;
 import io.micronaut.el.CompiledELContext;
 import io.micronaut.el.resolver.ELResolvers;
 import io.micronaut.el.resolver.IntrospectionELResolver;
+import io.micronaut.core.beans.BeanIntrospector;
+import jakarta.el.ELException;
 import jakarta.el.ELResolver;
 import jakarta.el.MapELResolver;
 import jakarta.el.PropertyNotWritableException;
@@ -103,5 +105,45 @@ class IntrospectionResolverTest {
         assertInstanceOf(IntrospectionELResolver.class, first.get(0));
         assertInstanceOf(IntrospectionELResolver.class, second.get(0));
         assertNotSame(first.get(0), second.get(0));
+    }
+
+    @Test
+    void whatAnAccessorThrowsIsReportedAsAnELException() {
+        FailingBook failing = new FailingBook();
+
+        ELException getter = assertThrows(ELException.class, () -> resolver.getValue(context, failing, "broken"));
+        assertInstanceOf(IllegalStateException.class, getter.getCause());
+        ELException setter = assertThrows(ELException.class,
+            () -> resolver.setValue(context, failing, "broken", "value"));
+        assertInstanceOf(IllegalStateException.class, setter.getCause());
+
+        // an ELException is not wrapped again
+        assertEquals("rejected getter",
+            assertThrows(ELException.class, () -> resolver.getValue(context, failing, "rejected")).getMessage());
+        assertEquals("rejected setter",
+            assertThrows(ELException.class, () -> resolver.setValue(context, failing, "rejected", "v")).getMessage());
+    }
+
+    @Test
+    void whatAMethodThrowsIsReportedAsAnELException() {
+        FailingBook failing = new FailingBook();
+
+        ELException failure = assertThrows(ELException.class,
+            () -> resolver.invoke(context, failing, "fail", null, new Object[0]));
+        assertInstanceOf(IllegalStateException.class, failure.getCause());
+        assertEquals("rejected method", assertThrows(ELException.class,
+            () -> resolver.invoke(context, failing, "reject", null, null)).getMessage());
+    }
+
+    @Test
+    void aResolverOfAnotherIntrospectorReadsTheSameProperties() {
+        ELResolver own = new IntrospectionELResolver(
+            BeanIntrospector.forClassLoader(IntrospectionResolverTest.class.getClassLoader()), true);
+
+        context.setPropertyResolved(false);
+        assertEquals("EL", own.getValue(context, book, "title"));
+        assertTrue(context.isPropertyResolved());
+        assertTrue(own.isReadOnly(context, book, "title"));
+        assertThrows(PropertyNotWritableException.class, () -> own.setValue(context, book, "title", "x"));
     }
 }

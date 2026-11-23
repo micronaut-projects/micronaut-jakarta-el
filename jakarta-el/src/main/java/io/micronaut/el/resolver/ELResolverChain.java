@@ -76,6 +76,7 @@ public final class ELResolverChain extends CompositeELResolver {
         Map.entry(IntrospectionELResolver.class, CONVERTS),
         Map.entry(StreamELResolver.class, CONVERTS),
         Map.entry(ExecutableMethodELExecutor.class, CONVERTS),
+        Map.entry(ContributedELResolver.class, CONVERTS),
         Map.entry(StaticFieldELResolver.class, CONVERTS),
         Map.entry(MapELResolver.class, CONVERTS | INVOKES),
         Map.entry(ResourceBundleELResolver.class, CONVERTS | INVOKES),
@@ -96,7 +97,7 @@ public final class ELResolverChain extends CompositeELResolver {
      */
     private static final Set<Class<?>> BASE_REQUIRED = Set.of(
         CommonELResolver.class, IntrospectionELResolver.class, StreamELResolver.class,
-        ExecutableMethodELExecutor.class,
+        ExecutableMethodELExecutor.class, ContributedELResolver.class,
         StaticFieldELResolver.class, MapELResolver.class, ResourceBundleELResolver.class, ListELResolver.class,
         ArrayELResolver.class, RecordELResolver.class, OptionalELResolver.class, BeanELResolver.class);
 
@@ -108,7 +109,7 @@ public final class ELResolverChain extends CompositeELResolver {
      */
     private static final Set<Class<?>> NON_REFLECTIVE = Set.of(
         CommonELResolver.class, IntrospectionELResolver.class, StreamELResolver.class,
-        ExecutableMethodELExecutor.class,
+        ExecutableMethodELExecutor.class, ContributedELResolver.class,
         MapELResolver.class, ListELResolver.class, ArrayELResolver.class, ResourceBundleELResolver.class,
         BeanNameELResolver.class);
 

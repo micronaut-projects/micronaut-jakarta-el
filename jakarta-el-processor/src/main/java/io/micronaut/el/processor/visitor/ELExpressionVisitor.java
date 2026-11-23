@@ -41,6 +41,8 @@ import io.micronaut.el.processor.compiler.ELExpressionDefinition;
 import io.micronaut.el.processor.compiler.ELMethodExpressionDefinition;
 import io.micronaut.el.parser.ELParser;
 import io.micronaut.el.parser.ELParsingException;
+import io.micronaut.el.parser.ELParserOptions;
+import io.micronaut.el.parser.ast.ELNode;
 import io.micronaut.el.processor.writer.ExpressionSourceWriter;
 import io.micronaut.el.processor.writer.MethodExpressionWriter;
 import io.micronaut.el.processor.writer.ValueExpressionWriter;
@@ -68,6 +70,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * The visitor compiling the expressions declared with {@link ELExpression} and {@link ELMethodExpression}.
@@ -79,19 +82,43 @@ import java.util.Set;
 public final class ELExpressionVisitor implements TypeElementVisitor<Object, Object> {
 
     private static final String EXPECTED_PARAM_TYPES = "expectedParamTypes";
+    private static final String VARIABLES = "variables";
+    /**
+     * The annotation processor options limiting the parser, named as the system properties the runtime parser
+     * reads, so that an expression is held to the same limits at compile time as at runtime, each with the
+     * camel case alias javac accepts: a key of {@code -A} must be a dot separated sequence of Java identifiers, which
+     * javac checks before any processor runs, so {@code -Amicronaut.el.parser.max-length=...} is rejected there,
+     * while KSP and the system properties a Groovy compilation reads take either name.
+     */
+    private static final Map<String, String> PARSER_OPTION_ALIASES = Map.of(
+        ELParserOptions.MAX_LENGTH_PROPERTY, ELParserOptions.PROPERTY_PREFIX + "maxLength",
+        ELParserOptions.MAX_TOKENS_PROPERTY, ELParserOptions.PROPERTY_PREFIX + "maxTokens",
+        ELParserOptions.MAX_DEPTH_PROPERTY, ELParserOptions.PROPERTY_PREFIX + "maxDepth",
+        ELParserOptions.MAX_TREE_HEIGHT_PROPERTY, ELParserOptions.PROPERTY_PREFIX + "maxTreeHeight"
+    );
+    private static final Set<String> PARSER_OPTIONS = parserOptionNames();
 
     private final Set<String> processed = new HashSet<>();
     private final List<ClassElement> pending = new ArrayList<>();
 
     @Override
     public VisitorKind getVisitorKind() {
-        return VisitorKind.ISOLATING;
+        // an expression may call a function discovered on any other class of the compilation, so its generated
+        // classes depend on more than the class declaring it; aggregating also keeps the visitor in the same
+        // processor, and visitor context, as ELFunctionVisitor
+        return VisitorKind.AGGREGATING;
     }
 
     @Override
     public void start(VisitorContext visitorContext) {
         processed.clear();
         pending.clear();
+    }
+
+    @Override
+    public Set<String> getSupportedOptions() {
+        // the names javac accepts: a supported option is declared to javac, which only knows identifiers
+        return Set.copyOf(PARSER_OPTION_ALIASES.values());
     }
 
     @Override
@@ -146,7 +173,7 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
             return;
         }
         try {
-            compile(element, context);
+            compile(element, context, context.getLanguage() != VisitorContext.Language.KOTLIN);
         } catch (ProcessingException e) {
             if (e.getCause() instanceof ELUndeclaredFunctionException && context.getLanguage() != VisitorContext.Language.KOTLIN) {
                 // the function may be declared in a class of the module not visited yet: Groovy visits the
@@ -170,14 +197,24 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
                 continue;
             }
             try {
-                compile(element, context);
+                compile(element, context, false);
             } catch (ProcessingException e) {
                 context.fail(String.valueOf(e.getMessage()), element);
             }
         }
     }
 
-    private void compile(ClassElement element, VisitorContext context) {
+    /**
+     * Compiles the expressions declared on a class and writes them, unless one of them cannot be compiled: each
+     * failure is then reported on the element declaring the expression, with its text, and every expression of
+     * the class is compiled first so that all the failures are reported at once.
+     *
+     * @param element         The class
+     * @param context         The visitor context
+     * @param retryUndeclared Whether an expression calling a function no class visited so far declares makes the
+     *                        whole class retried later, rather than reported
+     */
+    private void compile(ClassElement element, VisitorContext context, boolean retryUndeclared) {
         List<Declared<ELExpression>> expressions = declaredOn(element, ELExpression.class);
         List<Declared<ELMethodExpression>> methodExpressions = declaredOn(element, ELMethodExpression.class);
         if (expressions.isEmpty() && methodExpressions.isEmpty()) {
@@ -185,35 +222,16 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
         }
         SourceGenerator sourceGenerator = generatorFor(context);
         try {
-            Map<Element, ELCompiler> compilers = new LinkedHashMap<>();
-            String prefix = element.getPackageName() + "." + element.getSimpleName();
-            // every expression is compiled before anything is written: a class retried later must not find
-            // its first classes generated already
-            List<ClassDef> generated = new ArrayList<>();
-
-            List<ExpressionSourceWriter.CompiledValue> compiledValues = new ArrayList<>(expressions.size());
-            Set<String> constantNames = new HashSet<>();
-            for (int i = 0; i < expressions.size(); i++) {
-                Declared<ELExpression> declared = expressions.get(i);
-                ELExpressionDefinition definition = valueDefinition(declared.annotation(), declared.owner(), constantNames, context);
-                String className = prefix + "$Expression" + i;
-                ValueExpressionWriter.Written written = ValueExpressionWriter.write(className, definition,
-                    compilerFor(declared.owner(), element, compilers, context));
-                generated.add(written.type());
-                compiledValues.add(new ExpressionSourceWriter.CompiledValue(written.definition(), className));
+            ClassCompilation compilation = new ClassCompilation(element, context);
+            List<ExpressionSourceWriter.CompiledValue> compiledValues = compilation.compileValues(expressions);
+            List<ExpressionSourceWriter.CompiledMethod> compiledMethods = compilation.compileMethods(methodExpressions);
+            if (!compilation.failures.isEmpty()) {
+                reportFailures(compilation.failures, retryUndeclared, context);
+                return;
             }
 
-            List<ExpressionSourceWriter.CompiledMethod> compiledMethods = new ArrayList<>(methodExpressions.size());
-            for (int i = 0; i < methodExpressions.size(); i++) {
-                Declared<ELMethodExpression> declared = methodExpressions.get(i);
-                ELMethodExpressionDefinition definition = methodDefinition(declared.annotation(), declared.owner(), constantNames, context);
-                String className = prefix + "$MethodExpression" + i;
-                MethodExpressionWriter.Written written = MethodExpressionWriter.write(className, definition,
-                    compilerFor(declared.owner(), element, compilers, context));
-                generated.add(written.type());
-                compiledMethods.add(new ExpressionSourceWriter.CompiledMethod(written.definition(), className));
-            }
-
+            List<ClassDef> generated = compilation.generated;
+            String prefix = compilation.prefix;
             String sourceClassName = prefix + "$ELExpressions";
             generated.add(ExpressionSourceWriter.write(sourceClassName, compiledValues, compiledMethods));
             for (ClassDef classDef : generated) {
@@ -232,6 +250,27 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
                 throw runtimeException;
             }
             throw new ProcessingException(element, "Failed to generate the expressions: " + reportable(e), e);
+        }
+    }
+
+    /**
+     * Reports the expressions of a class that cannot be compiled on the elements declaring them.
+     *
+     * @throws ELUndeclaredFunctionException When one of them calls a function no class visited so far declares,
+     *                                       and the class is to be retried later
+     */
+    private static void reportFailures(List<Failure> failures, boolean retryUndeclared, VisitorContext context) {
+        Failure undeclared = failures.stream()
+            .filter(failure -> failure.cause() instanceof ELUndeclaredFunctionException)
+            .findFirst().orElse(null);
+        if (retryUndeclared && undeclared != null) {
+            throw undeclared.cause();
+        }
+        for (Failure failure : failures) {
+            // reported as it is: the processors of the languages would format it, and an expression may
+            // well contain a '%'
+            context.fail("The expression '" + failure.expression() + "' cannot be compiled: "
+                + reportable(failure.cause()), failure.owner());
         }
     }
 
@@ -361,7 +400,9 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
         // an omitted type is inferred from the static type of the expression once it is compiled
         ClassElement expectedType = ELTypes.resolveMember(annotation, "expectedType", context).orElse(null);
         String name = uniqueConstantName(annotation, owner, expression, used);
-        return new ELExpressionDefinition(expression, expectedType, false, name, ELParser.parse(expression));
+        ELParserOptions options = parserOptions(context);
+        return new ELExpressionDefinition(expression, expectedType, false, name,
+            parse(options, () -> ELParser.parse(expression, options)));
     }
 
     private ELMethodExpressionDefinition methodDefinition(AnnotationValue<ELMethodExpression> annotation,
@@ -379,8 +420,49 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
             "name", annotation.stringValue("name").orElse(""), EXPECTED_PARAM_TYPES,
             parameterTypes, context);
         String name = uniqueConstantName(annotation, owner, expression, used);
+        ELParserOptions options = parserOptions(context);
         return new ELMethodExpressionDefinition(expression, returnType, false, parameterTypes, name,
-            ELParser.parseEval(expression));
+            parse(options, () -> ELParser.parseEval(expression, options)));
+    }
+
+    /**
+     * The limits of the parser, read from the annotation processor options {@code micronaut.el.parser.max-length},
+     * {@code max-tokens}, {@code max-depth} and {@code max-tree-height}, or their aliases {@code maxLength},
+     * {@code maxTokens}, {@code maxDepth} and {@code maxTreeHeight}, the defaults for those not set.
+     */
+    private static ELParserOptions parserOptions(VisitorContext context) {
+        Map<String, String> options = context.getOptions();
+        try {
+            return ELParserOptions.fromResolver(name -> {
+                String value = options.get(name);
+                String alias = PARSER_OPTION_ALIASES.get(name);
+                return value != null || alias == null ? value : options.get(alias);
+            });
+        } catch (IllegalArgumentException e) {
+            throw new ELCompilationException("Invalid annotation processor option: " + e.getMessage());
+        }
+    }
+
+    private static Set<String> parserOptionNames() {
+        Set<String> names = new java.util.TreeSet<>(PARSER_OPTION_ALIASES.keySet());
+        names.addAll(PARSER_OPTION_ALIASES.values());
+        return java.util.Collections.unmodifiableSet(names);
+    }
+
+    /**
+     * Parses an expression, naming the annotation processor options in the failure of a limit that is not the
+     * default, so that the limit is found where it is set.
+     */
+    private static ELNode parse(ELParserOptions options, Supplier<ELNode> parser) {
+        try {
+            return parser.get();
+        } catch (ELParsingException e) {
+            if (options.equals(ELParserOptions.defaults())) {
+                throw e;
+            }
+            throw new ELParsingException(e.getMessage() + ". The limits of the parser are set by the annotation "
+                + "processor options " + String.join(", ", PARSER_OPTIONS) + ", here " + options);
+        }
     }
 
     private CompilationContext environmentOf(ClassElement element, Element owner, VisitorContext context) {
@@ -401,7 +483,7 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
         if (owner != element) {
             declare(owner.getAnnotation(ELEnvironment.class), owner, context, variables, importedClasses, importedPackages, staticImports, functions);
         }
-        return new CompilationContext(context, owner, ELFunctionDiscovery.current(), variables, importedClasses, importedPackages, staticImports, functions);
+        return new CompilationContext(context, owner, ELFunctionDiscovery.of(context), variables, importedClasses, importedPackages, staticImports, functions);
     }
 
     private void declare(@Nullable AnnotationValue<ELEnvironment> environment,
@@ -415,16 +497,22 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
         if (environment == null) {
             return;
         }
-        List<AnnotationValue<ELVariable>> declaredVariables = ELTypes.nested(environment, "variables", ELVariable.class);
+        List<AnnotationValue<ELVariable>> declaredVariables = ELTypes.nested(environment, VARIABLES, ELVariable.class);
         for (int i = 0; i < declaredVariables.size(); i++) {
             int variableIndex = i;
             AnnotationValue<ELVariable> variable = declaredVariables.get(i);
             String name = variable.stringValue("name").orElseThrow(() ->
                 new ELCompilationException("The name of @ELVariable is required"));
-            ClassElement type = ELTypes.resolveMember(variable, "type", context)
+            Optional<ClassElement> kotlinPrimitive = context.getLanguage() == VisitorContext.Language.KOTLIN
+                // the metadata names the wrapper of Int::class, the KSP model the primitive it is
+                ? KotlinAnnotationTypes.resolveNestedPrimitive(owner.getNativeType(), ELEnvironment.class.getName(),
+                    VARIABLES, variableIndex, "type")
+                : Optional.empty();
+            ClassElement type = kotlinPrimitive
+                .or(() -> ELTypes.resolveMember(variable, "type", context))
                 .or(() -> context.getLanguage() == VisitorContext.Language.JAVA
                     ? JavaAnnotationTypes.resolveNestedMember(owner.getNativeType(), ELEnvironment.class.getName(),
-                        "variables", variableIndex, "type", context)
+                        VARIABLES, variableIndex, "type", context)
                     : Optional.empty())
                 .orElseThrow(() ->
                 new ELCompilationException("The type of the variable '" + name + "' is required"));
@@ -516,5 +604,72 @@ public final class ELExpressionVisitor implements TypeElementVisitor<Object, Obj
     }
 
     private record DeclarationKey(Element owner, String signature) {
+    }
+
+    /**
+     * An expression that cannot be compiled.
+     *
+     * @param owner      The element declaring it, where the failure is reported
+     * @param expression The text of the expression
+     * @param cause      The reason
+     */
+    private record Failure(Element owner, String expression, RuntimeException cause) {
+    }
+
+    /**
+     * The compilation of the expressions declared on a class. Every expression is compiled before anything is
+     * written: a class retried later must not find its first classes generated already.
+     */
+    private final class ClassCompilation {
+
+        private final ClassElement element;
+        private final VisitorContext context;
+        private final String prefix;
+        private final Map<Element, ELCompiler> compilers = new LinkedHashMap<>();
+        private final Set<String> constantNames = new HashSet<>();
+        private final List<ClassDef> generated = new ArrayList<>();
+        private final List<Failure> failures = new ArrayList<>();
+
+        private ClassCompilation(ClassElement element, VisitorContext context) {
+            this.element = element;
+            this.context = context;
+            this.prefix = element.getPackageName() + "." + element.getSimpleName();
+        }
+
+        private List<ExpressionSourceWriter.CompiledValue> compileValues(List<Declared<ELExpression>> expressions) {
+            List<ExpressionSourceWriter.CompiledValue> compiledValues = new ArrayList<>(expressions.size());
+            for (int i = 0; i < expressions.size(); i++) {
+                Declared<ELExpression> declared = expressions.get(i);
+                try {
+                    ELExpressionDefinition definition = valueDefinition(declared.annotation(), declared.owner(), constantNames, context);
+                    String className = prefix + "$Expression" + i;
+                    ValueExpressionWriter.Written written = ValueExpressionWriter.write(className, definition,
+                        compilerFor(declared.owner(), element, compilers, context));
+                    generated.add(written.type());
+                    compiledValues.add(new ExpressionSourceWriter.CompiledValue(written.definition(), className));
+                } catch (ELParsingException | ELCompilationException e) {
+                    failures.add(new Failure(declared.owner(), expressionOf(declared.annotation()).orElse(""), e));
+                }
+            }
+            return compiledValues;
+        }
+
+        private List<ExpressionSourceWriter.CompiledMethod> compileMethods(List<Declared<ELMethodExpression>> methodExpressions) {
+            List<ExpressionSourceWriter.CompiledMethod> compiledMethods = new ArrayList<>(methodExpressions.size());
+            for (int i = 0; i < methodExpressions.size(); i++) {
+                Declared<ELMethodExpression> declared = methodExpressions.get(i);
+                try {
+                    ELMethodExpressionDefinition definition = methodDefinition(declared.annotation(), declared.owner(), constantNames, context);
+                    String className = prefix + "$MethodExpression" + i;
+                    MethodExpressionWriter.Written written = MethodExpressionWriter.write(className, definition,
+                        compilerFor(declared.owner(), element, compilers, context));
+                    generated.add(written.type());
+                    compiledMethods.add(new ExpressionSourceWriter.CompiledMethod(written.definition(), className));
+                } catch (ELParsingException | ELCompilationException e) {
+                    failures.add(new Failure(declared.owner(), expressionOf(declared.annotation()).orElse(""), e));
+                }
+            }
+            return compiledMethods;
+        }
     }
 }

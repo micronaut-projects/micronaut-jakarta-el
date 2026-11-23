@@ -171,7 +171,7 @@ class ELInterpreterExpressionsTest {
         assertEquals("default:EL", value(ELInterpreterExpressions$ELExpressions.FUNCTIONAL_INTERFACE));
         assertEquals("default:EL", value(ELInterpreterExpressions$ELExpressions.ALIASED_FUNCTIONAL_INTERFACE));
         assertEquals("1:int[]", value(ELInterpreterExpressions$ELExpressions.FORMATTING_PRIMITIVE_ARRAY));
-        assertEquals("1:java.lang.String[]", value(ELInterpreterExpressions$ELExpressions.FORMATTING_REFERENCE_ARRAY));
+        assertEquals("2:java.lang.String", value(ELInterpreterExpressions$ELExpressions.FORMATTING_REFERENCE_ARRAY));
         assertEquals(7, value(ELInterpreterExpressions$ELExpressions.STATIC_INTEGER_MAXIMUM));
         assertEquals(25d, value(ELInterpreterExpressions$ELExpressions.STATIC_DOUBLE_MAXIMUM));
         assertEquals(true, value(ELInterpreterExpressions$ELExpressions.LARGE_INTEGRAL_BIG_DECIMAL_EQUALITY));
@@ -202,7 +202,7 @@ class ELInterpreterExpressionsTest {
             new Object[]{"42"}));
         assertEquals("a,b", ELInterpreterExpressions$ELExpressions.VARARGS_METHOD.invoke(context,
             new Object[]{"a", "b"}));
-        assertEquals("1:java.lang.String[]", ELInterpreterExpressions$ELExpressions.OBJECT_VARARGS_METHOD.invoke(context,
+        assertEquals("2:java.lang.String", ELInterpreterExpressions$ELExpressions.OBJECT_VARARGS_METHOD.invoke(context,
             new Object[]{new String[]{"a", "b"}}));
         assertEquals("number", ELInterpreterExpressions$ELExpressions.SPECIFIC_METHOD.invoke(context,
             new Object[]{1L}));
@@ -237,9 +237,10 @@ class ELInterpreterExpressionsTest {
         assertEquals(List.of("before:${'1'}", "coerce"), events);
 
         events.clear();
-        assertThrows(ELException.class,
-            () -> ELInterpreterExpressions$ELExpressions.COERCION_LISTENER_METHOD.invoke(listeningContext, null));
-        assertEquals(List.of("before:#{varargs.numberText}", "coerce"), events);
+        // the result of an invoked method is not coerced to the expected return type, as in both reference
+        // implementations, so no conversion is attempted
+        assertEquals("1", ELInterpreterExpressions$ELExpressions.COERCION_LISTENER_METHOD.invoke(listeningContext, null));
+        assertEquals(List.of("before:#{varargs.numberText}", "after:#{varargs.numberText}"), events);
     }
 
     @Test
@@ -247,7 +248,8 @@ class ELInterpreterExpressionsTest {
         CompiledExpressionFactory factory = new CompiledExpressionFactory(
             List.of(new ELInterpreterExpressions$ELExpressions()));
 
-        assertEquals(1, ELInterpreterExpressions$ELExpressions.COERCION_LISTENER_METHOD.invoke(context, null));
+        // with or without an expected return type, the result of the method is returned as it is
+        assertEquals("1", ELInterpreterExpressions$ELExpressions.COERCION_LISTENER_METHOD.invoke(context, null));
         assertEquals("1", factory.createMethodExpression(context, "#{varargs.numberText}", null,
             new Class<?>[0]).invoke(context, null));
     }

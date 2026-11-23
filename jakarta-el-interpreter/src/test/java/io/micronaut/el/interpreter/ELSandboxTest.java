@@ -46,6 +46,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * methods, static members and constructors dynamically. Where that resolution reflects, these are the paths
  * through which it would otherwise reach arbitrary Java; where it does not, the application described what it
  * reaches and the sandbox stays out of the way.
+ *
+ * <p>These regressions are interpreter-only by design: the sandbox guards the expression strings an application
+ * builds at runtime, while a compiled expression is source of the application and is not sandboxed (see
+ * {@code aCompiledExpressionIsNotSandboxed}), so a generated counterpart of a denied expression would evaluate.
+ * The regressions whose result does not depend on the sandbox have their generated counterparts in
+ * {@code io.micronaut.el.test.parity.ParitySandboxExpressions} of the Java test suite.</p>
  */
 class ELSandboxTest {
 

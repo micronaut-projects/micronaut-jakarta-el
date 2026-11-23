@@ -22,7 +22,6 @@ import io.micronaut.el.stream.ELStream;
 import jakarta.el.ELClass;
 import jakarta.el.ELContext;
 import jakarta.el.ELResolver;
-import jakarta.el.LambdaExpression;
 import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Method;
@@ -70,13 +69,8 @@ public final class ReflectiveMethodELResolver extends ELResolver {
         if (target == null) {
             return null;
         }
-        if (params != null) {
-            for (Object param : params) {
-                if (param instanceof LambdaExpression lambda) {
-                    lambda.setELContext(context);
-                }
-            }
-        }
+        // a lambda argument is coerced with this context, which is what a proxy of it invokes with; the context
+        // the lambda carries is left as it is, the lambda may be shared with other threads and other contexts
         Object result = ReflectiveELMethods.invoke(context, target, instance, params);
         context.setPropertyResolved(base, method);
         return result;
