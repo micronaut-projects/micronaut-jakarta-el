@@ -5,23 +5,23 @@
   <testcase name="resourceBundleELResolverPNWETest()" classname="com.sun.ts.tests.el.api.jakarta_el.resourcebundleelresolver.ELClientIT" time="0"/>
   <testcase name="resourceBundleELResolverTest()" classname="com.sun.ts.tests.el.api.jakarta_el.resourcebundleelresolver.ELClientIT" time="0"/>
   <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[Oct 25, 2026 7:11:55 PM com.sun.ts.tests.el.api.jakarta_el.resourcebundleelresolver.ELClientIT logStartTest
+  <system-err><![CDATA[Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.resourcebundleelresolver.ELClientIT logStartTest
 INFO: STARTING TEST : resourceBundleELResolverNPETest()
-Oct 25, 2026 7:11:55 PM com.sun.ts.tests.el.api.jakarta_el.resourcebundleelresolver.ELClientIT logFinishTest
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.resourcebundleelresolver.ELClientIT logFinishTest
 INFO: FINISHED TEST : resourceBundleELResolverNPETest()
-Oct 25, 2026 7:11:55 PM com.sun.ts.tests.el.api.jakarta_el.resourcebundleelresolver.ELClientIT cleanup
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.resourcebundleelresolver.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 25, 2026 7:11:55 PM com.sun.ts.tests.el.api.jakarta_el.resourcebundleelresolver.ELClientIT logStartTest
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.resourcebundleelresolver.ELClientIT logStartTest
 INFO: STARTING TEST : resourceBundleELResolverPNWETest()
-Oct 25, 2026 7:11:55 PM com.sun.ts.tests.el.api.jakarta_el.resourcebundleelresolver.ELClientIT logFinishTest
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.resourcebundleelresolver.ELClientIT logFinishTest
 INFO: FINISHED TEST : resourceBundleELResolverPNWETest()
-Oct 25, 2026 7:11:55 PM com.sun.ts.tests.el.api.jakarta_el.resourcebundleelresolver.ELClientIT cleanup
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.resourcebundleelresolver.ELClientIT cleanup
 INFO: Cleanup method called
-Oct 25, 2026 7:11:55 PM com.sun.ts.tests.el.api.jakarta_el.resourcebundleelresolver.ELClientIT logStartTest
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.resourcebundleelresolver.ELClientIT logStartTest
 INFO: STARTING TEST : resourceBundleELResolverTest()
-Oct 25, 2026 7:11:55 PM com.sun.ts.tests.el.api.jakarta_el.resourcebundleelresolver.ELClientIT logFinishTest
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.resourcebundleelresolver.ELClientIT logFinishTest
 INFO: FINISHED TEST : resourceBundleELResolverTest()
-Oct 25, 2026 7:11:55 PM com.sun.ts.tests.el.api.jakarta_el.resourcebundleelresolver.ELClientIT cleanup
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.resourcebundleelresolver.ELClientIT cleanup
 INFO: Cleanup method called
 ]]></system-err>
 </testsuite>

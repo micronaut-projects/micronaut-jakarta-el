@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT" tests="7" skipped="0" failures="0" errors="0" timestamp="SANITIZED" hostname="SANITIZED" time="0">
+  <properties/>
+  <testcase name="beanNameELResolverInvokeTest()" classname="com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT" time="0"/>
+  <testcase name="beanNameELResolverGetValueNPETest()" classname="com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT" time="0"/>
+  <testcase name="beanNameELResolverGetTypeNPETest()" classname="com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT" time="0"/>
+  <testcase name="beanNameELResolverSetValueNPETest()" classname="com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT" time="0"/>
+  <testcase name="beanNameELResolverIsReadOnlyNPETest()" classname="com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT" time="0"/>
+  <testcase name="beanNameELResolverInvokeMNFETest()" classname="com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT" time="0"/>
+  <testcase name="beanNameELResolverTest()" classname="com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT" time="0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Nov 27, 2026 12:56:29 AM com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT logStartTest
+INFO: STARTING TEST : beanNameELResolverInvokeTest()
+Nov 27, 2026 12:56:29 AM com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT beanNameELResolverInvokeTest
+INFO: 
+Nov 27, 2026 12:56:29 AM com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT logFinishTest
+INFO: FINISHED TEST : beanNameELResolverInvokeTest()
+Nov 27, 2026 12:56:29 AM com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT cleanup
+INFO: Cleanup method called
+Nov 27, 2026 12:56:29 AM com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT logStartTest
+INFO: STARTING TEST : beanNameELResolverGetValueNPETest()
+Nov 27, 2026 12:56:29 AM com.sun.ts.tests.el.common.util.ELTestUtil checkForException
+INFO: Test PASSED
+Nov 27, 2026 12:56:29 AM com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT logFinishTest
+INFO: FINISHED TEST : beanNameELResolverGetValueNPETest()
+Nov 27, 2026 12:56:29 AM com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT cleanup
+INFO: Cleanup method called
+Nov 27, 2026 12:56:29 AM com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT logStartTest
+INFO: STARTING TEST : beanNameELResolverGetTypeNPETest()
+Nov 27, 2026 12:56:29 AM com.sun.ts.tests.el.common.util.ELTestUtil checkForException
+INFO: Test PASSED
+Nov 27, 2026 12:56:29 AM com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT logFinishTest
+INFO: FINISHED TEST : beanNameELResolverGetTypeNPETest()
+Nov 27, 2026 12:56:29 AM com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT cleanup
+INFO: Cleanup method called
+Nov 27, 2026 12:56:29 AM com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT logStartTest
+INFO: STARTING TEST : beanNameELResolverSetValueNPETest()
+Nov 27, 2026 12:56:29 AM com.sun.ts.tests.el.common.util.ELTestUtil checkForException
+INFO: Test PASSED
+Nov 27, 2026 12:56:29 AM com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT logFinishTest
+INFO: FINISHED TEST : beanNameELResolverSetValueNPETest()
+Nov 27, 2026 12:56:29 AM com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT cleanup
+INFO: Cleanup method called
+Nov 27, 2026 12:56:29 AM com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT logStartTest
+INFO: STARTING TEST : beanNameELResolverIsReadOnlyNPETest()
+Nov 27, 2026 12:56:29 AM com.sun.ts.tests.el.common.util.ELTestUtil checkForException
+INFO: Test PASSED
+Nov 27, 2026 12:56:29 AM com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT logFinishTest
+INFO: FINISHED TEST : beanNameELResolverIsReadOnlyNPETest()
+Nov 27, 2026 12:56:29 AM com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT cleanup
+INFO: Cleanup method called
+Nov 27, 2026 12:56:29 AM com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT logStartTest
+INFO: STARTING TEST : beanNameELResolverInvokeMNFETest()
+Nov 27, 2026 12:56:29 AM com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT beanNameELResolverInvokeMNFETest
+INFO: Test Passed  invoke() threw MethodNotFoundException
+Nov 27, 2026 12:56:29 AM com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT logFinishTest
+INFO: FINISHED TEST : beanNameELResolverInvokeMNFETest()
+Nov 27, 2026 12:56:29 AM com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT cleanup
+INFO: Cleanup method called
+Nov 27, 2026 12:56:29 AM com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT logStartTest
+INFO: STARTING TEST : beanNameELResolverTest()
+Nov 27, 2026 12:56:29 AM com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT beanNameELResolverTest
+INFO: setValue() tested successfully on writable property
+getValue() tested successfully
+Value expected: GOLDEN
+Value retrieved: GOLDEN
+getType() returns java.lang.String
+non-null as expected
+isReadOnly() returns false as expected
+getCommonPropertyType() returns java.lang.String
+
+Nov 27, 2026 12:56:29 AM com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT logFinishTest
+INFO: FINISHED TEST : beanNameELResolverTest()
+Nov 27, 2026 12:56:29 AM com.sun.ts.tests.el.api.jakarta_el.beannameelresolver.ELClientIT cleanup
+INFO: Cleanup method called
+]]></system-err>
+</testsuite>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT" tests="9" skipped="0" failures="0" errors="0" timestamp="SANITIZED" hostname="SANITIZED" time="0">
+  <properties/>
+  <testcase name="negativeMethodExpressionTest()" classname="com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT" time="0"/>
+  <testcase name="methodExpressionMatchingOverloadBeatsExactVarArgsTest()" classname="com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT" time="0"/>
+  <testcase name="methodExpressionSerializableTest()" classname="com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT" time="0"/>
+  <testcase name="positiveMethodExpressionTest()" classname="com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT" time="0"/>
+  <testcase name="methodExpressionMatchingCoercionBeatsExactVarArgsTest()" classname="com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT" time="0"/>
+  <testcase name="methodExpressionMatchingOverloadBeatsCoercionTest()" classname="com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT" time="0"/>
+  <testcase name="methodExpressionMatchingAmbiguousTest()" classname="com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT" time="0"/>
+  <testcase name="methodExpressionMatchingExactPreferredTest()" classname="com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT" time="0"/>
+  <testcase name="methodExpressionMatchingVarArgsTest()" classname="com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT" time="0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT logStartTest
+INFO: STARTING TEST : negativeMethodExpressionTest()
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT negativeMethodExpressionTest
+INFO: Expected Exception Thrown, when Null ELContext passed to getMethodInfo(): NullPointerException
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT negativeMethodExpressionTest
+INFO: Expected Exception Thrown, when Null ELContext passed to invoke(): NullPointerException
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT negativeMethodExpressionTest
+INFO: Expected Exception Thrown, when method does not exists for getMethodInfo(): MethodNotFoundException
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT negativeMethodExpressionTest
+INFO: Expected Exception Thrown, when method does not exists for invoke(): MethodNotFoundException
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT negativeMethodExpressionTest
+INFO: Expected Exception Thrown, No such property in ELContextfor getMethodInfo(): PropertyNotFoundException
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT negativeMethodExpressionTest
+INFO: Expected Exception Thrown, No such property in ELContextfor invoke(): PropertyNotFoundException
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT negativeMethodExpressionTest
+INFO: Expected Exception Thrown. Call to invoke() with string literal ELContext for invoke().
+Expected return type is void: ELException
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT negativeMethodExpressionTest
+INFO: Expected Exception Thrown. Call to invoke() with string literal ELContext for invoke().
+Expected return type can't be coerced: ELException
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT logFinishTest
+INFO: FINISHED TEST : negativeMethodExpressionTest()
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT cleanup
+INFO: Cleanup method called
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT logStartTest
+INFO: STARTING TEST : methodExpressionMatchingOverloadBeatsExactVarArgsTest()
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT logFinishTest
+INFO: FINISHED TEST : methodExpressionMatchingOverloadBeatsExactVarArgsTest()
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT cleanup
+INFO: Cleanup method called
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT logStartTest
+INFO: STARTING TEST : methodExpressionSerializableTest()
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT logFinishTest
+INFO: FINISHED TEST : methodExpressionSerializableTest()
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT cleanup
+INFO: Cleanup method called
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT logStartTest
+INFO: STARTING TEST : positiveMethodExpressionTest()
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT logFinishTest
+INFO: FINISHED TEST : positiveMethodExpressionTest()
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT cleanup
+INFO: Cleanup method called
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT logStartTest
+INFO: STARTING TEST : methodExpressionMatchingCoercionBeatsExactVarArgsTest()
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT logFinishTest
+INFO: FINISHED TEST : methodExpressionMatchingCoercionBeatsExactVarArgsTest()
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT cleanup
+INFO: Cleanup method called
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT logStartTest
+INFO: STARTING TEST : methodExpressionMatchingOverloadBeatsCoercionTest()
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT logFinishTest
+INFO: FINISHED TEST : methodExpressionMatchingOverloadBeatsCoercionTest()
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT cleanup
+INFO: Cleanup method called
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT logStartTest
+INFO: STARTING TEST : methodExpressionMatchingAmbiguousTest()
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT logFinishTest
+INFO: FINISHED TEST : methodExpressionMatchingAmbiguousTest()
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT cleanup
+INFO: Cleanup method called
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT logStartTest
+INFO: STARTING TEST : methodExpressionMatchingExactPreferredTest()
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT logFinishTest
+INFO: FINISHED TEST : methodExpressionMatchingExactPreferredTest()
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT cleanup
+INFO: Cleanup method called
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT logStartTest
+INFO: STARTING TEST : methodExpressionMatchingVarArgsTest()
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT logFinishTest
+INFO: FINISHED TEST : methodExpressionMatchingVarArgsTest()
+Nov 27, 2026 12:56:30 AM com.sun.ts.tests.el.api.jakarta_el.methodexpression.ELClientIT cleanup
+INFO: Cleanup method called
+]]></system-err>
+</testsuite>
